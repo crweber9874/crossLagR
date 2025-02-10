@@ -1,5 +1,8 @@
-#' @title ctModel_1unit
-#' @description Create a continuous time model and generate a one unit discrete time prediction for auto and cross effects.  The function returns the auto and cross effects translated to a discrete time model, and a change of t, dt = 1. These are the AR AND CL parameters in the CLPM.
+#' @title estimateCTSEM
+#' @description Create a continuous time model and generate a one unit discrete time
+#' prediction for auto and cross effects.
+#' The function returns the auto and cross effects translated to a discrete time model,
+#' and a change of t, dt = 1. These are the AR AND CL parameters in the CLPM.
 #'
 #' #'
 #' @param data Must be a long format data frame.
@@ -8,7 +11,7 @@
 #' @importFrom tidyr pivot_longer
 #' @importFrom readr parse_number
 #'
-#' @return A flattened auto and cross effect matrix.
+#' @return A list; returns model and drift matrix
 #' #'
 #' @examples
 
@@ -17,7 +20,7 @@
 #'
 #'
 
-ctModel_1unit <- function(data = dat_long,
+estimateCTSEM <- function(data = dat_long,
                           id = "id",
                           manifest.var.names = c("x", "y"),
                           latent.var.names = c("x", "y"),
@@ -47,5 +50,5 @@ ctModel_1unit <- function(data = dat_long,
     t() %>%
     as.data.frame() -> drift
   names(drift) <- c("xx", "xy", "yx", "yy")
-  return(drift)
+  return(list(parms = fit, drift = drift))
 }

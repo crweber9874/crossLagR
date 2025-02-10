@@ -1,0 +1,113 @@
+---
+title: "The Cross Lagged Panel Model"
+author: "Chris Weber"
+date: "2025-01-21"
+output: pdf_document
+---
+
+It is difficult to tease out causal mechanisms with cross-sectional observational data, panel and cross sectional. Causal relationships require careful theorizing about the data generating process. Data, particularly when observational, and statistical procedures do not guarantee that researcher will identify a causal mechanism.
+
+Notwithstanding, one model – the Cross Lagged Panel Model – has emerged as a statistical model that can tease apart causal relationships in panel data. In this paper, we will show that this reasoning is generally problematic, and ruling out spurious factors that generate a lagged correlation between variables is difficult to do with 1) observational data, and 2) little reasoning about confounded relationships.
+
+The CLPM is a variant of the **Autoregressive Distributed Lag** (ADL) model used in econometrics, and the causal mechanism identified in these class of models isn't **causal** in the strict sense of relying on **counterfactuals** or graphical representations of the relationship between variables. Instead, the type of causality explored in these models is referred to as **Granger Causality.** Granger causality simply refers to the predictive power of a lagged variable and its ability to predict contemporary values of another variable. It simply means that if $x$ measured at time $t-1$ predicts $y$ at time $t$, then $x$ Granger causes $y$.
+
+Bearing this in mind, the Cross Lagged Panel Model (CLPM) can be written as a one-level (ADL) model with cross-lagged effects.
+
+\[
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{t-1}  
+\end{bmatrix}
+-   
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+\]
+
+The diagonal elements in the $\theta$ matrix represent the autoregressive parameters; the off-diagonal elements are the cross-lagged parameters.
+
+There are different variations to this general model, often to accommodate important characteristics in one's data. For instance, it is important to consider state versus trait variation in the data generating process. The **Random Intercept Cross Lagged** model follows the form, but includes a time invariant "trait" level parameter to account for subject characteristics that reverts back to an equilibrium level. The autoregressive and cross lagged parameters correspond to time varying "state" effects, the expected change in $y_t$ or $x_t$ from each perturbation in $y_{t-1}$ or $x_{t-1}$, after accounting for the trait level effect, $\mu_i$ (Schuurman, Ferrer, Boer-Sonneschein, and Hamaker 2016).
+
+\[
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{t-1}  
+\end{bmatrix}
++
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
+}_{Trait}
+\]
+
+\begin{align*}
+e_{y,it} &\sim N(0, \sigma^2_y) \\
+e_{x,it} &\sim N(0, \sigma^2_x) \\
+\mu_{y,i} &\sim N(\bar{\mu}_y, \sigma^2_{\mu_y}) \\
+\mu_{x,i} &\sim N(\bar{\mu}_x, \sigma^2_{\mu_x})
+\end{align*}
+
+Or with correlated effects:
+
+\[
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+\sim MVN
+\begin{bmatrix}
+0,
+\begin{bmatrix}
+\sigma^2_{e_y} & \sigma^2_{e_y, e_x} \\
+\sigma^2_{e_y, e_x} & \sigma^2_{e_x}  
+\end{bmatrix}
+\end{bmatrix}
+\]
+
+\[
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
+\sim MVN
+\begin{bmatrix}
+\begin{bmatrix}
+\bar{\mu}_y \\
+\bar{\mu}_x
+\end{bmatrix},
+\begin{bmatrix}
+\sigma^2_{\mu_y} & \sigma^2_{\mu_y, \mu_x} \\
+\sigma^2_{\mu_y, \mu_x} & \sigma^2_{\mu_x}  
+\end{bmatrix}
+\end{bmatrix}
+\]
+
+The model follows a hierarchical structure, whereby the unit of analysis is the observation at time $t$ nested within person $i$. The autoregressive and cross-lagged parameters are estimated, alongside a stable, trait level parameter $\mu_i$. The model can be estimated using Maximum Likelihood or a Bayesian framework, wherein for the latter one can specify non-informative (or perhaps informative) priors and hierarchical priors on the model parameters.
+
+The package for this project, `crossLagR`, includes a function to simulate data from the Random Intercept Cross Lagged Panel Model. There's an additional function to pivot the data to long format, with lags for each variable, and within person effects.

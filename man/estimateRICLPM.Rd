@@ -20,11 +20,10 @@ Generates model syntax for Random Intercept Cross-Lagged Panel Model (RICLPM)
 This function generates the model syntax for a Random Intercept Cross-Lagged Panel Model (RICLPM)
 with a specified number of waves. The model includes latent variables for each wave, stability paths,
 and covariances between the latent variables.
-
-# Generate model syntax for a RICLPM with 5 waves
 }
 \examples{
-2+1
-model_syntax = estimateRICLPM(waves = 5)
-cat(model_syntax)
+# Not Run
+# Generate model syntax for a RICLPM with 5 waves
+#  model_syntax = estimateRICLPM(waves = 5)
+#  cat(model_syntax)
 }

@@ -1,4 +1,4 @@
-#' @title simulate_riclpm
+#' @title simRICLPM
 #' @description Simulate data from an observed, random intercept cross-lagged regression (RI-CLR) model
 #' In particular, this creates a synthetic dataset of a cross-lagged model with a specified number of waves and structural parameters.
 #'
@@ -20,7 +20,7 @@
 #'
 #'
 
-simulate_riclpm <- function(waves = 10,
+simRICLPM <- function(waves = 10,
                             stability.p = 0.2,
                             stability.q = 0.2,
                             cross.p = 0.1,
@@ -94,7 +94,8 @@ simulate_riclpm <- function(waves = 10,
         )
 
 
-        dat <- lavaan::simulateData(model = model_string, int.ov.free = FALSE)
+        dat <- lavaan::simulateData(model = model_string,
+                                    int.ov.free = FALSE)
 
         return(list(model = model_string, data = dat))
 }
