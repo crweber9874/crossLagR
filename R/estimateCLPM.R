@@ -13,7 +13,6 @@
 #' # Generate model syntax for a RICLPM with 5 waves
 #'
 #' @examples
-#' 2+1
 #' model_syntax = estimateRICLPM(waves = 5)
 #' cat(model_syntax)
 
