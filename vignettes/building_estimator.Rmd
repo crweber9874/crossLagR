@@ -1,5 +1,5 @@
 ---
-title: "Building a Within/Between Estimator"
+title: "The Cross Lagged Panel Model"
 author: "Chris Weber"
 date: "2025-01-21"
 output: html_document
