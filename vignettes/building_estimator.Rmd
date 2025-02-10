@@ -1,0 +1,413 @@
+---
+title: "Building a Within/Between Estimator"
+author: "Chris Weber"
+date: "2025-01-21"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+It is difficult to tease out causal mechanisms with cross-sectional observational data, panel and cross sectional. Causal relationships require careful theorizing about the data generating process. Data, particularly when observational, and statistical procedures do not guarantee that researcher will identify a causal mechanism.
+
+Notwithstanding, one model – the Cross Lagged Panel Model – has emerged as a statistical model that can tease apart causal relationships in panel data. In this paper, we will show that this reasoning is generally problematic, and ruling out spurious factors that generate a lagged correlation between variables is difficult to do with 1) observational data, and 2) little reasoning about confounded relationships.
+
+The CLPM is a variant of the **Autoregressive Distributed Lag** (ADL) model used in econometrics, and the causal mechanism identified in these class of models isn't **causal** in the strict sense of relying on **counterfactuals** or graphical representations of the relationship between variables. Instead, the type of causality explored in these models is referred to as **Granger Causality.** Granger causality simply refers to the predictive power of a lagged variable and its ability to predict contemporary values of another variable. It simply means that if $x$ measured at time $t-1$ predicts $y$ at time $t$, then $x$ Granger causes $y$.
+
+Bearing this in mind, the Cross Lagged Panel Model (CLPM) can be written as a one-level (ADL) model with cross-lagged effects.
+
+$$\begin{bmatrix}
+ y_{it}\\
+ x_{it}\\
+\end{bmatrix}
+
+=
+
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  \\
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} , x_{t-1}  \\
+\end{bmatrix}
+
+-   
+
+    \begin{bmatrix}
+       e_{y,it}\\
+       e_{x,it}\\
+       \end{bmatrix}
+
+  $$
+
+The diagonal elements in the $\theta$ matrix represent the autoregressive parameters; the off-diagonal elements are the cross-lagged parameters.
+
+There are different variations to this general model, often to accomodate important characteristics in one's data. For instance, it is important to consider state versus trait variation in the data generating process.The **Random Intercept Cross Lagged** model follows the form, but includes a time invariant "trait" level parameter to account for subject characteristics that reverts back to a an equilibrium level. The autoregressive and cross lagged parameters correspond to time varying "state" effects, the expected change in $y_t$ or $x_t$ from each perturbation in $y_{t-1}$ or $x_{t-1}$, after accounting for the trait level effect, $\mu_i$ (Schuurman, Ferrer, Boer-Sonneschein, and Hamaker 2016)
+
+$$
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}\\
+\end{bmatrix}
+
+=
+
+\underbrace{\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  \\
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} , x_{t-1}  \\
+\end{bmatrix}
+
++
+    \begin{bmatrix}
+       e_{y,it}\\
+       e_{x,it}\\
+       \end{bmatrix}
+}\_{State}
+
+-   \underbrace{\begin{bmatrix}
+       \mu_{y,i}\\
+       \mu_{x,i}\\
+       \end{bmatrix}}*{Trait}\\ e*{y,it} \sim N(0, \sigma^2_y)\\ e\_{x,it} \sim N(0, \sigma^2_x)\\ \mu_{y,i} \sim N(\bar{\mu*x},* \sigma^2{\mu*y})\\ \mu{x,i} \sim N(\bar{\mu*x},* \sigma^2{\mu\_x})$$
+
+Or with correlated effects
+
+$$
+
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}\\
+\end{bmatrix}
+
+\sim MVN
+
+\begin{bmatrix}
+
+0 ,
+\begin{bmatrix}
+\sigma^2_{e_y} &  \\
+\sigma^2_{e_y, e_x} & \sigma^2_{e_x}  \\
+\end{bmatrix}
+\end{bmatrix}
+
+\\
+
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}\\
+\end{bmatrix}
+
+\sim MVN
+
+\begin{bmatrix}
+\begin{bmatrix}
+\bar{\mu}_y \\
+\bar{\mu}_x
+\end{bmatrix},
+\begin{bmatrix}
+\sigma^2_{\mu_y} &  \\
+\sigma^2_{\mu_y,\mu_x} & \sigma^2_{\mu_x}  \\
+\end{bmatrix}
+\end{bmatrix}
+
+$$
+
+The model follows a hierarchical structure, whereby the unit of analysis is the observation at time $t$ nested within person $i$. The autoregressive and cross-lagged parameters are estimated, alongside a stable, trait level parameter $\mu_i$. The model can be estimated using Maximum Likelihood or a Bayesian framework, wherein for the latter one can specify non-informative (or perhaps informative) priors and hierarchical priors on the model parameters.
+
+The package for this project, $\texttt{crossLag}$ includes a function to simulate data from the Random Intercept Cross Lagged Panel Model. There's an additional function to pivot the data to long format, with lags for each variable, and within person effects.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+library(dplyr)
+library(brms)
+
+df = simulate_riclpm(waves = 5,
+                variance.p = 0.5,
+                variance.q = 0.5,
+                stability.p = 0.20,
+                stability.q = 0.20,
+                cross.q = 0.30,
+                cross.p = 0.30,
+                cov.pq = 0.00,
+                variance.between.x = 0.5,
+                variance.between.y = 0.5,
+                cov.between = 0,
+                sample.nobs = 10e2)
+df[[2]] %>%
+  mutate(id = seq(1:nrow(df[[2]])))  -> dat
+dat %>%
+  reshape_long_sim_cr() -> dat_long
+head(dat_long)
+```
+
+This model corresponds to the random intercept SEM in lavaan and the analogous model in $\texttt{brms}$
+
+```{r}
+library(lavaan)
+library(crossLag)
+fit1 <- lavaan(model_syntax_clpm(waves = 5),
+              data = dat,
+              int.ov.free = TRUE, # Fix intercepts to zero
+              estimator="ml") # Lavaan 
+
+summary(fit1)
+```
+
+
+
+```{r}
+
+yeqn = bf(y ~ xlag + ylag + (1 + ylag + xlag|p|id))
+xeqn = bf(x ~ xlag + ylag + (1 + ylag + xlag|p|id))
+
+fit2 = brm(yeqn + xeqn + set_rescor(FALSE),
+           data = dat_long,
+           family = gaussian(),
+           cores = 10,
+           chains = 3,
+           iter = 5000,
+           ) 
+summary(fit2)
+
+```
+
+
+The "within effects" model treats unit level effects by subtracting out the $i$ mean, averaged across $t$ waves from all $x_{i,t}$. These models should be the same.
+
+
+$$y_{i,t}=\beta_0+\beta_1 x_{i,t}+\sum_j^{J-1} \gamma_{j} d_i+ e_{i,t}$$
+
+
+$$(y_{t,i}-\bar{y}_i)=\beta_{0}+\beta_1 (x_{t,i}-\bar{x}_i)+ e_{t,i}$$
+
+```{r}
+
+
+
+This model removes any stable unit effect of $x$ on $y$. It's called the "within person" estimator, because it only estimates the "residual effects" of $x$ on $y$ after removing any unit level effects.
+
+
+We can use $\texttt{model_syntax_clpm()}$ to specify a random intercept cross-lagged panel model. This function is a wrapper for the $\texttt{lavaan}$ package. It just generates the code.
+
+```{r}
+model_syntax_clpm(waves = 4) %>% cat()
+```
+
+```{r}
+library(lavaan)
+fit1 <- lavaan(model_syntax_clpm(waves = 4),
+              data = dat,
+              int.ov.free = FALSE, # Fix intercepts to zero
+              estimator="ml")
+
+yeqn = bf(y ~ xlag + ylag + (1 +xlag + ylag |p|id))
+xeqn = bf(x ~ xlag + ylag + (1 +xlag + ylag |q|id))
+
+fit2 = brm(yeqn + xeqn + set_rescor(TRUE),
+           data = dat_long,
+           family = gaussian(),
+           cores = 10,
+           chains = 1
+           )
+
+```
+
+```{r}
+crossLag::simulate_riclpm(
+                                                        waves = 10,
+                                                        variance.p = 1,
+                                                        variance.q = 1,
+                                                        stability.p = 0.20,
+                                                        stability.q = 0.20,
+                                                        cross.q = 0.20,
+                                                        cross.p = 0.20,
+                                                        cov.pq = 0.00,
+                                                        variance.between.x = 1,
+                                                        variance.between.y = 1,
+                                                        cov.between = 0,
+                                                        sample.nobs = 100
+                                                      )[[2]]  %>%
+                                                        mutate(id = seq(1:nrow(df[[2]]))) %>%
+                                                        crossLag::reshape_long_sim_cr() %>%
+                                        dplyr::select(id, wave, x, y)   ->  dat_long
+                                        # ensure appropriate column names
+                                        names(dat_long) <- c("id", "time", "x", "y")
+
+ctModel_1unit(data = dat_long)
+```
+
+The model produces the results we expect. It's useful to estimate this as a Bayesian model, particularly as this grows more complex because we can put stronger priors on some of the parameters.
+
+```{r}
+library(blavaan)
+fit = blavaan(model_syntax_clpm(waves = 3),
+              data = dat,
+              int.ov.free = FALSE, # Fix intercepts to zero
+              n.chains = 3,
+              sample = 3000,
+              target = "stan",
+              seed = 123)
+
+```
+
+```{r}
+df = simulate_riclpm(waves = 3,
+                variance.p = 1,
+                variance.q = 1,
+                stability.p = 0.40,
+                stability.q = 0.40,
+                cross.q = 0.50,
+                cross.p = 0.50,
+                cov.pq = 0.00,
+                variance.between.x = 0.5,
+                variance.between.y = 0.5,
+                cov.between = 0,
+                n.obs = 10000)
+
+df[[2]] %>%
+  mutate(id = seq(1:nrow(df[[2]])))  -> dat
+
+```
+
+This is called a `random intercept model.'' In particular it's called the analysis of variance. It's really no different from the ANOVA formulation you've already learned. Here, just envision units nested within treatment conditions.This just separates the variation into between and within units -- i.e., between and within conditions. We might also write this in a single`reduced form'' equation.
+
+\begin{eqnarray}
+y_{i}=\omega_0+e_{1,i}+e_{2,j}\\
+\end{eqnarray}
+
+In other words, the variation in $y$ is a function of between and within variation, such that:
+
+$$var(y_{j})=var(e_{1,j})+var(e_{2,j})$$, or just
+
+$$\sigma^2_{(y_{j})}=\sigma^2_{i}+\sigma^2_{{j}}$$
+
+Do you now see the similarity to ANOVA, where $SS_T=SS_B+SS_W$? Let's then extend this model, where intercepts vary across level two units \emph{and} we have predictors that predict both levels.
+
+\begin{eqnarray}
+y_{i}=b_{0,j}+b_{1} x_{i}+e_{1,i}\\
+b_{0,j}=\omega_0+\omega_1 x_{j}+e_{2,j}\\
+e_{1,j} \sim N(0, \sigma_1^2)\\
+e_{2,j} \sim N(0, \sigma_2^2)
+\end{eqnarray}
+
+$x_{j[i]}$ consist of variables that vary within $J$ level two observations; $x_{j}$ consists of variables that only vary between level two observations. We might manaully construct these `between'' and`within'' variables. For instance, we could include,
+
+$$x_{within}=x_{j}-\bar{x}_{j}$$
+
+$$x_{between}=\bar{x}_{j}$$
+
+These variables are orthogonal and they capture something different -- the variation between $j$ levels and the variation within $j$ levels. Then,
+
+\begin{eqnarray}
+y_{j[i]}=b_{0,j}+b_{1} x_{within}+e_{1,i}\\
+b_{0,j}=\omega_0+\omega_1 x_{between}+e_{2,j}\\
+e_{1,j} \sim N(0, \sigma_1^2)\\
+e_{2,j} \sim N(0, \sigma_2^2)
+\end{eqnarray}
+
+These are all \`\`random intercept'' models, because only the intercept parameter is modeled to vary across $j$ levels. It is conceivable the model is even more complex, such that the level-1 parameter(s) may also vary across level 2 units.
+
+We could write the model to capture covariate heterogeneity, as:
+
+\begin{eqnarray}
+y_{i}=b_{0,j}+b_{1,j}x_{i}+e_{1}\\
+b_{0,j}=\omega_0+e_{2,j}\\
+b_{1,j}=\omega_1+e_{3,j}
+\end{eqnarray}
+
+This is the random coefficient model. These models follow a very similar logic to the within subjects ANOVA, which assumes that we can decompose variance into subject specific variance, in much the same way as is done above to remove a correlation between error terms. However, now we have three error terms,
+
+\begin{eqnarray}
+y_{i}=\omega_0+e_{2,j}+(\omega_1+e_{3,j})x_{i}+e_{1,i}\\
+\end{eqnarray}
+
+Two of these error terms correspond to the level-2 equations, one for the level-1 equation. The errors capture heterogeneity in $y$ after conditioning on $x$ (the intercept), heterogeneity in $b$ (the slope) \emph{and} unit level heterogeneity. This is called the `random slope/random intercept'' or just`random slope model''
+
+It rarely makes much sense to just include a random slope and a fixed intercept. The reason is that if we intuitively anticipate variation in the covariance between $x$ and $y$ why would we not anticipate heterogeneity in $y$? Thus, it is almost always the case that if you see a random coefficient or random slope model, you also will see the researcher allowing the intercept to also vary.
+
+There is an added level of complexity to the random coefficient model. Because we are estimating two level-2 errors, we should also consider the covariance between the errors. That is,
+
+$$cov(e_{2,j}, e_{3,j}) \neq 0$$
+
+If we fail to model this covariance, and make the strong assumption that the covariance is zero, we are positing that as the slope changes the intercept does not change. Let's examine some reasons as to why this is simply unrealistic.
+
+Thus, unlike the random intercept model, the random coefficients model should also model the covariance between the errors. We could extend the model further to include covariates.
+
+\begin{eqnarray}
+y_{i}=b_{0,j}+b_{1,j}x_{i}+e_{1,i}\\
+b_{0,j}=\omega_0+\omega_1 x_{j} +e_{2,j}\\
+b_{1,j}=\phi_0+\phi_1 x_{j}+e_{3,j}\\
+\end{eqnarray}
+
+These coefficients will capture the extent to which covariates change the $j$th value of $y$ (the intercept equation) and how covariates change the relationship between $x$ and $y$ (the slope equation). Condensed into a single equation.
+
+\begin{eqnarray}
+y_{i}=\omega_0+\omega_1 x_{j} +e_{2,j}+(\phi_0+\phi_1 x_{j[i]}+e_{3,j})x_{i}+e_{1,i}\\
+\end{eqnarray}
+
+It's important to dissect what each of these terms imply.
+
+\noindent $\bullet$ $\omega_0$ represents the average value of $y$ conditional on $x$, across level 2 units. It is the average intercept.
+
+\noindent $\bullet$ Level-2 units vary across around this mean value, $\omega$ according to $\e_{2,j}$.
+
+\noindent $\bullet$ $\omega_1 x_{j}$ represents how the $j$ level response on $x$ influences the outcome. Think of this as the between cluster effect on $y$.
+
+\noindent $\bullet$ $\phi_0 x_{i}$ represents the relationship between the $i$th nested in $j$th unit on the outcome. This represents the within cluster effect.
+
+\noindent $\bullet$ $\phi_1 x_{i} x_{j}$ represents the cross-level interaction between the within and the between effect. This is a natural outcome of including an equation for the slope. Not only are we capturing hetereogeneity in the coefficients effect on y, we are also modeling whether heterogeneity is caused by some covariate -- which can be stated another way: how does the within cluster effect change at levels of a between cluster covariate.
+
+\noindent $\bullet$ $e_{3,j}$ represents the unobserved heterogeneity in the slope of $b_1$.
+
+\noindent $\bullet$ $e_{1}$ represents the variation in $y$ for each $i$ observation nested in $j$.
+
+\\section\*{A Continuum}
+
+There are a few ways to think of the random effects multilevel model. Gelman and Hill (2007) introduce a useful description. Think of two models anchoring the polls of a continuum. At one extreme is a \textbf{no pooling} model. This is the fixed effects model above, in which each level-2 unit has a unique mean value. At the other end of the continuum is the \textbf{no pooling}. This is the regression model with no level 2 estimated means. Instead, we assume the level-2 units completely pool around a common intercept (and perhaps slope). Formally, compare
+
+$$y_{j,i}=\beta_0+\sum_j^{J-1} \gamma_{j} d_j+ e_{j,i}$$
+
+to,
+
+$$y_{j,i}=\beta_0+ e_{j,i}$$
+
+Note that each $\gamma$ value allows us to predict a unique mean -- and there is no common pooling around a particular value. Instead, we assume each level-2 unit is quite different.
+
+In the second case, all level-2 values assume the same mean value $\beta_0$. This also seems incorrect, in that we assume no heterogeneity. There is a compromise between these two approaches, a \textbf{partial pooling} model; this is the random effects model. Let's see why.
+
+\begin{eqnarray}
+y_{j,i}=b_{0,j}+e_{1,i}\\
+\end{eqnarray}
+
+In this model, we shall estimate each $\b_0$ (for each level-2 unit), with the following formula (Gelman and Hill 2007)
+
+\begin{eqnarray}
+b_{0,j}={{y_j\times n_j/\sigma^2_y+y_{all}\times 1/\sigma^2_{b_0}}\over{n_j/\sigma^2_y+ 1/\sigma^2_{b_0}}}\end{eqnarray}
+
+This is why this estimate is a compromise: The first part of the numerator represents the movement away from a common mean. Note that as $n_j$ increases (the group size), the estimate is pulled further from the common mean (which of course is what's on the right in the numerator).
+
+It's worth parsing this a bit further. Note the following characteristics:
+
+\noindent $\bullet$ As $n_j$ increases, the estimate of the estimated mean is influenced more by the group than a common mean. As $n_j$ decreases -- so small groups -- the formula now allows for a stronger likelihood that the estimates pools around a single value.
+
+\noindent $\bullet$ As the within group variance increases, the group mean is pullled towards the pooled mean. This also makes sense -- we should be more confident in the group mean if there isn't much within group variation. The reason the denominator is here is to standardized the value of the group mean.
+
+\noindent $\bullet$ As the between group variance increases, the common mean exerts a smaller impact. This is because the large the variation between groups, the less likely it is that all level-2 means pool around a common mean. This again should make sense -- we should be more confident in the common pooled mean if there isn't much between group variation. The reason the denominator is here is to standardized the value of the common mean.
+
+\noindent $\bullet$ The values in the numerator are then weighted by the variation between and within level-2 units.
+
+Another useful statistic is an indicator of how much the total variance is a function of the level-2 variance, or the level-1 variance. This is called the \textbf{intra-class correlation.}
+
+$$ICC=\sigma^2_{b_0}/[\sigma^2_{b_0}+\sigma^2_{y}]$$
+
+Recall,
+
+$$\sigma^2_{all}=\sigma^2_{b_0}+\sigma^2_{y}$$
+
+Thus, the estimate is an estimate of how much of the total variation in $y$ is a function of variation between level-2 units, relative to within level-1 units. Note the similarities here to ANOVA and how we estimate the proportion of variance explained by the treatment (or $R^2$), for instance.
+
+\\section\*{Summary}
+
+I've started this lecture from a more theoretical level, in order to demonstrate the general flexibility of this modeling approach. It's always worthwhile to sit down and write out exactly what you would like to estimate, before actually estimating a multilevel model. This is why I've introduced so many variations of the same thing. As I've suggested, the multilevel model is useful in the following circumstances: (1) our data are hierarchically structured, (2) we wish to model relations at multiple levels, (3) we are concerned about correlated errors, due to \`\`clustering'' in either time or space, and (4) we anticipate heterogeneity in covariate and/or treatment effects.

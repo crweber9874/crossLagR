@@ -1,0 +1,175 @@
+---
+title: "Simulation and the crossLag Package"
+author: "Christopher Weber"
+date: "`r Sys.Date()`"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Simulation and the crossLag Package}
+  %\VignetteEngine{knitr::rmarkdown}
+  %\VignetteEncoding{UTF-8}
+---
+
+## The Cross Lagged Panel Model (CLPM)
+
+It is difficult to tease out causal mechanisms with cross-sectional observational data, panel and cross sectional. Causal relationships require careful theorizing about the data generating process. Data, particularly when observational, and statistical procedures do not guarantee that researcher will identify a causal mechanism.
+
+```{r setup, include = FALSE}
+suppressMessages(library(dplyr))
+suppressMessages(library(haven))
+suppressMessages(library(dagitty))
+suppressMessages(library(ggdag))
+suppressMessages(library(ggplot2))
+suppressMessages(library(ggridges))
+suppressMessages(library(gganimate))
+suppressMessages(library(crossLag))
+```
+
+The CLPM is common in many social science applications, particularly in longitudinal, observational research designs.
+
+The design is straightforward. Does $X \rightarrow Y$, or does $Y \rightarrow X$? It's also a common design in practice (Federico and Gole De Zavala 2023; Craemer 2008; Claasen 2008; Hatemi, Crabtree and Smith 2019; Hetherington and Globeti 2002; Luttig 2021, Klandermans 2004; Lupu 2015; Goren and Chapp 2017; Layman and Carsey 2002; Putz 2002; Tilley, Neundor and Hobolt 2018; Sibley and Duckitt 2010, among many others)
+
+## Political Psychology Examples
+
+<div style="font-size: 0.7em;">
+
+| Reference | Description |
+|---------------------------------|---------------------------------------|
+| Bakker, Lelkes and Malka (2021) | Politics and personality reciprocal effects |
+| Brandt, Wetherell, and Henry (2015) | Income/SES predicts trust |
+| Claibourn and Martin (2000) | Joining groups increases interpersonal trust |
+| Campbell, Layman, Green and Sumaktoyo (2018) | Religion is endogenous to party |
+| Carsey and Layman (2006) | Party attachment and ideology |
+| Claasen (2008) | Party identification and campaign participation |
+| Federico and Gole De Zavala (2023) | Collective narcissism and nationalism |
+| Goren and Chapp (2017) | Culture war attitudes predict religion and partisan affiliation |
+| Hetherington and Globetti (2002) | Trust predicts preferences for spending (among Whites) |
+| Luttig (2021) | Authoritarianism is endogenous to party |
+| Sibley and Duckitt (2010) | SDO, RWA |
+
+</div>
+
+
+Yet, it is not uncommon for researchers to use statistical techniques to identify causal mechanisms, occasionally with very little theorizing about the data generating process. One such statistical technique is the cross-lagged panel model (CLPM). The CLPM is a variant of the Autoregressive Distributed Lag model used in econometrics, and the identified causal mechanism is a particular type of causality, Granger Causality. The reasoning is simple. The notion is that if one measures $x$ at time $t-1$ and $t$, and $y$ at time $t-1$ and $t$, then one estimates a model that predicts $y_{t}$ from $x_{t-1}$ and $y_{t-1}$, and an additional model where $x_{t}$ is predicted from $y_{t-1}$ and $x_{t-1}$. The temporal ordering of the data is then used to identify causal relationships. Although one may not be able to manipulate $x$ and $t$ -- to rule out spurious relationships -- if $x$ measured in the past predicts $y$ in the present, but $y$ measured in the past doesn't predict $x$ in the present, one can be reasonably certain that the causal ordering is such that $x$ affects $y$ and $y$ does not affect $x$. Graphically, the model can be represented as a Directed Acyclic Graph (DAG, Pearl 2001).
+
+```{r, fig.width=6, fig.height=4, out.width="40%"}
+library(dagitty)
+library(ggdag)
+library(ggplot2)
+options(repr.plot.width = 2, repr.plot.height = 2)  # Set smaller plot size
+g <- dagitty("dag {
+    X1 -> Y2 
+    Y1 -> Y2
+    X1 -> X2 
+    Y1 -> X2
+
+}")
+coordinates(g) <- list(
+    x=c(U1=0.5, Y1=1,X1=1,Y2=2,X2=2, U2=3),
+    y=c(U1=1.5, Y1=1,X1=2,Y2=1,X2=2, U2=2.5) )
+ggdag(g, text = TRUE) + theme_dag() + ggtitle("Figure 1: The Cross-Lagged Regression (CLR) Model") 
+```
+
+The CLPM is a variant of the Autoregressive Distributed Lag model used in econometrics, and the causal mechanism identified is often referred to as Granger Causality. Granger causality is a concept that means that if $x$ measured at time $t-1$ predicts $y$ at time $t$, then $x$ Granger causes $y$. The CLPM can be written as
+
+
+$$y_{t, i}=a_0 + a_1 y_{t-1, i} + a_2 x_{t-1, i} + e_{1,i} 
+
+    x_{t, i}=b_0 + b_1 y_{t-1, i} + b_2 x_{t-1, i} + e_{2,i}
+$$
+
+
+The conclusions from the CLPM attempts to leverage the temporal order in which variables are observed. If one were to estimate these two equations using traditional regression techniques, a large $a_2$ coefficient represents a causal relationship from $x_1\rightarrow y_2$; whereas a large $b_2$ coefficient translates to reversed effect, i.e., $y_1 \rightarrow x_2$. If $a_2$ is large and $b_2$ is effectively zero, it is tempting to conclude that $x$ causes $y$ but $y$ does not cause $x$. In both cases, we include the lagged value of the dependent variable, $y_{t-1, i}$ and $x_{t-1, i}$, to control for the effect of the dependent variable; each unit serves as their own control, or baseline. Should $a_2$ or $b_2$ reach conventional levels of statistical significance, it is tempting to conclude that a causal effect has been identified. Economists refer to this as Granger Causality, which is a statistical test of whether the lagged value of the independent variable can predict the dependent variable after controlling for the lagged value of the dependent variable.
+
+While the reasoning is simple, rather strong assumptions about the data generating process must be made. There several issues that arise upon estimating this model. The first pertains to the empirical consequence of including a lagged realization of the independent variable in the regression model, rather than contemporaneous effects; the the second issue pertains to inclusion of a lagged dependent variable (Allison 1990); and the third revolves around the identification of causal effects, particularly when there are unobserved confounders and stable unit effects.
+
+## Political Psychology, Personality and Politics
+
+As an example, let'se focus here primarily on its applicability in political psychology, exploring the relationship between  **Personality and Politics** (Luttig 2021; Bakker, Lelkes, and Malke 2021). It's common to use the CLPM in these settings, or propose doing so. Weber and Federico (2007) note,
+
+## Complicated Effects
+
+$$y_{t, i}=a_0 + a_1 y_{t-1, i} + a_2 x_{t-1, i} + e_{1,i} 
+
+    x_{t, i}=b_0 + b_1 y_{t-1, i} + b_2 x_{t-1, i} + e_{2,i}
+$$
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE, fig.width=10, fig.height=10}
+library(gganimate)
+# Define the nodes for the SEM with three waves (two rows and three columns)
+nodes <- data.frame(
+  node = 1:6,
+  label = c("X1", "Y1", "X2", "Y2", "X3", "Y3"),
+  x = c(1, 1, 2, 2, 3, 3),
+  y = c(2, 1, 2, 1, 2, 1)
+)
+
+# Define the edges for the SEM
+edges <- data.frame(
+  from = c(1, 1, 2, 2, 3, 3, 4, 4),
+  to =   c(3, 4, 3, 4, 5, 6, 5, 6)
+)
+
+# Function to offset the arrowheads
+offset_arrow <- function(x1, y1, x2, y2, offset = 0.10) {
+  angle <- atan2(y2 - y1, x2 - x1)
+  x1_new <- x1 + offset * cos(angle)
+  y1_new <- y1 + offset * sin(angle)
+  x2_new <- x2 - offset * cos(angle)
+  y2_new <- y2 - offset * sin(angle)
+  return(data.frame(x1 = x1_new, y1 = y1_new, x2 = x2_new, y2 = y2_new))
+}
+
+# Apply the offset to the edges
+edges_offset <- do.call(rbind, apply(edges, 1, function(row) {
+  offset_arrow(nodes$x[row["from"]], nodes$y[row["from"]],
+               nodes$x[row["to"]], nodes$y[row["to"]])
+}))
+
+# Define the paths for the balls through the SEM
+path1 <- c(1, 3, 5) # X1 to X2 to Y3
+path2 <- c(1, 3, 6) # X1 to X2 to X3
+path3 <- c(1, 4, 5) # X1 to X2 to Y3
+path4 <- c(1, 4, 6) # X1 to X2 to X3
+
+path5 <- c(2, 3, 5) # X1 to X2 to Y3
+path6 <- c(2, 3, 6) # X1 to X2 to X3
+path7 <- c(2, 4, 5) # X1 to X2 to Y3
+path8 <- c(2, 4, 6) # X1 to X2 to X3
+
+
+path_df1 <- data.frame(node = path1, time = 1:length(path1), ball = "Ball 1", color = "blue")
+path_df2 <- data.frame(node = path2, time = 1:length(path2), ball = "Ball 2", color = "blue")
+path_df3 <- data.frame(node = path3, time = 1:length(path3), ball = "Ball 3", color = "red")
+path_df4 <- data.frame(node = path4, time = 1:length(path4), ball = "Ball 4", color = "red")
+
+path_df5 <- data.frame(node = path5, time = 1:length(path5), ball = "Ball 5", color = "pink")
+path_df6 <- data.frame(node = path6, time = 1:length(path6), ball = "Ball 6", color = "pink")
+path_df7 <- data.frame(node = path7, time = 1:length(path7), ball = "Ball 7", color = "lightblue")
+path_df8 <- data.frame(node = path8, time = 1:length(path8), ball = "Ball 8", color = "lightblue")
+
+
+path_df <- rbind(path_df1, path_df2, path_df3, path_df4, path_df5, path_df6, path_df7, path_df8)
+path_df <- merge(path_df, nodes, by = "node")
+
+# Create a ggplot2 plot of the SEM
+p <- ggplot() +
+  geom_segment(data = edges_offset, aes(x = x1, y = y1, xend = x2, yend = y2),
+               arrow = arrow(length = unit(0.4, "cm")), size = 1, lineend = "round") +
+  geom_point(data = nodes, aes(x = x, y = y), size = 12, shape = 21, fill = "white", color = "darkblue", stroke = 1.5) +
+  geom_text(data = nodes, aes(x = x, y = y, label = label), vjust = 0.5, hjust = 0.5) +
+  geom_point(data = path_df, aes(x = x, y = y, frame = time, color = color), size = 15, alpha = 0.35) +
+  scale_color_manual(values = c("blue", "red", "pink", "lightblue")) +
+  theme_void() + # Remove all axes and background
+  theme(panel.background = element_rect(fill = "white", color = NA)) +
+  # no legend
+  theme(legend.position = "none")
+
+# Animate the balls moving through the SEM
+anim <- p + transition_time(time) + ease_aes('linear')
+anim
+```
+
+
+## Simulating Data using $\texttt{monteCarloCLPMRI}$
+
+Simulate five trials, of a three wave panel, with no cross lag effects, weak with person stability, and no confounding. The $\texttt{monteCarlo}$ function simulates data under several DGP models: The "clpm," the "ri-clpm," and the "dual-change" model. The simulation wrapper estimates an OLS with lagged independent and dependent variables.
