@@ -7,9 +7,11 @@ output: pdf_document
 
 The $\texttt{crossLagR}$ package includes several functions to simulate data.
 
-$\texttt{simRICLPM()}$ simulates data from a random intercept cross-lagged panel model. 
+$\texttt{simRICLPM()}$ simulates data from a random intercept cross-lagged panel model.
+
 $\texttt{simCLPM()}$ simulates data from a cross-lagged panel model. 
-$\texttt{reshape_long_sim_cr()}$ Takes a wide data frame, pivots to wide format, includes lags.
+
+$\texttt{reshape\_long\_sim\_cr()}$ Takes a wide data frame, pivots to wide format, includes lags.
 
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
@@ -35,7 +37,6 @@ dat %>%
 head(dat_long)
 ```
 
-
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
 library(crossLagR)
 df = simCLPM(waves = 5,
@@ -54,13 +55,9 @@ dat %>%
 head(dat_long)
 ```
 
-
 ## Models
 
-$\texttt{estCLPM()}$ Constructs the lavaan code to estimate a CLPM. 
-$\texttt{estRICLPM()}$ Constructs the lavaan code to estimate a RI-CLPM. 
-$\texttt{estCTSEM()}$ Estimates a continuous time structural equation model.
-$\texttt{estHLM()}$ Estimates an HLM.
+$\texttt{estCLPM()}$ Constructs the lavaan code to estimate a CLPM. $\texttt{estRICLPM()}$ Constructs the lavaan code to estimate a RI-CLPM. $\texttt{estCTSEM()}$ Estimates a continuous time structural equation model. $\texttt{estHLM()}$ Estimates the HLM.
 
 ### Cross-Lagged Panel Model
 
@@ -95,7 +92,7 @@ fit1 <- lavaan(estimateCLPM(waves = 5),
 summary(fit1)
 ```
 
-# Random Intercept Cross-Lagged Panel Model
+### Random Intercept Cross-Lagged Panel Model
 
 ```{r}
 library(crossLagR)
@@ -108,14 +105,16 @@ fit2 <- lavaan(estimateRICLPM(waves = 5),
 
 summary(fit2)
 ```
+
 The CLPM clearly does not fit the data well, and provides rather inaccurate estimates.
 
-# Hiearchical Linear Model, Random Intercepts and Slopes
+### Hiearchical Linear Model, Random Intercepts and Slopes
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 estimateHLM(data = dat_long, residual_correlation = FALSE)
 ```
-# Continous Time Model
+
+### Continuous Time Model
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
 dat_long %>%
@@ -128,5 +127,3 @@ model = estimateCTSEM(data = ct_sem_data)
 summary(model[[1]])$parmatrices
 print(model[[2]] %>% t())
 ```
-
-
