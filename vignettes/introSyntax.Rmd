@@ -1,0 +1,132 @@
+---
+title: "crossLagR: Simulation and Basic Model Syntax"
+author: "Chris Weber"
+date: "2025-02-13"
+output: pdf_document
+---
+
+The $\texttt{crossLagR}$ package includes several functions to simulate data.
+
+$\texttt{simRICLPM()}$ simulates data from a random intercept cross-lagged panel model. 
+$\texttt{simCLPM()}$ simulates data from a cross-lagged panel model. 
+$\texttt{reshape_long_sim_cr()}$ Takes a wide data frame, pivots to wide format, includes lags.
+
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+library(crossLagR)
+library(dplyr)
+
+df = simRICLPM(waves = 5,
+                variance.p = 0.5,
+                variance.q = 0.5,
+                stability.p = 0.20,
+                stability.q = 0.20,
+                cross.q = 0.30,
+                cross.p = 0.30,
+                cov.pq = 0.00,
+                variance.between.x = 0.5,
+                variance.between.y = 0.5,
+                cov.between = 0,
+                sample.nobs = 10e2)
+df[[2]] %>%
+  mutate(id = seq(1:nrow(df[[2]])))  -> dat
+dat %>%
+  reshape_long_sim_cr() -> dat_long
+head(dat_long)
+```
+
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE}
+library(crossLagR)
+df = simCLPM(waves = 5,
+                variance.p = 0.5,
+                variance.q = 0.5,
+                stability.p = 0.20,
+                stability.q = 0.20,
+                cross.q = 0.30,
+                cross.p = 0.30,
+                cov.pq = 0.00,
+                sample.nobs = 10e2)
+df[[2]] %>%
+  mutate(id = seq(1:nrow(df[[2]])))  -> dat
+dat %>%
+  reshape_long_sim_cr() -> dat_long
+head(dat_long)
+```
+
+
+## Models
+
+$\texttt{estCLPM()}$ Constructs the lavaan code to estimate a CLPM. 
+$\texttt{estRICLPM()}$ Constructs the lavaan code to estimate a RI-CLPM. 
+$\texttt{estCTSEM()}$ Estimates a continuous time structural equation model.
+$\texttt{estHLM()}$ Estimates an HLM.
+
+### Cross-Lagged Panel Model
+
+Let's fit several models under a random intercept cross lagged panel data generating process.
+
+```{r}
+library(crossLagR)
+library(lavaan)
+# Simulate Data Under RI CLPM
+df = simRICLPM(waves = 5,
+                variance.p = 0.5,
+                variance.q = 0.5,
+                stability.p = 0.20,
+                stability.q = 0.20,
+                cross.q = 0.30,
+                cross.p = 0.30,
+                cov.pq = 0.00,
+                variance.between.x = 0.5,
+                variance.between.y = 0.5,
+                cov.between = 0,
+                sample.nobs = 10e2)
+df[[2]] %>%
+  mutate(id = seq(1:nrow(df[[2]])))  -> dat
+dat %>%
+  reshape_long_sim_cr() -> dat_long
+
+fit1 <- lavaan(estimateCLPM(waves = 5),
+              data = dat,
+              int.ov.free = TRUE, # Fix intercepts to zero
+              estimator="ml")  
+
+summary(fit1)
+```
+
+# Random Intercept Cross-Lagged Panel Model
+
+```{r}
+library(crossLagR)
+library(lavaan)
+
+fit2 <- lavaan(estimateRICLPM(waves = 5),
+              data = dat,
+              int.ov.free = TRUE, # Fix intercepts to zero
+              estimator="ml")  
+
+summary(fit2)
+```
+The CLPM clearly does not fit the data well, and provides rather inaccurate estimates.
+
+# Hiearchical Linear Model, Random Intercepts and Slopes
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+estimateHLM(data = dat_long, residual_correlation = FALSE)
+```
+# Continous Time Model
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+dat_long %>%
+  select(id, wave, x, y) -> ct_sem_data
+# ctsem package Follows this convention:
+names(ct_sem_data) = c("id", "time", "x", "y")
+model = estimateCTSEM(data = ct_sem_data)
+# [1] Returns a list; Extract cstem model
+# [2] Return a discrete time CL and AR model
+summary(model[[1]])$parmatrices
+print(model[[2]] %>% t())
+```
+
+
