@@ -111,7 +111,8 @@ The CLPM clearly does not fit the data well, and provides rather inaccurate esti
 ### Hiearchical Linear Model, Random Intercepts and Slopes
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
-estimateHLM(data = dat_long, residual_correlation = FALSE)
+model = estimateHLM(data = dat_long, residual_correlation = FALSE)
+summary(model)
 ```
 
 ### Continuous Time Model
