@@ -16,7 +16,6 @@ output:
 ---
 
 
-
 ## The Cross Lagged Panel Model
 
 The CLPM is common in many social science applications, particularly in longitudinal, observational research designs. The design is straightforward, motivated by the difficulty in figuring out whether $X \rightarrow Y$, $Y \rightarrow X$. In political science, there are many examples (Federico and Gole De Zavala 2023; Craemer 2008; Claasen 2008; Hatemi, Crabtree and Smith 2019; Hetherington and Globeti 2002; Luttig 2021, Klandermans 2004; Lupu 2015; Goren and Chapp 2017; Layman and Carsey 2002; Putz 2002; Tilley, Neundor and Hobolt 2018; Sibley and Duckitt 2010, among many others), and among these examples many stem from political psychology. For instance.

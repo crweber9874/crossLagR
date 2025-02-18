@@ -11,7 +11,7 @@ Notwithstanding, one model – the Cross Lagged Panel Model – has emerged as a
 
 The CLPM is a variant of the **Autoregressive Distributed Lag** (ADL) model used in econometrics, and the causal mechanism identified in these class of models isn't **causal** in the strict sense of relying on **counterfactuals** or graphical representations of the relationship between variables. Instead, the type of causality explored in these models is referred to as **Granger Causality.** Granger causality simply refers to the predictive power of a lagged variable and its ability to predict contemporary values of another variable. It simply means that if $x$ measured at time $t-1$ predicts $y$ at time $t$, then $x$ Granger causes $y$.
 
-Bearing this in mind, the Cross Lagged Panel Model (CLPM) can be written as a one-level (ADL) model with cross-lagged effects.
+The Cross Lagged Panel Model (CLPM) can be written as a one-level (ADL) model with cross-lagged effects.
 
 \[
 \begin{bmatrix}
