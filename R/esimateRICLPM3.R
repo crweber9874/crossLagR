@@ -99,13 +99,13 @@ estimateRICLPM3 <- function(data, time_varying_x, time_varying_y, time_varying_z
 
   return(model_string)
 }
-lavaan:::lavaan(
-  estimateRICLPM3(
-    data = simRICLPM3(waves = 5)$data,
-    time_varying_x = c("x1", "x2", "x3", "x4", "x5"),
-    time_varying_y = c("y1", "y2", "y3", "y4", "y5"),
-    time_varying_z = c("z1", "z2", "z3", "z4", "z5"),
-    waves = 5
-  ),
-  data = simRICLPM3(waves = 5)$data
-) %>% summary()
+# lavaan:::lavaan(
+#   estimateRICLPM3(
+#     data = simRICLPM3(waves = 5)$data,
+#     time_varying_x = c("x1", "x2", "x3", "x4", "x5"),
+#     time_varying_y = c("y1", "y2", "y3", "y4", "y5"),
+#     time_varying_z = c("z1", "z2", "z3", "z4", "z5"),
+#     waves = 5
+#   ),
+#   data = simRICLPM3(waves = 5)$data
+# ) %>% summary()

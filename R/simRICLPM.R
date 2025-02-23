@@ -30,7 +30,7 @@ simRICLPM <- function(waves = 10,
                             cov.pq = 0.1,
                             variance.between.x = 1, # random intercepts, x
                             variance.between.y = 1, # random intercepts, y
-                            cov.between = 0.5, # covariance of intercept terms
+                            cov.between = 0.5, # covariance of intercept terms,
                             ...) {
         model_string <- ""
         model_string <- paste0(model_string, "\n BX =~  1* x1")
@@ -95,7 +95,7 @@ simRICLPM <- function(waves = 10,
 
 
         dat <- lavaan::simulateData(model = model_string,
-                                    int.ov.free = FALSE)
+                                    int.ov.free = TRUE)
 
         return(list(model = model_string, data = dat))
 }

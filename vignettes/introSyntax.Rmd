@@ -4,12 +4,12 @@ author: "Chris Weber"
 date: "2025-02-13"
 output: pdf_document
 ---
-
+y
 The $\texttt{crossLagR}$ package includes several functions to simulate data.
 
 $\texttt{simRICLPM()}$ simulates data from a random intercept cross-lagged panel model.
 
-$\texttt{simCLPM()}$ simulates data from a cross-lagged panel model. 
+$\texttt{simCLPM()}$ simulates data from a cross-lagged panel model.
 
 $\texttt{reshape\_long\_sim\_cr()}$ Takes a wide data frame, pivots to wide format, includes lags.
 
@@ -87,7 +87,7 @@ dat %>%
 fit1 <- lavaan(estimateCLPM(waves = 5),
               data = dat,
               int.ov.free = TRUE, # Fix intercepts to zero
-              estimator="ml")  
+              estimator="ml")
 
 summary(fit1)
 ```
@@ -101,7 +101,7 @@ library(lavaan)
 fit2 <- lavaan(estimateRICLPM(waves = 5),
               data = dat,
               int.ov.free = TRUE, # Fix intercepts to zero
-              estimator="ml")  
+              estimator="ml")
 
 summary(fit2)
 ```

@@ -75,7 +75,7 @@ simCLPM <- function(waves = 10,
 
 
   dat <- lavaan::simulateData(model = model_string,
-                              int.ov.free = FALSE)
+                              int.ov.free = TRUE)
 
   return(list(model = model_string, data = dat))
 }

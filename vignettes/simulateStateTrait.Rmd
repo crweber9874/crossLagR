@@ -1,0 +1,187 @@
+---
+title: "State and Trait Level Effects"
+header-includes:
+    - \usepackage{setspace}\doublespacing
+author: "Chris Weber"
+date: "2025-01-21"
+indent: true
+output:
+  pdf_document: default
+---
+
+# Introduction 
+
+The CLPM follows this structure.
+
+$$\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{t-1}  
+\end{bmatrix}
+-   
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+$$
+
+The diagonal elements in the $\theta$ matrix represent the autoregressive parameters; the off-diagonal elements are the cross-lagged parameters.
+
+To model **trait** and **state** effects, the **Random Intercept Cross Lagged** model follows the form, but includes a time invariant "trait" level parameter ($\mu_i$).
+
+$$\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{t-1}  
+\end{bmatrix}
++
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
+}_{Trait}
+$$
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+library(dplyr)
+monteCarloOLS(
+   trials = 1000,
+   waves = 6,
+   model_type = "clpm",
+   stability.p = 0.45,
+   stability.q = 0.45,
+   cross.p = 0.0,
+   cross.q = 0.0,
+   variance.q = 0.3,
+   variance.p = 0.3,
+   cov.between = 0,
+   sample_size = 2500) -> results
+
+results %>% summarize(xlagx = mean(xlag_x),
+                      xlagy = mean(xlag_y),
+                      ylagx = mean(ylag_x),
+                      ylagy = mean(ylag_y)) %>% t()
+
+```
+
+The OLS estimates are nearly identical to the true values. Here's the way to simulate the RI-CLPM.
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+library(dplyr)
+monteCarloOLS(
+   trials = 100,
+   waves = 6,
+   model_type = "riclpm",
+   stability.p = 0.45,
+   stability.q = 0.45,
+   cross.p = 0.0,
+   cross.q = 0.0,
+   variance.q = 0.3,
+   variance.p = 0.3,
+   cov.between = 0.3,
+   variance.between.x = 0.2,
+   variance.between.y = 1,
+   sample_size = 2500) -> results
+
+results %>% summarize(xlagx = mean(xlag_x),
+                      xlagy = mean(xlag_y),
+                      ylagx = mean(ylag_x),
+                      ylagy = mean(ylag_y)) %>% t()
+
+```
+
+Things generally fall apart when there are trait effects.
+
+
+```{r}
+between  = seq(0.5, 1, by = .1)
+for(x in between){
+            results <- rbind(results, 
+                             monteCarloOLS(
+                                               trials = 500,
+                                               waves = 6,
+                                               model_type = "riclpm",
+                                               stability.p = 0.3,
+                                               stability.q = 0.3,
+                                               cross.p = 0,
+                                               cross.q = 0,
+                                               variance.q = 0.5,
+                                               variance.p = 0.5,
+                                               variance.between.x = x,
+                                               variance.between.y = 0.5,
+                                               cov.between = 0.35,
+                                               sample_size = 2500)
+                       )
+  }
+results
+```
+
+I've specified a fixed random intercept variance of 0.5, varied the random intercept variance of the $y$, a covariance btween errors, a 0.3 AR parameter, and a fixed, "within" variance of 0.5. 
+
+
+```{r, echo=TRUE, message=FALSE, warning=FALSE}
+library(latex2exp)
+library(ggridges)
+results %>%
+  ggplot(aes(x = xlag_x, fill = "grey", y = as.factor(round(variance.between.x, 2)))) +
+  geom_density_ridges2(
+    alpha = 0.25,
+    scale = 1,
+    show.legend = FALSE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 3,
+    point_size = 1,
+    point_color = "darkgrey",
+    point_alpha = 0.01,
+    fill = "darkgrey",
+    color = NA  # Remove the outline
+
+  ) +
+  # scale_x_continuous("", limits = c(-0.25, 0.25)) +
+  scale_y_discrete("Random Intercept Variance (X)") +
+  scale_x_continuous(TeX(" b_2 ")) +
+  theme_minimal()  +
+  # Draw a vertical line at 0 that is dashed, use abline
+  geom_vline(xintercept = .4, linetype = "dashed", color = "black") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.4, y = 1, label = "True Value ", hjust = 0) +
+  labs(title = "Autoregressive Parameter Estimates\nVarying Random Intercept Variance (X)", subtitle = TeX("$x_{t, i}=a_0 + b_1 y_{t-1, i} + b_2 x_{t-1, i} + e_{2,i}$"))+
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),
+    axis.title = element_text(size = 15, face = "bold"),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 15, face = "bold"),
+    legend.text = element_text(size = 12)
+  )
+
+```
+
+

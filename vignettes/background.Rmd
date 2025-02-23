@@ -1,20 +1,31 @@
 ---
 title: "The Cross Lagged Panel Model"
+header-includes:
+    - \usepackage{setspace}\doublespacing
 author: "Chris Weber"
 date: "2025-01-21"
-output: pdf_document
+indent: true
+output:
+  pdf_document: default
 ---
 
-It is difficult to tease out causal mechanisms with cross-sectional observational data, panel and cross sectional. Causal relationships require careful theorizing about the data generating process. Data, particularly when observational, and statistical procedures do not guarantee that researcher will identify a causal mechanism.
+# Introduction
 
-Notwithstanding, one model – the Cross Lagged Panel Model – has emerged as a statistical model that can tease apart causal relationships in panel data. In this paper, we will show that this reasoning is generally problematic, and ruling out spurious factors that generate a lagged correlation between variables is difficult to do with 1) observational data, and 2) little reasoning about confounded relationships.
+Political scientists often turn to panel data to diagnose causal effects when experiments are impractical (Chiu et al. 2025). Whereas dozens of options exist for analyzing longer time series, researchers wishing to analyze the two- to three-wave panels available in the ANES, CCAP, CCES, and GSS almost always default to one approach: the cross-lagged panel model (CLPM). The CLPM is appealing because it is intuitive, flexible, and easy to implement – depending on the researcher’s preferences, a CLPM can be as complicated as estimating a series of simultaneous equations with latent variables or as simple as adding lagged dependent and independent variables to an ordinary least squares regression. Yet, given the CLPM’s popularity, there has been a surprising lack of discussion in political science about its properties and estimand. In fact, in the decade since Hamaker, Kuiper, and Grasman (2015) published an influential critique of the CLPM, the number of published political science articles using the method has more than doubled (from 73 to 164; see Figure 1).
 
-The CLPM is a variant of the **Autoregressive Distributed Lag** (ADL) model used in econometrics, and the causal mechanism identified in these class of models isn't **causal** in the strict sense of relying on **counterfactuals** or graphical representations of the relationship between variables. Instead, the type of causality explored in these models is referred to as **Granger Causality.** Granger causality simply refers to the predictive power of a lagged variable and its ability to predict contemporary values of another variable. It simply means that if $x$ measured at time $t-1$ predicts $y$ at time $t$, then $x$ Granger causes $y$.
+The CLPM is a variant of the **Autoregressive Distributed Lag** (ADL) model -- where the model includes **p** and **q** lags of the dependent variable and independent variable, respectively. While the causal mechanism identified in these class of models isn't **causal** in the strict sense of relying on **counterfactuals** or graphical representations of the relationship between variables. Instead, the type of causality is **Granger Causality.** Granger causality simply refers to the predictive power of a lagged variable and its ability to predict contemporary values of another variable. If $x$ measured at time $t-1$ predicts $y$ at time $t$, then $x$ Granger causes $y$.
 
-The Cross Lagged Panel Model (CLPM) can be written as a one-level (ADL) model with cross-lagged effects.
+To date, Hamaker and colleagues – estimating random intercept cross-lagged panel models (RI-CLPMs) . Of these, several acknowledge Hamaker et al.’s critique but continue to report and interpret CLPMs in the main text while relegating RI-CLPMs to appendices. One influential article justifies this practice on the basis that RI-CLPMs “also come with biases” and “would be expected to seriously distort conclusions if applied to the present panel data” (Bakker, Lelkes, and Malka 2021, p. 1485). Another influential article acknowledges that the assumptions of the CLPM are “arguably unreasonable” (p. 791) but nonetheless presents the CLPM as a reliable baseline against which to compare the “considerably more conservative” (p. 797) RI-CLPM (Hatemi, Crabtree, and Smith 2019). A more recent article argues for reporting both random intercept and traditional CLPMs because “RI-CLPMs can produce cross-lagged parameter estimates that are downwardly biased,” citing simulation results from Bakker and colleagues (2021; Vasilopoulos and Robinson 2024, p. 10).
 
-\[
-\begin{bmatrix}
+The consequences of ignoring statistical problems with the CLPM are potentially dire. In recent years, CLPMs have emerged as key pieces of evidence in debates over the prevalence of ideological polarization versus partisan sorting (Abramowitz and Saunders 1998; Carsey and Layman 2006; Chen and Goren 2016; Dancey and Goren 2010; Goren and Chapp 2017; 2024; Highton and Kam 2011; Layman and Carsey 2002; Levendusky 2009, pp. 91-96), the nature of information effects on public opinion (Lenz 2009; 2012; Wlezien 2024; Wlezien and Soroka 2023), and the link between predispositions and policy preferences (Bakker, Lelkes, and Malka 2021; Engelhardt 2023; Goren 2013; 2022; 2025; Luttig 2021; Vasilopoulos and Robinson 2024). These are just a small sample of the cases in which major, substantive debates in political science have been adjudicated on the basis of CLPMs (Table 1). For researchers who are interested in evaluating the evidence from these debates, a clear understanding of what we can and can’t learn from CLPMs is essential.
+
+There are different variations to this general model. It is common to include a time invariant "trait" parameter to account for unit level characteristics, where values fluctuate butrevert back to some equilibrium level. The RI-CLPM differentiates between state and trait effects. The autoregressive and cross-lagged parameters correspond to time varying "state" effects, the expected change in $y_t$ or $x_t$ from each change in $y_{t-1}$ or $x_{t-1}$. The model also includes a trait level effect, $\mu_i$ (Schuurman, Ferrer, Boer-Sonneschein, and Hamaker 2016). Another variant is the **Continuous Time Structural Equation Model** (CTSEM).
+
+The **RI-CLPM** is a random effects model. In the panel design, the unit of analysis is observation at time $t$ nested within person $i$. Unit level effects are estimated, by allowing the model parameters to vary across units. These are **residual** models; the autoregressive and cross lag parameters correspond the lagged *state* level departures in $y$ and $x$ from their trait level equilibria.
+
+The CLPM follows this structure.
+
+$$\begin{bmatrix}
  y_{it}\\
  x_{it}
 \end{bmatrix}
@@ -31,14 +42,13 @@ y_{it-1} \\ x_{t-1}
 e_{y,it}\\
 e_{x,it}
 \end{bmatrix}
-\]
+$$
 
 The diagonal elements in the $\theta$ matrix represent the autoregressive parameters; the off-diagonal elements are the cross-lagged parameters.
 
-There are different variations to this general model, often to accommodate important characteristics in one's data. For instance, it is important to consider state versus trait variation in the data generating process. The **Random Intercept Cross Lagged** model follows the form, but includes a time invariant "trait" level parameter to account for subject characteristics that reverts back to an equilibrium level. The autoregressive and cross lagged parameters correspond to time varying "state" effects, the expected change in $y_t$ or $x_t$ from each perturbation in $y_{t-1}$ or $x_{t-1}$, after accounting for the trait level effect, $\mu_i$ (Schuurman, Ferrer, Boer-Sonneschein, and Hamaker 2016).
+To model **trait** and **state** effects, the **Random Intercept Cross Lagged** model follows the form, but includes a time invariant "trait" level parameter ($\mu_i$).
 
-\[
-\begin{bmatrix}
+$$\begin{bmatrix}
  y_{it}\\
  x_{it}
 \end{bmatrix}
@@ -64,18 +74,11 @@ e_{x,it}
 \mu_{x,i}
 \end{bmatrix}
 }_{Trait}
-\]
+$$
 
-\begin{align*}
-e_{y,it} &\sim N(0, \sigma^2_y) \\
-e_{x,it} &\sim N(0, \sigma^2_x) \\
-\mu_{y,i} &\sim N(\bar{\mu}_y, \sigma^2_{\mu_y}) \\
-\mu_{x,i} &\sim N(\bar{\mu}_x, \sigma^2_{\mu_x})
-\end{align*}
+It is common to simultaneously model the correlation between residuals and trait level effects. The residuals are modeled as multivariate normal, with a covariance matrix that includes the variance of the residuals, and the covariance between residuals. The trait level effects are modeled as multivariate normal, with a covariance matrix that includes the variance of the trait level effects, and the covariance between trait level effects.
 
-Or with correlated effects:
-
-\[
+$$
 \begin{bmatrix}
 e_{y,it}\\
 e_{x,it}
@@ -88,9 +91,9 @@ e_{x,it}
 \sigma^2_{e_y, e_x} & \sigma^2_{e_x}  
 \end{bmatrix}
 \end{bmatrix}
-\]
+$$
 
-\[
+$$
 \begin{bmatrix}
 \mu_{y,i}\\
 \mu_{x,i}
@@ -106,8 +109,31 @@ e_{x,it}
 \sigma^2_{\mu_y, \mu_x} & \sigma^2_{\mu_x}  
 \end{bmatrix}
 \end{bmatrix}
-\]
+$$
 
-The model follows a hierarchical structure, whereby the unit of analysis is the observation at time $t$ nested within person $i$. The autoregressive and cross-lagged parameters are estimated, alongside a stable, trait level parameter $\mu_i$. The model can be estimated using Maximum Likelihood or a Bayesian framework, wherein for the latter one can specify non-informative (or perhaps informative) priors and hierarchical priors on the model parameters.
+## Continuous Time
 
-The package for this project, `crossLagR`, includes a function to simulate data from the Random Intercept Cross Lagged Panel Model. There's an additional function to pivot the data to long format, with lags for each variable, and within person effects.
+The majority of time-series and panel models in the social sciences are estimated in discrete time. **ARIMA*(p,d,q)*** models are estimated in discrete time, an observation at time $t$. The **p,d,q** parameters corresponding to **autoregressive**, **difference**, and **moving average** in discrete time intervals, such a minutes, hours, days, months, years, decades, and so forth. The CLPM and RI-CLPM are also situated in discrete time. Cross-lagged and autoregressive parameters are modeled over equally spaced intervals of time.
+
+The inherent problem is that time series and panel data are generally not observed in discrete time. They are observed in continuous time. Wave intervals are not the same across all units. In panel designs, waves may be unequally spaced, a characteristic of long *t* panels, the "longitudinal" design where participants are observed over many years. Some waves may be separated by short intervals (perhaps early in development), whereas for observations in adulthood perhaps waves are separated by five or ten years.
+
+In a strict sense, all data are generated in continuous time, and the researcher's analytic decision imposes a discrete structure on the data. Panel waves are never perfectly spaced, instead data are rounded up are down to a unit of discrete time, like a minute, month, week, or year.
+
+The **Continuous Time Structural Equation Model** (CTSEM) treats the parameters as functions that vary over time. The CTSEM relies on differential equations, modeling the position of $y$, the velocities as
+
+$${dy(t)\over dt} = A(y(t) - \mu) + G {dW(t) \over dt} $$ ${dy(t)\over dt}$ represents the position of $y$ in time; these are velocities, or **rates of change**.$\mu$ is the equilibrium value of $y$, and $y(t) - \mu$ is the departure from this equilibrium, the position of $y$ relative to the equilibrium. This is mapped onto the rate of change of $y$ by the matrix $A$, the **drift matrix**. The diagonals are the **auto-effects** and have their analogue in discrete time as the **autoregressive** parameter. The off-diagonals the **cross-effects**, and correspond to **cross-lagged** effects in discrete time. The **G** component is the **random** part of the model, creating a stochastic differential equation. This component is typically modeled as a Wiener process (for derivation, see Schuurman, Ferrer, Boer-Sonneschein, and Hamaker 2016).
+
+If there are $i$ units observed over $t$ waves -- a panel design -- then $i$ equilibrium values are used ($\mu_i$), corresponding to the unit level equilibrium.
+
+$${dy_i(t)\over dt} = A(y_i(t) - \mu_i) + G {dW_i(t) \over dt} $$
+
+We re-evaluate existing research and common practice in political science in light of advances in panel data analysis (e.g., Hamaker, Kuiper, and Grasman 2015; Lucas 2023; Muthén and Asparouhov 2024).
+
+
+## $\texttt{crossLagR}$
+
+The package for this project, `crossLagR`, includes a variety of tools for simulating data using wrappers for models estimated in $\texttt{lavaan}$, $\texttt{brms}$, and $\texttt{ctsem}$ in $\texttt{R}$. 
+
+The package includes functions to simulate data from a random intercept cross-lagged panel model, a cross-lagged panel model, and a continuous time structural equation model. The package also includes functions to reshape wide data frames to long format, at various lags.
+
+
