@@ -12,7 +12,9 @@ estimateCTSEM(
   LAMBDA = diag(2),
   type = "stanct",
   time_points = 10,
+  cores = cores,
   chains = chains,
+  model = NA,
   ...
 )
 }

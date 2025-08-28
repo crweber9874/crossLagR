@@ -17,22 +17,7 @@
 #'
 #'@examples
 #'# Not Run
-#'# simRICLPM(waves = 5,
-#'#           variance.p = 0.5,
-#'#           variance.q = 0.5,
-#'#           stability.p = 0.20,
-#'#           stability.q = 0.20,
-#'#           cross.q = 0.30,
-#'#           cross.p = 0.30,
-#'#           cov.pq = 0.00,
-#'#           variance.between.x = 0.5,
-#'#          variance.between.y = 0.5,
-#'#           cov.between = 0,
-#'#           sample.nobs = 10e2)[[2]] %>%
-#'#   mutate(id = seq(1:nrow(df[[2]]))) %>%
-#'#   reshape_long_sim_cr() -> dat_long
-#'#
-#'# estimateHLM()
+
 #' @export
 #'
 
@@ -42,18 +27,30 @@ estimateHLM = function(
     chains = 3,
     cores = 10,
     iterations = 3000,
+    variational = FALSE,
+    control = list(adapt_delta = 0.95),
     ...
    ) {
 
   yeqn = brms::bf(y ~ xlag + ylag + (1 + ylag + xlag|p|id))
   xeqn = brms::bf(x ~ xlag + ylag + (1 + ylag + xlag|p|id))
 
+    if (variational) {
+    algorithm_val <- "meanfield"
+    tol_rel_obj_val <- 1e-9
+  }
+    else {
+    algorithm_val <- "sampling" # or "optimizing"
+    tol_rel_obj_val <- NULL # or another relevant value
+  }
   fit = brms::brm(yeqn + xeqn + brms::set_rescor(residual_correlation),
              data = data,
              family = gaussian(),
              cores = cores,
              chains = chains,
              iter = iterations,
+             control = control,
+             algorithm = algorithm_val,
              ...)
   return(fit)
 }

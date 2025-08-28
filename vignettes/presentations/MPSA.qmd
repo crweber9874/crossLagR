@@ -1,0 +1,306 @@
+---
+title: "Rethinking the Cross Lagged Regression Model"
+subtitle: "Limitations and Alternatives in Panel Analysis"
+date: "April 4, 2025"
+author:
+  - name: "Stanley Feldman"
+    affiliation: "Stony Brook University"
+  - name: "Adam Panish"
+    affiliation: "Stony Brook University"
+  - name: "Christopher Weber"
+    affiliation: "University of Arizona"
+  - name: "Bang<br>Zheng"
+    affiliation: "University of Texas at Austin"
+
+
+format:
+  revealjs:
+    footer: "Presented at Midwest Political Science Association Annual Meeting, Chicago, IL, April 3-6, 2025"
+    theme: serif
+    code-copy: true
+    center-title-slide: true
+    mathjax: true # Enable MathJax
+highlight-style: a11y
+code-link: true
+height: 1000
+width: 1000
+
+execute: 
+  eval: true
+  echo: true
+title-block-banner: "#378DBD"  # Custom background color
+---
+
+## The Cross Lagged Panel Regression Model (CLPM)
+
+```{=html}
+<style>
+.reveal {
+  background-color: white; /* Override background color */
+}
+</style>
+```
+
+-   The CLPM is common in many social science applications, particularly in longitudinal, observational research designs
+
+-   $X \rightarrow Y$, $Y \rightarrow X$, or both?
+
+-   The CLPM is frequently used because of its intuitiveness, flexibility, and ease of implementation [(Campbell, 1963; Pelz and Andrews, 1966; Rozelle and Thiel, 1969; Abramowitz, 1978; Campbell and Wink, 1979; Iyengar and Kinder, 1987; Jennings and Niemi, 1977; Markus, 1979; Markus and Converse, 1979; Meier, 1979; More recent: Craemer 2008; Claasen 2008; Hatemi, Crabtree and Smith 2019; Hetherington and Globeti 2002; Luttig 2021, Klandermans 2004; Lupu 2015; Goren and Chapp 2017; Layman and Carsey 2002; Putz 2002; Tilley, Neundor and Hobolt 2018; Sibley and Duckitt 2010, among many others) ]{style="font-size: 0.8em;"}
+
+
+## The CLPM
+
+```{r, echo=FALSE, message=FALSE, warning=FALSE}
+library(dagitty)
+library(ggdag)
+library(dplyr)
+library(lavaan)
+library(crossLag)
+library(ggplot2)
+library(tibble)
+library(ggridges)
+library(gganimate)
+library(knitr)
+g <- dagitty("dag {
+    X1 -> Y2
+    Y1 -> Y2
+    X1 -> X2
+    Y1 -> X2
+    X2 -> Y3
+    Y2 -> Y3
+    X2 -> X3
+    Y2 -> X3
+}")
+coordinates(g) <- list(
+    x = c(U1 = 0.5, Y1 = 1, X1 = 1, Y2 = 2, X2 = 2, X3 = 3, Y3 = 3),
+    y = c(U1 = 1.5, Y1 = 1, X1 = 2, Y2 = 1, X2 = 2, X3 = 2, Y3 = 1)
+)
+ggdag(g, text = TRUE) + theme_dag() +
+  ggtitle("The Cross-Lagged Panel Model (CLPM)")
+```
+
+## State and Trait Effects
+
+- The CLPM is a variant of the **Autodistributed Lag Model** (ADL) [(Sims 1980) ]{style="font-size: 0.8em;"}
+
+
+- **Granger Causality**: $X_t$ Granger causes $Y$ if $X_{t-1}$ predicts $Y_{t}$ better than $Y_{t-1}$ predicts $X_t$
+
+-  The CLPM does not differentiate between **state** and **trait** effects
+
+-   "Unit effects" and stable, individual difference factors, like personality, party, and ideology, over short periods of time [(Bakker, Lelkes and Malka 2021; Luttig 2021; Hatemi, Crabtree and Smith 2019) ]{style="font-size: 0.8em;"}
+
+-   Hamaker et al (2015) and **A Critique of the Cross-Lagged Regression Model** [(Hamaker, Kuiper, and Grasman 2015) ]{style="font-size: 0.8em;"}
+
+## CLPMS in Political Science
+
+![](figure1.png)
+
+## By Subfield
+
+<div style="font-size: 0.8em;"> 
+
++----------------------------+----------+
+| Variable                   | Articles |
++============================+==========+
+| Policy Preferences         | 48       |
++----------------------------+----------+
+| Party Identification       | 42       |
++----------------------------+----------+
+| Vote Choice                | 21       |
++----------------------------+----------+
+| Political Trust            | 20       |
++----------------------------+----------+
+| Political Participation    | 15       |
++----------------------------+----------+
+| Affect Towards a Group     | 12       |
++----------------------------+----------+
+| Ideology                   | 12       |
++----------------------------+----------+
+| Economic Perceptions       | 11       |
++----------------------------+----------+
+| Affect Towards a Candidate | 10       |
++----------------------------+----------+
+| Perceptions of Government  | 10       |
++----------------------------+----------+
+
+: Ten Constructs Most Often Analyzed with CLPMs in Political Science
+
+</div>
+
+## State and Trait Effects: The RI-CLPM
+
+-   In the decade since this publication the number of published political science articles using the method doubled from the prior decade (from 74 to 169)
+
+-   Hamaker et al (2015) and the **Random Intercept Cross Lagged Panel Model**(RI-CLPM) [(Hamaker, Kuiper, and Grasman 2015) ]{style="font-size: 0.8em;"}
+
+-  The RI-CLPM is a variant of the CLPM that allows for the separation of **state** and **trait** effects, by controlling for stable, unit level variation
+
+## The RI-CLPM
+
+![](riclpm.png)
+
+
+## The Trait Effect Confounds the State Effect
+
+\begin{eqnarray}
+\begin{bmatrix}
+x_{it}\\
+ y_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta_{11} & \theta_{12}  \\
+\theta_{21} & \theta_{22}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ 
+x_{t-1}  
+\end{bmatrix}
++ 
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
++
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
+\label{eq:ri-clpm_eq}
+\end{eqnarray}
+
+::: {style="margin-left: 300px;"}
+<img src="riclpm.gif" width="600" height="600"/>
+:::
+
+## Misspecification
+
+- The CLPM is that its lag structure places a ceiling on how stable a variable can be before the model is mis-specified[(Lucas 2023)]{style="font-size: 0.8em;"}
+
+- The CLPM assumes that all variables follow a first-order autoregressive process – the correlation between $x_{t1}$ and $x_{t3}$ cannot exceed the product of the effects of $x_{t1}$ on $x_{t2}$ and $x_{t2}$ on $x_{t3}$
+
+- The correlations between the first two time points, $r_{x_{t=1},x_{t=1}}$ , then between the first and third -- $r_{x_{t=1},x_{t=3}}$, and so on 
+
+- Compare the decay implied by the CLPM with the observed decay, from the test-retest correlations, over time
+
+## Misspecification
+
+<div style="height: 80%; width: 80%; margin: 0 auto;">
+  <img src="figure2.png" style="width: 100%; display: block;">
+</div>
+
+
+## No Trait Effect
+<div style="width: 90%; margin: 0 auto;">
+  <img src="simple.png" style="width: 100%; display: block;">
+</div>
+
+[Note: Current realizations $x$ and $y$ are a function of autoregressive and cross lagged effects. Cross Lagged Effects: $\theta_{12} = 0.$ and $\theta_{2,1} = 0$ Autoregressive Effects: $\theta_{11}$ from 0 to 1, and fix $\theta_{22} = 0.5$. $var(x_{t}$, $y_t) = 1$, $N = 5,000$, $1,000$ replications.
+]{style="font-size: 0.7em;"}
+
+
+## Trait Effects
+<div style="width: 90%; margin: 0 auto;">
+  <img src="complicated.png" style="width: 100%; display: block;">
+</div>
+
+[Note: We vary the degree of "between-unit" variation in both $x$ and $y$, from 0.5 to 1.5. We  fix the cross lagged effects at 0, $\theta_{12} = 0$ and $\theta_{2,1} = 0$, and the autoregressive effects are fixed at 0.5, $\theta_{11}$, $\theta_{22} = 0.5$. The "within-subject" wave variance is fixed at 0.5,  sample size is $N = 5,000$.]{style="font-size: 0.7em;"}
+
+
+##  Ideology and Racial Resentment
+
+- Data: The 2011, 2016, and 2020 Voter Study Group
+
+- 5-point ideology and three item Racial Resentment scale
+
+- The CLPM and RI-CLPM reach different conclusions
+
+## The CLPM 
+
+<div style="width: 90%; margin: 0 auto;">
+  <img src="clpm_ideo.png" style="width: 100%; display: block;">
+</div>
+
+## The RI-CLPM 
+
+<div style="width: 90%; margin: 0 auto;">
+  <img src="ri_clpm_ideo.png" style="width: 100%; display: block;">
+</div>
+
+## Practical Considerations
+- The RI-CLPM is difficult to estimate when the vast majority of the variance is "trait" variation.
+
+<div style="width: 100%; margin: 0 auto;">
+  <img src="s2.png" style="width: 100%; display: block;">
+</div>
+
+
+## State-Trait-Occasion (STO)
+
+- The estimates of the CLPM are biased in the presence of time-invariant confounding. 
+- The State-Trait-Occasion Model (STO) [(Cole, Martin, and Steiger 2005)]{style="font-size: 0.8em;"}.
+
+
+<div style="width: 90%; margin: 0 auto;">
+  <img src="sto.png" style="width: 100%; display: block;">
+</div>
+
+## Variance Estimates and The STO Model
+
+<div style="width: 90%; margin: 0 auto;">
+  <img src="s1.png" style="width: 100%; display: block;">
+</div>
+
+## Concluding Remarks
+
+- The CLPM has been widely used in published research in political science
+
+- Confounding due to stable trait variance and unmodeled measurement error lead to spurious estimates of the autoregressive and  cross-lagged parameters
+
+- The RI-CLPM is a better alternative to the CLPM, but it is often difficult to estimate in many of the substantive examples that are common in published research, due to excessive "trait" variation
+
+- Alternatives: The Continuous Time Model, the STO model, and dynamic panel models
+
+##
+::: {style="text-align: center;"}
+<b>Thank you!</b>
+<p>chrisweber\@arizona.edu</p>
+:::
+
+
+## Supplementary Material: Monte Carlo Results
+<div style="width: 90%; margin: 0 auto;">
+  <img src="mc.png" style="width: 100%; display: block;">
+</div>
+
+[Note: Each model is tested under the same data generating process in which we vary the "trait level effect," the random intercept variance. $N = 5,000$.]{style="font-size: 0.7em;"}
+
+
+## Supplementary Material: Monte Carlo Results
+<div style="width: 90%; margin: 0 auto;">
+  <img src="mc3.png" style="width: 100%; display: block;">
+</div>
+
+[Note: Each model is tested under the same data generating process in which we vary the "trait level effect," the random intercept variance. $N = 5,000$.]{style="font-size: 0.7em;"}
+
+
+
+
+
+
+<!-- ## The RI-CLPM -->
+
+<!-- ```{r, echo = TRUE, message = TRUE, warning = TRUE} -->
+
+<!-- kable(regression_coefficients %>%  -->
+
+<!--         filter(stability == "stability") %>% -->
+
+<!--         select(-c(stability, pvalue)), -->
+
+<!--       col.names = c("Dependent Variable", "Independent Variable", "Estimate", "Standard Error", "Z-value"), -->
+
+<!--       caption = "Stability Coefficients in the RI-CLPM")  -->
+
+<!-- ``` -->

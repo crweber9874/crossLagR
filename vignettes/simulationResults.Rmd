@@ -1,0 +1,120 @@
+---
+title: "Monte Carlo Simulation"
+header-includes:
+    - \usepackage{setspace}\onehalfspacing
+author: "Chris Weber"
+date: "2025-01-21"
+indent: true
+output:
+  pdf_document: default
+---
+
+# Introduction 
+
+To model **trait** and **state** effects, the **Random Intercept Cross Lagged** model follows the form, but includes a time invariant "trait" level parameter ($\mu_i$).
+
+$$\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{t-1}  
+\end{bmatrix}
++
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
+}_{Trait}
+$$
+
+Insofar that the variance of the trait level term is zero, the model reduces to the CLPM. The CLPM is nested within the CLPM. In this example, we'll simulate data under the RI-CLPM and estimate several models.
+
+1. **Cross-Lagged Panel Model** as an observed variable model in OLS, with no correlated errors.
+2. **Random Intercept Cross-Lagged Panel Model** as a latent variable model in SEM, with correlated errors.
+3. **Continuous Time Structural Equation Model**, then retrieving the discrete time autorregressive and cross lagged estimates.
+
+Each model is tested under the same data generating process -- which we vary. We vary the random intercept variance for both $x$ and $y$, the trait level effect. The greater the variance, the more of the total variance in $y$ and/or $x$ is attributable to that stable trait. We also vary the degree of autoregression in both $x$ and $y$, the within wave stability. 1000 replications were run for each model. In particular,
+
+## Simulation Instructions
+* Vary $var(\mu_{y,i})$ and $var(\mu_{x,i})$ from 0.4 to 1.
+* Vary $\theta_{1y}$ and $\theta_{2x}$ from 0.4 to 1.
+* Fix $\theta_{2y}$ and $\theta_{1x}$ to zero, no cross lagged effects
+* Estimate CLPM, RI-CLPM, CTSEM, and HLM models, save associated AR and CL estimates, for each replication.
+
+## Monte Carlo Simulation
+### OLS
+
+This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the CLPM in OLS.
+
+within_person_stability_x = seq(0.2, 0.7, by = .1)
+variance.between.x = seq(0.3, 1, by = .1)
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+rm(list = ls())
+library(dplyr)
+library(ggplot2)
+library(ggridges)
+library(latex2exp)
+
+  subtitle = TeX("$x_{t, i}=a_0 + b_1 y_{t-1, i} + b_2 x_{t-1, i} + e_{2,i}$"))+
+
+devtools::load_all()
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/monteCarlo_results.rda")
+monteCarlo_results %>%
+  ggplot(aes(x = xlag_x, fill = "grey", y = as.factor(round(variance.between.x, 2)))) +
+  facet_wrap(~as.factor(round(variance.between.x, 2)), scales = "free") +
+  geom_density_ridges2(
+    alpha = 0.25,
+    scale = 1,
+    show.legend = FALSE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 3,
+    point_size = 1,
+    point_color = "darkgrey",
+    point_alpha = 0.01,
+    fill = "darkgrey",
+    color = NA  # Remove the outline
+
+  ) +
+  # scale_x_continuous("", limits = c(-0.25, 0.25)) +
+  scale_y_discrete("Random Intercept Variance (X)") +
+  scale_x_continuous(TeX(" b_2 ")) +
+  theme_minimal()  +
+  # Draw a vertical line at 0 that is dashed, use abline
+  geom_vline(xintercept = .4, linetype = "dashed", color = "black") +
+  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.4, y = 1, label = "True Value ", hjust = 0) +
+  labs(title = "Autoregressive Parameter Estimates\nVarying Random Intercept     
+  Variance (X)", 
+  subtitle = TeX("$x_{t, i}=a_0 + b_1 y_{t-1, i} + b_2 x_{t-1, i} + e_{2,i}$"))+
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 20, face = "bold"),
+    axis.title = element_text(size = 15, face = "bold"),
+    axis.text = element_text(size = 12),
+    legend.title = element_text(size = 15, face = "bold"),
+    legend.text = element_text(size = 12)
+  )
+
+```
+
+

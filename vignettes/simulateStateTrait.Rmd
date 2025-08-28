@@ -1,7 +1,7 @@
 ---
 title: "State and Trait Level Effects"
 header-includes:
-    - \usepackage{setspace}\doublespacing
+    - \usepackage{setspace}\onehalfspacing
 author: "Chris Weber"
 date: "2025-01-21"
 indent: true
@@ -9,7 +9,7 @@ output:
   pdf_document: default
 ---
 
-# Introduction 
+# Introduction
 
 The CLPM follows this structure.
 
@@ -64,88 +64,1401 @@ e_{x,it}
 }_{Trait}
 $$
 
+The parameters used to generate the data are as follows:
+
+There are 10 waves. The autoregressive parameters are 0.10, and there is no cross-lagged effect; these parameters are set to 0. The variances of the latent variabels are 1, and the sample size is 2500. Here's how that looks in the function $\texttt{monteCarloOLS()}$.
+
+This function simulates the data using these parameters, then estimates the CLPM in OLS. Currently, because we're dealing with lags, the first observation is missing. I've left it as missing, meaning that it is dropped from the analysis, though typically we can set this at some value. It repeats this process 100 times.
+
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
 library(dplyr)
+library(crossLagR)
+library(chattr)
+
+# Sys.setenv("OPENAI_API_KEY" = "")
+# The key will not be shown in the repository, just your local .renv environment.
+
+library(ggplot2)
 monteCarloOLS(
-   trials = 1000,
-   waves = 6,
-   model_type = "clpm",
-   stability.p = 0.45,
-   stability.q = 0.45,
+   trials = 100,
+   waves = 10,
+   dgp = "clpm",
+   stability.p = 0.1,
+   stability.q = 0.1,
    cross.p = 0.0,
    cross.q = 0.0,
-   variance.q = 0.3,
-   variance.p = 0.3,
+   variance.q = 1,
+   variance.p = 1,
    cov.between = 0,
    sample_size = 2500) -> results
 
-results %>% summarize(xlagx = mean(xlag_x),
-                      xlagy = mean(xlag_y),
-                      ylagx = mean(ylag_x),
-                      ylagy = mean(ylag_y)) %>% t()
+results %>% summarize(x_autoregression = mean(xlag_x),
+                      x_cross_lag = mean(xlag_y),
+                      y_autoregression = mean(ylag_y),
+                      y_cross_lag = mean(ylag_x)) %>% t()
 
 ```
 
-The OLS estimates are nearly identical to the true values. Here's the way to simulate the RI-CLPM.
+The means are summarized above. We could experiment with different parameter values, by creating a data frame corresponding to the parameters the user can choose to vary.
 
 ```{r, echo=TRUE, message=FALSE, warning=FALSE}
+rm(list = ls())
+devtools::load_all()
+library(tidyr)
 library(dplyr)
+# Construct the parameter data set by using expand.grid to generate all permutations
+# Vary AR parameters from 0 to 1 byincrements of 0.5
 monteCarloOLS(
-   trials = 100,
-   waves = 6,
-   model_type = "riclpm",
-   stability.p = 0.45,
-   stability.q = 0.45,
+   trials = 1,
+   waves = 5,
+   dgp = "clpm",
+   stability.p = 0,
+   stability.q = 0.50,
    cross.p = 0.0,
    cross.q = 0.0,
-   variance.q = 0.3,
-   variance.p = 0.3,
-   cov.between = 0.3,
-   variance.between.x = 0.2,
-   variance.between.y = 1,
-   sample_size = 2500) -> results
+   variance.q = 1,
+   variance.p = 1,
+   cov.between = 0,
+   sample_size = 5000) -> results
 
-results %>% summarize(xlagx = mean(xlag_x),
-                      xlagy = mean(xlag_y),
-                      ylagx = mean(ylag_x),
-                      ylagy = mean(ylag_y)) %>% t()
+expand.grid(
+  stability.p = seq(0, 1, by = .2),
+  stability.q = 0.5,
+  cross.p = 0,
+  cross.q = 0,
+  variance.q = 1,
+  variance.p = 1,
+  cov.between = 0,
+  sample_size = 5000) -> mc_params
 
+
+for(i in 1:nrow(mc_params)){
+  # print(paste("🚀 Running Monte Carlo Simulation 🚀"))
+  # print(paste("Within Person Stability X: ", mc_params$stability.p[i], " | Within Person Stability Y: ", mc_params$stability.q[i]))
+  # print(paste("Cross Lagged Effect X: ", mc_params$cross.p[i], " | Cross Lagged Effect Y: ", mc_params$cross.q[i]))
+  # print(paste("Variance X: ", mc_params$variance.p[i], " | Variance Y: ", mc_params$variance.q[i]))
+  # print(paste("Covariance Between X and Y: ", mc_params$cov.between[i]))
+  # print(paste("Sample Size: ", mc_params$sample_size[i]))
+  results <- rbind(results, 
+                   monteCarloOLS(
+                                   trials = 100,
+                                   waves = 5,
+                                   dgp = "clpm",
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross.p = mc_params$cross.p[i],
+                                   cross.q = mc_params$cross.q[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.between = mc_params$cov.between[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+
+resultsOLS = results
+save(resultsOLS, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLS.rda")
+```
+
+To summarize the data in joyplots, use the $\texttt{ggridges}$ package.
+
+```{r}
+library(ggplot2)
+library(ggridges)
+library(latex2exp)
+library(crossLagR)
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLS.rda")
+
+vline_data <- data.frame(
+  variable = c("X_autoregression", "Y_autoregression", "X_cross_lag", "Y_cross_lag"),
+  intercept = c(NA, 0.5, 0, 0)  # Replace with your desired intercept values
+)
+
+custom_labels <- c(
+  X_autoregression = "X (AR)",
+  Y_autoregression = "Y (AR)",
+  X_cross_lag = "X (CL)",
+  Y_cross_lag = "Y (CL)"
+)
+
+results %>%
+  filter(stability.p != 0.1) %>%
+  rename(X_autoregression = xlag_x,
+         Y_cross_lag =  ylag_x ,
+         X_cross_lag = xlag_y,
+         Y_autoregression = ylag_y) %>%
+    pivot_longer(
+        cols = c(X_autoregression, Y_autoregression, X_cross_lag, Y_cross_lag),
+        names_to = "variable",
+        values_to = "value"
+    ) %>%
+  ggplot(aes(x = value, 
+             fill = "grey", 
+             y = as.factor(stability.p)))+
+  facet_wrap(~variable, scales = "free", labeller = labeller(variable = custom_labels)) + 
+  geom_density_ridges2(
+    alpha = 0.20,
+    scale = 1,
+    show.legend = FALSE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = c(0.5, 0.975),
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 3,
+    point_size = 1,
+    point_color = "darkgrey",
+    point_alpha = 0.01,
+    fill = "darkgrey",
+    color = NA  # Remove the outline
+  ) +
+  theme_minimal() + 
+  # title
+  
+  labs(title = paste("Cross Lagged Panel Model Estimates"),
+  subtitle = TeX("$x_{t, i}=\\theta_{12} y_{t-1, i} +  \\theta_{11} x_{t-1, i} + e_{1,i}$\n
+                  $y_{t, i}=\\theta_{22} y_{t-1, i} +  \\theta_{21} x_{t-1, i} + e_{2,i}$
+                 " ))+
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(data = vline_data, aes(xintercept = intercept), linetype = "dashed", color = "black") +
+  
+  scale_x_continuous("Parameter Estimate (1,000 Trials)") +
+  scale_y_discrete("")  
+
+# Save graph
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/ols_plot.pdf", width = 8, height = 6)
 ```
 
 Things generally fall apart when there are trait effects.
 
 
+
 ```{r}
-between  = seq(0.5, 1, by = .1)
-for(x in between){
-            results <- rbind(results, 
-                             monteCarloOLS(
-                                               trials = 500,
-                                               waves = 6,
-                                               model_type = "riclpm",
-                                               stability.p = 0.3,
-                                               stability.q = 0.3,
-                                               cross.p = 0,
-                                               cross.q = 0,
-                                               variance.q = 0.5,
-                                               variance.p = 0.5,
-                                               variance.between.x = x,
-                                               variance.between.y = 0.5,
-                                               cov.between = 0.35,
-                                               sample_size = 2500)
-                       )
-  }
-results
+library(tidyr)
+library(dplyr)
+devtools::load_all()
+monteCarloOLS(
+  waves = 5,
+  variance.between.x = 0.5,
+  variance.between.y = 0.5,
+  stability.p = 0.2,
+  stability.q = 0.2,
+  cross.p = 0,
+  cross.q = 0,
+  variance.q = 0.5,
+  variance.p = 0.5,
+  cov.between = 0,
+  sample_size = 5000) -> results
+
+# Construct the parameter data set by using expand.grid to generate all permutations
+# Vary AR parameters from 0 to 1 byincrements of 0.5
+expand.grid(
+  variance.between.x = seq(0.5, 1.5, by = .2),
+  variance.between.y = seq(0.5, 1.5, by = .2),
+  stability.p = 0.2,
+  stability.q = 0.2,
+  cross.p = 0,
+  cross.q = 0,
+  variance.q = 0.5,
+  variance.p = 0.5,
+  cov.between = 0,
+  sample_size = 5000) -> mc_params
+
+# Generally don't do this -- append lists is inefficient.
+for(i in 1:nrow(mc_params)){
+  results <- rbind(results, 
+                   monteCarloOLS(
+                                   trials = 100,
+                                   waves = 5,
+                                   dgp = "riclpm",
+                                   variance.between.x = mc_params$variance.between.x[i],
+                                   variance.between.y = mc_params$variance.between.y[i],
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross.p = mc_params$cross.p[i],
+                                   cross.q = mc_params$cross.q[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.between = mc_params$cov.between[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+resultsOLS2 = results
+save(resultsOLS2, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLS2.rda")
+
 ```
 
-I've specified a fixed random intercept variance of 0.5, varied the random intercept variance of the $y$, a covariance btween errors, a 0.3 AR parameter, and a fixed, "within" variance of 0.5. 
+And here is the plot. The plot shows the effects for the equation $x_{t, i}=a_0 + b_1 y_{t-1, i} + b_2 x_{t-1, i} + e_{2,i}$, where $b_1$ is the autoregressive parameter, and $b_2$ is the cross-lagged parameter. The individual plots show the consequences when the trait-level, between unit variance of $y$ is varied. The axis-labels similarly show the consequences when the trait-level, between unit variance of $x$ is varied. The model generally fails in picking up the true parameter estimates for the CL and AR values.
 
-
-```{r, echo=TRUE, message=FALSE, warning=FALSE}
+```{r}
+library(ggridges)
 library(latex2exp)
+library(dplyr)
+library(ggplot2)
+library(tidyr)
+devtools::load_all()
+
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLS2.rda")
+resultsOLS2 %>%
+  pivot_longer(
+    cols = c(xlag_x, ylag_x, xlag_y, ylag_y),
+    names_to = c("variable", ".value"),
+    names_sep = "_"
+  ) %>%
+  mutate(variable = factor(variable, levels = c("xlag", "ylag"))) %>%
+  pivot_longer(
+    cols = c(x, y),
+    names_to = "lag_type",
+    values_to = "lag_value"
+  ) %>%
+  filter(lag_type == "x") %>%
+  ggplot(aes(x = lag_value, 
+             fill = variable, 
+             grouping = variable,
+             color = variable,
+             y = as.factor(variance.between.x)))+
+  facet_wrap(~paste("Var(Y) = ", variance.between.y), scales = "free", ncol = 2) +
+  geom_density_ridges2(
+    alpha = 1,
+    scale = 3,
+    show.legend = TRUE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 2,
+    point_size = 0.1,
+    point_color = "grey",
+    point_alpha = 0.01,
+    color = NA  # Remove the outline
+  ) + 
+  theme_minimal() + 
+  # title
+  labs(title = "CLPM Parameter Estimates (x)", 
+  subtitle = TeX("$\\textbf{x_{t, i}=\\theta_{12} y_{t-1, i} +  \\theta_{11} x_{t-1, i} + e_{1,i}}$\n
+                  $y_{t, i}=\\theta_{22} y_{t-1, i} +  \\theta_{21} x_{t-1, i} + e_{2,i}$")) + 
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0.2, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.2, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous("Parameter Estimate", limits = c(0,1)) +
+  scale_y_discrete("Trait Variance (X)") +
+  # color
+scale_fill_manual(values = c("xlag" = "darkgrey", "ylag" = "lightgrey"),
+                  labels = c("xlag" = "Autoregressive Parameter", "ylag" = "Cross Lagged Parameter")) +
+  # legend position
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(0.5, "cm"),
+        legend.key.width = unit(0.2, "cm"))
+
+
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/ols2_plot.pdf", width = 8, height = 6)
+```
+
+
+```{r}
+library(ggridges)
+library(latex2exp)
+
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLS2.rda")
+resultsOLS2 %>%
+  pivot_longer(
+    cols = c(xlag_x, ylag_x, xlag_y, ylag_y),
+    names_to = c("variable", ".value"),
+    names_sep = "_"
+  ) %>%
+  mutate(variable = factor(variable, levels = c("xlag", "ylag"))) %>%
+  pivot_longer(
+    cols = c(x, y),
+    names_to = "lag_type",
+    values_to = "lag_value"
+  ) %>%
+  filter(lag_type == "y") %>%
+  ggplot(aes(x = lag_value, 
+             fill = variable, 
+             grouping = variable,
+             color = variable,
+             y = as.factor(variance.between.x)))+
+  facet_wrap(~paste("Var(Y) = ", variance.between.y), scales = "free", ncol = 2) +
+  geom_density_ridges2(
+    alpha = 1,
+    scale = 3,
+    show.legend = TRUE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 2,
+    point_size = 0.1,
+    point_color = "grey",
+    point_alpha = 0.01,
+    color = NA  # Remove the outline
+  ) + 
+  theme_minimal() + 
+  # title
+  labs(title = "CLPM Parameter Estimates (y)", 
+  subtitle = TeX("$x_{t, i}=\\theta_{12} y_{t-1, i} +  \\theta_{11} x_{t-1, i} + e_{1,i}$\n
+                  $\\textbf{y_{t, i}=\\theta_{22} y_{t-1, i} +  \\theta_{21} x_{t-1, i} + e_{2,i}}$")) + 
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0.2, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.2, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous("Parameter Estimate", limits = c(0,1)) +
+  scale_y_discrete("Trait Variance (X)") +
+  # color
+scale_fill_manual(values = c("xlag" = "darkgrey", "ylag" = "lightgrey"),
+                  labels = c("xlag" = "Autoregressive Parameter", "ylag" = "Cross Lagged Parameter")) +
+  # legend position
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(0.5, "cm"),
+        legend.key.width = unit(0.2, "cm"))
+
+
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/ols3_plot.pdf", width = 8, height = 6)
+```
+# Create an animated plot
+
+
+```{r}
+library(gganimate)
+library(ggridges)
+library(latex2exp)
+library(dplyr)
+
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLS2.rda")
+resultsOLS2 %>%
+  pivot_longer(
+    cols = c(xlag_x, ylag_x, xlag_y, ylag_y),
+    names_to = c("variable", ".value"),
+    names_sep = "_"
+  ) %>%
+  mutate(variable = factor(variable, levels = c("xlag", "ylag"))) %>%
+  pivot_longer(
+    cols = c(x, y),
+    names_to =  "lag_type",
+    values_to = "lag_value"
+  ) %>%
+  filter(lag_type == "y") %>%
+  ggplot(aes(x = lag_value, 
+             fill = variable, 
+             grouping = variable,
+             color = variable,
+             y = as.factor(variance.between.x)))+
+  facet_wrap(~paste("Var(Y) = ", variance.between.y), scales = "free", ncol = 2) +
+  geom_density_ridges2(
+    alpha = 1,
+    scale = 3,
+    show.legend = TRUE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 2,
+    point_size = 0.1,
+    point_color = "grey",
+    point_alpha = 0.01,
+    color = NA  # Remove the outline
+  ) + 
+  theme_minimal() + 
+  # title
+  labs(title = "CLPM Parameter Estimates (y)", 
+  subtitle = TeX("$x_{t, i}=\\theta_{12} y_{t-1, i} +  \\theta_{11} x_{t-1, i} + e_{1,i}$\n
+                  $\\textbf{y_{t, i}=\\theta_{22} y_{t-1, i} +  \\theta_{21} x_{t-1, i} + e_{2,i}}$")) + 
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0.2, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.2, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous("Parameter Estimate", limits = c(0,1)) +
+  scale_y_discrete("Trait Variance (X)") +
+  # color
+scale_fill_manual(values = c("xlag" = "darkgrey",
+                             "ylag" = "lightgrey"),
+                  labels = c("xlag" = "Autoregressive Parameter", 
+                             "ylag" = "Cross Lagged Parameter")) +
+  # legend position
+  theme(legend.position = "bottom",
+        legend.title = element_blank(),
+        legend.text = element_text(size = 10),
+        legend.key.size = unit(0.5, "cm"),
+        legend.key.width = unit(0.2, "cm"))
+```
+
+
+
+
+```{r}
+library(ggridges)
+library(latex2exp)
+
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLS2.rda")
+resultsOLS2 %>%
+  pivot_longer(
+    cols = c(xlag_x, ylag_x, xlag_y, ylag_y),
+    names_to = c("variable", ".value"),
+    names_sep = "_"
+  ) %>%
+  mutate(variable = factor(variable, levels = c("xlag", "ylag"))) %>%
+  pivot_longer(
+    cols = c(x, y),
+    names_to = "lag_type",
+    values_to = "lag_value"
+  ) %>%
+  filter(lag_type == "y") %>%
+  ggplot(aes(x = lag_value, 
+             fill = "grey", 
+             y = as.factor(variance.between.x)))+
+  facet_wrap(~paste("Var(Y) = ", variance.between.y), scales = "free", ncol = 3) +
+  geom_density_ridges2(
+    alpha = 0.25,
+    scale = 1,
+    show.legend = FALSE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 2,
+    point_size = 1,
+    point_color = "darkgrey",
+    point_alpha = 0.01,
+    fill = " darkgrey",
+    color = NA  # Remove the outline
+  ) + 
+  theme_minimal() + 
+  # title
+  labs(title = "CLPM Parameter Estimates (y)", 
+  subtitle = TeX("$x_{t, i}=\\theta_{12} y_{t-1, i} +  \\theta_{11} x_{t-1, i} + e_{1,i}$\n
+                  $\\textbf{y_{t, i}=\\theta_{22} y_{t-1, i} +  \\theta_{21} x_{t-1, i} + e_{2,i}}$")) + 
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0.5, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.5, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous("Parameter Estimate") +
+  scale_y_discrete("Trait Variance (X)") 
+
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/ols3_plot.pdf", width = 8, height = 6)
+```
+
+
+
+```{r}
+# Pivot the xlag and ylag variables
+
+```
+
+## Summary
+
+The OLS model only picks up the correct parameter estimates -- i.e., the values used to simulate the data, when there is no unit level variance. We estimate the following equation.
+
+$$x_{t, i}=a_0 + b_1 y_{t-1, i} + b_2 x_{t-1, i} + e_{2,i}$$
+
+Yet, we assume the DGP looks like this
+
+$$x_{t, i}=a_0 + b_1 y_{t-1, i} + b_2 x_{t-1, i} + \mu_i + e_{2,i}$$
+
+Where $var(\mu_i) \sim (\bar{\mu_i}, \sigma_{\mu_i})$
+
+The extent to which $\sigma_{\mu_i}$ is greater than zero -- the trait level variance -- the CLPM, because it is unable to accomodate both trait and state level effects, fails to estimate the correct parameter values, for both CL and AR paramters.
+
+## The RI-CLPM
+
+The RI-CLPM is a model that includes both trait and state level effects. The $\texttt{monteCarloRICLPM()}$ function can simulate data under this model.
+
+```{r}
+rm(list = ls())
+library(tidyr)
+library(dplyr)
+devtools::load_all()
+monteCarloOLS(
+   trials = 1,
+   waves = 5,
+   dgp = "riclpm",
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   variance.between.x = 0.8,
+   variance.between.y = 0.8,
+   cov.pq = 0,
+   sample_size = 5000) -> results
+
+
+# Construct the parameter data set by using expand.grid to generate all permutations
+# Vary AR parameters from 0 to 1 byincrements of 0.5
+expand.grid(
+  stability.p = 0.2,
+  stability.q = 0.2,
+  variance.between.x = seq(0.8, 1.6, by = .2),
+  variance.between.y = 0.5,
+  cross.p = 0,
+  cross.q = 0,
+  variance.q = 1,
+  variance.p = 1,
+  cov.between = 0,
+  sample_size = 5000) -> mc_params
+
+# Generally don't do this -- append lists is inefficient.
+for(i in 1:nrow(mc_params)){
+  results <- rbind(results, 
+                   monteCarloOLS(
+                                   trials = 100,
+                                   waves = 5,
+                                   dgp = "riclpm",
+                                   variance.between.x = mc_params$variance.between.x[i],
+                                   variance.between.y = mc_params$variance.between.y[i],
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross.p = mc_params$cross.p[i],
+                                   cross.q = mc_params$cross.q[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.between = mc_params$cov.between[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+resultsMCOLS = results
+save(resultsMCOLS, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLS2.rda")
+
+```
+
+```{r}
+rm(list = ls())
+devtools::load_all()
+library(tidyr)
+library(dplyr)
+library(lavaan)
+monteCarloRICLPM(
+   trials = 1,
+   waves = 5,
+   dgp = "riclpm",
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   variance.between.x = 0.8,
+   variance.between.y = 0.6,
+   cov.pq = 0,
+   sample_size = 5000) -> results
+
+# Construct the parameter data set by using expand.grid to generate all permutations
+# Vary AR parameters from 0 to 1 byincrements of 0.5
+expand.grid(
+   variance.between.x = seq(0.8, 1.6, by = .2),
+   variance.between.y = 0.6,
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   cov.pq = 0,
+   sample_size = 5000) -> mc_params
+
+#
+for(i in 1:nrow(mc_params)){
+  results <- rbind(results, 
+                   monteCarloRICLPM(
+                                   trials = 100,
+                                   waves = 5,
+                                   dgp = "riclpm",
+                                   variance.between.x = mc_params$variance.between.x[i],
+                                   variance.between.y = mc_params$variance.between.y[i],
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross_lag_x = mc_params$cross_lag_x[i],
+                                   cross_lag_y = mc_params$cross_lag_y[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.pq = mc_params$cov.pq[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+resultsRICLPM = results
+save(resultsRICLPM, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsRICLPM.rda")
+```
+
+
+```{r}
+rm(list = ls())
+devtools::load_all()
+library(tidyr)
+library(dplyr)
+library(lavaan)
+monteCarloFI(
+   trials = 1,
+   waves = 5,
+   dgp = "riclpm",
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   variance.between.x = 0.8,
+   variance.between.y = 0.6,
+   cov.pq = 0,
+   sample_size = 5000) -> results
+
+# Construct the parameter data set by using expand.grid to generate all permutations
+# Vary AR parameters from 0 to 1 byincrements of 0.5
+expand.grid(
+   variance.between.x = seq(0.8, 1.6, by = .2),
+   variance.between.y = 0.6,
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   cov.pq = 0,
+   sample_size = 5000) -> mc_params
+
+#
+for(i in 1:nrow(mc_params)){
+  results <- rbind(results, 
+                   monteCarloFI(
+                                   trials = 100,
+                                   waves = 5,
+                                   dgp = "riclpm",
+                                   variance.between.x = mc_params$variance.between.x[i],
+                                   variance.between.y = mc_params$variance.between.y[i],
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross_lag_x = mc_params$cross_lag_x[i],
+                                   cross_lag_y = mc_params$cross_lag_y[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.pq = mc_params$cov.pq[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+resultsOLSFI = results
+save(resultsOLSFI, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLSFI.rda")
+```
+
+
+```{r}
+library(lavaan)
+monteCarloCLPM(
+   trials = 1,
+   waves = 5,
+   dgp = "riclpm",
+   stability.p = 0.2,
+   stability.q = 0.2,
+   variance.between.x = 0.5,
+   variance.between.y = 0.6,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.5,
+   variance.p = 0.5,
+   cov.pq = 0,
+   sample_size = 5000) -> results
+
+# Vary AR parameters from 0 to 1 byincrements of 0.5
+expand.grid(
+   variance.between.x = seq(0.8, 1.6, by = .2),
+   variance.between.y = 0.6,
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   cov.pq = 0,
+   sample_size = 5000) -> mc_params
+
+#
+for(i in 1:nrow(mc_params)){
+  results <- rbind(results, 
+                   monteCarloCLPM(
+                                   trials = 100,
+                                   waves = 5,
+                                   dgp = "riclpm",
+                                   variance.between.x = mc_params$variance.between.x[i],
+                                   variance.between.y = mc_params$variance.between.y[i],
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross_lag_x = mc_params$cross_lag_x[i],
+                                   cross_lag_y = mc_params$cross_lag_y[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.pq = mc_params$cov.pq[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+resultsCLPM = results
+save(resultsCLPM, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsCLPM.RData")
+
+```
+
+
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+rm(list = ls())
+devtools::load_all()
+library(tidyr)
+library(dplyr)
+library(lavaan)
+monteCarloCTSEM(
+   trials = 1,
+   waves = 5,
+   dgp = "riclpm",
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   variance.between.x = 0.8,
+   variance.between.y = 0.8,
+   cov.pq = 0,
+   sample_size = 5000) -> results
+
+
+expand.grid(
+   variance.between.x = seq(0.8, 1.6, by = .2),
+   variance.between.y = 0.6,
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   cov.pq = 0,
+   sample_size = 5000) -> mc_params
+
+for(i in 1:nrow(mc_params)){
+  results <- rbind(results, 
+                   monteCarloCTSEM(
+                                   trials = 25,
+                                   waves = 5,
+                                   dgp = "riclpm",
+                                   variance.between.x = mc_params$variance.between.x[i],
+                                   variance.between.y = mc_params$variance.between.y[i],
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross_lag_x = mc_params$cross_lag_x[i],
+                                   cross_lag_y = mc_params$cross_lag_y[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.pq = mc_params$cov.pq[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+
+resultsCTSEM = results
+save(resultsCTSEM, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsCTSEM.RData")
+
+```
+
+
+
+```{r}
+rm(list = ls())
+devtools::load_all()
+library(tidyr)
+library(dplyr)
+library(lavaan)
+monteCarloLChange(
+   trials = 1,
+   waves = 5,
+   dgp = "riclpm",
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   variance.between.x = 0.8,
+   variance.between.y = 0.6,
+   cov.pq = 0,
+   sample_size = 5000) -> results
+
+
+expand.grid(
+   variance.between.x = seq(0.8, 1.6, by = .2),
+   variance.between.y = 0.6,
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   cov.pq = 0,
+   sample_size = 5000) -> mc_params
+
+
+for(i in 1:nrow(mc_params)){
+  print(paste("🚀 Running Monte Carlo Simulation 🚀"))
+  print(paste("Within Person Stability X: ", mc_params$variance.between.x[i], " | Within Person Stability Y: ", mc_params$variance.between.y[i]))
+  results <- rbind(results, 
+                   monteCarloLChange(
+                                   trials = 100,
+                                   waves = 5,
+                                   dgp = "riclpm",
+                                   variance.between.x = mc_params$variance.between.x[i],
+                                   variance.between.y = mc_params$variance.between.y[i],
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross_lag_x = mc_params$cross_lag_x[i],
+                                   cross_lag_y = mc_params$cross_lag_y[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.pq = mc_params$cov.pq[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+
+resultsLCHANGE= results
+save(resultsLCHANGE, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsLCHANGE.rda")
+```
+
+```{r}
+rm(list = ls())
+library(dplyr)
+library(tidyr)
+library(dplyr)
+library(crossLagR)
+
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsCLPM.RData")
+resultsCLPM <- resultsCLPM %>% mutate(model = "CLPM")
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsRICLPM.rda")
+resultsRICLPM <- resultsRICLPM %>% mutate(model = "RICLPM")
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsCTSEM.RData")
+resultsCTSEM <- resultsCTSEM %>% mutate(model = "CTSEM")
+# load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsLCHANGE.rdat")
+# resultsLCHANGE <- resultsLCHANGE %>% mutate(model = "LCHANGE")
+load("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/resultsOLSFI.rda")
+resultsOLSFI <- resultsOLSFI %>% mutate(model = "OLSFI")
+
+
+
+bind_rows(resultsCLPM, 
+          resultsRICLPM, 
+          resultsCTSEM, 
+          resultsOLSFI) -> resultsSIM
+
+```
+
+```{r}
+
+```
+
+```{r}
+library(ggplot2)
+library(ggridges)
+library(latex2exp)
+  
+ylag_x <- ggplot(
+  # Data 
+  resultsSIM %>% filter(variance.between.x!=0.5) %>% 
+         #rename model Model
+         mutate(Model = as.factor(model)), 
+  # Structure  
+    aes(x = ylag_x, 
+        y = as.factor(variance.between.x),
+        grouping = as.factor(Model),
+        color = Model,
+        fill = Model,
+            )) + 
+  geom_density_ridges( alpha = 0.25,
+    scale = 1,
+    show.legend = TRUE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 3,
+    point_size = 1,
+    point_color = "black",
+    point_alpha = 0.01,
+    color = NA  # Remove the outline
+  ) +
+  theme_minimal() + 
+  # title
+  labs(title = paste("Cross Lagged Effects (Y)"),
+  subtitle = TeX("$x_{t, i}= \\theta_{11}  x_{t-1, i} +  \\theta_{12} y_{t-1, i} + \\mu_{x,i} + e_{1,i}$\n
+                  $y_{t, i}= \\theta_{22}  y_{t-1, i} +  \\theta_{21}  y_{x-1, i} + \\mu_{y,i} + e_{1,i}$" ))+
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  # geom_vline(xintercept = 0.2, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+ # annotate("text", x = 0.2, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous(TeX("$var(\\mu_{x,i})$ "), limits = c(-1,1)) +
+  scale_y_discrete("") 
+
+ylag_y <- ggplot(
+  # Data 
+  resultsSIM %>% filter(variance.between.x!=0.5) %>% 
+         #rename model Model
+         mutate(Model = as.factor(model)), 
+  # Structure  
+    aes(x = ylag_y, 
+        y = as.factor(variance.between.x),
+        grouping = as.factor(Model),
+        color = Model,
+        fill = Model,
+            )) + 
+  geom_density_ridges( alpha = 0.25,
+    scale = 1,
+    show.legend = TRUE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 3,
+    point_size = 1,
+    point_color = "black",
+    point_alpha = 0.01,
+    color = NA  # Remove the outline
+  ) +
+  theme_minimal() + 
+  # title
+  labs(title = paste("Autoregressive Effect (Y)"),
+  subtitle = TeX("$x_{t, i}= \\theta_{11} x_{t-1, i} + \\theta_{12} y_{t-1, i} + \\mu_{x,i} + e_{1,i}$\n
+                  $y_{t, i}= \\theta_{22} y_{t-1, i} + \\theta_{21} x_{t-1, i} + \\mu_{y,i} + e_{2,i}$" ))+
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0.2, linetype = "dashed", color = "black") +
+  #geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.2, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  #annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous(TeX("$var(\\mu_{x,i})$ "), limits = c(-1,1)) +
+  scale_y_discrete("Random Intercept Variance (X)")
+
+xlag_y <- ggplot(
+  # Data 
+  resultsSIM %>% filter(variance.between.x!=0.5) %>% 
+         #rename model Model
+         mutate(Model = as.factor(model)), 
+  # Structure  
+    aes(x = xlag_y, 
+        y = as.factor(variance.between.x),
+        grouping = as.factor(Model),
+        color = Model,
+        fill = Model,
+            )) +
+  geom_density_ridges( alpha = 0.25,
+    scale = 1,
+    show.legend = TRUE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 3,
+    point_size = 1,
+    point_color = "black",
+    point_alpha = 0.01,
+    color = NA  # Remove the outline
+  ) +
+  theme_minimal() +
+  # title
+  labs(title = paste("Cross Lagged Effect (X)"),
+  subtitle = TeX("$x_{t, i}= \\theta_{11} x_{t-1, i} + \\theta_{12} y_{t-1, i} + \\mu_{x,i} + e_{1,i}$\n
+                  $y_{t, i}= \\theta_{22} y_{t-1, i} + \\theta_{21} x_{t-1, i} + \\mu_{y,i} + e_{2,i}$" ))+
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  #annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous(TeX("$var(\\mu_{x,i})$ "), limits = c(-1,1)) +
+  scale_y_discrete("Random Intercept Variance (X)")
+
+xlag_x <- ggplot(
+  # Data 
+  resultsSIM %>% filter(variance.between.x!=0.5) %>% 
+         #rename model Model
+         mutate(Model = as.factor(model)), 
+  # Structure  
+    aes(x = xlag_x, 
+        y = as.factor(variance.between.x),
+        grouping = as.factor(Model),
+        color = Model,
+        fill = Model,
+            )) +
+  geom_density_ridges( alpha = 0.25,
+    scale = 1,
+    show.legend = TRUE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 3,
+    point_size = 1,
+    point_color = "black",
+    point_alpha = 0.01,
+    color = NA  # Remove the outline
+  ) +
+  theme_minimal() +
+  # title
+  labs(title = paste("Autoregressive Effect (X)"),
+  subtitle = TeX("$x_{t, i}= \\theta_{11} x_{t-1, i} + \\theta_{12} y_{t-1, i} + \\mu_{x,i} + e_{1,i}$\n
+                  $y_{t, i}= \\theta_{22} y_{t-1, i} + \\theta_{21} x_{t-1, i} + \\mu_{y,i} + e_{2,i}$" ))+
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0.2, linetype = "dashed", color = "black") +
+  #annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  annotate("text", x = 0.2, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  scale_x_continuous(TeX("$var(\\mu_{x,i})$ "), limits = c(-1,1)) +
+  scale_y_discrete("Random Intercept Variance (X)")
+
+# write each to a separate pdf
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/ylag_x.pdf", ylag_x, width = 8, height = 6)
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/ylag_y.pdf", ylag_y, width = 8, height = 6)
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/xlag_x.pdf", xlag_x, width = 8, height = 6)
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/xlag_y.pdf", xlag_y, width = 8, height = 6)
+```
+
+
+
+
+```{r}
+library(ggplot2)
+library(ggridges)
+resultsSIM %>%
+  pivot_longer(
+    cols = c(xlag_x, ylag_x, xlag_y, ylag_y),
+    names_to = c("variable", ".value"),
+    names_sep = "_"
+  ) %>%
+  mutate(variable = factor(variable, levels = c("xlag", "ylag"))) %>%
+  pivot_longer(
+    cols = c(x, y),
+    names_to = "lag_type",
+    values_to = "values"
+  ) %>%
+  filter(variance.between.y == 0.6) %>%
+  filter(variance.between.x != 0.5) %>%
+  filter(lag_type == "x") %>%
+  ggplot(aes(x = values, 
+             fill = "grey", 
+             y = as.factor(variance.between.x),
+             grouping = model,
+             fill = model))+
+            
+  facet_wrap(~ as.factor(model)) + 
+  geom_density_ridges2(
+    alpha = 0.40,
+    scale = 1,
+    show.legend = TRUE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 2,
+    point_size = 1,
+    point_alpha = 0.01,
+    fill = " darkgrey",
+    color = NA  # Remove the outline
+  ) +
+  theme_minimal() + 
+  # title
+  labs(title = paste("Monte Carlo Simulations (X)"),
+  subtitle = TeX("$\\textbf{x_{t, i}= \\theta_{11} x_{t-1, i} + \\theta_{12} y_{t-1, i} + \\mu_{x,i} + e_{1,i}}$\n
+                  $y_{t, i}= \\theta_{22} y_{t-1, i} + \\theta_{21} x_{t-1, i} + \\mu_{y,i} + e_{2,i}$" ))+
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0.2, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.2, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous("Parameter Estimate") +
+  scale_y_discrete("Trait Variance (X)") 
+
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/mc_plot.pdf", width = 8, height = 6)
+
+```
+
+
+```{r}
+library(ggplot2)
+library(ggridges)
+resultsSIM %>%
+  pivot_longer(
+    cols = c(xlag_x, ylag_x, xlag_y, ylag_y),
+    names_to = c("variable", ".value"),
+    names_sep = "_"
+  ) %>%
+  mutate(variable = factor(variable, levels = c("xlag", "ylag"))) %>%
+  pivot_longer(
+    cols = c(x, y),
+    names_to = "lag_type",
+    values_to = "values"
+  ) %>%
+  filter(variance.between.y == 0.6) %>%
+  filter(variance.between.x != 0.5) %>%
+  filter(lag_type == "y") %>%
+  ggplot(aes(x = values, 
+             fill = "grey", 
+             y = as.factor(variance.between.x),
+             grouping = model,
+             fill = model))+
+            
+  facet_wrap(~ as.factor(model)) + 
+  geom_density_ridges2(
+    alpha = 0.40,
+    scale = 1,
+    show.legend = TRUE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 2,
+    point_size = 1,
+    point_alpha = 0.01,
+    fill = " darkgrey",
+    color = NA  # Remove the outline
+  ) +
+  theme_minimal() + 
+  # title
+  labs(title = paste("Monte Carlo Simulations (Y)"),
+  subtitle = TeX("$x_{t, i}= \\theta_{11} x_{t-1, i} + \\theta_{12} y_{t-1, i} + \\mu_{x,i} + e_{1,i}$\n
+                  $\\textbf{y_{t, i}= \\theta_{22} y_{t-1, i} + \\theta_{21} x_{t-1, i} + \\mu_{y,i} + e_{2,i}}$" ))+
+  # Style the plot
+  theme(
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0.2, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.2, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous("Parameter Estimate") +
+  scale_y_discrete("Trait Variance (y)") 
+
+ggsave("~/Dropbox/github_repos/crossLag_p/crossLagR/tmpdat/mc_plot2.pdf", width = 8, height = 6)
+
+```
+
+
+
+
+The models captures these estimates perfectly. We could try the same thing with the continuous time structural equation model. This one takes a little bit -- which could be sped up by compiling once.
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+rm(list = ls())
+devtools::load_all()
+library(tidyr)
+library(dplyr)
+library(lavaan)
+monteCarloCTSEM(
+   trials = 1,
+   waves = 5,
+   dgp = "riclpm",
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   variance.between.x = 0.8,
+   variance.between.y = 0.8,
+   cov.pq = 0,
+   sample_size = 5000) -> results
+
+
+expand.grid(
+   variance.between.x = seq(0.8, 1.6, by = .2),
+   variance.between.y = seq(0.8, 1.6, by = .2),
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   cov.pq = 0,
+   sample_size = 5000) -> mc_params
+
+for(i in 1:nrow(mc_params)){
+  results <- rbind(results, 
+                   monteCarloCTSEM(
+                                   trials = 25,
+                                   waves = 5,
+                                   dgp = "riclpm",
+                                   variance.between.x = mc_params$variance.between.x[i],
+                                   variance.between.y = mc_params$variance.between.y[i],
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross_lag_x = mc_params$cross_lag_x[i],
+                                   cross_lag_y = mc_params$cross_lag_y[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.pq = mc_params$cov.pq[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+```
+
+The random intercept variances vary from -- 0.8 to 1.6, by increments of 0.2. The AR parameters (i.e., stability) are fixed at 0.2, and the cross lagged effects are fixed at 0. The "within subject" variances are fixed at 0.4.
+
+```{r}
+
+rm(list = ls())
+devtools::load_all()
+library(tidyr)
+library(dplyr)
+library(lavaan)
+monteCarloLChange(
+   trials = 1,
+   waves = 5,
+   dgp = "riclpm",
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   variance.between.x = 0.8,
+   variance.between.y = 0.8,
+   cov.pq = 0,
+   sample_size = 5000) -> results
+
+
+expand.grid(
+   variance.between.x = seq(0.8, 1.6, by = .2),
+   variance.between.y = seq(0.8, 1.6, by = .2),
+   stability.p = 0.2,
+   stability.q = 0.2,
+   cross_lag_x = 0.0,
+   cross_lag_y = 0.0,
+   variance.q = 0.4,
+   variance.p = 0.4,
+   cov.pq = 0,
+   sample_size = 5000) -> mc_params
+
+
+for(i in 1:nrow(mc_params)){
+  print(paste("🚀 Running Monte Carlo Simulation 🚀"))
+  print(paste("Within Person Stability X: ", mc_params$variance.between.x[i], " | Within Person Stability Y: ", mc_params$variance.between.y[i]))
+  results <- rbind(results, 
+                   monteCarloLChange(
+                                   trials = 25,
+                                   waves = 5,
+                                   dgp = "riclpm",
+                                   variance.between.x = mc_params$variance.between.x[i],
+                                   variance.between.y = mc_params$variance.between.y[i],
+                                   stability.p = mc_params$stability.p[i],
+                                   stability.q = mc_params$stability.q[i],
+                                   cross_lag_x = mc_params$cross_lag_x[i],
+                                   cross_lag_y = mc_params$cross_lag_y[i],
+                                   variance.q = mc_params$variance.q[i],
+                                   variance.p = mc_params$variance.p[i],
+                                   cov.pq = mc_params$cov.pq[i],
+                                   sample_size = mc_params$sample_size[i])
+                )
+
+}
+```
+
+
+
+
+```{r}
+library(ggplot2)
 library(ggridges)
 results %>%
-  ggplot(aes(x = xlag_x, fill = "grey", y = as.factor(round(variance.between.x, 2)))) +
+  ggplot(aes(x = xlag_y, 
+             fill = "grey", 
+             y = as.factor(variance.between.x)))+
+  facet_wrap(~paste("Var(Y) = ", variance.between.y), scales = "free", ncol = 2) +
   geom_density_ridges2(
     alpha = 0.25,
     scale = 1,
@@ -158,30 +1471,82 @@ results %>%
     position = position_points_jitter(width = 0.05, height = 0),
     point_shape = 3,
     point_size = 1,
-    point_color = "darkgrey",
+    point_color = "black",
     point_alpha = 0.01,
-    fill = "darkgrey",
+    fill = " black",
     color = NA  # Remove the outline
-
   ) +
-  # scale_x_continuous("", limits = c(-0.25, 0.25)) +
-  scale_y_discrete("Random Intercept Variance (X)") +
-  scale_x_continuous(TeX(" b_2 ")) +
-  theme_minimal()  +
-  # Draw a vertical line at 0 that is dashed, use abline
-  geom_vline(xintercept = .4, linetype = "dashed", color = "black") +
-  geom_hline(yintercept = 0, linetype = "dashed", color = "black") +
-  annotate("text", x = 0.4, y = 1, label = "True Value ", hjust = 0) +
-  labs(title = "Autoregressive Parameter Estimates\nVarying Random Intercept Variance (X)", subtitle = TeX("$x_{t, i}=a_0 + b_1 y_{t-1, i} + b_2 x_{t-1, i} + e_{2,i}$"))+
+   geom_density_ridges2(
+     aes(x = xlag_x, 
+             fill = "grey", 
+             y = as.factor(variance.between.x)),
+    alpha = 0.25,
+    scale = 1,
+    show.legend = FALSE,
+    quantile_lines = TRUE,
+    rel_min_height = 0.01,
+    quantiles = 0.5,
+    calc_ecdf = FALSE,
+    jittered_points = TRUE,
+    position = position_points_jitter(width = 0.05, height = 0),
+    point_shape = 3,
+    point_size = 1,
+    point_color = "darkblue",
+    point_alpha = 0.01,
+    fill = "darkblue",
+    color = NA  # Remove the outline
+  ) +
+  theme_minimal() + 
+  # title
+  labs(title = "Autoregressive (Blue)\nand Cross Lagged (Grey) Parameter Estimates") + 
   # Style the plot
   theme(
-    plot.title = element_text(size = 20, face = "bold"),
-    axis.title = element_text(size = 15, face = "bold"),
-    axis.text = element_text(size = 12),
-    legend.title = element_text(size = 15, face = "bold"),
-    legend.text = element_text(size = 12)
-  )
+    plot.title = element_text(size = 12, face = "bold"),
+    axis.title = element_text(size = 10, face = "bold"),
+    axis.text = element_text(size = 10),
+    legend.title = element_text(size = 11, face = "bold"),
+    legend.text = element_text(size = 11) ) +
+  geom_vline(xintercept = 0.2, linetype = "dashed", color = "black") +
+  geom_vline(xintercept = 0, linetype = "dashed", color = "black") +
+  annotate("text", x = 0.2, y = 1, label = "True AR ", hjust = 0, size = 3) +
+  annotate("text", x = 0, y = 1, label = "True CL ", hjust = 0, size = 3) +
+  scale_x_continuous("Autoregressive (AR) and Cross Lagged (CL) Parameters") +
+  scale_y_discrete("Random Intercept Variance (Y)") 
+```
 
+The CTSEM also picks up the correct parameter values.
+
+## The Latent Change Model
+
+```{r}
+library(chattr)
+library(dplyr)
+library(lavaan)
+devtools::load_all()
+library(dplyr)
+simRICLPM(waves = 10,
+          variance.p = 0.8,
+          variance.q = 0.8,
+          stability.p = 0.2,
+          stability.q = 0.2,
+          cross.q = 0,
+          cross.p = 0,
+          cov.pq = 0.3,
+          cov.between = 0,
+          variance.between.x = 0.8,
+          variance.between.y = 0.8,
+          sample.nobs = 10000)[[2]] %>%
+  mutate(id = seq(1:nrow(.))) %>%
+  lavaan::lavaan(model = latentChange(waves = 5, 
+                              model_type = "dual_change"
+                             ),
+                meanstructure = FALSE,
+                estimator = "ML",
+                missing = "fiml",
+                fixed.x = FALSE,
+                mimic="mplus",
+                control=list(iter.max=1000),
+                verbose=FALSE) %>%summary(standardized = TRUE)
 ```
 
 

@@ -5,39 +5,32 @@
 \title{estimateRICLPM}
 \usage{
 estimateRICLPM(
-  data = data,
-  time_varying_x = x_vars,
-  time_varying_y = y_vars,
+  time_varying_x,
+  time_varying_y,
+  time_varying_z = NULL,
   time_invariant_vars = NULL,
-  waves = 10
+  waves
 )
 }
 \arguments{
-\item{data}{A data frame containing}
+\item{time_varying_x}{A vector of variable names for the X variables, ordered from earliest to latest.}
 
-\item{time_varying_x}{A vector of variable names for the X variables  in data frame. Ordered in time from earliest to latest.}
+\item{time_varying_y}{A vector of variable names for the Y variables, ordered from earliest to latest.}
 
-\item{time_varying_y}{A vector of variable names for the Y variables in data frame. Ordered in time from earliest to latest.}
+\item{time_varying_z}{An optional vector of variable names for an additional Z variable, ordered from earliest to latest.}
+
+\item{time_invariant_vars}{A vector of variable names for time-invariant variables.}
 
 \item{waves}{The number of waves (time points) in the model.}
-
-\item{y_vars}{A vector of variable names for the Y variables.}
 }
 \value{
-A character string containing the Lavaan model syntax for RI-CLPM.
-   * `model`: The Lavaan model syntax used for data simulation.
+A character string containing the Lavaan model syntax for RICLPM.
 }
 \description{
-Generates model syntax for Random Intercept Cross-Lagged Panel Model (RICLPM)
+Generates model syntax for Random Intercept Cross-Lagged Panel Model (RICLPM).
 }
 \details{
 This function generates the model syntax for a Random Intercept Cross-Lagged Panel Model (RICLPM)
 with a specified number of waves. The model includes latent variables for each wave, stability paths,
 and covariances between the latent variables.
-}
-\examples{
-# Not Run
-# Generate model syntax for a RICLPM with 5 waves
-#  model_syntax = estimateRICLPM(data = my_data, x_vars = c("x1", "x2", "x3", "x4", "x5"), y_vars = c("y1", "y2", "y3", "y4", "y5"), waves = 5)
-#  cat(model_syntax)
 }

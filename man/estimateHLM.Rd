@@ -10,6 +10,8 @@ estimateHLM(
   chains = 3,
   cores = 10,
   iterations = 3000,
+  variational = FALSE,
+  control = list(adapt_delta = 0.95),
   ...
 )
 }
@@ -37,20 +39,4 @@ The model includes random intercepts and slopes for x and y.
 }
 \examples{
 # Not Run
-# simRICLPM(waves = 5,
-#           variance.p = 0.5,
-#           variance.q = 0.5,
-#           stability.p = 0.20,
-#           stability.q = 0.20,
-#           cross.q = 0.30,
-#           cross.p = 0.30,
-#           cov.pq = 0.00,
-#           variance.between.x = 0.5,
-#          variance.between.y = 0.5,
-#           cov.between = 0,
-#           sample.nobs = 10e2)[[2]] \%>\%
-#   mutate(id = seq(1:nrow(df[[2]]))) \%>\%
-#   reshape_long_sim_cr() -> dat_long
-#
-# estimateHLM()
 }

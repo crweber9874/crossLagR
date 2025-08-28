@@ -27,7 +27,9 @@ estimateCTSEM <- function(data = dat_long,
                           LAMBDA = diag(2),
                           type = "stanct",
                           time_points = 10,
+                          cores = cores,
                           chains = chains,
+                          model = NA,
                           ...) {
   my_model <- ctsem::ctModel(
     Tpoints = time_points,
@@ -40,8 +42,8 @@ estimateCTSEM <- function(data = dat_long,
   )
   fit <- ctsem::ctStanFit(
     datalong = data,
-    ctstanmodel = my_model,
     iter = 3000,
+    ctstanmodel = my_model,
     ...
   )
   summary(fit, timeinterval = 1)$parmatrices %>%
@@ -50,5 +52,5 @@ estimateCTSEM <- function(data = dat_long,
     t() %>%
     as.data.frame() -> drift
   names(drift) <- c("xx", "xy", "yx", "yy")
-  return(list(parms = fit, drift = drift))
+  return(list(parms = fit, drift = drift, model = my_model))
 }

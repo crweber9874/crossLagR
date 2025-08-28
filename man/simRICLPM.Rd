@@ -8,38 +8,75 @@ simRICLPM(
   waves = 10,
   stability.p = 0.2,
   stability.q = 0.2,
+  stability.r = NULL,
   cross.p = 0.1,
   cross.q = 0.1,
+  cross.zx = NULL,
+  cross.zy = NULL,
   variance.p = 1,
   variance.q = 1,
+  variance.r = NULL,
   cov.pq = 0.1,
+  cov.pr = NULL,
+  cov.qr = NULL,
   variance.between.x = 1,
   variance.between.y = 1,
-  cov.between = 0.5,
+  variance.between.z = NULL,
+  cov.between.xy = 0.5,
+  cov.between.xz = NULL,
+  cov.between.yz = NULL,
   ...
 )
 }
 \arguments{
 \item{waves}{The number of waves (time points) in the model.}
 
-\item{stability.p}{The stability parameter for the x variable (autoregressive effect).}
+\item{stability.p}{The stability parameter for the X variable (autoregressive effect).}
 
-\item{stability.q}{The stability parameter for the y variable (autoregressive effect).}
+\item{stability.q}{The stability parameter for the Y variable (autoregressive effect).}
 
-\item{cross.p}{The cross-lagged effect of y on x at the next time point.}
+\item{stability.r}{The stability parameter for the Z variable (autoregressive effect, if applicable).}
 
-\item{cross.q}{The cross-lagged effect of x on y at the next time point.}
+\item{cross.p}{The cross-lagged effect of Y on X at the next time point.}
 
-\item{cov.pq}{The covariance between x and y within the same time point.}
+\item{cross.q}{The cross-lagged effect of X on Y at the next time point.}
+
+\item{cross.zx}{The cross-lagged effect of Z on X at the next time point (if applicable).}
+
+\item{cross.zy}{The cross-lagged effect of Z on Y at the next time point (if applicable).}
+
+\item{variance.p}{The variance for the latent X variables.}
+
+\item{variance.q}{The variance for the latent Y variables.}
+
+\item{variance.r}{The variance for the latent Z variables (if applicable).}
+
+\item{cov.pq}{The covariance between X and Y within the same time point.}
+
+\item{cov.pr}{The covariance between X and Z within the same time point (if applicable).}
+
+\item{cov.qr}{The covariance between Y and Z within the same time point (if applicable).}
+
+\item{variance.between.x}{The variance for the random intercept of X.}
+
+\item{variance.between.y}{The variance for the random intercept of Y.}
+
+\item{variance.between.z}{The variance for the random intercept of Z (if applicable).}
+
+\item{cov.between.xy}{The covariance of intercept terms between X and Y.}
+
+\item{cov.between.xz}{The covariance of intercept terms between X and Z (if applicable).}
+
+\item{cov.between.yz}{The covariance of intercept terms between Y and Z (if applicable).}
 
 \item{...}{Additional arguments to pass to the `lavaan::simulateData` function.}
 }
 \value{
 A list containing two elements:
    * `model`: The Lavaan model syntax used for data simulation.
-   * `data`:  The simulated data in a data frame format.
+   * `data`: The simulated data in a data frame format.
 }
 \description{
-Simulate data from an observed, random intercept cross-lagged regression (RI-CLR) model
-In particular, this creates a synthetic dataset of a cross-lagged model with a specified number of waves and structural parameters.
+Simulate data from an observed, random intercept cross-lagged regression (RI-CLR) model,
+including an optional third variable that can interact with X and Y.
 }

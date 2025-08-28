@@ -1,0 +1,37 @@
+---
+title: "Causal Inference and Cross Lagged Effects"
+author: "Chris Weber"
+date: "2025-08-06"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+$$
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{t-1}  
+\end{bmatrix}
++
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+$$
+
+The **cross lagged panel** regression model follows this form. Utilizing the potential outcomes framework, define the potential outcomes of $Y_t$ and $X_t$ for different values of $X_{t-1}$ and $Y_{t-1}$, $E[Y_{t}^{X_{t-1}})]$, $E[X_{t}^{Y_{t-1}})]$. The potential outcomes represent what $X_t$ or $Y_t$ would be if $X_{t-1}$ or $Y_{t-1}$ were set to a specific value, respectively. If we assume a linear function for the cross lagged effects, the **marginal structural model** can be used in combination with the observed data to retrieve the potential outcomes and define a causal estimand (Hernan and Robins 2020) is:
+
+$$ 
+E[Y_{t}^{X_{t-1}})] = \theta_{2y} Y_{t-1} \\
+E[X_{t}^{Y_{t-1}})] = \theta_{2x} X_{t-1} 
+$$

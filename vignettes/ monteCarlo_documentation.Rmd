@@ -1,0 +1,49 @@
+---
+title: " monteCarlo_documentation"
+output: html_document
+---
+
+The structure of the repository to run monte carlo simulations is located in the `crossLagR` package. Several functions are used to generate the data, estimate the models, and then run the monte carlo simulations. All of these functions are located in the `\R` folder of the package. 
+
+* `simCLPM` generates data from a standard cross-lagged panel model.
+* `simRICLPM` generates data from a random-intercept cross-lagged panel model.
+
+
+
+
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(dplyr)
+library(tictoc)
+devtools::load_all()
+
+stability_q <- seq(0.2, 0.7, by = .1)
+variance.between.x <- seq(0.3, 1, by = .1)
+
+# Timer for full OLS simulation
+tic("Full OLS Monte Carlo Simulation")
+resultsOLS <- expand.grid(x = stability_q, y = variance.between.x) |>
+  rowwise() |>
+  mutate(result = list({
+    res <- monteCarloOLS(
+      trials = 10,  # Reduced from 100
+      waves = 3,    # Reduced from 5
+      data_generation = "riclpm",
+      stability.p = 0.2,
+      stability.q = x,
+      cross_lag_x = 0.0,
+      cross_lag_y = 0.0,
+      variance.q = 0.5,
+      variance.p = 0.5,
+      variance.between.x = y,
+      variance.between.y = 0.5,
+      cov_pq = 0,
+      sample_size = 1000  # Reduced from 5000
+    )
+    res
+  })) |>
+  unnest(result)
+toc()
+# save(resultsOLS, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsOLS.rda")
+
+```

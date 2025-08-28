@@ -1,0 +1,42 @@
+---
+title: "mpsa_responses"
+output: html_document
+---
+
+First, build the package from this repository, or just download it from github
+```{r}
+devtools::load_all()
+library(dplyr)
+```
+
+Now, simulate data from a multi-indicator RI-CLPM
+
+```{r}
+dat = simRICLPMl(
+  waves = 5,
+  num_indicators_x = 5,
+  num_indicators_y = 5,
+  variance.p = 0.5,
+  variance.q = 0.5,
+  stability.p = 0.20,
+  stability.q = 0.20,
+  cross.q = 0.30,
+  cross.p = 0.30,
+  cov.pq = 0.00,
+  variance.between.x = 0.5,
+  variance.between.y = 0.5
+  )
+
+ind_list = generate_riclpm_indicator_lists(waves = 5, num_indicators = 5)
+
+
+lavaan::lavaan(model = estimateRICLPMl(waves = 5,
+                time_varying_y = ind_list$time_varying_y,
+                time_varying_x = ind_list$time_varying_x
+                
+),
+data = dat$data)
+                 
+
+```
+

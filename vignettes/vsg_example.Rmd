@@ -1,0 +1,146 @@
+---
+title: "The RI-CLPM and the VSG Data"
+header-includes:
+    - \usepackage{setspace}\onehalfspacing
+author: "Chris Weber"
+date: "2025-01-21"
+indent: true
+output:
+  pdf_document: default
+---
+
+# Introduction
+
+The CLPM follows this structure.
+
+$$\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{t-1}  
+\end{bmatrix}
+-   
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+$$
+
+The diagonal elements in the $\theta$ matrix represent the autoregressive parameters; the off-diagonal elements are the cross-lagged parameters.
+
+To model **trait** and **state** effects, the **Random Intercept Cross Lagged** model follows the form, but includes a time invariant "trait" level parameter ($\mu_i$).
+
+$$\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{t-1}  
+\end{bmatrix}
++
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
+}_{Trait}
+$$
+
+```{r}
+library(dplyr)
+library(car)
+devtools::load_all()
+
+datVoter <- read.csv("/Users/Chris/Dropbox/Mac/Desktop/vsg_mpsa/VOTER Panel Data Files/voter_panel.csv")
+panel.2011 <- data.frame(id = datVoter$cdid_2011)
+panel.2011$sex.2011 <- recode(datVoter$gender_2011, "1=0; 2=1; else=NA")
+panel.2011$income.2011 <- recode(datVoter$faminc_2011, "1:5=0; 6:32=1;else=NA") # 68th percentile
+panel.2011$white.2011 <- recode(datVoter$race_2011, "1=1; 2:8=0; else=NA")
+panel.2011$college.2011 <- recode(datVoter$educ_2011, "5:6=1; 1:4=0; else=NA")
+panel.2011$ideo2011 <- recode(datVoter$ideo5_2011, "1=1; 2=2; 3=3; 4=4; 5=5; else = NA") %>% zero.one()
+# Racial Resentment
+panel.2011$race_overcome_2011  <- recode(datVoter$race_overcome_2011,  "1=5; 2=4; 3=3; 4=2; 5=1; else = NA")
+panel.2011$race_tryharder_2011 <- recode(datVoter$race_tryharder_2011, "1=5; 2=4; 3=3; 4=2; 5=1; else = NA")
+panel.2011$race_slave_2011 <- recode(datVoter$race_slave_2011, "1=1; 2=2; 3=3; 4=4; 5=5; else = NA")
+# 2016
+panel.2011$sex.2016 <- recode(datVoter$gender_2011, "1=0; 2=1; else=NA")
+panel.2011$income.2016 <- recode(datVoter$faminc_2016, "1:5=0; 6:32=1;else=NA") # 68th percentile
+panel.2011$white.2016 <- recode(datVoter$race_2016, "1=1; 2:8=0; else=NA")
+panel.2011$college.2016 <- recode(datVoter$educ_2016, "5:6=1; 1:4=0; else=NA")
+panel.2011$ideo2016 <- recode(datVoter$ideo5_2016, "1=1; 2=2; 3=3; 4=4; 5=5; else = NA") %>% zero.one()
+
+panel.2011$race_overcome_2016 <- recode(datVoter$race_overcome_2016,  "1=5; 2=4; 3=3; 4=2; 5=1; else = NA")
+panel.2011$race_tryharder_2016 <- recode(datVoter$race_tryharder_2016, "1=5; 2=4; 3=3; 4=2; 5=1; else = NA")
+panel.2011$race_slave_2016 <- recode(datVoter$race_slave_2016, "1=1; 2=2; 3=3; 4=4; 5=5; else = NA")
+
+
+panel.2011$sex.2020 <- recode(datVoter$gender_2020Sep, "1=0; 2=1; else=NA")
+panel.2011$income.2020<- recode(datVoter$faminc_2020Sep, "1:5=0; 6:32=1;else=NA") # 68th percentile
+panel.2011$white.2020 <- recode(datVoter$race_2020Sep, "1=1; 2:8=0; else=NA")
+panel.2011$college.2020 <- recode(datVoter$ideo5_2020Sep, "5:6=1; 1:4=0; else=NA")
+panel.2011$ideo2020 <- recode(datVoter$ideo5_2020Sep, "1=1; 2=2; 3=3; 4=4; 5=5; else = NA") %>% zero.one()
+
+panel.2011$race_overcome_2020  <- recode(datVoter$race_overcome_2020Sep,  "1=5; 2=4; 3=3; 4=2; 5=1; else = NA")
+panel.2011$race_tryharder_2020 <- recode(datVoter$race_tryharder_2020Sep, "1=5; 2=4; 3=3; 4=2; 5=1; else = NA")
+panel.2011$race_slave_2020 <- recode(datVoter$race_slave_2020Sep, "1=1; 2=2; 3=3; 4=4; 5=5; else = NA")
+
+panel.2011$rr11 <- rowMeans(cbind(panel.2011$race_overcome_2011, 
+                                panel.2011$race_tryharder_2011,
+                                panel.2011$race_slave_2011), na.rm = TRUE) %>% zero.one()
+panel.2011$rr16 <- rowMeans(cbind(panel.2011$race_overcome_2016,
+                               panel.2011$race_tryharder_2016,
+                               panel.2011$race_slave_2016), na.rm = TRUE) %>% zero.one()
+
+panel.2011$rr20 <- rowMeans(cbind(panel.2011$race_overcome_2020,
+                               panel.2011$race_tryharder_2020,
+                               panel.2011$race_slave_2020), na.rm = TRUE) %>% zero.one()
+```
+
+```{r}
+dat <- data.frame(x1 = panel.2011$rr11)
+dat$x2 <- panel.2011$rr16
+dat$x3 <- panel.2011$rr20
+dat$sex <- panel.2011$sex.2011
+
+dat$y1 <- panel.2011$ideo2011
+dat$y2 <- panel.2011$ideo2016
+dat$y3 <- panel.2011$ideo2020
+
+lavaan::lavaan(estimateCLPM(waves = 3), data = dat,
+               meanstructure = FALSE) -> CLPM
+
+
+lavaan::lavaan(estimateRICLPM(waves = 3, 
+                               time_varying_x = c("x1", "x2", "x3"),
+                               time_varying_y = c("y1", "y2", "y3")),
+                  data = dat,
+               meanstructure = FALSE) -> RICLPM
+```
+
+```{r}
+dat %>%
+  # correlation between x1 and x2, drop missing
+  select(y1, y2, y3) %>%
+  cor(use = "pairwise.complete.obs") 
+
+
+
+```

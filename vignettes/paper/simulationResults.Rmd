@@ -160,10 +160,11 @@ var.y = seq(0, 1, by = .1)
 
 for(x in var.x){
   for(y in var.y){
+    pritn
         results <- rbind(results, 
                          monteCarlo_OLS(
-                                         trials = 100,
-                                         waves = 4,
+                                         trials = 10,
+                                         waves = 10,
                                          data_generation = "ri-clpm",
                                          within_person_stability_y = 0,
                                          within_person_stability_x = 0,

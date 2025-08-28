@@ -9,7 +9,7 @@
 #' @param proportion.change_x Proportion of change in x.
 #' @param proportion.change_y Proportion of change in y.
 #'
-#' @import tidyr dplyr
+#'x @import tidyr dplyr
 
 #'
 #' @return A data frame containing the results of the simulation.
@@ -27,10 +27,10 @@ monteCarloOLS <- function(
     variance.p = 1,
     variance.q = 1,
     sample_size = 2500,
-    model_type = "riclpm",
+    dgp = "riclpm",
     ...
 ) {
-if(model_type == "riclpm") {
+if(dgp == "riclpm") {
     simulation_parameters <- expand.grid(
             variance.between.x = variance.between.x,
             variance.between.y = variance.between.y,
@@ -91,14 +91,17 @@ if(model_type == "riclpm") {
             ylag_x = yvalue_x,
             xlag_y = xvalue_y,
             ylag_y = yvalue_y,
-            trial = j
+            trial = j,
+            estimator = "ols",
+            dgp = "riclpm"
+
           )
         }
       }
       results_df <- do.call(rbind, results)
 
 }
-else if(model_type == "clpm") {
+else if(dgp == "clpm") {
     simulation_parameters <- expand.grid(
       stability.p = stability.p,
       stability.q = stability.q,
@@ -128,8 +131,8 @@ else if(model_type == "clpm") {
           reshape_long_sim_cr() %>% as.data.frame()
 
         # Fit the OLS model and extract coefficients
-        model_fit_y <- lm(y ~ xlag + ylag, dat)
-        model_fit_x <- lm(x ~ xlag + ylag, dat)
+        model_fit_y <- lm(y ~  xlag + ylag, dat)
+        model_fit_x <- lm(x ~  xlag + ylag, dat)
 
 
         xvalue_x <-  model_fit_x$coefficients[["xlag"]]
@@ -155,7 +158,10 @@ else if(model_type == "clpm") {
           ylag_x = yvalue_x,
           xlag_y = xvalue_y,
           ylag_y = yvalue_y,
-          trial = j
+          trial = j,
+          estimator = "ols",
+          dgp = "clpm"
+
         )
       }
     }

@@ -4,7 +4,7 @@ author: "Chris Weber"
 date: "2025-02-13"
 output: pdf_document
 ---
-y
+
 The $\texttt{crossLagR}$ package includes several functions to simulate data.
 
 $\texttt{simRICLPM()}$ simulates data from a random intercept cross-lagged panel model.
@@ -15,8 +15,9 @@ $\texttt{reshape\_long\_sim\_cr()}$ Takes a wide data frame, pivots to wide form
 
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE}
-library(crossLagR)
+devtools::load_all()
 library(dplyr)
+
 
 df = simRICLPM(waves = 5,
                 variance.p = 0.5,
@@ -29,7 +30,9 @@ df = simRICLPM(waves = 5,
                 variance.between.x = 0.5,
                 variance.between.y = 0.5,
                 cov.between = 0,
-                sample.nobs = 10e2)
+                sample.nobs = 10e2,
+                time_varying_y = paste0("y", 1:5),
+                time_varying_x = paste0("x", 1:5))
 df[[2]] %>%
   mutate(id = seq(1:nrow(df[[2]])))  -> dat
 dat %>%
@@ -95,10 +98,14 @@ summary(fit1)
 ### Random Intercept Cross-Lagged Panel Model
 
 ```{r}
-library(crossLagR)
+devtools::load_all()
 library(lavaan)
+WAVES = 5
 
-fit2 <- lavaan(estimateRICLPM(waves = 5),
+fit2 <- lavaan(estimateRICLPM(data= dat,
+                              waves = WAVES, 
+                              time_varying_x = paste0("x", 1:WAVES), 
+                              time_varying_y = paste0("y", 1:WAVES)),
               data = dat,
               int.ov.free = TRUE, # Fix intercepts to zero
               estimator="ml")

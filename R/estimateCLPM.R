@@ -16,14 +16,15 @@
 #' #  model_syntax = estimateCLPM(waves = 5)
 #' #  cat(model_syntax)
 
-estimateCLPM = function(
-    waves = 10) {
+estimateCLPM = function(waves = 10) {
+  # Check that 'waves' is a positive integer
+  if (!is.numeric(waves) || waves <= 0 || waves != as.integer(waves)) {
+    stop("Error: Parameter 'waves' must be a positive integer.")
+  }
 
   model_string <- ""
 
   model_string <- paste0(model_string, "\n")
-
-
 
   for (w in 1:waves) {
     model_string <- paste0(
@@ -35,19 +36,18 @@ estimateCLPM = function(
   # Stability
   for (w in 2:waves) {
     model_string <- paste0(
-      model_string, "\n p", w, " ~  ", "ar*p", w - 1, " + ","cl*q", w - 1,
-      "\n q", w, " ~ ", "ar*q", w - 1, " + ", "cl*p", w - 1
+      model_string, "\n p", w, " ~  ", "ar_yeqn*p", w - 1, " + ", "cl_yeqn*q", w - 1,
+      "\n q", w, " ~ ", "ar_xeqn*q", w - 1, " + ", "cl_xeqn*p", w - 1
     )
   }
 
   for (w in 1:waves) {
     model_string <- paste0(
-      model_string, "\n p", w, " ~~ ",  " p", w,
-      "\n q", w, " ~~ ",  "q", w,
-      "\n p", w, " ~~ ",  " q", w
+      model_string, "\n p", w, " ~~ ", " p", w,
+      "\n q", w, " ~~ ", " q", w,
+      "\n p", w, " ~~ ", " q", w
     )
   }
 
   return(model_string)
 }
-
