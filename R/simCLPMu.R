@@ -3,18 +3,18 @@
 #' In particular, this creates a simulated dataset of a cross-lagged model with a specified number of waves, structural parameters, and an optional common confounder.
 #'
 #' @param waves The number of waves (time points) in the model.
-#' @param stability.p The stability parameter for the x variable (autoregressive effect).
-#' @param stability.q The stability parameter for the y variable (autoregressive effect).
-#' @param cov.pq The covariance between x and y within the same time point.
-#' @param cross.q The cross-lagged effect of x on y at the next time point.
-#' @param cross.p The cross-lagged effect of y on x at the next time point.
-#' @param variance.p The variance of the p latent variable.
-#' @param variance.q The variance of the q latent variable.
-#' @param include.confounder Logical. Whether to include a common confounder u.
-#' @param confounder.p The effect of the confounder u on x variables.
-#' @param confounder.q The effect of the confounder u on y variables.
-#' @param confounder.variance The variance of the confounder u.
-#' @param confounder.stability The stability parameter for the confounder (autoregressive effect).
+#' @param stability_p The stability parameter for the x variable (autoregressive effect).
+#' @param stability_q The stability parameter for the y variable (autoregressive effect).
+#' @param cov_pq The covariance between x and y within the same time point.
+#' @param cross_q The cross-lagged effect of x on y at the next time point.
+#' @param cross_p The cross-lagged effect of y on x at the next time point.
+#' @param variance_p The variance of the p latent variable.
+#' @param variance_q The variance of the q latent variable.
+#' @param include_confounder Logical. Whether to include a common confounder u.
+#' @param confounder_p The effect of the confounder u on x variables.
+#' @param confounder_q The effect of the confounder u on y variables.
+#' @param confounder_variance The variance of the confounder u.
+#' @param confounder_stability The stability parameter for the confounder (autoregressive effect).
 #' @param ... Additional arguments to pass to the `lavaan::simulateData` function.
 #'
 #' @return A list containing two elements:
@@ -24,19 +24,19 @@
 #' @export
 
 simCLPMu <- function(waves = 10,
-                    stability.p = 0.2,
-                    stability.q = 0.2,
-                    cross.p = 0.1,
-                    cross.q = 0.1,
-                    variance.p = 1,
-                    variance.q = 1,
-                    cov.pq = 0.1,
-                    include.confounder = TRUE,
-                    confounder.p = 0.3,
-                    confounder.q = 0.3,
-                    confounder.variance = 1,
-                    confounder.stability = 0.4,
-                    ...) {
+                     stability_p = 0.2,
+                     stability_q = 0.2,
+                     cross_p = 0.1,
+                     cross_q = 0.1,
+                     variance_p = 1,
+                     variance_q = 1,
+                     cov_pq = 0.1,
+                     include_confounder = TRUE,
+                     confounder_p = 0.3,
+                     confounder_q = 0.3,
+                     confounder_variance = 1,
+                     confounder_stability = 0.4,
+                     ...) {
 
   model_string <- ""
 
@@ -49,7 +49,7 @@ simCLPMu <- function(waves = 10,
   }
 
   # If including confounder, add intercepts for u variables
-  if (include.confounder) {
+  if (include_confounder) {
     for (w in 1:waves) {
       model_string <- paste0(model_string, "u", w, "~ 1", "\n")
     }
@@ -65,29 +65,29 @@ simCLPMu <- function(waves = 10,
 
   # Stability and cross-lagged effects
   for (w in 2:waves) {
-    if (include.confounder) {
+    if (include_confounder) {
       # Include confounder effects in the structural model
       model_string <- paste0(
         model_string,
-        "\n p", w, " ~ ", stability.p, " * p", w - 1, " + ", cross.q, " * q", w - 1, " + ", confounder.p, " * u", w,
-        "\n q", w, " ~ ", stability.q, " * q", w - 1, " + ", cross.p, " * p", w - 1, " + ", confounder.q, " * u", w
+        "\n p", w, " ~ ", stability_p, " * p", w - 1, " + ", cross_q, " * q", w - 1, " + ", confounder_p, " * u", w,
+        "\n q", w, " ~ ", stability_q, " * q", w - 1, " + ", cross_p, " * p", w - 1, " + ", confounder_q, " * u", w
       )
     } else {
       # Original model without confounder
       model_string <- paste0(
         model_string,
-        "\n p", w, " ~ ", stability.p, " * p", w - 1, " + ", cross.q, " * q", w - 1,
-        "\n q", w, " ~ ", stability.q, " * q", w - 1, " + ", cross.p, " * p", w - 1
+        "\n p", w, " ~ ", stability_p, " * p", w - 1, " + ", cross_q, " * q", w - 1,
+        "\n q", w, " ~ ", stability_q, " * q", w - 1, " + ", cross_p, " * p", w - 1
       )
     }
   }
 
   # Include confounder effects for first wave as well
-  if (include.confounder) {
+  if (include_confounder) {
     model_string <- paste0(
       model_string,
-      "\n p1 ~ ", confounder.p, " * u1",
-      "\n q1 ~ ", confounder.q, " * u1"
+      "\n p1 ~ ", confounder_p, " * u1",
+      "\n q1 ~ ", confounder_q, " * u1"
     )
   }
 
@@ -95,19 +95,19 @@ simCLPMu <- function(waves = 10,
   for (w in 1:waves) {
     model_string <- paste0(
       model_string,
-      "\n p", w, " ~~ ", variance.p, " * p", w,
-      "\n q", w, " ~~ ", variance.q, " * q", w,
-      "\n p", w, " ~~ ", cov.pq, " * q", w
+      "\n p", w, " ~~ ", variance_p, " * p", w,
+      "\n q", w, " ~~ ", variance_q, " * q", w,
+      "\n p", w, " ~~ ", cov_pq, " * q", w
     )
   }
 
   # Confounder structure
-  if (include.confounder) {
+  if (include_confounder) {
     # Confounder autoregressive effects
     for (w in 2:waves) {
       model_string <- paste0(
         model_string,
-        "\n u", w, " ~ ", confounder.stability, " * u", w - 1
+        "\n u", w, " ~ ", confounder_stability, " * u", w - 1
       )
     }
 
@@ -115,7 +115,7 @@ simCLPMu <- function(waves = 10,
     for (w in 1:waves) {
       model_string <- paste0(
         model_string,
-        "\n u", w, " ~~ ", confounder.variance, " * u", w
+        "\n u", w, " ~~ ", confounder_variance, " * u", w
       )
     }
   }
