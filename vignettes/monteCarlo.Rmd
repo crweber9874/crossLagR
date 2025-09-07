@@ -52,14 +52,14 @@ Each model is tested under the same data generating process -- which we vary. We
 
 # Tested with DGP (CLPM, RICLPM) and estimator (OLS, RICLPM, CLPM), caches error messages
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
+```{r echo=FALSE, message=FALSE, warning=FALSE, cache = FALSE}
 library(dplyr)
 library(tictoc)
 library(tidyr)
 devtools::load_all()
-# Estimate the CLPM with a RI-CLPM data generating process
+rm(list = ls())
 run_mc_sims(
-  estimator = "CLPM",
+  estimator = "OLS",
   param_grid = expand.grid(
     stability_p = 0.3,
     stability_q = 0.3,
@@ -72,7 +72,7 @@ run_mc_sims(
   waves = 3,
   sample_size = 2000,
   verbose = TRUE,
-  data_generation = "clpm"
+  data_generation = "clpmu"
 ) |> head()
 ```
 
@@ -125,19 +125,19 @@ This function runs a monte carlo simulation, simulating data from the RI-CLPM, a
 library(lavaan)
 library(tictoc)
 
-variance.between.y <- seq(0.2, 0.7, by = .1)
-variance.between.x <- seq(0.3, 1, by = .1)
+variance_between_y <- seq(0.2, 0.7, by = .1)
+variance_between_x <- seq(0.3, 1, by = .1)
 
 # Timer for full RICLPM simulation
 tic("Full RICLPM Monte Carlo Simulation")
-resultsRICLPM <- expand.grid(x = variance.between.y, y = variance.between.x) |>
+resultsRICLPM <- expand.grid(x = variance_between_y, y = variance_between_x) |>
   rowwise() |>
   mutate(result = list({
     # tic(paste("RICLPM Simulation for x =", x, ", y =", y))
     res <- monteCarloRICLPM(
       trials = 10,  # Reduced from 100
       waves = 3,    # Reduced from 5
-      dgp = "riclpm",
+      dgp = "clpm",
       stability.p = 0.2,
       stability.q = x,
       cross_lag_x = 0.0,
@@ -147,17 +147,47 @@ resultsRICLPM <- expand.grid(x = variance.between.y, y = variance.between.x) |>
       variance.between.x = y,
       variance.between.y = 0.5,
       cov.pq = 0,
-      sample_size = 1000  # Reduced from 5000
+      sample_size = 1000  #
     )
     res
   })) |>
   unnest(result)
   toc()
-
 ```
 
 ```{r}
+# Fix this: Not pulling in from library
+library(lavaan)
+library(tictoc)
 
+variance_between_y <- seq(0.2, 0.7, by = .1)
+variance_between_x <- seq(0.3, 1, by = .1)
+
+# Timer for full RICLPM simulation
+tic("Full RICLPM Monte Carlo Simulation")
+resultsRICLPM <- expand.grid(x = variance_between_y, y = variance_between_x) |>
+  rowwise() |>
+  mutate(result = list({
+    # tic(paste("RICLPM Simulation for x =", x, ", y =", y))
+    res <- monteCarloCLPM(
+      trials = 2,  # Reduced from 100
+      waves = 3,    # Reduced from 5
+      dgp = "clpm",
+      stability.p = 0.2,
+      stability.q = x,
+      cross_lag_x = 0.0,
+      cross_lag_y = 0.0,
+      variance.q = 0.5,
+      variance.p = 0.5,
+      variance.between.x = y,
+      variance.between.y = 0.5,
+      cov.pq = 0,
+      sample_size = 1000  #
+    )
+    res
+  })) |>
+  unnest(result)
+  toc()
 ```
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE}
