@@ -73,6 +73,9 @@ run_mc_sims <- function(estimator,
     param_grid <- as.data.frame(param_grid)
   }
 
+  # Ensure param_grid is a proper data frame
+  param_grid <- as.data.frame(param_grid)
+
   # Set default parameters
   default_params <- list(
     stability_p = 0.2,
@@ -125,21 +128,22 @@ run_mc_sims <- function(estimator,
       cat("Processing parameter combination", i, "of", nrow(param_grid), "\n")
     }
 
-    current_params <- param_grid[i, ]
+    # FIX: Convert to regular list to avoid S4 class issues
+    current_params <- as.list(param_grid[i, ])
 
     # Build parameters for Monte Carlo function
     base_params <- list(
       trials = trials,
       waves = waves,
-      stability.p = current_params$stability_p,
-      stability.q = current_params$stability_q,
-      cross.p = current_params$cross_p,
-      cross.q = current_params$cross_q,
-      variance.q = current_params$variance_q,
-      variance.p = current_params$variance_p,
-      variance.between.x = current_params$variance_between_x,
-      variance.between.y = current_params$variance_between_y,
-      cov.pq = current_params$cov_pq,
+      stability_p = current_params[["stability_p"]],
+      stability_q = current_params[["stability_q"]],
+      cross_p = current_params[["cross_p"]],
+      cross_q = current_params[["cross_q"]],
+      variance_q = current_params[["variance_q"]],
+      variance_p = current_params[["variance_p"]],
+      variance_between_x = current_params[["variance_between_x"]],
+      variance_between_y = current_params[["variance_between_y"]],
+      cov_pq = current_params[["cov_pq"]],
       sample_size = sample_size
     )
 
@@ -153,16 +157,16 @@ run_mc_sims <- function(estimator,
     # Add confounder parameters if they exist
     if (data_generation == "clpm_confounder") {
       if ("confounder_p" %in% names(current_params)) {
-        base_params$confounder.p <- current_params$confounder_p
+        base_params$confounder_p <- current_params[["confounder_p"]]
       }
       if ("confounder_q" %in% names(current_params)) {
-        base_params$confounder.q <- current_params$confounder_q
+        base_params$confounder_q <- current_params[["confounder_q"]]
       }
       if ("confounder_variance" %in% names(current_params)) {
-        base_params$confounder.variance <- current_params$confounder_variance
+        base_params$confounder_variance <- current_params[["confounder_variance"]]
       }
       if ("confounder_stability" %in% names(current_params)) {
-        base_params$confounder.stability <- current_params$confounder_stability
+        base_params$confounder_stability <- current_params[["confounder_stability"]]
       }
     }
 

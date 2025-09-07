@@ -99,14 +99,14 @@ resultsOLS <- expand.grid(x = stability_q, y = variance.between.x) |>
       trials = 10,  # Reduced from 100
       waves = 3,    # Reduced from 5
       data_generation = "riclpm",
-      stability.p = 0.2,
-      stability.q = x,
+      stability_p = 0.2,
+      stability)q = x,
       cross_lag_x = 0.0,
       cross_lag_y = 0.0,
       variance.q = 0.5,
       variance.p = 0.5,
-      variance.between.x = y,
-      variance.between.y = 0.5,
+      variance_between_x = y,
+      variance_between_y = 0.5,
       cov_pq = 0,
       sample_size = 1000  # Reduced from 5000
     )

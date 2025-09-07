@@ -14,16 +14,14 @@
 #' @return A list; returns model and drift matrix
 #' #'
 #' @examples
-
 #'
 #' @export
 #'
 #'
-
 estimateCTSEM <- function(data = dat_long,
                           id = "id",
-                          manifest.var.names = c("x", "y"),
-                          latent.var.names = c("x", "y"),
+                          manifest_var_names = c("x", "y"),
+                          latent_var_names = c("x", "y"),
                           LAMBDA = diag(2),
                           type = "stanct",
                           time_points = 10,
@@ -34,8 +32,8 @@ estimateCTSEM <- function(data = dat_long,
   my_model <- ctsem::ctModel(
     Tpoints = time_points,
     id = id,
-    manifestNames = manifest.var.names,
-    latentNames = latent.var.names,
+    manifestNames = manifest_var_names,
+    latentNames = latent_var_names,
     LAMBDA = LAMBDA,
     type = type,
     ...

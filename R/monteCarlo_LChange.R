@@ -6,8 +6,8 @@
 #' @param waves The number of waves (time points) in the model.
 #' @param model Specify whether an "ols" or "clpm" model.
 #' @param data_generation Specify the data generation method: "clpm", "ri-clpm"
-#' @param proportion.change_x Proportion of change in x.
-#' @param proportion.change_y Proportion of change in y.
+#' @param proportion_change_x Proportion of change in x.
+#' @param proportion_change_y Proportion of change in y.
 #'
 #' @import tidyr dplyr lavaan
 #' @importFrom dplyr %>% select mutate row_number group_by ungroup
@@ -19,28 +19,28 @@
 monteCarloLChange<- function(
     trials = 10,
     waves = 5,
-    variance.between.x = 0.5,
-    variance.between.y = 0.5,
-    stability.q = 0.25,
-    stability.p = 0.25,
-    cross.p = 0,
-    cross.q = 0,
-    variance.p = 1,
-    variance.q = 1,
+    variance_between_x = 0.5,
+    variance_between_y = 0.5,
+    stability_q = 0.25,
+    stability_p = 0.25,
+    cross_p = 0,
+    cross_q = 0,
+    variance_p = 1,
+    variance_q = 1,
     sample_size = 2500,
     dgp = "riclpm",
     ...
 ) {
   if(dgp == "riclpm") {
     simulation_parameters <- expand.grid(
-      variance.between.x = variance.between.x,
-      variance.between.y = variance.between.y,
-      stability.p = stability.p,
-      stability.q = stability.q,
-      cross.p = cross.p,
-      cross.q = cross.q,
-      variance.p = variance.p,
-      variance.q = variance.q) %>% as.data.frame()
+      variance_between_x = variance_between_x,
+      variance_between_y = variance_between_y,
+      stability_p = stability_p,
+      stability_q = stability_q,
+      cross_p = cross_p,
+      cross_q = cross_q,
+      variance_p = variance_p,
+      variance_q = variance_q) %>% as.data.frame()
 
     # Initialize an empty list to store results
     results <- list()
@@ -52,31 +52,31 @@ monteCarloLChange<- function(
 
         dat <- simRICLPM(
           waves = waves,
-          sample.nobs = sample_size,
-          stability.p =  params$stability.p,
-          stability.q =  params$stability.q,
-          cross.p = params$cross.p,
-          cross.q = params$cross.q,
-          variance.p = params$variance.p,
-          variance.q = params$variance.q,
-          variance.between.x = params$variance.between.x,
-          variance.between.y = params$variance.between.y,
+          stability_p =  params$stability_p,
+          stability_q =  params$stability_q,
+          cross_p = params$cross_p,
+          cross_q = params$cross_q,
+          variance_p = params$variance_p,
+          variance_q = params$variance_q,
+          variance_between_x = params$variance_between_x,
+          variance_between_y = params$variance_between_y,
+          sample.nobs = sample_size
         )$data -> df
 
         suppressWarnings({
 
-        lavaan::lavaan(
-          latentChange(
-            waves = waves,
-            model_type = "dual_change"),
-          meanstructure = FALSE,
-          estimator = "ML",
-          missing = "fiml",
-          fixed.x = FALSE,
-          mimic="mplus",
-          control=list(iter.max=1000),
-          verbose=FALSE,
-          data = df) -> model
+          lavaan::lavaan(
+            latentChange(
+              waves = waves,
+              model_type = "dual_change"),
+            meanstructure = FALSE,
+            estimator = "ML",
+            missing = "fiml",
+            fixed.x = FALSE,
+            mimic="mplus",
+            control=list(iter.max=1000),
+            verbose=FALSE,
+            data = df) -> model
         })
 
         cross_lag_y = coef(model)["change.x"]
@@ -87,14 +87,14 @@ monteCarloLChange<- function(
 
         # Store results in the list
         results[[length(results) + 1]] <- data.frame(
-          variance.between.x = params$variance.between.x,
-          variance.between.y = params$variance.between.y,
-          stability.p =  params$stability.p,
-          stability.q =  params$stability.q,
-          cross.p = params$cross.p,
-          cross.q = params$cross.q,
-          variance.p = params$variance.p,
-          variance.q = params$variance.q,
+          variance_between_x = params$variance_between_x,
+          variance_between_y = params$variance_between_y,
+          stability_p =  params$stability_p,
+          stability_q =  params$stability_q,
+          cross_p = params$cross_p,
+          cross_q = params$cross_q,
+          variance_p = params$variance_p,
+          variance_q = params$variance_q,
           xlag_x = auto_regressive_x,
           ylag_x = cross_lag_x,
           xlag_y = cross_lag_y,
@@ -111,12 +111,12 @@ monteCarloLChange<- function(
   }
   else if(dgp == "clpm") {
     simulation_parameters <- expand.grid(
-      stability.p = stability.p,
-      stability.q = stability.q,
-      cross.p = cross.p,
-      cross.q = cross.q,
-      variance.p = variance.p,
-      variance.q = variance.q) %>% as.data.frame()
+      stability_p = stability_p,
+      stability_q = stability_q,
+      cross_p = cross_p,
+      cross_q = cross_q,
+      variance_p = variance_p,
+      variance_q = variance_q) %>% as.data.frame()
 
     # Initialize an empty list to store results
     results <- list()
@@ -128,13 +128,13 @@ monteCarloLChange<- function(
 
         dat <- simCLPM(
           waves = waves,
-          sample.nobs = sample_size,
-          stability.p =  params$stability.p,
-          stability.q =  params$stability.q,
-          cross.p = params$cross.p,
-          cross.q = params$cross.q,
-          variance.p = params$variance.p,
-          variance.q = params$variance.q,
+          stability_p =  params$stability_p,
+          stability_q =  params$stability_q,
+          cross_p = params$cross_p,
+          cross_q = params$cross_q,
+          variance_p = params$variance_p,
+          variance_q = params$variance_q,
+          sample.nobs = sample_size
         )$data -> df
 
         lavaan::lavaan(
@@ -152,12 +152,12 @@ monteCarloLChange<- function(
 
         # Store results in the list
         results[[length(results) + 1]] <- data.frame(
-          stability.p =  params$stability.p,
-          stability.q =  params$stability.q,
-          cross.p = params$cross.p,
-          cross.q = params$cross.q,
-          variance.p = params$variance.p,
-          variance.q = params$variance.q,
+          stability_p =  params$stability_p,
+          stability_q =  params$stability_q,
+          cross_p = params$cross_p,
+          cross_q = params$cross_q,
+          variance_p = params$variance_p,
+          variance_q = params$variance_q,
           xlag_x = auto_regressive_x,
           ylag_x = cross_lag_x,
           xlag_y = cross_lag_y,
@@ -176,6 +176,4 @@ monteCarloLChange<- function(
   return(results_df)
 
 }
-
-
 
