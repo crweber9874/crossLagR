@@ -1,5 +1,5 @@
 ---
-title: "Monte Carlo Simulation"
+title: "The Cross Lagged Regression Model: Simulations"
 header-includes:
     - \usepackage{setspace}\onehalfspacing
 author: "Chris Weber"
@@ -11,279 +11,349 @@ output:
 
 # Introduction
 
-To model **trait** and **state** effects, the **Random Intercept Cross Lagged** model follows the form, but includes a time invariant "trait" level parameter ($\mu_i$).
+The cross-lagged regression model follows an intuitive structure.  The current realizations $x$ and $y$ are a function of autoregressive and cross lagged effects.  I closely follow the structure and notation from Ludtke and Robitzch (2021)
+
 
 $$
-\begin{bmatrix}
-y_{it}\\
-x_{it}
-\end{bmatrix} = 
-\underbrace{
-\begin{bmatrix}
-\theta_{1y} & \theta_{1x} \\
-\theta_{2y} & \theta_{2x}
-\end{bmatrix}
-\begin{bmatrix}
-y_{it-1} \\
-x_{it-1}
-\end{bmatrix} +
-\begin{bmatrix}
-e_{y,it}\\
-e_{x,it}
-\end{bmatrix}
-}_{State} + \underbrace{
-\begin{bmatrix}
-\mu_{y,i}\\
-\mu_{x,i}
-\end{bmatrix}
-}_{Trait} 
+\begin{aligned}
+x_{t, i}= \theta_{0,x,t} + \theta_{11} x_{t-1, i} +  \theta_{12} y_{t-1, i} +  e^x_{t,i}  \\
+y_{t, i}= \theta_{0,y,t} + \theta_{21} x_{t-1, i} + \theta_{22}  y_{t-1, i} + e^y_{t,i}  
+\end{aligned}
 $$
 
-Insofar that the variance of the trait level term is zero, the model reduces to the CLPM. The CLPM is nested within the CLPM. In this example, we'll simulate data under the RI-CLPM and estimate several models.
+$\theta_{11}$ and $\theta_{22}$ are the autoregressive effects, the degree to which $x$ and $y$ are stable from one time point to the next. $\theta_{12}$ and $\theta_{21}$ are the cross lagged effects, the degree to which $x$ and $y$ influence each other over time. The error terms $e_{t,i}$ and $e_{t,i}$ are assumed to be normally distributed with mean zero and constant variance, and uncorrelated with each other. In practice, they are often correlated, such that $cov(e^x_{t,i}, e^y_{t,i}) \neq 0$.
 
-1.  **Cross-Lagged Panel Model** as an observed variable model in OLS, with no correlated errors.
-2.  **Random Intercept Cross-Lagged Panel Model** as a latent variable model in SEM, with correlated errors.
-3.  **Continuous Time Structural Equation Model**, then retrieving the discrete time autorregressive and cross lagged estimates.
-4.  **Hierarchical Linear Model**.
+The random intercept specification allows for disposition, trait level effects: To what extent are $x$ and $y$ relatively unchanging and stable over time. In some cases, researchers might estimate a hierarchical model, simply allowing $\theta_{0,x,t}$ and $\theta_{0,x,t}$ to vary across units, or including "fixed effects" terms. Variations of this model are known as the "Dynamic Random Effects Model" and "Dynamic Panel Model."  While the fixed or random effects are generally an improvement over no variation, the lagged realizations of the dependent variables in both equations complicates matters, often producing a form of bias known as "Nickell Bias" (Nickel 1981). Well-known approaches to deal with this form of bias rely on first differencing, such as the Arellano- Bond estimator, or the Bond estimator. The problem -- in a nutshell -- is that the lagged dependent variable does not include the stable, trait level variation accounted for in the random intercepts themselves (or fixed effects).
 
-Each model is tested under the same data generating process -- which we vary. We vary the random intercept variance for both $x$ and $y$, the trait level effect. The greater the variance, the more of the total variance in $y$ and/or $x$ is attributable to that stable trait. We also vary the degree of autoregression in both $x$ and $y$, the within wave stability. 1000 replications were run for each model. In particular,
+The RI-CLPM -- a popular approach in psychology -- also explicitly includes trait level variation, but in a manner somewhat different from the aformentioned approaches. Ignoring the lags and cross-lagged effects, let us assume that $x$ and $y$ are each a function of a stable trait level component, plus a time-varying state component.
 
-## Monte Carlo Simulation
+$$
+\begin{aligned}
+x_{t, i}= \theta_{0,x,t} + \mu^x_{i} +  x^*_{t,i}\\
+y_{t, i}= \theta_{0,y,t} + \mu^y_{i} +  y^*_{t,i}
+\end{aligned}
+$$
 
-# Tested with DGP (CLPM, RICLPM) and estimator (OLS, RICLPM, CLPM), caches error messages
+The $\theta_{0,x,t}$ and $\theta_{0,y,t}$ terms are the average levels of $x$ and $y$ at time $t$; the intercept, or the average across individuals. The $\mu^x_i$ and $\mu^y_i$ terms are the stable, trait level components for individual $i$. And $x^*_{t,i}$ and $y^*_{t,i}$ terms are the time-varying state components. We can view this formation as providing a decomposition of the total variance in $x$ and $y$ into between-person (trait) and within-person (state) components.
 
-```{r echo=FALSE, message=FALSE, warning=FALSE, cache = FALSE}
-library(dplyr)
-library(tictoc)
-library(tidyr)
-devtools::load_all()
-rm(list = ls())
-run_mc_sims(
-  estimator = "OLS",
-  param_grid = expand.grid(
-    stability_p = 0.3,
-    stability_q = 0.3,
-    cross_p = c(0.1, 0.5),
-    cross_q = c(0.1, 0.5),
-    variance_between_x = 0.8,
-    variance_between_y = 0.8
-  ),
-  trials = 1,
-  waves = 3,
-  sample_size = 2000,
-  verbose = TRUE,
-  data_generation = "clpmu"
-) |> head()
-```
+From here, we can rewrite the cross-lagged and lagged effects from the state components alone.
 
-### Below is Deletable
+$$
+\begin{aligned}
+x^*_{t, i}= \theta_{0,x,t} + \theta^*_{11} x^*_{t-1, i} +  \theta_{12}^* y^*_{t-1, i} +  e^{x\ast}_{t,i}\\
+y^*_{t, i}= \theta_{0,y,t} + \theta^*_{21}  x^*_{t-1, i} + \theta^*_{22}  y^*_{t-1, i} + e^{y\ast}_{t,i}
+\end{aligned}
+$$
 
-### OLS
+The RI-CLPM then is simply a re-expression of the CLPM, partialing out the stable, trait level aspects of both $x$ and $y$ variables. The reduced form expression becomes,
 
-This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the CLPM in OLS.
+$$
+\begin{aligned}
+x_{t, i}= \theta_{0,x,t} +  \mu^x_{i}  + \theta^*_{11} x^*_{t-1, i} +  \theta_{12}^* y^*_{t-1, i} +  e^{x\ast}_{t,i}\\
+y_{t, i}= \theta_{0,y,t} +  \mu^y_{i} + \theta^*_{21}  x^*_{t-1, i} + \theta^*_{22}  y^*_{t-1, i} + e^{y\ast}_{t,i}
+\end{aligned}
+$$
 
-```{r echo=FALSE, message=FALSE, warning=FALSE}
-library(dplyr)
-library(tictoc)
-devtools::load_all()
+* $\theta_{0,x,t}$ and $\theta_{0,y,t}$ are the average levels of $x$ and $y$ at time $t$; the intercepts.
+* $\mu^x_i$ and $\mu^y_i$ are the stable, trait level components for individual $i$.
+* $x^*_{t,i}$ and $y^*_{t,i}$ are the time-varying state components.
+* $\theta^*_{11}$ and $\theta^*_{22}$ are the autoregressive effects for the state components.
+* $\theta^*_{12}$ and $\theta^*_{21}$ are the cross-lagged effects for the state components.
 
-stability_q <- seq(0.2, 0.7, by = .1)
-variance.between.x <- seq(0.3, 1, by = .1)
+## Causal Effects
 
-# Timer for full OLS simulation
-tic("Full OLS Monte Carlo Simulation")
-resultsOLS <- expand.grid(x = stability_q, y = variance.between.x) |>
-  rowwise() |>
-  mutate(result = list({
-    res <- monteCarloOLS(
-      trials = 10,  # Reduced from 100
-      waves = 3,    # Reduced from 5
-      data_generation = "riclpm",
-      stability_p = 0.2,
-      stability)q = x,
-      cross_lag_x = 0.0,
-      cross_lag_y = 0.0,
-      variance.q = 0.5,
-      variance.p = 0.5,
-      variance_between_x = y,
-      variance_between_y = 0.5,
-      cov_pq = 0,
-      sample_size = 1000  # Reduced from 5000
-    )
-    res
-  })) |>
-  unnest(result)
-toc()
-# save(resultsOLS, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsOLS.rda")
+In the causal effects framework, assume that we wish to model potential outcomes; what would $x_{t,i}$ and $y_{t,i}$ be if we intervened on $x$ or $y$ at time $t-1$, $E[x_{i,t}^{y_{t-1}}]$ and $E[y_{i,t}^{x_{t-1}}]$. We might start by assuming that such an intervention could be modeled as a linear expression, similar to the structure set forth in the CLPM and following a simple linear expression (Ludtke and Robitzch 2021; Hernan and Robins 2020; Vanderwheele 2015). 
 
-```
+$$
+\begin{aligned}
+E[X_{i,t}^{y_{t-1}}] = \tau_{0,1} + \tau_{1,1} y_2 \\
+E[Y_{i,t}^{x_{t-1}}] = \tau_{0,2} + \tau_{1,2} x_2 \\
+\end{aligned}
+$$
 
-This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the RI-CLPM.
+And the model follows the well-known g-formula (Hernan and Robins 2020; Vanderwheele 2015), where one may estimate a marginal structural model (MSM) for the potential outcomes.
 
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Fix this: Not pulling in from library
-library(lavaan)
-library(tictoc)
+$$
+\begin{aligned}
+E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}] f(x_{t-1}, y_{t-1}) dx_{t-1}dy_{t-1} \\
+E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}] f(x_{t-1}, y_{t-1}) dx_{t-1}dy_{t-1} \\
+\end{aligned}
+$$
 
-variance_between_y <- seq(0.2, 0.7, by = .1)
-variance_between_x <- seq(0.3, 1, by = .1)
-
-# Timer for full RICLPM simulation
-tic("Full RICLPM Monte Carlo Simulation")
-resultsRICLPM <- expand.grid(x = variance_between_y, y = variance_between_x) |>
-  rowwise() |>
-  mutate(result = list({
-    # tic(paste("RICLPM Simulation for x =", x, ", y =", y))
-    res <- monteCarloRICLPM(
-      trials = 10,  # Reduced from 100
-      waves = 3,    # Reduced from 5
-      dgp = "clpm",
-      stability.p = 0.2,
-      stability.q = x,
-      cross_lag_x = 0.0,
-      cross_lag_y = 0.0,
-      variance.q = 0.5,
-      variance.p = 0.5,
-      variance.between.x = y,
-      variance.between.y = 0.5,
-      cov.pq = 0,
-      sample_size = 1000  #
-    )
-    res
-  })) |>
-  unnest(result)
-  toc()
-```
-
-```{r}
-# Fix this: Not pulling in from library
-library(lavaan)
-library(tictoc)
-
-variance_between_y <- seq(0.2, 0.7, by = .1)
-variance_between_x <- seq(0.3, 1, by = .1)
-
-# Timer for full RICLPM simulation
-tic("Full RICLPM Monte Carlo Simulation")
-resultsRICLPM <- expand.grid(x = variance_between_y, y = variance_between_x) |>
-  rowwise() |>
-  mutate(result = list({
-    # tic(paste("RICLPM Simulation for x =", x, ", y =", y))
-    res <- monteCarloCLPM(
-      trials = 2,  # Reduced from 100
-      waves = 3,    # Reduced from 5
-      dgp = "clpm",
-      stability.p = 0.2,
-      stability.q = x,
-      cross_lag_x = 0.0,
-      cross_lag_y = 0.0,
-      variance.q = 0.5,
-      variance.p = 0.5,
-      variance.between.x = y,
-      variance.between.y = 0.5,
-      cov.pq = 0,
-      sample_size = 1000  #
-    )
-    res
-  })) |>
-  unnest(result)
-  toc()
-```
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-# Fix this: Not pulling in from library
-library(lavaan)
-library(lavaan)
-library(tictoc)
-
-stability.q <- seq(0.2, 0.7, by = .1)
-variance.between.x <- seq(0.3, 1, by = .1)
-
-# Timer for full CLPM simulation
-tic("Full CLPM Monte Carlo Simulation")
-resultsCLPM <- expand.grid(x = stability.q, y = variance.between.x) |>
-  rowwise() |>
-  mutate(result = list({
-    res <- monteCarloCLPM(
-      trials = 10,  # Reduced from 100
-      waves = 3,    # Reduced from 5
-      dgp = "riclpm",
-      stability.p = 0.2,
-      stability.q = x,
-      variance.between.x = y,
-      variance.between.y = 0.5,
-      cross_lag_x = 0.0,
-      cross_lag_y = 0.0,
-      variance.q = 0.5,
-      variance.p = 0.5,
-      cov.pq = 0,
-      sample_size = 1000  # Reduced from 5000
-    )
-    res
-  })) |>
-  unnest(result)
-toc()
-#save(resultsCLPM, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCLPM.RData")
-```
-
-This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the continuous time structural equation model.
-
-Note: this compiles at each run. Could fix to compile just once, maybe.
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE}
-monteCarloCTSEM(
-   trials = 1,
-   waves = 5,
-   dgp = "riclpm",
-   stability.p = 0.2,
-   stability.q = 0.2,
-   cross_lag_x = 0.0,
-   cross_lag_y = 0.0,
-   variance.q = 0.5,
-   variance.p = 0.5,
-   variance.between.x = 0.5,
-   variance.between.y = 0.5,
-   cov.pq = 0,
-   sample_size = 5000) -> results
+If the model were to include added covariates, $Z$, the MSM would be conditional on $Z$ as well.
 
 
-#####
-within_person_stability_x = seq(0.2, 0.7, by = .1)
-variance.between.x = seq(0.3, 1, by = .1)
-######
-for(x in stability.q){
-  for(y in variance.between.x){
-        results <- rbind(results, 
-                         monteCarloCTSEM(
-                                         trials = 1,
-                                         waves = 5,
-                                         dgp = "riclpm",
-                                         stability.p = 0.2,
-                                         stability.q = x,
-                                         cross_lag_x = 0.0,
-                                         cross_lag_y = 0.0,
-                                         variance.q = 0.5,
-                                         variance.p = 0.5,
-                                         variance.between.x = y,
-                                         variance.between.y = 0.5,
-                                         cov.pq = 0,
-                                         sample_size = 5000)
-                  )
-        }
-  }
-resultsCTSEM = results
-#save(resultsCTSEM, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCTSEM.rda")
-```
+$$
+\begin{aligned}
+E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, Z_i = z_i] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z \\
+E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, Z_i = z_i] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z\\
+\end{aligned}
+$$
 
-## Full Data
+In practice:
 
-```{r}
-library(dplyr)
-load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCLPM.RData")
-load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsRICLPM.rda")
-load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsOLS.rda")
-load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCTSEM.rda")
+* Estimate the structural model, the linear regression of $x_{t,i}$ and $y_{t,i}$ on the lagged values of $x$ and $y$ (and $z$ if applicable).
+* Generate predictions for each observation, holding $y_{t-1}$ (or $x_{t-1}$) at a fixed value, and the values of $z$ at their observed values in the data.
+* Average across the data to calculate the marginal expectation at a particular value of $y_{t-1}$ and $x_{t-1}$.
 
-bind_rows(resultsCTSEM, resultsCLPM, resultsRICLPM, resultsOLS) -> monteCarlo_results
-save(monteCarlo_results, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/monteCarlo_results.rda")
-```
+## Confounding Variables
+
+In the presence of confounding variables, $Z$, that influence both $x$ and $y$, the cross-lagged estimates may be biased, in both the CLPM or the RI-CLPM. If we assume the   
+
+
+
+
+
+The RI-CLPM is often touted as a solution to this problem, as the stable trait level components $\mu^x_i$ and $\mu^y_i$ may capture some of the confounding influence of $Z$. However, this only holds if $Z$ is time-invariant. If $Z$ varies over time, and influences both $x$ and $y$, then the RI-CLPM does not account for this source of confounding. In such cases, it is necessary to include $Z$ directly in the model, either as a time-varying covariate or through other methods such as fixed effects or instrumental variables.
+
+<!-- Insofar that the variance of the trait level term is zero, the model reduces to the CLPM. The CLPM is nested within the CLPM. In this example, we'll simulate data under the RI-CLPM and estimate several models. -->
+
+<!-- 1.  **Cross-Lagged Panel Model** as an observed variable model in OLS, with no correlated errors. -->
+<!-- 2.  **Random Intercept Cross-Lagged Panel Model** as a latent variable model in SEM, with correlated errors. -->
+<!-- 3.  **Continuous Time Structural Equation Model**, then retrieving the discrete time autorregressive and cross lagged estimates. -->
+<!-- 4.  **Hierarchical Linear Model**. -->
+
+<!-- Each model is tested under the same data generating process -- which we vary. We vary the random intercept variance for both $x$ and $y$, the trait level effect. The greater the variance, the more of the total variance in $y$ and/or $x$ is attributable to that stable trait. We also vary the degree of autoregression in both $x$ and $y$, the within wave stability. 1000 replications were run for each model. In particular, -->
+
+<!-- ## Monte Carlo Simulation -->
+
+<!-- # Tested with DGP (CLPM, RICLPM) and estimator (OLS, RICLPM, CLPM), caches error messages -->
+
+<!-- ```{r echo=FALSE, message=FALSE, warning=FALSE, cache = FALSE} -->
+<!-- library(dplyr) -->
+<!-- library(tictoc) -->
+<!-- library(tidyr) -->
+<!-- devtools::load_all() -->
+<!-- rm(list = ls()) -->
+<!-- run_mc_sims( -->
+<!--   estimator = "LCHANGE", -->
+<!--   lchange_type = "dual_change", -->
+<!--   param_grid = expand.grid( -->
+<!--     stability_p = 0.3, -->
+<!--     stability_q = 0.3, -->
+<!--     cross_p = c(0.1, 0.5), -->
+<!--     cross_q = c(0.1, 0.5), -->
+<!--     variance_between_x = c(0,0.5), -->
+<!--     variance_between_y = 0.8, -->
+<!--     confounder_variance = c(0.5, 0.1), -->
+<!--     confounder_stability = 0.4 -->
+<!--   ), -->
+<!--   trials = 1, -->
+<!--   waves = 3, -->
+<!--   sample_size = 2000, -->
+<!--   verbose = TRUE, -->
+<!--   data_generation = "clpm" -->
+<!-- ) |> head() -->
+<!-- ``` -->
+
+<!-- ### Below is Deletable -->
+
+<!-- ### OLS -->
+
+<!-- This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the CLPM in OLS. -->
+
+<!-- ```{r echo=FALSE, message=FALSE, warning=FALSE} -->
+<!-- library(dplyr) -->
+<!-- library(tictoc) -->
+<!-- devtools::load_all() -->
+
+<!-- stability_q <- seq(0.2, 0.7, by = .1) -->
+<!-- variance.between.x <- seq(0.3, 1, by = .1) -->
+
+<!-- # Timer for full OLS simulation -->
+<!-- tic("Full OLS Monte Carlo Simulation") -->
+<!-- resultsOLS <- expand.grid(x = stability_q, y = variance.between.x) |> -->
+<!--   rowwise() |> -->
+<!--   mutate(result = list({ -->
+<!--     res <- monteCarloOLS( -->
+<!--       trials = 10,  # Reduced from 100 -->
+<!--       waves = 3,    # Reduced from 5 -->
+<!--       data_generation = "riclpm", -->
+<!--       stability_p = 0.2, -->
+<!--       stability)q = x, -->
+<!--       cross_lag_x = 0.0, -->
+<!--       cross_lag_y = 0.0, -->
+<!--       variance.q = 0.5, -->
+<!--       variance.p = 0.5, -->
+<!--       variance_between_x = y, -->
+<!--       variance_between_y = 0.5, -->
+<!--       cov_pq = 0, -->
+<!--       sample_size = 1000  # Reduced from 5000 -->
+<!--     ) -->
+<!--     res -->
+<!--   })) |> -->
+<!--   unnest(result) -->
+<!-- toc() -->
+<!-- # save(resultsOLS, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsOLS.rda") -->
+
+<!-- ``` -->
+
+<!-- This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the RI-CLPM. -->
+
+<!-- ```{r, echo = FALSE, message = FALSE, warning = FALSE} -->
+<!-- # Fix this: Not pulling in from library -->
+<!-- library(lavaan) -->
+<!-- library(tictoc) -->
+
+<!-- variance_between_y <- seq(0.2, 0.7, by = .1) -->
+<!-- variance_between_x <- seq(0.3, 1, by = .1) -->
+
+<!-- # Timer for full RICLPM simulation -->
+<!-- tic("Full RICLPM Monte Carlo Simulation") -->
+<!-- resultsRICLPM <- expand.grid(x = variance_between_y, y = variance_between_x) |> -->
+<!--   rowwise() |> -->
+<!--   mutate(result = list({ -->
+<!--     # tic(paste("RICLPM Simulation for x =", x, ", y =", y)) -->
+<!--     res <- monteCarloRICLPM( -->
+<!--       trials = 10,  # Reduced from 100 -->
+<!--       waves = 3,    # Reduced from 5 -->
+<!--       dgp = "clpm", -->
+<!--       stability.p = 0.2, -->
+<!--       stability.q = x, -->
+<!--       cross_lag_x = 0.0, -->
+<!--       cross_lag_y = 0.0, -->
+<!--       variance.q = 0.5, -->
+<!--       variance.p = 0.5, -->
+<!--       variance.between.x = y, -->
+<!--       variance.between.y = 0.5, -->
+<!--       cov.pq = 0, -->
+<!--       sample_size = 1000  # -->
+<!--     ) -->
+<!--     res -->
+<!--   })) |> -->
+<!--   unnest(result) -->
+<!--   toc() -->
+<!-- ``` -->
+
+<!-- ```{r} -->
+<!-- # Fix this: Not pulling in from library -->
+<!-- library(lavaan) -->
+<!-- library(tictoc) -->
+
+<!-- variance_between_y <- seq(0.2, 0.7, by = .1) -->
+<!-- variance_between_x <- seq(0.3, 1, by = .1) -->
+
+<!-- # Timer for full RICLPM simulation -->
+<!-- tic("Full RICLPM Monte Carlo Simulation") -->
+<!-- resultsRICLPM <- expand.grid(x = variance_between_y, y = variance_between_x) |> -->
+<!--   rowwise() |> -->
+<!--   mutate(result = list({ -->
+<!--     # tic(paste("RICLPM Simulation for x =", x, ", y =", y)) -->
+<!--     res <- monteCarloCLPM( -->
+<!--       trials = 2,  # Reduced from 100 -->
+<!--       waves = 3,    # Reduced from 5 -->
+<!--       dgp = "clpm", -->
+<!--       stability.p = 0.2, -->
+<!--       stability.q = x, -->
+<!--       cross_lag_x = 0.0, -->
+<!--       cross_lag_y = 0.0, -->
+<!--       variance.q = 0.5, -->
+<!--       variance.p = 0.5, -->
+<!--       variance.between.x = y, -->
+<!--       variance.between.y = 0.5, -->
+<!--       cov.pq = 0, -->
+<!--       sample_size = 1000  # -->
+<!--     ) -->
+<!--     res -->
+<!--   })) |> -->
+<!--   unnest(result) -->
+<!--   toc() -->
+<!-- ``` -->
+
+<!-- ```{r, echo = FALSE, message = FALSE, warning = FALSE} -->
+<!-- # Fix this: Not pulling in from library -->
+<!-- library(lavaan) -->
+<!-- library(lavaan) -->
+<!-- library(tictoc) -->
+
+<!-- stability.q <- seq(0.2, 0.7, by = .1) -->
+<!-- variance.between.x <- seq(0.3, 1, by = .1) -->
+
+<!-- # Timer for full CLPM simulation -->
+<!-- tic("Full CLPM Monte Carlo Simulation") -->
+<!-- resultsCLPM <- expand.grid(x = stability.q, y = variance.between.x) |> -->
+<!--   rowwise() |> -->
+<!--   mutate(result = list({ -->
+<!--     res <- monteCarloCLPM( -->
+<!--       trials = 10,  # Reduced from 100 -->
+<!--       waves = 3,    # Reduced from 5 -->
+<!--       dgp = "riclpm", -->
+<!--       stability.p = 0.2, -->
+<!--       stability.q = x, -->
+<!--       variance.between.x = y, -->
+<!--       variance.between.y = 0.5, -->
+<!--       cross_lag_x = 0.0, -->
+<!--       cross_lag_y = 0.0, -->
+<!--       variance.q = 0.5, -->
+<!--       variance.p = 0.5, -->
+<!--       cov.pq = 0, -->
+<!--       sample_size = 1000  # Reduced from 5000 -->
+<!--     ) -->
+<!--     res -->
+<!--   })) |> -->
+<!--   unnest(result) -->
+<!-- toc() -->
+<!-- #save(resultsCLPM, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCLPM.RData") -->
+<!-- ``` -->
+
+<!-- This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the continuous time structural equation model. -->
+
+<!-- Note: this compiles at each run. Could fix to compile just once, maybe. -->
+
+<!-- ```{r, echo = FALSE, message = FALSE, warning = FALSE} -->
+<!-- monteCarloCTSEM( -->
+<!--    trials = 1, -->
+<!--    waves = 5, -->
+<!--    dgp = "riclpm", -->
+<!--    stability.p = 0.2, -->
+<!--    stability.q = 0.2, -->
+<!--    cross_lag_x = 0.0, -->
+<!--    cross_lag_y = 0.0, -->
+<!--    variance.q = 0.5, -->
+<!--    variance.p = 0.5, -->
+<!--    variance.between.x = 0.5, -->
+<!--    variance.between.y = 0.5, -->
+<!--    cov.pq = 0, -->
+<!--    sample_size = 5000) -> results -->
+
+
+<!-- ##### -->
+<!-- within_person_stability_x = seq(0.2, 0.7, by = .1) -->
+<!-- variance.between.x = seq(0.3, 1, by = .1) -->
+<!-- ###### -->
+<!-- for(x in stability.q){ -->
+<!--   for(y in variance.between.x){ -->
+<!--         results <- rbind(results,  -->
+<!--                          monteCarloCTSEM( -->
+<!--                                          trials = 1, -->
+<!--                                          waves = 5, -->
+<!--                                          dgp = "riclpm", -->
+<!--                                          stability.p = 0.2, -->
+<!--                                          stability.q = x, -->
+<!--                                          cross_lag_x = 0.0, -->
+<!--                                          cross_lag_y = 0.0, -->
+<!--                                          variance.q = 0.5, -->
+<!--                                          variance.p = 0.5, -->
+<!--                                          variance.between.x = y, -->
+<!--                                          variance.between.y = 0.5, -->
+<!--                                          cov.pq = 0, -->
+<!--                                          sample_size = 5000) -->
+<!--                   ) -->
+<!--         } -->
+<!--   } -->
+<!-- resultsCTSEM = results -->
+<!-- #save(resultsCTSEM, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCTSEM.rda") -->
+<!-- ``` -->
+
+<!-- ## Full Data -->
+
+<!-- ```{r} -->
+<!-- library(dplyr) -->
+<!-- load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCLPM.RData") -->
+<!-- load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsRICLPM.rda") -->
+<!-- load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsOLS.rda") -->
+<!-- load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCTSEM.rda") -->
+
+<!-- bind_rows(resultsCTSEM, resultsCLPM, resultsRICLPM, resultsOLS) -> monteCarlo_results -->
+<!-- save(monteCarlo_results, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/monteCarlo_results.rda") -->
+<!-- ``` -->

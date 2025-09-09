@@ -14,6 +14,12 @@
 #'     \item "FI" - Fixed Individual effects (First Differences)
 #'     \item "LCHANGE" - Latent Change Score Model
 #'   }
+#' @param riclpm_type Character string specifying which RICLPM variant to use (only relevant when estimator = "RICLPM").
+#'   Must be one of:
+#'   \itemize{
+#'     \item "riclpm" - Regular RICLPM with autoregressive and cross-lagged effects (default)
+#'     \item "riclpm_nolag" - RICLPM without autoregressive effects (cross-lagged only)
+#'   }
 #' @param param_grid Data frame or NULL. If NULL, uses default parameter grid. If provided,
 #'   should contain columns for parameters to vary across simulations. Missing parameters
 #'   will be filled with defaults.
@@ -85,6 +91,40 @@
 #'   sample_size = 500
 #' )
 #'
+#' # Compare regular RICLPM vs no-lag RICLPM
+#' results_regular <- run_mc_sims(
+#'   estimator = "RICLPM",
+#'   riclpm_type = "riclpm",
+#'   trials = 10,
+#'   waves = 4,
+#'   sample_size = 1000
+#' )
+#'
+#' results_nolag <- run_mc_sims(
+#'   estimator = "RICLPM",
+#'   riclpm_type = "riclpm_nolag",
+#'   trials = 10,
+#'   waves = 4,
+#'   sample_size = 1000
+#' )
+#'
+#' # Compare latent change models
+#' results_dual_change <- run_mc_sims(
+#'   estimator = "LCHANGE",
+#'   lchange_type = "dual_change",
+#'   trials = 10,
+#'   waves = 4,
+#'   sample_size = 1000
+#' )
+#'
+#' results_single_change <- run_mc_sims(
+#'   estimator = "LCHANGE",
+#'   lchange_type = "latent_change",
+#'   trials = 10,
+#'   waves = 4,
+#'   sample_size = 1000
+#' )
+#'
 #' # Study bias from unmeasured confounder
 #' results_confounded <- run_mc_sims(
 #'   estimator = "CLPM",
@@ -123,7 +163,10 @@
 #' @import dplyr tictoc
 #' @export
 run_mc_sims <- function(estimator,
+                        riclpm_type = "riclpm",
                         param_grid = NULL,
+                        lchange_type = "dual_change",  # ADD THIS LINE
+
                         trials = 10,
                         waves = 3,
                         sample_size = 1000,
@@ -148,6 +191,12 @@ run_mc_sims <- function(estimator,
   valid_estimators <- c("OLS", "RICLPM", "CLPM", "CTSEM", "FI", "LCHANGE")
   if (!estimator %in% valid_estimators) {
     stop("estimator must be one of: ", paste(valid_estimators, collapse = ", "))
+  }
+
+  # Valid RICLPM types
+  valid_riclpm_types <- c("riclpm", "riclpm_nolag")
+  if (!riclpm_type %in% valid_riclpm_types) {
+    stop("riclpm_type must be one of: ", paste(valid_riclpm_types, collapse = ", "))
   }
 
   # Valid data generation processes
@@ -234,6 +283,9 @@ run_mc_sims <- function(estimator,
 
   if (verbose) {
     cat("Running", estimator, "Monte Carlo simulation\n")
+    if (estimator == "RICLPM") {
+      cat("RICLPM type:", riclpm_type, "\n")
+    }
     cat("Parameter combinations:", nrow(param_grid), "\n")
     cat("Parameters being varied:", paste(names(param_grid), collapse = ", "), "\n")
     cat("Data generation process:", data_generation, "\n")
@@ -296,6 +348,11 @@ run_mc_sims <- function(estimator,
       base_params$dgp <- data_generation
     }
 
+    # Add RICLPM-specific parameter
+    if (estimator == "RICLPM") {
+      base_params$estimator <- riclpm_type
+    }
+
     # Call the appropriate Monte Carlo function
     tryCatch({
       if (estimator == "OLS") {
@@ -320,6 +377,11 @@ run_mc_sims <- function(estimator,
             result[[param_name]] <- current_params[[param_name]]
           }
         }
+
+        # Add riclpm_type to results for RICLPM runs
+        if (estimator == "RICLPM" && !"riclpm_type" %in% names(result)) {
+          result$riclpm_type <- riclpm_type
+        }
       }
 
       all_results[[i]] <- result
@@ -328,12 +390,25 @@ run_mc_sims <- function(estimator,
       if (verbose) {
         cat("Error in parameter combination", i, ":", e$message, "\n")
       }
-      all_results[[i]] <- data.frame(
+
+      # Create error result with parameter info
+      error_result <- data.frame(
         error_occurred = TRUE,
         error_message = as.character(e$message),
         param_combination = i,
         stringsAsFactors = FALSE
       )
+
+      # Add parameter values to error result
+      for (param_name in names(current_params)) {
+        error_result[[param_name]] <- current_params[[param_name]]
+      }
+
+      if (estimator == "RICLPM") {
+        error_result$riclpm_type <- riclpm_type
+      }
+
+      all_results[[i]] <- error_result
     })
   }
 

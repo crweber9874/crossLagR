@@ -30,6 +30,12 @@ monteCarloCTSEM <- function(
     sample_size = 2500,
     dgp = "riclpm",
     cores = 10,
+    # Add confounder parameters
+    confounder_p = 0.3,
+    confounder_q = 0.3,
+    confounder_variance = 1,
+    confounder_stability = 0.4,
+    include_confounder = TRUE,
     ...
 ) {
   if(dgp == "riclpm") {
@@ -45,7 +51,6 @@ monteCarloCTSEM <- function(
 
     # Initialize an empty list to store results
     results <- list()
-
 
     # Loop through each combination of parameters and trials
     for (i in 1:nrow(simulation_parameters)) {
@@ -68,9 +73,7 @@ monteCarloCTSEM <- function(
           select(id, wave, x, y) -> ct_sem_data
 
         names(ct_sem_data) = c("id", "time", "x", "y")
-        model = estimateCTSEM(data = ct_sem_data,
-        )
-
+        model = estimateCTSEM(data = ct_sem_data)
 
         cross_lag_y =   model[[2]]$yx
         auto_regressive_y =  model[[2]]$yy
@@ -134,7 +137,6 @@ monteCarloCTSEM <- function(
         names(ct_sem_data) = c("id", "time", "x", "y")
         model = estimateCTSEM(data = ct_sem_data)
 
-
         cross_lag_y =   model[[2]]$yx
         auto_regressive_y =  model[[2]]$yy
 
@@ -156,7 +158,82 @@ monteCarloCTSEM <- function(
           trial = j,
           estimator = "ctsem",
           dgp = "clpm"
+        )
+      }
+    }
+    results_df <- do.call(rbind, results)
+  }
+  else if(dgp == "clpmu") {  # NEW SECTION FOR CONFOUNDER MODEL
+    simulation_parameters <- expand.grid(
+      stability_p = stability_p,
+      stability_q = stability_q,
+      cross_p = cross_p,
+      cross_q = cross_q,
+      variance_p = variance_p,
+      variance_q = variance_q,
+      confounder_p = confounder_p,
+      confounder_q = confounder_q,
+      confounder_variance = confounder_variance,
+      confounder_stability = confounder_stability,
+      include_confounder = include_confounder
+    ) %>% as.data.frame()
 
+    # Initialize an empty list to store results
+    results <- list()
+
+    # Loop through each combination of parameters and trials
+    for (i in 1:nrow(simulation_parameters)) {
+      for (j in 1:trials) {
+        params <- simulation_parameters[i, ]
+
+        dat <- simCLPMu(
+          waves = waves,
+          stability_p = params$stability_p,
+          stability_q = params$stability_q,
+          cross_p = params$cross_p,
+          cross_q = params$cross_q,
+          variance_p = params$variance_p,
+          variance_q = params$variance_q,
+          cov_pq = 0.1,  # Add this parameter
+          include_confounder = params$include_confounder,
+          confounder_p = params$confounder_p,
+          confounder_q = params$confounder_q,
+          confounder_variance = params$confounder_variance,
+          confounder_stability = params$confounder_stability,
+          sample.nobs = sample_size
+        )$data %>%
+          reshape_long_sim_cr() %>%
+          select(id, wave, x, y) -> ct_sem_data
+
+        names(ct_sem_data) = c("id", "time", "x", "y")
+        model = estimateCTSEM(data = ct_sem_data)
+
+        cross_lag_y =   model[[2]]$yx
+        auto_regressive_y =  model[[2]]$yy
+
+        cross_lag_x =   model[[2]]$xy
+        auto_regressive_x = model[[2]]$xx
+
+        # Store results in the list
+        results[[length(results) + 1]] <- data.frame(
+          stability_p = params$stability_p,
+          stability_q = params$stability_q,
+          cross_p = params$cross_p,
+          cross_q = params$cross_q,
+          variance_p = params$variance_p,
+          variance_q = params$variance_q,
+          confounder_p = params$confounder_p,
+          confounder_q = params$confounder_q,
+          confounder_variance = params$confounder_variance,
+          confounder_stability = params$confounder_stability,
+          include_confounder = params$include_confounder,
+          xlag_x = auto_regressive_x,
+          ylag_x = cross_lag_x,
+          xlag_y = cross_lag_y,
+          ylag_y = auto_regressive_y,
+          trial = j,
+          estimator = "ctsem",
+          dgp = "clpmu"
         )
       }
     }
@@ -164,6 +241,4 @@ monteCarloCTSEM <- function(
   }
 
   return(results_df)
-
 }
-
