@@ -19,6 +19,8 @@
 #' @param confounder_variance Variance of the confounder
 #' @param confounder_stability Autoregressive effect of confounder
 #' @param include_confounder Whether to include confounder in clpmu model
+#' @param confounder_type Character string specifying confounder type for clpmu dgp.
+#'   Must be one of "time_variant" (default) or "time_invariant".
 #' @param verbose Whether to print progress and error messages
 #'
 #' @import tidyr dplyr lavaan
@@ -47,6 +49,7 @@ monteCarloRICLPM <- function(
     confounder_variance = 1,
     confounder_stability = 0.4,
     include_confounder = TRUE,
+    confounder_type = "time_variant",  # NEW PARAMETER
     verbose = FALSE,
     ...
 ) {
@@ -62,6 +65,11 @@ monteCarloRICLPM <- function(
 
   if (!estimator %in% valid_estimators) {
     stop("estimator must be one of: ", paste(valid_estimators, collapse = ", "))
+  }
+
+  # Validate confounder_type
+  if (!confounder_type %in% c("time_variant", "time_invariant")) {
+    stop("confounder_type must be either 'time_variant' or 'time_invariant'")
   }
 
   # Safe coefficient extraction function
@@ -329,20 +337,37 @@ monteCarloRICLPM <- function(
     results_df <- do.call(rbind, results)
   }
 
-  else if(dgp == "clpmu") {
-    simulation_parameters <- expand.grid(
-      stability_p = stability_p,
-      stability_q = stability_q,
-      cross_p = cross_p,
-      cross_q = cross_q,
-      variance_p = variance_p,
-      variance_q = variance_q,
-      confounder_p = confounder_p,
-      confounder_q = confounder_q,
-      confounder_variance = confounder_variance,
-      confounder_stability = confounder_stability,
-      include_confounder = include_confounder
-    ) %>% as.data.frame()
+  else if(dgp == "clpmu") {  # UPDATED SECTION FOR CONFOUNDER MODEL
+    # Build simulation parameters based on confounder type
+    if (confounder_type == "time_variant") {
+      simulation_parameters <- expand.grid(
+        stability_p = stability_p,
+        stability_q = stability_q,
+        cross_p = cross_p,
+        cross_q = cross_q,
+        variance_p = variance_p,
+        variance_q = variance_q,
+        confounder_p = confounder_p,
+        confounder_q = confounder_q,
+        confounder_variance = confounder_variance,
+        confounder_stability = confounder_stability,
+        include_confounder = include_confounder
+      ) %>% as.data.frame()
+    } else {  # time_invariant
+      simulation_parameters <- expand.grid(
+        stability_p = stability_p,
+        stability_q = stability_q,
+        cross_p = cross_p,
+        cross_q = cross_q,
+        variance_p = variance_p,
+        variance_q = variance_q,
+        confounder_p = confounder_p,
+        confounder_q = confounder_q,
+        confounder_variance = confounder_variance,
+        include_confounder = include_confounder
+        # Note: No confounder_stability for time-invariant
+      ) %>% as.data.frame()
+    }
 
     results <- list()
 
@@ -361,33 +386,58 @@ monteCarloRICLPM <- function(
           confounder_p = params$confounder_p,
           confounder_q = params$confounder_q,
           confounder_variance = params$confounder_variance,
-          confounder_stability = params$confounder_stability,
           include_confounder = params$include_confounder,
+          confounder_type = confounder_type,
           trial = j,
           param_combo = i,
           estimator = estimator,
           dgp = "clpmu"
         )
 
+        # Add confounder_stability only for time_variant confounders
+        if (confounder_type == "time_variant") {
+          base_result$confounder_stability <- params$confounder_stability
+        } else {
+          base_result$confounder_stability <- NA
+        }
+
         # Try to generate data and fit model
         model_result <- tryCatch({
-          # Generate data
-          dat <- simCLPMu(
-            waves = waves,
-            stability_p = params$stability_p,
-            stability_q = params$stability_q,
-            cross_p = params$cross_p,
-            cross_q = params$cross_q,
-            variance_p = params$variance_p,
-            variance_q = params$variance_q,
-            cov_pq = 0.1,
-            include_confounder = params$include_confounder,
-            confounder_p = params$confounder_p,
-            confounder_q = params$confounder_q,
-            confounder_variance = params$confounder_variance,
-            confounder_stability = params$confounder_stability,
-            sample.nobs = sample_size
-          )$data
+          # Choose data generation function based on confounder type
+          if (confounder_type == "time_variant") {
+            dat <- simCLPMu(
+              waves = waves,
+              stability_p = params$stability_p,
+              stability_q = params$stability_q,
+              cross_p = params$cross_p,
+              cross_q = params$cross_q,
+              variance_p = params$variance_p,
+              variance_q = params$variance_q,
+              cov_pq = 0.1,
+              include_confounder = params$include_confounder,
+              confounder_p = params$confounder_p,
+              confounder_q = params$confounder_q,
+              confounder_variance = params$confounder_variance,
+              confounder_stability = params$confounder_stability,
+              sample.nobs = sample_size
+            )$data
+          } else {  # time_invariant
+            dat <- simCLPM_timeInvariantU(
+              waves = waves,
+              stability_p = params$stability_p,
+              stability_q = params$stability_q,
+              cross_p = params$cross_p,
+              cross_q = params$cross_q,
+              variance_p = params$variance_p,
+              variance_q = params$variance_q,
+              cov_pq = 0.1,
+              include_confounder = params$include_confounder,
+              confounder_p = params$confounder_p,
+              confounder_q = params$confounder_q,
+              confounder_variance = params$confounder_variance,
+              sample.nobs = sample_size
+            )$data
+          }
 
           # Choose model syntax based on estimator
           if (estimator == "riclpm") {

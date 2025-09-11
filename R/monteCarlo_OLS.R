@@ -1,3 +1,22 @@
+#' @title monteCarloOLS
+#' @description A somewhat strange function. It's common to estimate the cross-lagged panel model with two OLS regression models.
+#' allows the user to specify different Data Generating conditions, and apply the OLS model to the data.
+#' The output is a data frame that includes the estimated coefficients across these trials
+#' @param trials The number of trials for the Monte Carlo simulation.
+#' @param waves The number of waves (time points) in the model.
+#' @param model Specify whether an "ols" or "clpm" model.
+#' @param data_generation Specify the data generation method: "clpm", "ri-clpm"
+#' @param proportion_change_x Proportion of change in x.
+#' @param proportion_change_y Proportion of change in y.
+#' @param confounder_type Character string specifying confounder type for clpmu dgp.
+#'   Must be one of "time_variant" (default) or "time_invariant".
+#'
+#' @import tidyr dplyr
+#' @importFrom dplyr %>% select mutate row_number group_by ungroup
+#'
+#' @return A data frame containing the results of the simulation.
+#'
+#' @export
 monteCarloOLS <- function(
     trials = 10,
     waves = 5,
@@ -17,15 +36,15 @@ monteCarloOLS <- function(
     confounder_variance = 1,
     confounder_stability = 0.4,
     include_confounder = TRUE,
+    confounder_type = "time_variant",  # NEW PARAMETER
     ...
 ) {
+  # Validate confounder_type
+  if (!confounder_type %in% c("time_variant", "time_invariant")) {
+    stop("confounder_type must be either 'time_variant' or 'time_invariant'")
+  }
+
   if(dgp == "riclpm") {
-    # Existing riclpm code...
-
-  } else if(dgp == "clpm") {
-    # Existing clpm code...
-
-  } else if(dgp == "clpmu") {  # ADD THIS NEW SECTION
     simulation_parameters <- expand.grid(
       variance_between_x = variance_between_x,
       variance_between_y = variance_between_y,
@@ -34,13 +53,196 @@ monteCarloOLS <- function(
       cross_p = cross_p,
       cross_q = cross_q,
       variance_p = variance_p,
-      variance_q = variance_q,
-      confounder_p = confounder_p,
-      confounder_q = confounder_q,
-      confounder_variance = confounder_variance,
-      confounder_stability = confounder_stability,
-      include_confounder = include_confounder
-    ) %>% as.data.frame()
+      variance_q = variance_q) %>% as.data.frame()
+
+    # Initialize an empty list to store results
+    results <- list()
+
+    # Loop through each combination of parameters and trials
+    for (i in 1:nrow(simulation_parameters)) {
+      for (j in 1:trials) {
+        params <- simulation_parameters[i, ]
+
+        tryCatch({
+          dat <- simRICLPM(
+            waves = waves,
+            stability_p =  params$stability_p,
+            stability_q =  params$stability_q,
+            cross_p = params$cross_p,
+            cross_q = params$cross_q,
+            variance_p = params$variance_p,
+            variance_q = params$variance_q,
+            variance_between_x = params$variance_between_x,
+            variance_between_y = params$variance_between_y,
+            sample.nobs = sample_size
+          )$data %>%
+            reshape_long_sim_cr() %>% as.data.frame() %>% na.omit()
+
+          # Fit the OLS model and extract coefficients
+          model_fit_y <- lm(y ~ xlag + ylag, dat)
+          model_fit_x <- lm(x ~ xlag + ylag, dat)
+
+          xvalue_x <-  model_fit_x$coefficients[["xlag"]]
+          yvalue_x <-  model_fit_x$coefficients[["ylag"]]
+          xvalue_y <-  model_fit_y$coefficients[["xlag"]]
+          yvalue_y <-  model_fit_y$coefficients[["ylag"]]
+
+          # Store results in the list
+          results[[length(results) + 1]] <- data.frame(
+            variance_between_x = params$variance_between_x,
+            variance_between_y = params$variance_between_y,
+            stability_p =  params$stability_p,
+            stability_q =  params$stability_q,
+            cross_p = params$cross_p,
+            cross_q = params$cross_q,
+            variance_p = params$variance_p,
+            variance_q = params$variance_q,
+            xlag_x = as.numeric(xvalue_x),
+            ylag_x = as.numeric(yvalue_x),
+            xlag_y = as.numeric(xvalue_y),
+            ylag_y = as.numeric(yvalue_y),
+            trial = j,
+            estimator = "ols",
+            dgp = "riclpm"
+          )
+        }, error = function(e) {
+          # Store NA results for failed trials
+          results[[length(results) + 1]] <<- data.frame(
+            variance_between_x = params$variance_between_x,
+            variance_between_y = params$variance_between_y,
+            stability_p =  params$stability_p,
+            stability_q =  params$stability_q,
+            cross_p = params$cross_p,
+            cross_q = params$cross_q,
+            variance_p = params$variance_p,
+            variance_q = params$variance_q,
+            xlag_x = NA,
+            ylag_x = NA,
+            xlag_y = NA,
+            ylag_y = NA,
+            trial = j,
+            estimator = "ols",
+            dgp = "riclpm"
+          )
+        })
+      }
+    }
+    results_df <- do.call(rbind, results)
+
+  }
+  else if(dgp == "clpm") {
+    simulation_parameters <- expand.grid(
+      stability_p = stability_p,
+      stability_q = stability_q,
+      cross_p = cross_p,
+      cross_q = cross_q,
+      variance_p = variance_p,
+      variance_q = variance_q) %>% as.data.frame()
+
+    # Initialize an empty list to store results
+    results <- list()
+
+    # Loop through each combination of parameters and trials
+    for (i in 1:nrow(simulation_parameters)) {
+      for (j in 1:trials) {
+        params <- simulation_parameters[i, ]
+
+        tryCatch({
+          dat <- simCLPM(
+            waves = waves,
+            stability_p =  params$stability_p,
+            stability_q =  params$stability_q,
+            cross_p = params$cross_p,
+            cross_q = params$cross_q,
+            variance_p = params$variance_p,
+            variance_q = params$variance_q,
+            sample.nobs = sample_size
+          )$data %>%
+            reshape_long_sim_cr() %>% as.data.frame() %>% na.omit()
+
+          # Fit the OLS model and extract coefficients
+          model_fit_y <- lm(y ~ xlag + ylag, dat)
+          model_fit_x <- lm(x ~ xlag + ylag, dat)
+
+          xvalue_x <-  model_fit_x$coefficients[["xlag"]]
+          yvalue_x <-  model_fit_x$coefficients[["ylag"]]
+          xvalue_y <-  model_fit_y$coefficients[["xlag"]]
+          yvalue_y <-  model_fit_y$coefficients[["ylag"]]
+
+          # Store results in the list
+          results[[length(results) + 1]] <- data.frame(
+            stability_p =  params$stability_p,
+            stability_q =  params$stability_q,
+            cross_p = params$cross_p,
+            cross_q = params$cross_q,
+            variance_p = params$variance_p,
+            variance_q = params$variance_q,
+            xlag_x = as.numeric(xvalue_x),
+            ylag_x = as.numeric(yvalue_x),
+            xlag_y = as.numeric(xvalue_y),
+            ylag_y = as.numeric(yvalue_y),
+            trial = j,
+            estimator = "ols",
+            dgp = "clpm"
+          )
+        }, error = function(e) {
+          # Store NA results for failed trials
+          results[[length(results) + 1]] <<- data.frame(
+            stability_p =  params$stability_p,
+            stability_q =  params$stability_q,
+            cross_p = params$cross_p,
+            cross_q = params$cross_q,
+            variance_p = params$variance_p,
+            variance_q = params$variance_q,
+            xlag_x = NA,
+            ylag_x = NA,
+            xlag_y = NA,
+            ylag_y = NA,
+            trial = j,
+            estimator = "ols",
+            dgp = "clpm"
+          )
+        })
+      }
+    }
+    results_df <- do.call(rbind, results)
+
+  }
+  else if(dgp == "clpmu") {  # UPDATED SECTION FOR CONFOUNDER MODEL
+    # Build simulation parameters based on confounder type
+    if (confounder_type == "time_variant") {
+      simulation_parameters <- expand.grid(
+        variance_between_x = variance_between_x,
+        variance_between_y = variance_between_y,
+        stability_p = stability_p,
+        stability_q = stability_q,
+        cross_p = cross_p,
+        cross_q = cross_q,
+        variance_p = variance_p,
+        variance_q = variance_q,
+        confounder_p = confounder_p,
+        confounder_q = confounder_q,
+        confounder_variance = confounder_variance,
+        confounder_stability = confounder_stability,
+        include_confounder = include_confounder
+      ) %>% as.data.frame()
+    } else {  # time_invariant
+      simulation_parameters <- expand.grid(
+        variance_between_x = variance_between_x,
+        variance_between_y = variance_between_y,
+        stability_p = stability_p,
+        stability_q = stability_q,
+        cross_p = cross_p,
+        cross_q = cross_q,
+        variance_p = variance_p,
+        variance_q = variance_q,
+        confounder_p = confounder_p,
+        confounder_q = confounder_q,
+        confounder_variance = confounder_variance,
+        include_confounder = include_confounder
+        # Note: No confounder_stability for time-invariant
+      ) %>% as.data.frame()
+    }
 
     results <- list()
 
@@ -48,59 +250,125 @@ monteCarloOLS <- function(
       for (j in 1:trials) {
         params <- simulation_parameters[i, ]
 
-        # Use simCLPMu instead of simRICLPM
-        dat <- simCLPMu(
-          waves = waves,
-          stability_p = params$stability_p,
-          stability_q = params$stability_q,
-          cross_p = params$cross_p,
-          cross_q = params$cross_q,
-          variance_p = params$variance_p,
-          variance_q = params$variance_q,
-          cov_pq = 0.1,  # Add this parameter
-          include_confounder = params$include_confounder,
-          confounder_p = params$confounder_p,
-          confounder_q = params$confounder_q,
-          confounder_variance = params$confounder_variance,
-          confounder_stability = params$confounder_stability,
-          sample.nobs = sample_size
-        )$data %>%
-          reshape_long_sim_cr() %>% as.data.frame() %>% na.omit()
+        tryCatch({
+          # Choose data generation function based on confounder type
+          if (confounder_type == "time_variant") {
+            dat <- simCLPMu(
+              waves = waves,
+              stability_p = params$stability_p,
+              stability_q = params$stability_q,
+              cross_p = params$cross_p,
+              cross_q = params$cross_q,
+              variance_p = params$variance_p,
+              variance_q = params$variance_q,
+              cov_pq = 0.1,
+              include_confounder = params$include_confounder,
+              confounder_p = params$confounder_p,
+              confounder_q = params$confounder_q,
+              confounder_variance = params$confounder_variance,
+              confounder_stability = params$confounder_stability,
+              sample.nobs = sample_size
+            )$data %>%
+              reshape_long_sim_cr() %>% as.data.frame() %>% na.omit()
+          } else {  # time_invariant
+            dat <- simCLPM_timeInvariantU(
+              waves = waves,
+              stability_p = params$stability_p,
+              stability_q = params$stability_q,
+              cross_p = params$cross_p,
+              cross_q = params$cross_q,
+              variance_p = params$variance_p,
+              variance_q = params$variance_q,
+              cov_pq = 0.1,
+              include_confounder = params$include_confounder,
+              confounder_p = params$confounder_p,
+              confounder_q = params$confounder_q,
+              confounder_variance = params$confounder_variance,
+              sample.nobs = sample_size
+            )$data %>%
+              reshape_long_sim_cr() %>% as.data.frame() %>% na.omit()
+          }
 
-        # Same OLS fitting as before
-        model_fit_y <- lm(y ~ xlag + ylag, dat)
-        model_fit_x <- lm(x ~ xlag + ylag, dat)
+          # Same OLS fitting as before
+          model_fit_y <- lm(y ~ xlag + ylag, dat)
+          model_fit_x <- lm(x ~ xlag + ylag, dat)
 
-        xvalue_x <- model_fit_x$coefficients[["xlag"]]
-        yvalue_x <- model_fit_x$coefficients[["ylag"]]
-        xvalue_y <- model_fit_y$coefficients[["xlag"]]
-        yvalue_y <- model_fit_y$coefficients[["ylag"]]
+          xvalue_x <- model_fit_x$coefficients[["xlag"]]
+          yvalue_x <- model_fit_x$coefficients[["ylag"]]
+          xvalue_y <- model_fit_y$coefficients[["xlag"]]
+          yvalue_y <- model_fit_y$coefficients[["ylag"]]
 
-        # Store results
-        results[[length(results) + 1]] <- data.frame(
-          variance_between_x = params$variance_between_x,
-          variance_between_y = params$variance_between_y,
-          stability_p = params$stability_p,
-          stability_q = params$stability_q,
-          cross_p = params$cross_p,
-          cross_q = params$cross_q,
-          variance_p = params$variance_p,
-          variance_q = params$variance_q,
-          confounder_p = params$confounder_p,
-          confounder_q = params$confounder_q,
-          include_confounder = params$include_confounder,
-          xlag_x = xvalue_x,
-          ylag_x = yvalue_x,
-          xlag_y = xvalue_y,
-          ylag_y = yvalue_y,
-          trial = j,
-          estimator = "ols",
-          dgp = "clpmu"
-        )
+          # Store results - include confounder type info
+          result_row <- data.frame(
+            variance_between_x = params$variance_between_x,
+            variance_between_y = params$variance_between_y,
+            stability_p = params$stability_p,
+            stability_q = params$stability_q,
+            cross_p = params$cross_p,
+            cross_q = params$cross_q,
+            variance_p = params$variance_p,
+            variance_q = params$variance_q,
+            confounder_p = params$confounder_p,
+            confounder_q = params$confounder_q,
+            confounder_variance = params$confounder_variance,
+            include_confounder = params$include_confounder,
+            confounder_type = confounder_type,
+            xlag_x = as.numeric(xvalue_x),
+            ylag_x = as.numeric(yvalue_x),
+            xlag_y = as.numeric(xvalue_y),
+            ylag_y = as.numeric(yvalue_y),
+            trial = j,
+            estimator = "ols",
+            dgp = "clpmu"
+          )
+
+          # Add confounder_stability only for time_variant confounders
+          if (confounder_type == "time_variant") {
+            result_row$confounder_stability <- params$confounder_stability
+          } else {
+            result_row$confounder_stability <- NA
+          }
+
+          results[[length(results) + 1]] <- result_row
+
+        }, error = function(e) {
+          # Store NA results for failed trials
+          result_row <- data.frame(
+            variance_between_x = params$variance_between_x,
+            variance_between_y = params$variance_between_y,
+            stability_p = params$stability_p,
+            stability_q = params$stability_q,
+            cross_p = params$cross_p,
+            cross_q = params$cross_q,
+            variance_p = params$variance_p,
+            variance_q = params$variance_q,
+            confounder_p = params$confounder_p,
+            confounder_q = params$confounder_q,
+            confounder_variance = params$confounder_variance,
+            include_confounder = params$include_confounder,
+            confounder_type = confounder_type,
+            xlag_x = NA,
+            ylag_x = NA,
+            xlag_y = NA,
+            ylag_y = NA,
+            trial = j,
+            estimator = "ols",
+            dgp = "clpmu"
+          )
+
+          # Add confounder_stability
+          if (confounder_type == "time_variant") {
+            result_row$confounder_stability <- params$confounder_stability
+          } else {
+            result_row$confounder_stability <- NA
+          }
+
+          results[[length(results) + 1]] <<- result_row
+        })
       }
     }
-    results_df <- do.call(rbind, results)  # This was missing!
+    results_df <- do.call(rbind, results)
   }
 
-  return(results_df)  # Make sure this is outside all if/else blocks
+  return(results_df)
 }

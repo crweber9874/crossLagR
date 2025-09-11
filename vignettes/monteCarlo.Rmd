@@ -98,13 +98,33 @@ In practice:
 
 ## Confounding Variables
 
-In the presence of confounding variables, $Z$, that influence both $x$ and $y$, the cross-lagged estimates may be biased, in both the CLPM or the RI-CLPM. If we assume the   
+In the presence of confounding variables, $Z$, that influence both $x$ and $y$, the cross-lagged estimates may be biased, in both the CLPM or the RI-CLPM. A confounder, like all variables in a panel design may be *time-varying* or *time-invariant*; characteristics that fluctuate over time, partially or fully explaining the pattern of relationships between $x$ and $y$, or stable characteristics that do not change over time, but also explain the joint relationship between $x$ and $y$.
 
+If confounder $Z$ is time-invariant, we may respecify the CLPM or RI-CLPM as follows:
 
+$$
+\begin{aligned}
+x_{t, i}= \theta_{0,x,t} + \theta_{11} x_{t-1, i} +  \theta_{12} y_{t-1, i} + \theta_{13}z_i+  e^x_{t,i}  \\
+y_{t, i}= \theta_{0,y,t} + \theta_{21} x_{t-1, i} + \theta_{22}  y_{t-1, i} + \theta_{23}z_i +  e^y_{t,i}  
+\end{aligned}
+$$
 
+If the confounder is time varying, then:
 
+$$
+\begin{aligned}
+x_{t, i}= \theta_{0,x,t} + \theta_{11} x_{t-1, i} +  \theta_{12} y_{t-1, i} + \theta_{13}z_{t,i}+  e^x_{t,i}  \\
+y_{t, i}= \theta_{0,y,t} + \theta_{21} x_{t-1, i} + \theta_{22}  y_{t-1, i} + \theta_{23}z_{t,i} +  e^y_{t,i}  
+\end{aligned}
+$$
 
-The RI-CLPM is often touted as a solution to this problem, as the stable trait level components $\mu^x_i$ and $\mu^y_i$ may capture some of the confounding influence of $Z$. However, this only holds if $Z$ is time-invariant. If $Z$ varies over time, and influences both $x$ and $y$, then the RI-CLPM does not account for this source of confounding. In such cases, it is necessary to include $Z$ directly in the model, either as a time-varying covariate or through other methods such as fixed effects or instrumental variables.
+When the confounder is "unobserved" and either time-invariant or time-varying, we might ask: What is the consequence of ignoring that confounder in the CLPM or RI-CLPM? There is some disagreement in the literature on this question.
+
+```{r}
+devtools::load_all()
+simCLPM_timeInvariantU()
+```
+
 
 <!-- Insofar that the variance of the trait level term is zero, the model reduces to the CLPM. The CLPM is nested within the CLPM. In this example, we'll simulate data under the RI-CLPM and estimate several models. -->
 
