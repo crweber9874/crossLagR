@@ -2,7 +2,7 @@
 #' @description Run Monte Carlo simulations across different estimators and parameter combinations
 #'
 #' This function provides a unified interface for running Monte Carlo simulations across multiple
-#' estimators (OLS, RICLPM, CLPM, CTSEM, FI, LCHANGE) with varying parameter combinations.
+#' estimators (OLS, RICLPM, CLPM, CTSEM, FI, LCHANGE, RI) with varying parameter combinations.
 #' It handles parameter grid expansion, error catching, and result compilation automatically.
 #'
 #' @param estimator Character string specifying which estimator to use. Must be one of:
@@ -13,6 +13,7 @@
 #'     \item "CTSEM" - Continuous Time Structural Equation Model
 #'     \item "FI" - Fixed Individual effects (First Differences)
 #'     \item "LCHANGE" - Latent Change Score Model
+#'     \item "RI" - Random Intercepts using lmer
 #'   }
 #' @param riclpm_type Character string specifying which RICLPM variant to use (only relevant when estimator = "RICLPM").
 #'   Must be one of:
@@ -34,6 +35,12 @@
 #'     \item "riclpm" - Random Intercept Cross-Lagged Panel Model data generation
 #'     \item "clpm" - Cross-Lagged Panel Model data generation
 #'     \item "clpmu" - CLPM with unmeasured confounder (uses simCLPMu)
+#'   }
+#' @param lchange_type Character string specifying latent change model type (only relevant when estimator = "LCHANGE").
+#'   Must be one of:
+#'   \itemize{
+#'     \item "dual_change" - Bivariate latent change model (default)
+#'     \item "latent_change" - Single variable latent change model
 #'   }
 #'
 #' @details
@@ -89,6 +96,23 @@
 #'   trials = 5,
 #'   waves = 3,
 #'   sample_size = 500
+#' )
+#'
+#' # Test Random Intercepts with both full and cross-lagged only
+#' results_ri_full <- run_mc_sims(
+#'   estimator = "RI",
+#'   param_grid = data.frame(include_lagged_dv = TRUE),
+#'   trials = 10,
+#'   waves = 4,
+#'   sample_size = 1000
+#' )
+#'
+#' results_ri_cross <- run_mc_sims(
+#'   estimator = "RI",
+#'   param_grid = data.frame(include_lagged_dv = FALSE),
+#'   trials = 10,
+#'   waves = 4,
+#'   sample_size = 1000
 #' )
 #'
 #' # Compare regular RICLPM vs no-lag RICLPM
@@ -153,7 +177,7 @@
 #' )
 #'
 #' # Compare estimators under confounding
-#' estimators <- c("OLS", "RICLPM", "CLPM")
+#' estimators <- c("OLS", "RICLPM", "CLPM", "RI")
 #' all_results <- lapply(estimators, function(est) {
 #'   run_mc_sims(estimator = est, trials = 5, waves = 3, data_generation = "clpmu")
 #' })
@@ -165,8 +189,7 @@
 run_mc_sims <- function(estimator,
                         riclpm_type = "riclpm",
                         param_grid = NULL,
-                        lchange_type = "dual_change",  # ADD THIS LINE
-
+                        lchange_type = "dual_change",
                         trials = 10,
                         waves = 3,
                         sample_size = 1000,
@@ -187,8 +210,8 @@ run_mc_sims <- function(estimator,
   library(dplyr)
   library(tictoc)
 
-  # Valid estimators
-  valid_estimators <- c("OLS", "RICLPM", "CLPM", "CTSEM", "FI", "LCHANGE")
+  # Valid estimators - UPDATED TO INCLUDE "RI"
+  valid_estimators <- c("OLS", "RICLPM", "CLPM", "CTSEM", "FI", "LCHANGE", "RI")
   if (!estimator %in% valid_estimators) {
     stop("estimator must be one of: ", paste(valid_estimators, collapse = ", "))
   }
@@ -271,6 +294,14 @@ run_mc_sims <- function(estimator,
     default_params <- c(default_params, confounder_defaults)
   }
 
+  # Add RI-specific defaults
+  if (estimator == "RI") {
+    ri_defaults <- list(
+      include_lagged_dv = TRUE
+    )
+    default_params <- c(default_params, ri_defaults)
+  }
+
   # Add missing parameters with default values
   for (param_name in names(default_params)) {
     if (!param_name %in% names(param_grid)) {
@@ -285,6 +316,9 @@ run_mc_sims <- function(estimator,
     cat("Running", estimator, "Monte Carlo simulation\n")
     if (estimator == "RICLPM") {
       cat("RICLPM type:", riclpm_type, "\n")
+    }
+    if (estimator == "LCHANGE") {
+      cat("Latent change type:", lchange_type, "\n")
     }
     cat("Parameter combinations:", nrow(param_grid), "\n")
     cat("Parameters being varied:", paste(names(param_grid), collapse = ", "), "\n")
@@ -353,6 +387,18 @@ run_mc_sims <- function(estimator,
       base_params$estimator <- riclpm_type
     }
 
+    # Add LCHANGE-specific parameter
+    if (estimator == "LCHANGE") {
+      base_params$model_type <- lchange_type
+    }
+
+    # Add RI-specific parameter
+    if (estimator == "RI") {
+      if ("include_lagged_dv" %in% names(current_params)) {
+        base_params$include_lagged_dv <- current_params[["include_lagged_dv"]]
+      }
+    }
+
     # Call the appropriate Monte Carlo function
     tryCatch({
       if (estimator == "OLS") {
@@ -368,6 +414,8 @@ run_mc_sims <- function(estimator,
         result <- do.call(monteCarloFI, base_params)
       } else if (estimator == "LCHANGE") {
         result <- do.call(monteCarloLChange, base_params)
+      } else if (estimator == "RI") {
+        result <- do.call(monteCarloRI, base_params)
       }
 
       # Add parameter combination info to each row of results
@@ -381,6 +429,11 @@ run_mc_sims <- function(estimator,
         # Add riclpm_type to results for RICLPM runs
         if (estimator == "RICLPM" && !"riclpm_type" %in% names(result)) {
           result$riclpm_type <- riclpm_type
+        }
+
+        # Add lchange_type to results for LCHANGE runs
+        if (estimator == "LCHANGE" && !"lchange_type" %in% names(result)) {
+          result$lchange_type <- lchange_type
         }
       }
 
@@ -406,6 +459,10 @@ run_mc_sims <- function(estimator,
 
       if (estimator == "RICLPM") {
         error_result$riclpm_type <- riclpm_type
+      }
+
+      if (estimator == "LCHANGE") {
+        error_result$lchange_type <- lchange_type
       }
 
       all_results[[i]] <- error_result

@@ -13,18 +13,18 @@ Imports:
   stats,
   MASS,
   dplyr,
+  gt,
   ggplot2,
   lavaan,
   dagitty,
   ggdag,
   tidyverse,
   stringr,
-  ggridges,
   gganimate,
   tidyr,
   stringr,
   ctsem,
-  brms
+  lme4
 Suggests:
     knitr,
     rmarkdown,

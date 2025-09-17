@@ -31,3 +31,8 @@ This repository contains a project that aims to [briefly describe the purpose of
 # Installation
 # Usage
 # Contributing
+
+## Technologies
+- R
+- Shiny
+- Claude.AI - This project's code was developed with the assistance of an AI code assistant to assist with with base code, error catching, and debugging.

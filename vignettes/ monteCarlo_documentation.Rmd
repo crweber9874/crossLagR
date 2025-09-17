@@ -9,9 +9,6 @@ The structure of the repository to run monte carlo simulations is located in the
 * `simRICLPM` generates data from a random-intercept cross-lagged panel model.
 
 
-
-
-
 ```{r echo=FALSE, message=FALSE, warning=FALSE}
 library(dplyr)
 library(tictoc)
@@ -38,7 +35,7 @@ resultsOLS <- expand.grid(x = stability_q, y = variance.between.x) |>
       variance.between.x = y,
       variance.between.y = 0.5,
       cov_pq = 0,
-      sample_size = 1000  # Reduced from 5000
+      sample_size = 1000  
     )
     res
   })) |>
