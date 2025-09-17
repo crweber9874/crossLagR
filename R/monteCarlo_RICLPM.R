@@ -1,5 +1,6 @@
 #' @title monteCarloRICLPM
-#' @description This function combines the estimation and simulation of an RI-CLPM over a fixed number of trials.
+#' @description Monte Carlo simulation for Random Intercept Cross-Lagged Panel Model
+#' This function combines the estimation and simulation of an RI-CLPM over a fixed number of trials.
 #' The output is a data frame that includes the estimated coefficients across these trials
 #' @param trials The number of trials for the Monte Carlo simulation.
 #' @param waves The number of waves (time points) in the model.
@@ -49,7 +50,8 @@ monteCarloRICLPM <- function(
     confounder_variance = 1,
     confounder_stability = 0.4,
     include_confounder = TRUE,
-    confounder_type = "time_variant",  # NEW PARAMETER
+    confounder_type = "time_variant",
+    cov_pq = 0.1,
     verbose = FALSE,
     ...
 ) {
@@ -154,20 +156,26 @@ monteCarloRICLPM <- function(
             stop("Model did not converge")
           }
 
-          # Extract coefficients safely
-          coeffs <- coef(model)
+          # Extract coefficients with CORRECTED mapping
+          param_table <- lavaan::parameterEstimates(model)
 
-          cross_lag_y <- get_coef_safe("cl_yeqn", coeffs)
-          auto_regressive_y <- get_coef_safe("ar_yeqn", coeffs)
-          cross_lag_x <- get_coef_safe("cl_xeqn", coeffs)
-          auto_regressive_x <- get_coef_safe("ar_xeqn", coeffs)
+          # IMPORTANT: The estimateRICLPM function uses the same confusing parameter names:
+          # - "ar_yeqn" is actually the X autoregressive parameter
+          # - "ar_xeqn" is actually the Y autoregressive parameter
+          # - "cl_yeqn" is actually the Y→X cross-lagged parameter
+          # - "cl_xeqn" is actually the X→Y cross-lagged parameter
+
+          ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
+          ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
+          cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
+          cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
 
           list(
             success = TRUE,
-            xlag_x = auto_regressive_x,
-            ylag_x = cross_lag_x,
-            xlag_y = cross_lag_y,
-            ylag_y = auto_regressive_y,
+            xlag_x = as.numeric(ar_x),        # X autoregressive (corrected)
+            ylag_x = as.numeric(cl_y_to_x),   # Y→X cross-lagged (corrected)
+            xlag_y = as.numeric(cl_x_to_y),   # X→Y cross-lagged (corrected)
+            ylag_y = as.numeric(ar_y),        # Y autoregressive (corrected)
             converged = TRUE,
             error_message = NA_character_,
             error_type = NA_character_
@@ -253,6 +261,7 @@ monteCarloRICLPM <- function(
             cross_q = params$cross_q,
             variance_p = params$variance_p,
             variance_q = params$variance_q,
+            cov_pq = cov_pq,
             sample.nobs = sample_size
           )$data
 
@@ -279,20 +288,20 @@ monteCarloRICLPM <- function(
             stop("Model did not converge")
           }
 
-          # Extract coefficients safely
-          coeffs <- coef(model)
+          # Extract coefficients with CORRECTED mapping
+          param_table <- lavaan::parameterEstimates(model)
 
-          cross_lag_y <- get_coef_safe("cl_yeqn", coeffs)
-          auto_regressive_y <- get_coef_safe("ar_yeqn", coeffs)
-          cross_lag_x <- get_coef_safe("cl_xeqn", coeffs)
-          auto_regressive_x <- get_coef_safe("ar_xeqn", coeffs)
+          ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
+          ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
+          cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
+          cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
 
           list(
             success = TRUE,
-            xlag_x = auto_regressive_x,
-            ylag_x = cross_lag_x,
-            xlag_y = cross_lag_y,
-            ylag_y = auto_regressive_y,
+            xlag_x = as.numeric(ar_x),        # X autoregressive (corrected)
+            ylag_x = as.numeric(cl_y_to_x),   # Y→X cross-lagged (corrected)
+            xlag_y = as.numeric(cl_x_to_y),   # X→Y cross-lagged (corrected)
+            ylag_y = as.numeric(ar_y),        # Y autoregressive (corrected)
             converged = TRUE,
             error_message = NA_character_,
             error_type = NA_character_
@@ -337,7 +346,7 @@ monteCarloRICLPM <- function(
     results_df <- do.call(rbind, results)
   }
 
-  else if(dgp == "clpmu") {  # UPDATED SECTION FOR CONFOUNDER MODEL
+  else if(dgp == "clpmu") {
     # Build simulation parameters based on confounder type
     if (confounder_type == "time_variant") {
       simulation_parameters <- expand.grid(
@@ -413,7 +422,7 @@ monteCarloRICLPM <- function(
               cross_q = params$cross_q,
               variance_p = params$variance_p,
               variance_q = params$variance_q,
-              cov_pq = 0.1,
+              cov_pq = cov_pq,
               include_confounder = params$include_confounder,
               confounder_p = params$confounder_p,
               confounder_q = params$confounder_q,
@@ -430,7 +439,7 @@ monteCarloRICLPM <- function(
               cross_q = params$cross_q,
               variance_p = params$variance_p,
               variance_q = params$variance_q,
-              cov_pq = 0.1,
+              cov_pq = cov_pq,
               include_confounder = params$include_confounder,
               confounder_p = params$confounder_p,
               confounder_q = params$confounder_q,
@@ -462,20 +471,20 @@ monteCarloRICLPM <- function(
             stop("Model did not converge")
           }
 
-          # Extract coefficients safely
-          coeffs <- coef(model)
+          # Extract coefficients with CORRECTED mapping
+          param_table <- lavaan::parameterEstimates(model)
 
-          cross_lag_y <- get_coef_safe("cl_yeqn", coeffs)
-          auto_regressive_y <- get_coef_safe("ar_yeqn", coeffs)
-          cross_lag_x <- get_coef_safe("cl_xeqn", coeffs)
-          auto_regressive_x <- get_coef_safe("ar_xeqn", coeffs)
+          ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
+          ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
+          cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
+          cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
 
           list(
             success = TRUE,
-            xlag_x = auto_regressive_x,
-            ylag_x = cross_lag_x,
-            xlag_y = cross_lag_y,
-            ylag_y = auto_regressive_y,
+            xlag_x = as.numeric(ar_x),        # X autoregressive (corrected)
+            ylag_x = as.numeric(cl_y_to_x),   # Y→X cross-lagged (corrected)
+            xlag_y = as.numeric(cl_x_to_y),   # X→Y cross-lagged (corrected)
+            ylag_y = as.numeric(ar_y),        # Y autoregressive (corrected)
             converged = TRUE,
             error_message = NA_character_,
             error_type = NA_character_

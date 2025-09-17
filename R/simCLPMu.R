@@ -116,8 +116,7 @@ simCLPMu <- function(waves = 10,
 
   # Generate data
   dat <- lavaan::simulateData(model = model_string,
-                              int.ov.free = TRUE,
-                              ...)
+                              int.ov.free = TRUE)
 
   return(list(model = model_string, data = dat))
 }

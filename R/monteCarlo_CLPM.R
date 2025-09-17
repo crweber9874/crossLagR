@@ -1,5 +1,5 @@
-#' @title monteCarloCLPM_fixed
-#' @description Fixed Monte Carlo simulation for Cross-Lagged Panel Model
+#' @title monteCarloCLPM
+#' @description Monte Carlo simulation for Cross-Lagged Panel Model
 #'
 #' @param trials The number of trials for the Monte Carlo simulation.
 #' @param waves The number of waves (time points) in the model.
@@ -43,6 +43,7 @@ monteCarloCLPM <- function(
     confounder_q = 0.3,
     confounder_variance = 1,
     confounder_stability = 0.4,
+    cov_pq = 0.1,
     ...
 ) {
 
@@ -94,15 +95,21 @@ monteCarloCLPM <- function(
             data = dat
           )
 
-          # Extract coefficients from the parameter table
+          # Extract coefficients from the parameter table - CORRECTED MAPPING
           param_table <- lavaan::parameterEstimates(model)
 
-          cross_lag_y <- param_table[param_table$label == "cl_yeqn", "est"]
-          auto_regressive_y <- param_table[param_table$label == "ar_yeqn", "est"]
-          cross_lag_x <- param_table[param_table$label == "cl_xeqn", "est"]
-          auto_regressive_x <- param_table[param_table$label == "ar_xeqn", "est"]
+          # IMPORTANT: The estimateCLPM function uses confusing parameter names:
+          # - "ar_yeqn" is actually the X autoregressive parameter
+          # - "ar_xeqn" is actually the Y autoregressive parameter
+          # - "cl_yeqn" is actually the Y→X cross-lagged parameter
+          # - "cl_xeqn" is actually the X→Y cross-lagged parameter
 
-          # Store results in the list
+          ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
+          ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
+          cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
+          cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
+
+          # Store results in the list with CORRECT mapping
           results[[length(results) + 1]] <- data.frame(
             variance_between_x = params$variance_between_x,
             variance_between_y = params$variance_between_y,
@@ -112,10 +119,10 @@ monteCarloCLPM <- function(
             cross_q = params$cross_q,
             variance_p = params$variance_p,
             variance_q = params$variance_q,
-            xlag_x = as.numeric(auto_regressive_x),
-            ylag_x = as.numeric(cross_lag_x),
-            xlag_y = as.numeric(cross_lag_y),
-            ylag_y = as.numeric(auto_regressive_y),
+            xlag_x = as.numeric(ar_x),        # X autoregressive (corrected)
+            ylag_x = as.numeric(cl_y_to_x),   # Y→X cross-lagged (corrected)
+            xlag_y = as.numeric(cl_x_to_y),   # X→Y cross-lagged (corrected)
+            ylag_y = as.numeric(ar_y),        # Y autoregressive (corrected)
             trial = j,
             estimator = "clpm",
             dgp = "riclpm"
@@ -168,6 +175,7 @@ monteCarloCLPM <- function(
             cross_q = params$cross_q,
             variance_p = params$variance_p,
             variance_q = params$variance_q,
+            cov_pq = cov_pq,
             sample.nobs = sample_size
           )$data
 
@@ -176,12 +184,13 @@ monteCarloCLPM <- function(
             data = dat
           )
 
+          # Extract coefficients with CORRECTED mapping
           param_table <- lavaan::parameterEstimates(model)
 
-          cross_lag_y <- param_table[param_table$label == "cl_yeqn", "est"]
-          auto_regressive_y <- param_table[param_table$label == "ar_yeqn", "est"]
-          cross_lag_x <- param_table[param_table$label == "cl_xeqn", "est"]
-          auto_regressive_x <- param_table[param_table$label == "ar_xeqn", "est"]
+          ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
+          ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
+          cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
+          cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
 
           results[[length(results) + 1]] <- data.frame(
             stability_p = params$stability_p,
@@ -190,10 +199,10 @@ monteCarloCLPM <- function(
             cross_q = params$cross_q,
             variance_p = params$variance_p,
             variance_q = params$variance_q,
-            xlag_x = as.numeric(auto_regressive_x),
-            ylag_x = as.numeric(cross_lag_x),
-            xlag_y = as.numeric(cross_lag_y),
-            ylag_y = as.numeric(auto_regressive_y),
+            xlag_x = as.numeric(ar_x),        # X autoregressive (corrected)
+            ylag_x = as.numeric(cl_y_to_x),   # Y→X cross-lagged (corrected)
+            xlag_y = as.numeric(cl_x_to_y),   # X→Y cross-lagged (corrected)
+            ylag_y = as.numeric(ar_y),        # Y autoregressive (corrected)
             trial = j,
             estimator = "clpm",
             dgp = "clpm"
@@ -264,7 +273,7 @@ monteCarloCLPM <- function(
               cross_q = params$cross_q,
               variance_p = params$variance_p,
               variance_q = params$variance_q,
-              cov_pq = 0.1,
+              cov_pq = cov_pq,
               confounder_p = params$confounder_p,
               confounder_q = params$confounder_q,
               confounder_variance = params$confounder_variance,
@@ -280,7 +289,7 @@ monteCarloCLPM <- function(
               cross_q = params$cross_q,
               variance_p = params$variance_p,
               variance_q = params$variance_q,
-              cov_pq = 0.1,
+              cov_pq = cov_pq,
               confounder_p = params$confounder_p,
               confounder_q = params$confounder_q,
               confounder_variance = params$confounder_variance,
@@ -293,12 +302,13 @@ monteCarloCLPM <- function(
             data = dat
           )
 
+          # Extract coefficients with CORRECTED mapping
           param_table <- lavaan::parameterEstimates(model)
 
-          cross_lag_y <- param_table[param_table$label == "cl_yeqn", "est"]
-          auto_regressive_y <- param_table[param_table$label == "ar_yeqn", "est"]
-          cross_lag_x <- param_table[param_table$label == "cl_xeqn", "est"]
-          auto_regressive_x <- param_table[param_table$label == "ar_xeqn", "est"]
+          ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
+          ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
+          cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
+          cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
 
           # Store results in the list - include confounder type info
           result_row <- data.frame(
@@ -313,10 +323,10 @@ monteCarloCLPM <- function(
             confounder_variance = params$confounder_variance,
             include_confounder = TRUE, # Confounding is always included here
             confounder_type = confounder_type,
-            xlag_x = as.numeric(auto_regressive_x),
-            ylag_x = as.numeric(cross_lag_x),
-            xlag_y = as.numeric(cross_lag_y),
-            ylag_y = as.numeric(auto_regressive_y),
+            xlag_x = as.numeric(ar_x),        # X autoregressive (corrected)
+            ylag_x = as.numeric(cl_y_to_x),   # Y→X cross-lagged (corrected)
+            xlag_y = as.numeric(cl_x_to_y),   # X→Y cross-lagged (corrected)
+            ylag_y = as.numeric(ar_y),        # Y autoregressive (corrected)
             trial = j,
             estimator = "clpm",
             dgp = "clpmu"
@@ -369,5 +379,3 @@ monteCarloCLPM <- function(
   }
   return(results_df)
 }
-
-

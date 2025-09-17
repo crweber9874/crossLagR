@@ -128,8 +128,7 @@ param_grid <- expand.grid(
   y_stability = c(0.5),
   variance_between_x = c(0.75),
   variance_between_y = c(0.75),
-  include_confounder    = c(FALSE),
-  dgp = c("clpm")
+  dgp = c("clpm", "clpmu", "riclpm")
 )
 
 run_monte_carlo_simulation <- function(x_stab, y_stab, var_x, var_y, dgp) {
@@ -150,7 +149,7 @@ run_monte_carlo_simulation <- function(x_stab, y_stab, var_x, var_y, dgp) {
     confounder_q = 0.25,
     confounder_variance = 1,
     confounder_stability = 0.4,
-    include_confounder = FALSE, 
+    include_confounder = include_confounder, 
     confounder_type = "time_invariant",
     cov_pq = 0.1,
 
@@ -179,17 +178,6 @@ The `param_grid` data frame contains all combinations of the parameters.
 `rowwise()` iterates over each row of the parameter grid, applying the simulation function and storing the results in a new column called `result`. 
 
 I executed the procedure 100 times (100 trials), varying these parameters
-
-```{r}
-param_grid <- expand.grid(
-  x_stability = c(0, 0.25, 0.5),
-  y_stability = c(0, 0.25, 0.5),
-  variance_between_x = c(0.25, 0.5, 0.75),
-  variance_between_y = c(0.25, 0.5, 0.75),
-  include_confounder    = c(FALSE, TRUE),
-  dgp = c("clpmu", "riclpm")
-)
-```
 
 `_stability` is simply the autoregressive parameters -- in the x-equation and y-equation. I simulate the effect of varying stability in both equations. 
 
@@ -273,8 +261,8 @@ library(gt)
 
 ## Vary these things
 param_grid <- expand.grid(
-  x_stability = c(0, 0.5),
-  y_stability = c(0, 0.5),
+  x_stability = c(0.5),
+  y_stability = c(0.5),
   variance_between_x = c(0.75),
   variance_between_y = c(0.75),
   include_confounder    = c(FALSE),
@@ -295,10 +283,10 @@ bias_analysis <- function(
   # Perform bias calculations and summarization
   bias_analysis_summary <- clpm_simulation_results %>%
     mutate(
-      cross_p_bias = cross_p - xlag_y,
-      cross_q_bias = cross_q - ylag_x,
-      relative_cross_p_bias = (cross_p_bias / xlag_x) * 100,
-      relative_cross_q_bias = (cross_q_bias / ylag_y) * 100
+      cross_p_bias = ylag_x - 0.5,
+      cross_q_bias = xlag_y - 0.25,
+      relative_cross_p_bias = (cross_p_bias / 0.5) * 100,
+      relative_cross_q_bias = (cross_q_bias / 0.25) * 100
     ) |>
     group_by(across(all_of(names(param_grid)))) |>
     summarize(
@@ -317,7 +305,6 @@ bias_analysis <- function(
       y_stability %in% y_stability_filter,
       variance_between_x %in% variance_between_x_filter,
       variance_between_y %in% variance_between_y_filter,
-      include_confounder %in% include_confounder_filter
     )
   
   return(filtered_results)
@@ -326,54 +313,234 @@ bias_analysis <- function(
 bias_analysis(
   simulation_results = clpm_simulation_results,
   param_grid = param_grid,
-  dgp_filter = c("clpm"),
+  dgp_filter = c("clpm", "clpmu", "riclpm"),
   x_stability_filter = c(0.5),
   y_stability_filter = c(0.5),
   variance_between_x_filter = c(0.75),
   variance_between_y_filter = c(0.75),
   # include_confounder_filter = c(TRUE, FALSE)
 ) |>
-  select(include_confounder, mean_cross_p_bias, mean_cross_q_bias,
-         mean_relative_cross_p_bias, mean_relative_cross_q_bias)
-
-
-# |>
-#   pivot_longer(cols = -include_confounder, names_to = "parameter", values_to = "bias") %>%
-#   pivot_wider(names_from = include_confounder, values_from = bias,
-#               names_prefix = "Y_") |>
-#   mutate(
-#     parameter = case_when(
-#       parameter == "mean_cross_p_bias" ~ "Bias in Cross Lagged X~Y",
-#       parameter == "mean_cross_q_bias" ~ "Bias in Cross Lagged Y~X",
-#       parameter == "mean_relative_cross_p_bias" ~ "Relative Bias in Cross Lagged X~Y",
-#       parameter == "mean_relative_cross_q_bias" ~ "Relative Bias in Cross Lagged Y~X")
-#     )|>
-#   gt() 
-  # tab_header(
-  #   title = md("**Monte Carlo Bias Analysis**"),
-  #   subtitle = "CLPM Simulation: Effect of varying autoregression in the y-equation"
-  # ) |>
-  # cols_label(
-  #   parameter = "Parameter",
-  #   Y_FALSE = "No Time Invariant Confounder",
-  #   Y_TRUE = "Time Variant Confounder"
-  # ) 
-
-#|>
-#   tab_source_note(
-#     source_note = md("*Note*: The results reported here are from 100 simulations,
-#     where there is no confounding, the autoregressive parameter for the x-equation is 0,
-#     and the true cross lagged effect is 0.5")
-#   ) |>
-#   tab_footnote(
-#     footnote = "Bias = Mean(estimate) - True value,
-#     Relative Bias = (Bias / True value) * 100",
-#     locations = cells_column_labels(columns = starts_with("Y_"))
-#   )
+  select(dgp, mean_cross_p_bias, mean_cross_q_bias,
+         mean_relative_cross_p_bias, mean_relative_cross_q_bias) |>
+   pivot_longer(cols = -dgp, names_to = "parameter", values_to = "bias") |>
+   pivot_wider(names_from = dgp, values_from = bias) |>
+  mutate(
+    parameter = case_when(
+      parameter == "mean_cross_p_bias" ~ "Bias in Cross Lagged X~Y",
+      parameter == "mean_cross_q_bias" ~ "Bias in Cross Lagged Y~X",
+      parameter == "mean_relative_cross_p_bias" ~ "Relative Bias in Cross Lagged Y~X",
+      parameter == "mean_relative_cross_q_bias" ~ "Relative Bias in Cross Lagged X~Y")
+    )|>
+  gt() |>
+  tab_header(
+    title = md("**Monte Carlo Bias Analysis**"),
+    subtitle = "CLPM Simulation: Varying the DGP"
+  ) |>
+  cols_label(
+    parameter = "Parameter",
+    clpmu =  "CLPM, Confounder",
+    clpm  =  "CLPM, No Confounder",
+    riclpm = "RICLPM",
+) |>
+    fmt_number(
+    columns = c(clpm, clpmu, riclpm),  # All numeric columns
+    decimals = 3  # Change this number to control decimals
+  ) |>
+  tab_source_note(
+    source_note = md("*Note*: The results reported here are from 100 simulations,
+     where there is no confounding, the autoregressive parameter for the x-equation is 0,
+     and the true cross lagged effect is 0.5")
+   ) |>
+   tab_footnote(
+     footnote = "Bias = Mean(estimate) - True value,
+     Relative Bias = (Bias / True value) * 100",
+     locations = cells_column_labels(columns = starts_with("Y_"))
+   )
 # 
 # 
 
 ```
+
+
+```{r, echo = FALSE, warning = FALSE}
+library(tibble)
+library(dplyr)
+devtools::load_all()
+
+## Vary these things
+param_grid <- expand.grid(
+  x_stability = c(0.20),
+  y_stability = c(0.20),
+  variance_between_x = c(0.70),
+  variance_between_y = c(0.70),
+  dgp = c("clpm", "clpmu", "riclpm")
+)
+
+run_monte_carlo_simulation_riclpm <- function(x_stab, y_stab, var_x, var_y, dgp) {
+  monteCarloRICLPM(
+    trials = 100,
+    waves = 5,
+    stability_q = y_stab,
+    stability_p = x_stab,
+    variance_between_y = var_y,
+    variance_between_x = var_x,
+    cross_p = 0.25,
+    cross_q = 0.50,
+    variance_p = 1,
+    variance_q = 1,
+    sample_size = 2500,
+    dgp = dgp,
+    confounder_p = 0.25,
+    confounder_q = 0.25,
+    confounder_variance = 1,
+    confounder_stability = 0.4,
+    confounder_type = "time_invariant",
+    cov_pq = 0.1,
+
+  )
+}
+riclpm_simulation_results <- param_grid |>
+  rowwise() |>
+  mutate(
+    result = list(run_monte_carlo_simulation_riclpm(
+      x_stab = x_stability,
+      y_stab = y_stability, 
+      var_x = variance_between_x,
+      var_y = variance_between_y,
+      dgp = dgp
+    ))
+  ) |>
+  ungroup() |>
+  tidyr::unnest()
+```
+
+
+
+
+
+
+
+
+
+
+
+
+```{r}
+#### Plot some results ###
+library(tidyr)
+library(dplyr)
+library(gt)
+
+param_grid <- expand.grid(
+  x_stability = c(0.20),
+  y_stability = c(0.20),
+  variance_between_x = c(0.70),
+  variance_between_y = c(0.70),
+  dgp = c("clpm", "clpmu", "riclpm")
+)
+
+bias_analysis <- function(
+    simulation_results,
+    param_grid,
+    dgp_filter = c("clpm", "clpmu", "riclpm"),
+    x_stability_filter = c(0.5),
+    y_stability_filter = c(0.5),
+    variance_between_x_filter = c(0.75),
+    variance_between_y_filter = c(0.75),
+    include_confounder_filter = c(FALSE, TRUE)
+) {
+
+  # Perform bias calculations and summarization
+  bias_analysis_summary <- riclpm_simulation_results %>%
+    mutate(
+      cross_p_bias = ylag_x - 0.5,
+      cross_q_bias = xlag_y - 0.25,
+      relative_cross_p_bias = (cross_p_bias / 0.5) * 100,
+      relative_cross_q_bias = (cross_q_bias / 0.25) * 100
+    ) |>
+    group_by(across(all_of(names(param_grid)))) |>
+    summarize(
+      mean_cross_p_bias = mean(cross_p_bias, na.rm = TRUE),
+      mean_cross_q_bias = mean(cross_q_bias, na.rm = TRUE),
+      mean_relative_cross_p_bias = mean(relative_cross_p_bias, na.rm = TRUE),
+      mean_relative_cross_q_bias = mean(relative_cross_q_bias, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+  # Filter results based on function arguments
+  filtered_results <- bias_analysis_summary |>
+    filter(
+      dgp %in% dgp_filter,
+      x_stability %in% x_stability_filter,
+      y_stability %in% y_stability_filter,
+      variance_between_x %in% variance_between_x_filter,
+      variance_between_y %in% variance_between_y_filter,
+    )
+  
+  return(filtered_results)
+}
+
+bias_analysis(
+  simulation_results = riclpm_simulation_results,
+  param_grid = param_grid,
+  dgp_filter = c("clpm", "clpmu", "riclpm"),
+  x_stability_filter = c(0.2),
+  y_stability_filter = c(0.2),
+  variance_between_x_filter = c(0.7),
+  variance_between_y_filter = c(0.7),
+  # include_confounder_filter = c(TRUE, FALSE)
+) |>
+  select(dgp, mean_cross_p_bias, mean_cross_q_bias,
+         mean_relative_cross_p_bias, mean_relative_cross_q_bias) |>
+   pivot_longer(cols = -dgp, names_to = "parameter", values_to = "bias") |>
+   pivot_wider(names_from = dgp, values_from = bias) |>
+  mutate(
+    parameter = case_when(
+      parameter == "mean_cross_p_bias" ~ "Bias in Cross Lagged X~Y",
+      parameter == "mean_cross_q_bias" ~ "Bias in Cross Lagged Y~X",
+      parameter == "mean_relative_cross_p_bias" ~ "Relative Bias in Cross Lagged Y~X",
+      parameter == "mean_relative_cross_q_bias" ~ "Relative Bias in Cross Lagged X~Y")
+    )|>
+  gt() |>
+  tab_header(
+    title = md("**Monte Carlo Bias Analysis**"),
+    subtitle = "RICLPM Simulation: Varying the DGP"
+  ) |>
+  cols_label(
+    parameter = "Parameter",
+    clpmu =  "CLPM, Confounder",
+    clpm  =  "CLPM, No Confounder",
+    riclpm = "RICLPM",
+) |>
+    fmt_number(
+    columns = c(clpm, clpmu, riclpm),  # All numeric columns
+    decimals = 3  # Change this number to control decimals
+  ) |>
+  tab_source_note(
+    source_note = md("*Note*: The results reported here are from 100 simulations,
+     where there is no confounding, the autoregressive parameter for the x-equation is 0,
+     and the true cross lagged effect is 0.5")
+   ) |>
+   tab_footnote(
+     footnote = "Bias = Mean(estimate) - True value,
+     Relative Bias = (Bias / True value) * 100",
+     locations = cells_column_labels(columns = starts_with("Y_"))
+   )
+# 
+# 
+
+```
+
+
+
+
+
+
+
+
+
+
+
 
 
 ```{r}
