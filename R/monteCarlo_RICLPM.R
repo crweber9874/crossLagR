@@ -119,56 +119,65 @@ monteCarloRICLPM <- function(
 
         # Try to generate data and fit model
         model_result <- tryCatch({
-          # Generate data
-          dat <- simRICLPM(
-            waves = waves,
-            stability_p = params$stability_p,
-            stability_q = params$stability_q,
-            cross_p = params$cross_p,
-            cross_q = params$cross_q,
-            variance_p = params$variance_p,
-            variance_q = params$variance_q,
-            variance_between_x = params$variance_between_x,
-            variance_between_y = params$variance_between_y,
-            sample.nobs = sample_size
-          )$data
+          warnings_collected <- c()
 
-          # Choose model syntax based on estimator
-          if (estimator == "riclpm") {
-            model_syntax <- estimateRICLPM(
-              time_varying_x = paste0("x", c(1:waves)),
-              time_varying_y = paste0("y", c(1:waves)),
-              waves = waves
-            )
-          } else if (estimator == "riclpm_nolag") {
-            model_syntax <- estimateRICLPM_nolag(
-              time_varying_x = paste0("x", c(1:waves)),
-              time_varying_y = paste0("y", c(1:waves)),
-              waves = waves
-            )
-          }
+          # Capture warnings during execution
+          withCallingHandlers({
+            # Generate data
+            dat <- simRICLPM(
+              waves = waves,
+              stability_p = params$stability_p,
+              stability_q = params$stability_q,
+              cross_p = params$cross_p,
+              cross_q = params$cross_q,
+              variance_p = params$variance_p,
+              variance_q = params$variance_q,
+              variance_between_x = params$variance_between_x,
+              variance_between_y = params$variance_between_y,
+              sample.nobs = sample_size
+            )$data
 
-          # Fit model
-          model <- lavaan::lavaan(model_syntax, data = dat)
+            # Choose model syntax based on estimator
+            if (estimator == "riclpm") {
+              model_syntax <- estimateRICLPM(
+                time_varying_x = paste0("x", c(1:waves)),
+                time_varying_y = paste0("y", c(1:waves)),
+                waves = waves
+              )
+            } else if (estimator == "riclpm_nolag") {
+              model_syntax <- estimateRICLPM_nolag(
+                time_varying_x = paste0("x", c(1:waves)),
+                time_varying_y = paste0("y", c(1:waves)),
+                waves = waves
+              )
+            }
 
-          # Check convergence
-          if (!lavInspect(model, "converged")) {
-            stop("Model did not converge")
-          }
+            # Fit model
+            model <- lavaan::lavaan(model_syntax, data = dat)
 
-          # Extract coefficients with CORRECTED mapping
-          param_table <- lavaan::parameterEstimates(model)
+            # Check convergence
+            if (!lavInspect(model, "converged")) {
+              stop("Model did not converge")
+            }
 
-          # IMPORTANT: The estimateRICLPM function uses the same confusing parameter names:
-          # - "ar_yeqn" is actually the X autoregressive parameter
-          # - "ar_xeqn" is actually the Y autoregressive parameter
-          # - "cl_yeqn" is actually the Y→X cross-lagged parameter
-          # - "cl_xeqn" is actually the X→Y cross-lagged parameter
+            # Extract coefficients with CORRECTED mapping
+            param_table <- lavaan::parameterEstimates(model)
 
-          ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
-          ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
-          cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
-          cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
+            # IMPORTANT: The estimateRICLPM function uses the same confusing parameter names:
+            # - "ar_yeqn" is actually the X autoregressive parameter
+            # - "ar_xeqn" is actually the Y autoregressive parameter
+            # - "cl_yeqn" is actually the Y→X cross-lagged parameter
+            # - "cl_xeqn" is actually the X→Y cross-lagged parameter
+
+            ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
+            ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
+            cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
+            cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
+
+          }, warning = function(w) {
+            warnings_collected <<- c(warnings_collected, w$message)
+            invokeRestart("muffleWarning")
+          })
 
           list(
             success = TRUE,
@@ -178,7 +187,9 @@ monteCarloRICLPM <- function(
             ylag_y = as.numeric(ar_y),        # Y autoregressive (corrected)
             converged = TRUE,
             error_message = NA_character_,
-            error_type = NA_character_
+            error_type = NA_character_,
+            warning_messages = if(length(warnings_collected) > 0) paste(warnings_collected, collapse = "; ") else NA_character_,
+            warning_count = length(warnings_collected)
           )
 
         }, error = function(e) {
@@ -203,14 +214,16 @@ monteCarloRICLPM <- function(
             ylag_y = NA_real_,
             converged = FALSE,
             error_message = error_msg,
-            error_type = error_type
+            error_type = error_type,
+            warning_messages = NA_character_,
+            warning_count = 0
           )
         })
 
         # Combine base result with model results
         final_result <- cbind(base_result, model_result[c(
           "xlag_x", "ylag_x", "xlag_y", "ylag_y",
-          "converged", "error_message", "error_type"
+          "converged", "error_message", "error_type", "warning_messages", "warning_count"
         )])
 
         results[[length(results) + 1]] <- final_result
@@ -252,49 +265,58 @@ monteCarloRICLPM <- function(
 
         # Try to generate data and fit model
         model_result <- tryCatch({
-          # Generate data
-          dat <- simCLPM(
-            waves = waves,
-            stability_p = params$stability_p,
-            stability_q = params$stability_q,
-            cross_p = params$cross_p,
-            cross_q = params$cross_q,
-            variance_p = params$variance_p,
-            variance_q = params$variance_q,
-            cov_pq = cov_pq,
-            sample.nobs = sample_size
-          )$data
+          warnings_collected <- c()
 
-          # Choose model syntax based on estimator
-          if (estimator == "riclpm") {
-            model_syntax <- estimateRICLPM(
-              time_varying_x = paste0("x", c(1:waves)),
-              time_varying_y = paste0("y", c(1:waves)),
-              waves = waves
-            )
-          } else if (estimator == "riclpm_nolag") {
-            model_syntax <- estimateRICLPM_nolag(
-              time_varying_x = paste0("x", c(1:waves)),
-              time_varying_y = paste0("y", c(1:waves)),
-              waves = waves
-            )
-          }
+          # Capture warnings during execution
+          withCallingHandlers({
+            # Generate data
+            dat <- simCLPM(
+              waves = waves,
+              stability_p = params$stability_p,
+              stability_q = params$stability_q,
+              cross_p = params$cross_p,
+              cross_q = params$cross_q,
+              variance_p = params$variance_p,
+              variance_q = params$variance_q,
+              cov_pq = cov_pq,
+              sample.nobs = sample_size
+            )$data
 
-          # Fit model
-          model <- lavaan::lavaan(model_syntax, data = dat)
+            # Choose model syntax based on estimator
+            if (estimator == "riclpm") {
+              model_syntax <- estimateRICLPM(
+                time_varying_x = paste0("x", c(1:waves)),
+                time_varying_y = paste0("y", c(1:waves)),
+                waves = waves
+              )
+            } else if (estimator == "riclpm_nolag") {
+              model_syntax <- estimateRICLPM_nolag(
+                time_varying_x = paste0("x", c(1:waves)),
+                time_varying_y = paste0("y", c(1:waves)),
+                waves = waves
+              )
+            }
 
-          # Check convergence
-          if (!lavInspect(model, "converged")) {
-            stop("Model did not converge")
-          }
+            # Fit model
+            model <- lavaan::lavaan(model_syntax, data = dat)
 
-          # Extract coefficients with CORRECTED mapping
-          param_table <- lavaan::parameterEstimates(model)
+            # Check convergence
+            if (!lavInspect(model, "converged")) {
+              stop("Model did not converge")
+            }
 
-          ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
-          ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
-          cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
-          cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
+            # Extract coefficients with CORRECTED mapping
+            param_table <- lavaan::parameterEstimates(model)
+
+            ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
+            ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
+            cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
+            cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
+
+          }, warning = function(w) {
+            warnings_collected <<- c(warnings_collected, w$message)
+            invokeRestart("muffleWarning")
+          })
 
           list(
             success = TRUE,
@@ -304,7 +326,9 @@ monteCarloRICLPM <- function(
             ylag_y = as.numeric(ar_y),        # Y autoregressive (corrected)
             converged = TRUE,
             error_message = NA_character_,
-            error_type = NA_character_
+            error_type = NA_character_,
+            warning_messages = if(length(warnings_collected) > 0) paste(warnings_collected, collapse = "; ") else NA_character_,
+            warning_count = length(warnings_collected)
           )
 
         }, error = function(e) {
@@ -329,14 +353,16 @@ monteCarloRICLPM <- function(
             ylag_y = NA_real_,
             converged = FALSE,
             error_message = error_msg,
-            error_type = error_type
+            error_type = error_type,
+            warning_messages = NA_character_,
+            warning_count = 0
           )
         })
 
         # Combine base result with model results
         final_result <- cbind(base_result, model_result[c(
           "xlag_x", "ylag_x", "xlag_y", "ylag_y",
-          "converged", "error_message", "error_type"
+          "converged", "error_message", "error_type", "warning_messages", "warning_count"
         )])
 
         results[[length(results) + 1]] <- final_result
@@ -412,72 +438,81 @@ monteCarloRICLPM <- function(
 
         # Try to generate data and fit model
         model_result <- tryCatch({
-          # Choose data generation function based on confounder type
-          if (confounder_type == "time_variant") {
-            dat <- simCLPMu(
-              waves = waves,
-              stability_p = params$stability_p,
-              stability_q = params$stability_q,
-              cross_p = params$cross_p,
-              cross_q = params$cross_q,
-              variance_p = params$variance_p,
-              variance_q = params$variance_q,
-              cov_pq = cov_pq,
-              include_confounder = params$include_confounder,
-              confounder_p = params$confounder_p,
-              confounder_q = params$confounder_q,
-              confounder_variance = params$confounder_variance,
-              confounder_stability = params$confounder_stability,
-              sample.nobs = sample_size
-            )$data
-          } else {  # time_invariant
-            dat <- simCLPM_timeInvariantU(
-              waves = waves,
-              stability_p = params$stability_p,
-              stability_q = params$stability_q,
-              cross_p = params$cross_p,
-              cross_q = params$cross_q,
-              variance_p = params$variance_p,
-              variance_q = params$variance_q,
-              cov_pq = cov_pq,
-              include_confounder = params$include_confounder,
-              confounder_p = params$confounder_p,
-              confounder_q = params$confounder_q,
-              confounder_variance = params$confounder_variance,
-              sample.nobs = sample_size
-            )$data
-          }
+          warnings_collected <- c()
 
-          # Choose model syntax based on estimator
-          if (estimator == "riclpm") {
-            model_syntax <- estimateRICLPM(
-              time_varying_x = paste0("x", c(1:waves)),
-              time_varying_y = paste0("y", c(1:waves)),
-              waves = waves
-            )
-          } else if (estimator == "riclpm_nolag") {
-            model_syntax <- estimateRICLPM_nolag(
-              time_varying_x = paste0("x", c(1:waves)),
-              time_varying_y = paste0("y", c(1:waves)),
-              waves = waves
-            )
-          }
+          # Capture warnings during execution
+          withCallingHandlers({
+            # Choose data generation function based on confounder type
+            if (confounder_type == "time_variant") {
+              dat <- simCLPMu(
+                waves = waves,
+                stability_p = params$stability_p,
+                stability_q = params$stability_q,
+                cross_p = params$cross_p,
+                cross_q = params$cross_q,
+                variance_p = params$variance_p,
+                variance_q = params$variance_q,
+                cov_pq = cov_pq,
+                include_confounder = params$include_confounder,
+                confounder_p = params$confounder_p,
+                confounder_q = params$confounder_q,
+                confounder_variance = params$confounder_variance,
+                confounder_stability = params$confounder_stability,
+                sample.nobs = sample_size
+              )$data
+            } else {  # time_invariant
+              dat <- simCLPM_timeInvariantU(
+                waves = waves,
+                stability_p = params$stability_p,
+                stability_q = params$stability_q,
+                cross_p = params$cross_p,
+                cross_q = params$cross_q,
+                variance_p = params$variance_p,
+                variance_q = params$variance_q,
+                cov_pq = cov_pq,
+                include_confounder = params$include_confounder,
+                confounder_p = params$confounder_p,
+                confounder_q = params$confounder_q,
+                confounder_variance = params$confounder_variance,
+                sample.nobs = sample_size
+              )$data
+            }
 
-          # Fit model
-          model <- lavaan::lavaan(model_syntax, data = dat)
+            # Choose model syntax based on estimator
+            if (estimator == "riclpm") {
+              model_syntax <- estimateRICLPM(
+                time_varying_x = paste0("x", c(1:waves)),
+                time_varying_y = paste0("y", c(1:waves)),
+                waves = waves
+              )
+            } else if (estimator == "riclpm_nolag") {
+              model_syntax <- estimateRICLPM_nolag(
+                time_varying_x = paste0("x", c(1:waves)),
+                time_varying_y = paste0("y", c(1:waves)),
+                waves = waves
+              )
+            }
 
-          # Check convergence
-          if (!lavInspect(model, "converged")) {
-            stop("Model did not converge")
-          }
+            # Fit model
+            model <- lavaan::lavaan(model_syntax, data = dat)
 
-          # Extract coefficients with CORRECTED mapping
-          param_table <- lavaan::parameterEstimates(model)
+            # Check convergence
+            if (!lavInspect(model, "converged")) {
+              stop("Model did not converge")
+            }
 
-          ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
-          ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
-          cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
-          cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
+            # Extract coefficients with CORRECTED mapping
+            param_table <- lavaan::parameterEstimates(model)
+
+            ar_x <- param_table[param_table$label == "ar_yeqn", "est"]      # X autoregressive
+            ar_y <- param_table[param_table$label == "ar_xeqn", "est"]      # Y autoregressive
+            cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"] # X→Y cross-lagged
+            cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"] # Y→X cross-lagged
+
+          }, warning = function(w) {
+            warnings_collected <<- c(warnings_collected, w$message)
+            invokeRestart("muffleWarning")
+          })
 
           list(
             success = TRUE,
@@ -487,7 +522,9 @@ monteCarloRICLPM <- function(
             ylag_y = as.numeric(ar_y),        # Y autoregressive (corrected)
             converged = TRUE,
             error_message = NA_character_,
-            error_type = NA_character_
+            error_type = NA_character_,
+            warning_messages = if(length(warnings_collected) > 0) paste(warnings_collected, collapse = "; ") else NA_character_,
+            warning_count = length(warnings_collected)
           )
 
         }, error = function(e) {
@@ -512,14 +549,16 @@ monteCarloRICLPM <- function(
             ylag_y = NA_real_,
             converged = FALSE,
             error_message = error_msg,
-            error_type = error_type
+            error_type = error_type,
+            warning_messages = NA_character_,
+            warning_count = 0
           )
         })
 
         # Combine base result with model results
         final_result <- cbind(base_result, model_result[c(
           "xlag_x", "ylag_x", "xlag_y", "ylag_y",
-          "converged", "error_message", "error_type"
+          "converged", "error_message", "error_type", "warning_messages", "warning_count"
         )])
 
         results[[length(results) + 1]] <- final_result

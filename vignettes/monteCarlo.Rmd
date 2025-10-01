@@ -2,7 +2,7 @@
 title: "The Cross Lagged Regression Model: Simulations"
 header-includes:
     - \usepackage{setspace}\onehalfspacing
-author: "Chris Weber"
+author: ""
 date: "2025-01-21"
 indent: true
 output:
@@ -11,113 +11,181 @@ output:
 
 # Introduction
 
-The cross-lagged regression model follows an intuitive structure.  The current realizations $x$ and $y$ are a function of autoregressive and cross lagged effects.  I closely follow the structure and notation from Ludtke and Robitzch (2021).
+The cross-lagged regression model follows an intuitive structure.  The current realizations $x$ and $y$ are a function of autoregressive and cross lagged effects. I closely follow the structure and notation in Ludtke and Robitzch (2021).
 
 $$
-\begin{aligned}
-x_{t, i}= \theta_{0,x,t} + \theta_{11} x_{t-1, i} +  \theta_{12} y_{t-1, i} +  e^x_{t,i}  \\
-y_{t, i}= \theta_{0,y,t} + \theta_{21} x_{t-1, i} + \theta_{22}  y_{t-1, i} + e^y_{t,i}  
-\end{aligned}
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{it-1}  
+\end{bmatrix}
++
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
 $$
 
-$\theta_{11}$ and $\theta_{22}$ are the autoregressive effects, the degree to which $x$ and $y$ are stable from one time point to the next. $\theta_{12}$ and $\theta_{21}$ are the cross lagged effects, the degree to which $x$ and $y$ influence each other over time. The error terms $e_{t,i}$ and $e_{t,i}$ are assumed to be normally distributed with mean zero and constant variance, and uncorrelated with each other. In practice, they are often correlated, such that $cov(e^x_{t,i}, e^y_{t,i}) \neq 0$.
+$\theta_{1y}$ and $\theta_{1x}$ are the autoregressive effects and cross lagged effects in the $y$ equation. $\theta_{2y}$ and $\theta_{2x}$ represent, the cross-lagged and autoregressive effects in the $x$ equation.  The error terms $e_{y,it}$ and $e_{x,it}$ are assumed to be normally distributed with mean zero and constant variance, and uncorrelated with each other. In practice, they are often correlated, such that $cov(e^y_{t,i}, e^x_{t,i}) \neq 0$.
 
-The random intercept specification allows for disposition, trait level effects: To what extent are $x$ and $y$ relatively unchanging and stable over time. In some cases, researchers might estimate a hierarchical model, simply allowing $\theta_{0,x,t}$ and $\theta_{0,x,t}$ to vary across units, or including "fixed effects" terms. Variations of this model are known as the "Dynamic Random Effects Model" and "Dynamic Panel Model."  While the fixed or random effects are generally an improvement over no variation, the lagged realizations of the dependent variables in both equations complicates matters, often producing a form of bias known as "Nickell Bias" (Nickel 1981). Well-known approaches to deal with this form of bias rely on first differencing, such as the Arellano- Bond estimator, or the Bond estimator. The problem -- in a nutshell -- is that the lagged dependent variable does not include the stable, trait level variation accounted for in the random intercepts themselves (or fixed effects).
+The random intercept specification allows for disposition, trait level effects: To what extent are $x$ and $y$ relatively unchanging and stable over time. In some cases, researchers might estimate a hierarchical model, simply allowing unique "intercepts for each unit, known as"fixed effects" terms. Variations of this model are known as the "Dynamic Random Effects Model" and "Dynamic Panel Model."  While the fixed or random effects are generally an improvement over no variation, the lagged realizations of the dependent variables in both equations complicates matters, often producing a form of bias known as "Nickell Bias" (Nickel 1981). Well-known approaches to deal with this form of bias rely on first differencing, such as the Arellano- Bond estimator, or the Bond estimator. The problem -- in a nutshell -- is that the lagged dependent variable does not include the stable, trait level variation accounted for in the random intercepts themselves (or fixed effects).
 
 The RI-CLPM -- a popular approach in psychology -- also explicitly includes trait level variation, but in a manner somewhat different from the "dynamic panel" approaches described. For the moment, ignoring the lags and cross-lagged effects, let us assume that $x$ and $y$ are each a function of a stable trait level component, plus a time-varying state component.
 
 $$
-\begin{aligned}
-x_{t, i}= \theta_{0,x,t} + \mu^x_{i} +  x^*_{t,i}\\
-y_{t, i}= \theta_{0,y,t} + \mu^y_{i} +  y^*_{t,i}
-\end{aligned}
-$$
-The $\theta_{0,x,t}$ and $\theta_{0,y,t}$ terms are the average levels of $x$ and $y$ at time $t$; the intercept, or the average across individuals. The $\mu^x_i$ and $\mu^y_i$ terms are the stable, trait level components for individual $i$. And $x^*_{t,i}$ and $y^*_{t,i}$ terms are the time-varying state components. We can view this formation as providing a decomposition of the total variance in $x$ and $y$ into between-person (trait) and within-person (state) components.
-
-From here, we can rewrite the cross-lagged and lagged effects from the state components alone.
-
-$$
-\begin{aligned}
-x^*_{t, i}= \theta_{0,x,t} + \theta^*_{11} x^*_{t-1, i} +  \theta_{12}^* y^*_{t-1, i} +  e^{x\ast}_{t,i}\\
-y^*_{t, i}= \theta_{0,y,t} + \theta^*_{21}  x^*_{t-1, i} + \theta^*_{22}  y^*_{t-1, i} + e^{y\ast}_{t,i}
-\end{aligned}
-$$
-The RI-CLPM then is simply a re-expression of the CLPM, partialing out the stable, trait level aspects of both $x$ and $y$ variables. The reduced form expression becomes,
-
-$$
-\begin{aligned}
-x_{t, i}= \theta_{0,x,t} +  \mu^x_{i}  + \theta^*_{11} x^*_{t-1, i} +  \theta_{12}^* y^*_{t-1, i} +  e^{x\ast}_{t,i}\\
-y_{t, i}= \theta_{0,y,t} +  \mu^y_{i} + \theta^*_{21}  x^*_{t-1, i} + \theta^*_{22}  y^*_{t-1, i} + e^{y\ast}_{t,i}
-\end{aligned}
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mu^y_{i} \\
+\mu^x_{i}
+\end{bmatrix}
++
+\begin{bmatrix}
+y^*_{y,it}\\
+x^*_{x,it}
+\end{bmatrix}
 $$
 
-* $\theta_{0,x,t}$ and $\theta_{0,y,t}$ are the average levels of $x$ and $y$ at time $t$; the intercepts.
+The $\mu^x_i$ and $\mu^y_i$ terms are the stable, trait level components for individual $i$. And $x^*_{t,i}$ and $y^*_{t,i}$ terms are the time-varying state components. We can view this formation as providing a decomposition of the total variance in $x$ and $y$ into between-person (trait; $\mu$) and within-person (state, $x^*,y^*$) components. From here, we can rewrite the cross-lagged and lagged effects from the state components alone.
+
+$$
+\begin{bmatrix}
+ y^*_{it}\\
+ x^*_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta^*_{1y} & \theta^*_{1x}  \\
+\theta^*_{2y} & \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{it-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+$$
+
+Taken together, the observed variables, $x$ and $y$ are a function of the intercepts, the stable, trait level components, and the lagged state components.
+
+$$
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta^*_{1y} & \theta^*_{1x}  \\
+\theta^*_{2y} & \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{t-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
+}_{Trait}
+$$
+
 * $\mu^x_i$ and $\mu^y_i$ are the stable, trait level components for individual $i$.
 * $x^*_{t,i}$ and $y^*_{t,i}$ are the time-varying state components.
-* $\theta^*_{11}$ and $\theta^*_{22}$ are the autoregressive effects for the state components.
-* $\theta^*_{12}$ and $\theta^*_{21}$ are the cross-lagged effects for the state components.
+* $\theta^*_{1y}$ and $\theta^*_{2x}$ are the autoregressive effects for the state components.
+* $\theta^*_{1x}$ and $\theta^*_{1x}$ are the cross-lagged effects for the state components.
 
 ## Causal Effects
 
-In the causal effects framework, assume that we wish to model potential outcomes; what would $x_{t,i}$ and $y_{t,i}$ be if we intervened on $x$ or $y$ at time $t-1$, $E[x_{i,t}^{y_{t-1}}]$ and $E[y_{i,t}^{x_{t-1}}]$. We might start by assuming that such an intervention could be modeled as a linear expression, similar to the structure set forth in the CLPM and following a simple linear expression (Ludtke and Robitzch 2021; Hernan and Robins 2020; Vanderwheele 2015). 
+Extending the model, we can use the CLPM and RI-CLPM to produce potential outcomes ; what would $x_{t,i}$ and $y_{t,i}$ be if we intervened on $x$ or $y$ at time $t-1$, $E[x_{i,t}^{y_{t-1}}]$ and $E[y_{i,t}^{x_{t-1}}]$? By assuming that such an intervention is linear, similar to the structure set forth in the CLPM, the marginal effect of the treatment is $\tau$  (Ludtke and Robitzch 2021; Hernan and Robins 2020; Vanderwheele 2015). 
 
 $$
 \begin{aligned}
-E[X_{i,t}^{y_{t-1}}] = \tau_{0,1} + \tau_{1,1} y_2 \\
-E[Y_{i,t}^{x_{t-1}}] = \tau_{0,2} + \tau_{1,2} x_2 \\
+E[Y_{i,t}^{x_{t-1}}] = \alpha_{1} + \tau_{1} x_{t-1} \\
+E[X_{i,t}^{y_{t-1}}] = \alpha_{2} + \tau_{2} y_{t-1} \\
 \end{aligned}
 $$
 
-Relying on the g-formula (Hernan and Robins 2020; Vanderwheele 2015), the marginal structural model (MSM) for the potential outcomes.
+The marginal effects, $\tau$ are calculated by the expectations fixing $x_{t,i}$ and $y_{t,i}$ at a value and integrated over the joint distribution of $x_{t-1}$ and $y_{t-1}$. In a linear model, this is typically just $\hat{\theta_{1y}}$ and $\hat{\theta_{2x}}$, the slopes from a regression equation. If there are unobserved confounders, $Z$, then 
 
 $$
 \begin{aligned}
-E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}] f(x_{t-1}, y_{t-1}) dx_{t-1}dy_{t-1} \\
-E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}] f(x_{t-1}, y_{t-1}) dx_{t-1}dy_{t-1} \\
+E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} =  z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z \\
+E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} = z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z\\
 \end{aligned}
 $$
 
-If the model were to include added covariates, $Z$, the MSM would be conditional on $Z$ as well.
 
-
-$$
-\begin{aligned}
-E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, Z_i = z_i] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z \\
-E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, Z_i = z_i] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z\\
-\end{aligned}
-$$
-
-In practice:
-
-* Estimate the structural model, the linear regression of $x_{t,i}$ and $y_{t,i}$ on the lagged values of $x$ and $y$ (and $z$ if applicable).
-* Generate predictions for each observation, holding $y_{t-1}$ (or $x_{t-1}$) at a fixed value, and the values of $z$ at their observed values in the data.
-* Average across the data to calculate the marginal expectation at a particular value of $y_{t-1}$ and $x_{t-1}$.
+The potential outcome is simply the expectation of $x_{t,i}$ and $_{y,i}$, holding $y_{t-1}$ and $x_{t-1}$ at a fixed value, and averaging over the joint distribution of $x_{t-1}$, $y_{t-1}$, and $z$.
 
 ## Confounding Variables
 
 In the presence of confounding variables, $Z$, that influence both $x$ and $y$, the cross-lagged estimates may be biased, in both the CLPM or the RI-CLPM. A confounder, like all variables in a panel design may be *time-varying* or *time-invariant*. Some characteristics fluctuate over time, partially or fully explaining the pattern of relationships between $x$ and $y$, others are stable and tend not to change, but also explain the joint relationship between $x$ and $y$.
 
-If confounder $Z$ is time-invariant, the CLPM may be respecified as the RI-CLPM:
+If confounder $z$ is time-invariant, the CLPM may be respecified as the RI-CLPM:
+$$
+\begin{bmatrix}
+ y^*_{it}\\
+ x^*_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta^*_{1y} & \theta^*_{1x}  \\
+\theta^*_{2y} & \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{t-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
++
+\begin{bmatrix}
+\alpha_{y}\\
+\alpha_{x}
+\end{bmatrix}
+z_{i}
+}_{Trait}
+$$
 
-$$
-\begin{aligned}
-x_{t, i}= \theta_{0,x,t} + \theta_{11} x_{t-1, i} +  \theta_{12} y_{t-1, i} + \theta_{13}z_i+  e^x_{t,i}  \\
-y_{t, i}= \theta_{0,y,t} + \theta_{21} x_{t-1, i} + \theta_{22}  y_{t-1, i} + \theta_{23}z_i +  e^y_{t,i}  
-\end{aligned}
-$$
-
-If the confounder is time varying:
-
-$$
-\begin{aligned}
-x_{t, i}= \theta_{0,x,t} + \theta_{11} x_{t-1, i} +  \theta_{12} y_{t-1, i} + \theta_{13}z_{t,i}+  e^x_{t,i}  \\
-y_{t, i}= \theta_{0,y,t} + \theta_{21} x_{t-1, i} + \theta_{22}  y_{t-1, i} + \theta_{23}z_{t,i} +  e^y_{t,i}  
-\end{aligned}
-$$
+* $\mu^x_i$ and $\mu^y_i$ are the stable, trait level components for individual $i$.
+* $x^*_{t,i}$ and $y^*_{t,i}$ are the time-varying state components.
+* $\theta^*_{1y}$ and $\theta^*_{2x}$ are the autoregressive effects for the state components.
+* $\theta^*_{1x}$ and $\theta^*_{1x}$ are the cross-lagged effects for the state components.
 
 When the confounder is "unobserved" and either time-invariant or time-varying, what is the consequence of ignoring that confounder in the CLPM or RI-CLPM? There is some disagreement in the literature on this question.
 
-```{r, echo = FALSE, warning = FALSE}
+
+```{r,  warning = FALSE, message=FALSE, echo = TRUE}
 library(tibble)
 library(dplyr)
 devtools::load_all()
@@ -170,96 +238,46 @@ clpm_simulation_results <- param_grid |>
   tidyr::unnest()
 ```
 
+## Setup 
 
-`run_monte_carlo_simulation` is a helper function to run the `monteCarloCLPM` function with specified parameters. 
+* `_stability` are  the autoregressive parameters -- in the x-equation and y-equation. I simulate the effect of varying stability in both equations at 0.5
 
-The `param_grid` data frame contains all combinations of the parameters. 
+* `variance_between_` are the variance parameters when simulating data under a RICLPM. They are fixed at 0.75
 
-`rowwise()` iterates over each row of the parameter grid, applying the simulation function and storing the results in a new column called `result`. 
+* We fix the cross-lagged effect of $x$ on $y$ at 0.25
 
-I executed the procedure 100 times (100 trials), varying these parameters
+* We fix the cross-lagged effect of *y* on *x* at 0.50
 
-`_stability` is simply the autoregressive parameters -- in the x-equation and y-equation. I simulate the effect of varying stability in both equations. 
+* The variances of the wave specific latent variable are fixed at 1.
 
-I run the simulations under three DGPs. 
+* When a confounder is specified, it is *time-invariant* and with a slope of 0.25 when predicting the latent factors.
 
-- The `clpm`
-- The `clpm` with a time invariant confounder
-- The `riclpm` which varies the stable, trait level variation in both x and y.
+* The confounder variance, when this DGP is used is fixed to 1.
 
-To simplify the presentation, I present the degree of bias in the cross-lagged parameter -- the parameter of interest -- which is simply $\hat{\theta}$ - $\theta$. This parameter is 0.25 in all simulations. I also present the relative bias, which is simply the bias divided by the true value, then multipled by 100 to represent a percentage. I then average across every simulation condition, in this block of code
-
+* The simulations were run for 100 trials in each DGP condition.
 
 
-# ```{r, echo = FALSE, warning = FALSE}
-# library(tibble)
-# library(dplyr)
-# devtools::load_all()
-# param_grid <- expand.grid(
-#   x_stability = c(0, 0.5),
-#   y_stability = c(0, 0.5),
-#   variance_between_x = c(0.75),
-#   variance_between_y = c(0.75),
-#   include_confounder    = c(FALSE, TRUE),
-#   dgp = c("clpmu", "riclpm")
-# )
-# 
-# run_monte_carlo_simulation <- function(x_stab, y_stab, var_x, var_y, dgp, include_confounder) {
-#   monteCarloRICLPM(
-#     trials = 100,
-#     waves = 5,
-#     stability_q = y_stab,
-#     stability_p = x_stab,
-#     variance_between_y = var_y,
-#     variance_between_x = var_x,
-#     cross_p = 0.25,
-#     cross_q = 0.25,
-#     variance_p = 1,
-#     variance_q = 1,
-#     sample_size = 2500,
-#     dgp = dgp,
-#     confounder_p = 0.25,
-#     confounder_q = 0.25,
-#     confounder_variance = 1,
-#     confounder_stability = 0.4,
-#     include_confounder = include_confounder,
-#     confounder_type = "time_invariant",
-#     cov_pq = 0.1,
-# 
-#   )
-# }
-# riclpm_simulation_results <- param_grid |>
-#   rowwise() |>
-#   mutate(
-#     result = list(run_monte_carlo_simulation(
-#       x_stab = x_stability,
-#       y_stab = y_stability, 
-#       var_x = variance_between_x,
-#       var_y = variance_between_y,
-#       dgp = dgp,
-#       include_confounder = include_confounder
-#     ))
-#   ) |>
-#   ungroup() |>
-#   tidyr::unnest()
-# ```
+Three DGPs are used.
+
+* The `clpm`
+
+* The `clpm` with a time invariant confounder
+
+ The `riclpm` which varies the stable, trait level variation in both x and y.
+
+
+To simplify the presentation, I estimated the degree of bias in the cross-lagged parameter -- the parameter of interest -- which is simply $\hat{\theta}$ - $\theta$. I also show the relative bias, which is simply the bias divided by the true value, then multipled by 100. I then averaged across every simulation condition below
 
 ## The Results
 
-There are a lot of things varying in the simulations -- the DGP: (1) random-intercept cross lagged, (2) cross lagged with time invariant confounder, (3) cross lagged without confounder; the stability in the x and y equations; the amount of stable, trait level variation in x and y (when the riclpm dgp is used. The first block of code simulates the data, estimates a CLPM regression model, and stores the results over 100 trials in each condition. The second block of code simulates the same data, but estimates an RICLPM model. The simulation also stores any errors or warnings that arise during estimation. 
-
-```{r}
-head(clpm_simulation_results)
-```
+The only thing varying in the simulations is the DGP: (1) random-intercept cross lagged, (2) cross lagged with time invariant confounder, (3) cross lagged without confounder; the stability in the x and y equations; the amount of stable, trait level variation in x and y (when the riclpm dgp is used). 
 
 
-```{r}
-#### Plot some results ###
+```{r, warning = FALSE, message=FALSE, echo= FALSE}
 library(tidyr)
 library(dplyr)
 library(gt)
 
-## Vary these things
 param_grid <- expand.grid(
   x_stability = c(0.5),
   y_stability = c(0.5),
@@ -347,13 +365,10 @@ bias_analysis(
     decimals = 3  # Change this number to control decimals
   ) |>
   tab_source_note(
-    source_note = md("*Note*: The results reported here are from 100 simulations,
-     where there is no confounding, the autoregressive parameter for the x-equation is 0,
-     and the true cross lagged effect is 0.5")
+    source_note = md("*Note*: The results reported here are from 100 simulations.")
    ) |>
    tab_footnote(
-     footnote = "Bias = Mean(estimate) - True value,
-     Relative Bias = (Bias / True value) * 100",
+     footnote = "Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100",
      locations = cells_column_labels(columns = starts_with("Y_"))
    )
 # 
@@ -362,7 +377,12 @@ bias_analysis(
 ```
 
 
-```{r, echo = FALSE, warning = FALSE}
+
+## Estimation with the RI-CLPM
+
+The same, but using the RI-CLPM to estimate the models from the three DGPs.
+
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
 library(tibble)
 library(dplyr)
 devtools::load_all()
@@ -418,14 +438,7 @@ riclpm_simulation_results <- param_grid |>
 
 
 
-
-
-
-
-
-
-
-```{r}
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
 #### Plot some results ###
 library(tidyr)
 library(dplyr)
@@ -517,9 +530,7 @@ bias_analysis(
     decimals = 3  # Change this number to control decimals
   ) |>
   tab_source_note(
-    source_note = md("*Note*: The results reported here are from 100 simulations,
-     where there is no confounding, the autoregressive parameter for the x-equation is 0,
-     and the true cross lagged effect is 0.5")
+    source_note = md("*Note*: The results reported here are from 100 simulations.")
    ) |>
    tab_footnote(
      footnote = "Bias = Mean(estimate) - True value,
@@ -532,530 +543,101 @@ bias_analysis(
 ```
 
 
+### Limitations of the RI-CLPM
+
+One of the issues that frequently emerges when estimating an RI-CLPM in practice, is that the model fails to converge, or produces inadmissible solutions. This is particularly true when the amount of stable, trait level variation is high, accounting for much of the variation in the x and y variables. On the other hand, there is very little remaining "state" variation.
+
+To illustrate this point, I run a series of simulations where I vary the amount of stable, trait level variation in both x and y from 0 to 0.3 (in increments of 0.05) while holding other parameters constant. The "between-subject" (or random intercept) variance is quite high, set at 1. 
 
 
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(tibble)
+library(dplyr)
+devtools::load_all()
 
-
-
-
-
-
-
-
-
-```{r}
+## Vary these things
 param_grid <- expand.grid(
-  x_stability = c(0, 0.25, 0.5),
-  y_stability = c(0, 0.25, 0.5),
-  variance_between_x = c(0.25, 0.5, 0.75),
-  variance_between_y = c(0.25, 0.5, 0.75),
-  include_confounder    = c(FALSE, TRUE),
-  dgp = c("clpm", "riclpm")
+  x_stability = c(0.05),
+  y_stability = c(0.05),
+  variance_between_x = c(1),
+  variance_between_y = c(1),
+  variance_p = seq(0.0, 0.15,  by =  0.05),
+  variance_q = seq(0.0, 0.15,  by  = 0.05),
+  dgp = c("riclpm")
 )
 
-filtered_bias <- bias_analysis |> 
-  ungroup() |> 
-  filter(
-    include_confounder == FALSE,
-    dgp == "clpm",
-    x_stability == 0,
-    variance_between_x == 0.5,
-    variance_between_y == 0.5
-  )  %>%
-  select(y_stability, mean_cross_p_bias, mean_cross_q_bias, 
-         mean_relative_cross_p_bias, mean_relative_cross_q_bias) 
-custom_table <- filtered_bias %>%
-  select(y_stability, mean_cross_p_bias, mean_cross_q_bias,
-         mean_relative_cross_p_bias, mean_relative_cross_q_bias
-         ) %>%
-  pivot_longer(cols = -y_stability, names_to = "parameter", values_to = "bias") %>%
-  pivot_wider(names_from = y_stability, values_from = bias, 
-              names_prefix = "Y_") %>%
-  mutate(
-    parameter = case_when(
-      parameter == "mean_cross_p_bias" ~ "Bias in Cross Lagged X~Y",
-      parameter == "mean_cross_q_bias" ~ "Bias in Cross Lagged Y~X",
-      parameter == "mean_relative_cross_p_bias" ~ "Relative Bias in Cross Lagged X~Y",
-      parameter == "mean_relative_cross_q_bias" ~ "Relative Bias in Cross Lagged X~Y"
-    )
-  ) %>%
-  gt() %>%
-  tab_header(
-    title = md("**Monte Carlo Bias Analysis**"),  # Bold title
-    subtitle = "CLPM Simulation: Effect of varying autoregression in the y-equation"
-  ) %>%
-  cols_label(
-    parameter = "Parameter",
-    Y_0 = "Y = 0",
-    Y_0.25 = "Y = 0.25", 
-    Y_0.5 = "Y = 0.5"
-  ) %>%
-  fmt_number(
-    columns = starts_with("Y_"),
-    decimals = 3
-  ) %>%
-  tab_source_note(
-    source_note = md("*Note*: The results reported here are from 100 simulations,
-    where there is no confounding, the autoregressive parameter for the x-equation is 0,
-    and the true cross lagged effect is 0.5")
-  ) %>%
-  tab_footnote(
-    footnote = "Bias = Mean(estimate) - True value,
-    Relative Bias = (Bias / True value) * 100",
-    locations = cells_column_labels(columns = starts_with("Y_"))
+run_monte_carlo_simulation_riclpm <- function(x_stab, y_stab, var_x, var_y, dgp,
+                                              variance_p, variance_q) {
+  monteCarloRICLPM(
+    trials = 100,
+    waves = 5,
+    stability_q = y_stab,
+    stability_p = x_stab,
+    variance_between_y = var_y,
+    variance_between_x = var_x,
+    cross_p = 0.10,
+    cross_q = 0.15,
+    variance_p = variance_p,
+    variance_q = variance_q,
+    sample_size = 2500,
+    dgp = dgp,
+    confounder_p = 0.25,
+    confounder_q = 0.25,
+    confounder_variance = 1,
+    confounder_stability = 0.4,
+    confounder_type = "time_invariant",
+    cov_pq = 0.1,
+
   )
-
-custom_table
-```
-
-```{r}
-create_bias_table <- function(data,
-                             filter_conditions = list(),
-                             vary_by = "y_stability",
-                             measures = "both",
-                             title = "Monte Carlo Bias Analysis",
-                             subtitle = NULL,
-                             source_note = NULL,
-                             footnote = NULL,
-                             decimals = 3,
-                             inverted = TRUE) {
-  
-  # Apply filters
-  filtered_data <- data %>% ungroup()
-  
-  for (var_name in names(filter_conditions)) {
-    filtered_data <- filtered_data %>%
-      filter(.data[[var_name]] == filter_conditions[[var_name]])
-  }
-  
-  # Determine which columns to select based on measures
-  bias_cols <- c()
-  if (measures %in% c("absolute", "both")) {
-    bias_cols <- c(bias_cols, "mean_cross_p_bias", "mean_cross_q_bias")
-  }
-  if (measures %in% c("relative", "both")) {
-    bias_cols <- c(bias_cols, "mean_relative_cross_p_bias", "mean_relative_cross_q_bias")
-  }
-  
-  # Select relevant columns
-  table_data <- filtered_data %>%
-    select(all_of(c(vary_by, bias_cols)))
-  
-  if (inverted) {
-    # Pivot to put parameters as rows, vary_by values as columns
-    table_data <- table_data %>%
-      pivot_longer(cols = -all_of(vary_by), names_to = "parameter", values_to = "value") %>%
-      pivot_wider(names_from = all_of(vary_by), values_from = value, names_prefix = paste0(vary_by, "_"))
-    
-    # Clean parameter names
-    table_data <- table_data %>%
-      mutate(
-        parameter = case_when(
-          parameter == "mean_cross_p_bias" ~ "Cross Lagged: Y→X",
-          parameter == "mean_cross_q_bias" ~ "Cross Lagged: X→Y", 
-          parameter == "mean_relative_cross_p_bias" ~ "Cross Lagged: Y→X Relative Bias (%)",
-          parameter == "mean_relative_cross_q_bias" ~ "Cross Lagged: Y→X Relative Bias (%)",
-          TRUE ~ parameter
-        )
-      )
-  }
-  
-  # Create gt table
-  gt_table <- table_data %>% gt()
-  
-  # Add header if provided
-  if (!is.null(title) || !is.null(subtitle)) {
-    gt_table <- gt_table %>%
-      tab_header(title = ifelse(is.null(title), "", title),
-                subtitle = ifelse(is.null(subtitle), "", subtitle))
-  }
-  
-  # Format columns
-  if (inverted) {
-    # Format the vary_by columns
-    value_cols <- names(table_data)[grepl(paste0("^", vary_by, "_"), names(table_data))]
-    gt_table <- gt_table %>%
-      fmt_number(columns = all_of(value_cols), decimals = decimals)
-    
-    # Clean column labels
-    new_labels <- setNames(
-      gsub(paste0("^", vary_by, "_"), paste0(vary_by, " = "), value_cols),
-      value_cols
-    )
-    gt_table <- gt_table %>%
-      cols_label(.list = c(list(parameter = "Parameter"), new_labels))
-    
-  } else {
-    # Format bias columns
-    gt_table <- gt_table %>%
-      fmt_number(columns = all_of(bias_cols), decimals = decimals)
-  }
-  
-  # Add source note if provided
-  if (!is.null(source_note)) {
-    gt_table <- gt_table %>%
-      tab_source_note(source_note = source_note)
-  }
-  
-  # Add footnote if provided
-  if (!is.null(footnote)) {
-    if (inverted) {
-      gt_table <- gt_table %>%
-        tab_footnote(footnote = footnote,
-                    locations = cells_column_labels(columns = starts_with(paste0(vary_by, "_"))))
-    } else {
-      gt_table <- gt_table %>%
-        tab_footnote(footnote = footnote,
-                    locations = cells_column_labels(columns = all_of(bias_cols)))
-    }
-  }
-  
-  return(gt_table)
 }
-
-create_bias_table(
-  data = bias_analysis,
-  filter_conditions = list(
-    include_confounder = FALSE,
-    dgp = "clpm", 
-    x_stability = 0,
-    variance_between_x = 0.5,
-    variance_between_y = 0.5
-  ),
-  vary_by = "y_stability",
-  measures = "both",
-  title = md("**Monte Carlo Bias Analysis**"),
-  subtitle = "CLPM Simulation: Effect of varying autoregression in the y-equation",
-  source_note = md("*Note*: Results from 100 simulations, no confounding, autoregressive parameter for x-equation = 0, true cross-lagged effect = 0.25"),
-  footnote = "Bias = Mean(estimate) - True value; Relative Bias = (Bias / True value) × 100",
-  decimals = 3
-)
-```
-
-```{r}
-create_bias_table(
-  data = bias_analysis,
-  filter_conditions = list(
-    include_confounder = TRUE,
-    dgp = "clpm", 
-    x_stability = 0,
-    variance_between_x = 0.5,
-    variance_between_y = 0.5
-  ),
-  vary_by = "y_stability",
-  measures = "both",
-  title = md("**Monte Carlo Bias Analysis**"),
-  subtitle = "CLPM Simulation: Effect of varying autoregression in the y-equation",
-  source_note = md("*Note*: Results from 100 simulations, no confounding, autoregressive parameter for x-equation = 0, true cross-lagged effect = 0.25"),
-  footnote = "Bias = Mean(estimate) - True value; Relative Bias = (Bias / True value) × 100",
-  decimals = 3
-)
-```
-
-
-filtered_bias <- bias_analysis |> 
-  ungroup() |> 
-  filter(
-    include_confounder == FALSE,
-    dgp == "clpm",
-    x_stability == 0.5,
-    variance_between_x == 0.5,
-    variance_between_y == 0.5
-  )  %>%
-  select(y_stability, mean_cross_p_bias, mean_cross_q_bias, 
-         mean_relative_cross_p_bias, mean_relative_cross_q_bias) 
-custom_table <- filtered_bias %>%
-  select(y_stability, mean_cross_p_bias, mean_cross_q_bias,
-         mean_relative_cross_p_bias, mean_relative_cross_q_bias
-         ) %>%
-  pivot_longer(cols = -y_stability, names_to = "parameter", values_to = "bias") %>%
-  pivot_wider(names_from = y_stability, values_from = bias, 
-              names_prefix = "Y_") %>%
+riclpm_simulation_results <- param_grid |>
+  rowwise() |>
   mutate(
-    parameter = case_when(
-      parameter == "mean_cross_p_bias" ~ "Bias in Cross Lagged X~Y",
-      parameter == "mean_cross_q_bias" ~ "Bias in Cross Lagged Y~X",
-      parameter == "mean_relative_cross_p_bias" ~ "Relative Bias in Cross Lagged X~Y",
-      parameter == "mean_relative_cross_q_bias" ~ "Relative Bias in Cross Lagged X~Y"
-    )
-  ) %>%
-  gt() %>%
-  tab_header(
-    title = md("**Monte Carlo Bias Analysis**"),  # Bold title
-    subtitle = "CLPM Simulation: Effect of varying autoregression in the y-equation"
-  ) %>%
-  cols_label(
-    parameter = "Parameter",
-    Y_0 = "Y = 0",
-    Y_0.25 = "Y = 0.25", 
-    Y_0.5 = "Y = 0.5"
-  ) %>%
-  fmt_number(
-    columns = starts_with("Y_"),
-    decimals = 3
-  ) %>%
-  tab_source_note(
-    source_note = md("*Note*: The results reported here are from 100 simulations,
-    where there is no confounding, the autoregressive parameter for the x-equation is 0.5,
-    and the true cross lagged effect is 0.5")
-  ) %>%
-  tab_footnote(
-    footnote = "Bias = Mean(estimate) - True value,
-    Relative Bias = (Bias / True value) * 100",
-    locations = cells_column_labels(columns = starts_with("Y_"))
-  )
-
-custom_table
+    result = list(run_monte_carlo_simulation_riclpm(
+      x_stab = x_stability,
+      y_stab = y_stability, 
+      var_x = variance_between_x,
+      var_y = variance_between_y,
+      variance_p = variance_p,
+      variance_q = variance_q,
+      dgp = dgp
+    ))
+  ) |>
+  ungroup() |>
+  tidyr::unnest()
 ```
 
-<!-- Insofar that the variance of the trait level term is zero, the model reduces to the CLPM. The CLPM is nested within the CLPM. In this example, we'll simulate data under the RI-CLPM and estimate several models. -->
-
-<!-- 1.  **Cross-Lagged Panel Model** as an observed variable model in OLS, with no correlated errors. -->
-<!-- 2.  **Random Intercept Cross-Lagged Panel Model** as a latent variable model in SEM, with correlated errors. -->
-<!-- 3.  **Continuous Time Structural Equation Model**, then retrieving the discrete time autorregressive and cross lagged estimates. -->
-<!-- 4.  **Hierarchical Linear Model**. -->
-
-<!-- Each model is tested under the same data generating process -- which we vary. We vary the random intercept variance for both $x$ and $y$, the trait level effect. The greater the variance, the more of the total variance in $y$ and/or $x$ is attributable to that stable trait. We also vary the degree of autoregression in both $x$ and $y$, the within wave stability. 1000 replications were run for each model. In particular, -->
-
-<!-- ## Monte Carlo Simulation -->
-
-<!-- # Tested with DGP (CLPM, RICLPM) and estimator (OLS, RICLPM, CLPM), caches error messages -->
-
-<!-- ```{r echo=FALSE, message=FALSE, warning=FALSE, cache = FALSE} -->
-<!-- library(dplyr) -->
-<!-- library(tictoc) -->
-<!-- library(tidyr) -->
-<!-- devtools::load_all() -->
-<!-- rm(list = ls()) -->
-<!-- run_mc_sims( -->
-<!--   estimator = "LCHANGE", -->
-<!--   lchange_type = "dual_change", -->
-<!--   param_grid = expand.grid( -->
-<!--     stability_p = 0.3, -->
-<!--     stability_q = 0.3, -->
-<!--     cross_p = c(0.1, 0.5), -->
-<!--     cross_q = c(0.1, 0.5), -->
-<!--     variance_between_x = c(0,0.5), -->
-<!--     variance_between_y = 0.8, -->
-<!--     confounder_variance = c(0.5, 0.1), -->
-<!--     confounder_stability = 0.4 -->
-<!--   ), -->
-<!--   trials = 1, -->
-<!--   waves = 3, -->
-<!--   sample_size = 2000, -->
-<!--   verbose = TRUE, -->
-<!--   data_generation = "clpm" -->
-<!-- ) |> head() -->
-<!-- ``` -->
-
-<!-- ### Below is Deletable -->
-
-<!-- ### OLS -->
-
-<!-- This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the CLPM in OLS. -->
-
-<!-- ```{r echo=FALSE, message=FALSE, warning=FALSE} -->
-<!-- library(dplyr) -->
-<!-- library(tictoc) -->
-<!-- devtools::load_all() -->
-
-<!-- stability_q <- seq(0.2, 0.7, by = .1) -->
-<!-- variance.between.x <- seq(0.3, 1, by = .1) -->
-
-<!-- # Timer for full OLS simulation -->
-<!-- tic("Full OLS Monte Carlo Simulation") -->
-<!-- resultsOLS <- expand.grid(x = stability_q, y = variance.between.x) |> -->
-<!--   rowwise() |> -->
-<!--   mutate(result = list({ -->
-<!--     res <- monteCarloOLS( -->
-<!--       trials = 10,  # Reduced from 100 -->
-<!--       waves = 3,    # Reduced from 5 -->
-<!--       data_generation = "riclpm", -->
-<!--       stability_p = 0.2, -->
-<!--       stability)q = x, -->
-<!--       cross_lag_x = 0.0, -->
-<!--       cross_lag_y = 0.0, -->
-<!--       variance.q = 0.5, -->
-<!--       variance.p = 0.5, -->
-<!--       variance_between_x = y, -->
-<!--       variance_between_y = 0.5, -->
-<!--       cov_pq = 0, -->
-<!--       sample_size = 1000  # Reduced from 5000 -->
-<!--     ) -->
-<!--     res -->
-<!--   })) |> -->
-<!--   unnest(result) -->
-<!-- toc() -->
-<!-- # save(resultsOLS, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsOLS.rda") -->
-
-<!-- ``` -->
-
-<!-- This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the RI-CLPM. -->
-
-<!-- ```{r, echo = FALSE, message = FALSE, warning = FALSE} -->
-<!-- # Fix this: Not pulling in from library -->
-<!-- library(lavaan) -->
-<!-- library(tictoc) -->
-
-<!-- variance_between_y <- seq(0.2, 0.7, by = .1) -->
-<!-- variance_between_x <- seq(0.3, 1, by = .1) -->
-
-<!-- # Timer for full RICLPM simulation -->
-<!-- tic("Full RICLPM Monte Carlo Simulation") -->
-<!-- resultsRICLPM <- expand.grid(x = variance_between_y, y = variance_between_x) |> -->
-<!--   rowwise() |> -->
-<!--   mutate(result = list({ -->
-<!--     # tic(paste("RICLPM Simulation for x =", x, ", y =", y)) -->
-<!--     res <- monteCarloRICLPM( -->
-<!--       trials = 10,  # Reduced from 100 -->
-<!--       waves = 3,    # Reduced from 5 -->
-<!--       dgp = "clpm", -->
-<!--       stability.p = 0.2, -->
-<!--       stability.q = x, -->
-<!--       cross_lag_x = 0.0, -->
-<!--       cross_lag_y = 0.0, -->
-<!--       variance.q = 0.5, -->
-<!--       variance.p = 0.5, -->
-<!--       variance.between.x = y, -->
-<!--       variance.between.y = 0.5, -->
-<!--       cov.pq = 0, -->
-<!--       sample_size = 1000  # -->
-<!--     ) -->
-<!--     res -->
-<!--   })) |> -->
-<!--   unnest(result) -->
-<!--   toc() -->
-<!-- ``` -->
-
-<!-- ```{r} -->
-<!-- # Fix this: Not pulling in from library -->
-<!-- library(lavaan) -->
-<!-- library(tictoc) -->
-
-<!-- variance_between_y <- seq(0.2, 0.7, by = .1) -->
-<!-- variance_between_x <- seq(0.3, 1, by = .1) -->
-
-<!-- # Timer for full RICLPM simulation -->
-<!-- tic("Full RICLPM Monte Carlo Simulation") -->
-<!-- resultsRICLPM <- expand.grid(x = variance_between_y, y = variance_between_x) |> -->
-<!--   rowwise() |> -->
-<!--   mutate(result = list({ -->
-<!--     # tic(paste("RICLPM Simulation for x =", x, ", y =", y)) -->
-<!--     res <- monteCarloCLPM( -->
-<!--       trials = 2,  # Reduced from 100 -->
-<!--       waves = 3,    # Reduced from 5 -->
-<!--       dgp = "clpm", -->
-<!--       stability.p = 0.2, -->
-<!--       stability.q = x, -->
-<!--       cross_lag_x = 0.0, -->
-<!--       cross_lag_y = 0.0, -->
-<!--       variance.q = 0.5, -->
-<!--       variance.p = 0.5, -->
-<!--       variance.between.x = y, -->
-<!--       variance.between.y = 0.5, -->
-<!--       cov.pq = 0, -->
-<!--       sample_size = 1000  # -->
-<!--     ) -->
-<!--     res -->
-<!--   })) |> -->
-<!--   unnest(result) -->
-<!--   toc() -->
-<!-- ``` -->
-
-<!-- ```{r, echo = FALSE, message = FALSE, warning = FALSE} -->
-<!-- # Fix this: Not pulling in from library -->
-<!-- library(lavaan) -->
-<!-- library(lavaan) -->
-<!-- library(tictoc) -->
-
-<!-- stability.q <- seq(0.2, 0.7, by = .1) -->
-<!-- variance.between.x <- seq(0.3, 1, by = .1) -->
-
-<!-- # Timer for full CLPM simulation -->
-<!-- tic("Full CLPM Monte Carlo Simulation") -->
-<!-- resultsCLPM <- expand.grid(x = stability.q, y = variance.between.x) |> -->
-<!--   rowwise() |> -->
-<!--   mutate(result = list({ -->
-<!--     res <- monteCarloCLPM( -->
-<!--       trials = 10,  # Reduced from 100 -->
-<!--       waves = 3,    # Reduced from 5 -->
-<!--       dgp = "riclpm", -->
-<!--       stability.p = 0.2, -->
-<!--       stability.q = x, -->
-<!--       variance.between.x = y, -->
-<!--       variance.between.y = 0.5, -->
-<!--       cross_lag_x = 0.0, -->
-<!--       cross_lag_y = 0.0, -->
-<!--       variance.q = 0.5, -->
-<!--       variance.p = 0.5, -->
-<!--       cov.pq = 0, -->
-<!--       sample_size = 1000  # Reduced from 5000 -->
-<!--     ) -->
-<!--     res -->
-<!--   })) |> -->
-<!--   unnest(result) -->
-<!-- toc() -->
-<!-- #save(resultsCLPM, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCLPM.RData") -->
-<!-- ``` -->
-
-<!-- This function runs a monte carlo simulation, simulating data from the RI-CLPM, and estimating the continuous time structural equation model. -->
-
-<!-- Note: this compiles at each run. Could fix to compile just once, maybe. -->
-
-<!-- ```{r, echo = FALSE, message = FALSE, warning = FALSE} -->
-<!-- monteCarloCTSEM( -->
-<!--    trials = 1, -->
-<!--    waves = 5, -->
-<!--    dgp = "riclpm", -->
-<!--    stability.p = 0.2, -->
-<!--    stability.q = 0.2, -->
-<!--    cross_lag_x = 0.0, -->
-<!--    cross_lag_y = 0.0, -->
-<!--    variance.q = 0.5, -->
-<!--    variance.p = 0.5, -->
-<!--    variance.between.x = 0.5, -->
-<!--    variance.between.y = 0.5, -->
-<!--    cov.pq = 0, -->
-<!--    sample_size = 5000) -> results -->
+The model has a high failure rate when the amount of stable, trait level variation is high, and the amount of state variation is quite low. 
 
 
-<!-- ##### -->
-<!-- within_person_stability_x = seq(0.2, 0.7, by = .1) -->
-<!-- variance.between.x = seq(0.3, 1, by = .1) -->
-<!-- ###### -->
-<!-- for(x in stability.q){ -->
-<!--   for(y in variance.between.x){ -->
-<!--         results <- rbind(results,  -->
-<!--                          monteCarloCTSEM( -->
-<!--                                          trials = 1, -->
-<!--                                          waves = 5, -->
-<!--                                          dgp = "riclpm", -->
-<!--                                          stability.p = 0.2, -->
-<!--                                          stability.q = x, -->
-<!--                                          cross_lag_x = 0.0, -->
-<!--                                          cross_lag_y = 0.0, -->
-<!--                                          variance.q = 0.5, -->
-<!--                                          variance.p = 0.5, -->
-<!--                                          variance.between.x = y, -->
-<!--                                          variance.between.y = 0.5, -->
-<!--                                          cov.pq = 0, -->
-<!--                                          sample_size = 5000) -->
-<!--                   ) -->
-<!--         } -->
-<!--   } -->
-<!-- resultsCTSEM = results -->
-<!-- #save(resultsCTSEM, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCTSEM.rda") -->
-<!-- ``` -->
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+riclpm_simulation_results %>%
+    group_by(variance_p, variance_q) %>%
+    summarise(
+        failure_rate = mean(converged == FALSE) * 100,
+        .groups = 'drop'
+    )  |> 
+  rename(Within_Subject_Y = variance_p, Within_Subject_X = variance_q) |>
+  
+  print()
+```
 
-<!-- ## Full Data -->
-
-<!-- ```{r} -->
-<!-- library(dplyr) -->
-<!-- load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCLPM.RData") -->
-<!-- load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsRICLPM.rda") -->
-<!-- load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsOLS.rda") -->
-<!-- load("~/Dropbox/github_repos/crossLag_p/crossLagR/resultsCTSEM.rda") -->
-
-<!-- bind_rows(resultsCTSEM, resultsCLPM, resultsRICLPM, resultsOLS) -> monteCarlo_results -->
-<!-- save(monteCarlo_results, file = "~/Dropbox/github_repos/crossLag_p/crossLagR/monteCarlo_results.rda") -->
-<!-- ``` -->
+```{r, echo = FALSE, warning = FALSE, message = FALSE}
+library(gt)
+riclpm_simulation_results %>%
+    group_by(variance_p, variance_q) %>%
+    summarise(
+        check_covariance= mean(error_message == "lavaan->lav_start_check_cov():  \n   please provide better fixed values for (co)variances; variables involved are: p1 q1") * 100,
+        sigma_not_positive_definite = mean(error_message ==  "'Sigma' is not positive definite") * 100,
+        sample_matrix_not_positive_definite = mean(error_message ==  "lavaan->lav_samplestats_icov():  \n   sample covariance matrix is not positive-definite") * 100,
+        model_did_not_converge = mean(error_message ==  "Model did not converge") * 100,
+        .groups = 'drop'
+    )  |>
+tidyr::replace_na(list(
+    check_covariance = 0,
+    sigma_not_positive_definite = 0,
+    sample_matrix_not_positive_definite = 0,
+    model_did_not_converge = 0
+  )) |>
+  print()
+```
