@@ -1,0 +1,517 @@
+---
+title: "The Cross Lagged Regression Model: Simulations"
+header-includes:
+    - \usepackage{setspace}\onehalfspacing
+author: ""
+date: "2025-01-21"
+indent: true
+output:
+  pdf_document: default
+---
+
+# Introduction
+
+The cross-lagged regression model follows an intuitive structure.  The current realizations $x$ and $y$ are a function of autoregressive and cross lagged effects. I closely follow the structure and notation in Ludtke and Robitzch (2021).
+
+$$
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{it-1}  
+\end{bmatrix}
++
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+$$
+
+$\theta_{1y}$ and $\theta_{1x}$ are the autoregressive effects and cross lagged effects in the $y$ equation. $\theta_{2y}$ and $\theta_{2x}$ represent, the cross-lagged and autoregressive effects in the $x$ equation.  The error terms $e_{y,it}$ and $e_{x,it}$ are assumed to be normally distributed with mean zero and constant variance, and uncorrelated with each other. In practice, they are often correlated, such that $cov(e^y_{t,i}, e^x_{t,i}) \neq 0$.
+
+The random intercept specification allows for disposition, trait level effects: To what extent are $x$ and $y$ relatively unchanging and stable over time. In some cases, researchers might estimate a hierarchical model, simply allowing unique "intercepts for each unit, known as"fixed effects" terms. Variations of this model are known as the "Dynamic Random Effects Model" and "Dynamic Panel Model."  While the fixed or random effects are generally an improvement over no variation, the lagged realizations of the dependent variables in both equations complicates matters, often producing a form of bias known as "Nickell Bias" (Nickel 1981). Well-known approaches to deal with this form of bias rely on first differencing, such as the Arellano- Bond estimator, or the Bond estimator. The problem -- in a nutshell -- is that the lagged dependent variable does not include the stable, trait level variation accounted for in the random intercepts themselves (or fixed effects).
+
+The RI-CLPM -- a popular approach in psychology -- also explicitly includes trait level variation, but in a manner somewhat different from the "dynamic panel" approaches described. For the moment, ignoring the lags and cross-lagged effects, let us assume that $x$ and $y$ are each a function of a stable trait level component, plus a time-varying state component.
+
+$$
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mu^y_{i} \\
+\mu^x_{i}
+\end{bmatrix}
++
+\begin{bmatrix}
+y^*_{y,it}\\
+x^*_{x,it}
+\end{bmatrix}
+$$
+
+The $\mu^x_i$ and $\mu^y_i$ terms are the stable, trait level components for individual $i$. And $x^*_{t,i}$ and $y^*_{t,i}$ terms are the time-varying state components. We can view this formation as providing a decomposition of the total variance in $x$ and $y$ into between-person (trait; $\mu$) and within-person (state, $x^*,y^*$) components. From here, we can rewrite the cross-lagged and lagged effects from the state components alone.
+
+$$
+\begin{bmatrix}
+ y^*_{it}\\
+ x^*_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta^*_{1y} & \theta^*_{1x}  \\
+\theta^*_{2y} & \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{it-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+$$
+
+Taken together, the observed variables, $x$ and $y$ are a function of the intercepts, the stable, trait level components, and the lagged state components.
+
+$$
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta^*_{1y} & \theta^*_{1x}  \\
+\theta^*_{2y} & \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{t-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
+}_{Trait}
+$$
+
+* $\mu^x_i$ and $\mu^y_i$ are the stable, trait level components for individual $i$.
+* $x^*_{t,i}$ and $y^*_{t,i}$ are the time-varying state components.
+* $\theta^*_{1y}$ and $\theta^*_{2x}$ are the autoregressive effects for the state components.
+* $\theta^*_{1x}$ and $\theta^*_{1x}$ are the cross-lagged effects for the state components.
+
+## Causal Effects
+
+Extending the model, we can use the CLPM and RI-CLPM to produce potential outcomes ; what would $x_{t,i}$ and $y_{t,i}$ be if we intervened on $x$ or $y$ at time $t-1$, $E[x_{i,t}^{y_{t-1}}]$ and $E[y_{i,t}^{x_{t-1}}]$? By assuming that such an intervention is linear, similar to the structure set forth in the CLPM, the marginal effect of the treatment is $\tau$  (Ludtke and Robitzch 2021; Hernan and Robins 2020; Vanderwheele 2015). 
+
+$$
+\begin{aligned}
+E[Y_{i,t}^{x_{t-1}}] = \alpha_{1} + \tau_{1} x_{t-1} \\
+E[X_{i,t}^{y_{t-1}}] = \alpha_{2} + \tau_{2} y_{t-1} \\
+\end{aligned}
+$$
+
+The marginal effects, $\tau$ are calculated by the expectations fixing $x_{t,i}$ and $y_{t,i}$ at a value and integrated over the joint distribution of $x_{t-1}$ and $y_{t-1}$. In a linear model, this is typically just $\hat{\theta_{1y}}$ and $\hat{\theta_{2x}}$, the slopes from a regression equation. If there are unobserved confounders, $Z$, then 
+
+$$
+\begin{aligned}
+E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} =  z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z \\
+E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} = z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z\\
+\end{aligned}
+$$
+
+
+The potential outcome is simply the expectation of $x_{t,i}$ and $_{y,i}$, holding $y_{t-1}$ and $x_{t-1}$ at a fixed value, and averaging over the joint distribution of $x_{t-1}$, $y_{t-1}$, and $z$.
+
+## Confounding Variables
+
+In the presence of confounding variables, $Z$, that influence both $x$ and $y$, the cross-lagged estimates may be biased, in both the CLPM or the RI-CLPM. A confounder, like all variables in a panel design may be *time-varying* or *time-invariant*. Some characteristics fluctuate over time, partially or fully explaining the pattern of relationships between $x$ and $y$, others are stable and tend not to change, but also explain the joint relationship between $x$ and $y$.
+
+If confounder $z$ is time-invariant, the CLPM may be respecified as the RI-CLPM:
+$$
+\begin{bmatrix}
+ y^*_{it}\\
+ x^*_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta^*_{1y} & \theta^*_{1x}  \\
+\theta^*_{2y} & \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{t-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
++
+\begin{bmatrix}
+\alpha_{y}\\
+\alpha_{x}
+\end{bmatrix}
+z_{i}
+}_{Trait}
+$$
+
+* $\mu^x_i$ and $\mu^y_i$ are the stable, trait level components for individual $i$.
+* $x^*_{t,i}$ and $y^*_{t,i}$ are the time-varying state components.
+* $\theta^*_{1y}$ and $\theta^*_{2x}$ are the autoregressive effects for the state components.
+* $\theta^*_{1x}$ and $\theta^*_{1x}$ are the cross-lagged effects for the state components.
+
+When the confounder is "unobserved" and either time-invariant or time-varying, what is the consequence of ignoring that confounder in the CLPM or RI-CLPM? There is some disagreement in the literature on this question.
+
+## The CLPM and RICLPM 
+
+Starting with a relatively straightforward set of simulations, I generate data from a CLPM data generating process (DGP) with no confounders, but varying 
+
+AR(1)
+
+Assume an AR(1) process where the parameter values range from 0.25 to 1 in increments of 0.25. 
+
+* Fit three different models to data generated from a CLPM DGP.
+
+  1. CLPM 
+  2. RI-CLPM 
+
+* Return the data frame and then structure a table of results. 
+
+### CLPM with Lag-1 DGP
+
+```{r}
+library(tibble)
+library(dplyr)
+devtools::load_all()
+
+param_grid <- expand.grid(
+  ar_x = c(0.5),
+  ar_y = c(0.25, 0.5, 0.75, 1),
+  cl_x = c(0.2),
+  cl_y = c(0.2),
+)
+run_monte_carlo_simulation <- function(x_stab, 
+                                       y_stab
+                                      ) {
+  monteCarloCLPM(
+    trials = 100,
+    waves = 5,
+    stability_q = 1,
+    stability_p = 1,
+    variance_between_y = 0,
+    variance_between_x = 0,
+    cross_p = 0.2,
+    cross_q = 0.2,
+    variance_p = 1,
+    variance_q = 1,
+    sample_size = sample_size,
+    dgp = "clpm",
+    confounder_p = 0.25,
+    confounder_q = 0.25,
+    confounder_variance = 1,
+    confounder_stability = 0.4,
+    include_confounder = FALSE, 
+    confounder_type = "time_invariant",
+    cov_pq = 0.1,
+
+  )
+}
+clpm_simulation_results <- param_grid |>
+  rowwise() |>
+  mutate(
+    result = list(run_monte_carlo_simulation(
+      x_stab = ar_x,
+      y_stab = ar_y
+    ))
+  ) |>
+  ungroup() |>
+  tidyr::unnest()
+```
+
+And the summary table:
+
+```{r}
+library(gt)
+library(tidyr)
+
+bias_analysis_summary <- clpm_simulation_results %>%
+    mutate(
+      cross_p_bias = ylag_x - 0.2,
+      cross_q_bias = xlag_y - 0.2,
+      relative_cross_p_bias = (cross_p_bias / 0.2) * 100,
+      relative_cross_q_bias = (cross_q_bias / 0.2) * 100
+    ) |>
+    group_by(across(all_of(names(param_grid)))) |>
+    summarize(
+      mean_cross_p_bias = mean(cross_p_bias, na.rm = TRUE),
+      mean_cross_q_bias = mean(cross_q_bias, na.rm = TRUE),
+      mean_relative_cross_p_bias = mean(relative_cross_p_bias, na.rm = TRUE),
+      mean_relative_cross_q_bias = mean(relative_cross_q_bias, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+bias_analysis_summary |> 
+  select(ar_y, mean_cross_p_bias, mean_cross_q_bias,
+         mean_relative_cross_p_bias, mean_relative_cross_q_bias) |>
+   # pivot_longer(names_to = "parameter", values_to = "bias") |>
+   # pivot_wider(names_from = dgp, values_from = bias) |>
+  rename(    
+     "Bias: Y~X(t-1)" = mean_cross_q_bias,
+     "Bias: X~Y(t-1)" = mean_cross_p_bias,
+     "Relative Bias: Y~X(t-1)" = mean_relative_cross_p_bias,
+     "Relative Bias: X~Y(t-1)" = mean_relative_cross_q_bias,
+     "Autoregression in Y" = ar_y
+  )  |>
+  gt() |>
+  tab_header(
+    title = md("**Monte Carlo Bias Analysis**"),
+    subtitle = "CLPM Simulation: Varying Autoregressive Parameter in Y Equation"
+  ) |>
+    fmt_number(
+    columns = everything(),  # All numeric columns
+    decimals = 3  # Change this number to control decimals
+  ) |>
+  tab_source_note(
+    source_note = md("*Note*: The results reported here are from 100 simulations.")
+   ) |>
+   tab_footnote(
+     footnote = "Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100",
+     locations = cells_column_labels(columns = starts_with("Y_"))
+   )
+
+```
+
+### RICLPM with Lag-1 DGP
+
+```{r}
+library(tibble)
+library(dplyr)
+
+param_grid <- expand.grid(
+  ar_x = c(0.5),
+  ar_y = c(0.25, 0.5, 0.75, 1),
+  cl_x = c(0),
+  cl_y = c(0),
+  sample_size = c(1000, 5000, 10000)
+)
+run_monte_carlo_simulation <- function(x_stab, 
+                                       y_stab
+                                      ) {
+  monteCarloRICLPM(
+    trials = 100,
+    waves = 3,
+    stability_q = 1,
+    stability_p = 1,
+    variance_between_y = 0.5,
+    variance_between_x = 0.5,
+    cross_p = 0.2,
+    cross_q = 0.2,
+    variance_p = 1,
+    variance_q = 1,
+    sample_size = sample_size,
+    dgp = "clpm",
+    confounder_p = 0.25,
+    confounder_q = 0.25,
+    confounder_variance = 1,
+    confounder_stability = 0.4,
+    include_confounder = FALSE, 
+    confounder_type = "time_invariant",
+    cov_pq = 0.1,
+
+  )
+}
+clpm_simulation_results <- param_grid |>
+  rowwise() |>
+  mutate(
+    result = list(run_monte_carlo_simulation(
+      x_stab = ar_x,
+      y_stab = ar_y
+    ))
+  ) |>
+  ungroup() |>
+  tidyr::unnest()
+
+```
+
+
+```{r}
+library(gt)
+library(tidyr)
+
+bias_analysis_summary <- clpm_simulation_results %>%
+    mutate(
+      cross_p_bias = ylag_x - 0.2,
+      cross_q_bias = xlag_y - 0.2,
+      relative_cross_p_bias = (cross_p_bias / 0.2) * 100,
+      relative_cross_q_bias = (cross_q_bias / 0.2) * 100
+    ) |>
+    group_by(across(all_of(names(param_grid)))) |>
+    summarize(
+      mean_cross_p_bias = mean(cross_p_bias, na.rm = TRUE),
+      mean_cross_q_bias = mean(cross_q_bias, na.rm = TRUE),
+      mean_relative_cross_p_bias = mean(relative_cross_p_bias, na.rm = TRUE),
+      mean_relative_cross_q_bias = mean(relative_cross_q_bias, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+bias_analysis_summary |> 
+  select(ar_y, mean_cross_p_bias, mean_cross_q_bias,
+         mean_relative_cross_p_bias, mean_relative_cross_q_bias) |>
+   # pivot_longer(names_to = "parameter", values_to = "bias") |>
+   # pivot_wider(names_from = dgp, values_from = bias) |>
+  rename(    
+     "Bias: Y~X(t-1)" = mean_cross_q_bias,
+     "Bias: X~Y(t-1)" = mean_cross_p_bias,
+     "Relative Bias: Y~X(t-1)" = mean_relative_cross_p_bias,
+     "Relative Bias: X~Y(t-1)" = mean_relative_cross_q_bias,
+     "Autoregression in Y" = ar_y
+  )  |>
+  gt() |>
+  tab_header(
+    title = md("**Monte Carlo Bias Analysis**"),
+    subtitle = "RICLPM Simulation: Varying Autoregressive Parameter in Y Equation"
+  ) |>
+    fmt_number(
+    columns = everything(),  # All numeric columns
+    decimals = 3  # Change this number to control decimals
+  ) |>
+  tab_source_note(
+    source_note = md("*Note*: The results reported here are from 100 simulations.")
+   ) |>
+   tab_footnote(
+     footnote = "Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100",
+     locations = cells_column_labels(columns = starts_with("Y_"))
+   )
+
+```
+## Latent Change
+
+
+```{r}
+library(tibble)
+library(dplyr)
+
+param_grid <- expand.grid(
+  ar_x = c(0.5),
+  ar_y = c(0.25, 0.5, 0.75, 1),
+  cl_x = c(0),
+  cl_y = c(0),
+  sample_size = c(5000)
+)
+run_monte_carlo_simulation <- function(x_stab, 
+                                       y_stab
+                                      ) {
+  monteCarloLChange(
+    trials = 100,
+    waves = 5,
+    stability_q = 1,
+    stability_p = 1,
+    variance_between_y = 0,
+    variance_between_x = 0,
+    cross_p = 0.2,
+    cross_q = 0.2,
+    variance_p = 1,
+    variance_q = 1,
+    sample_size = sample_size,
+    dgp = "clpm",
+    confounder_p = 0.25,
+    confounder_q = 0.25,
+    confounder_variance = 1,
+    confounder_stability = 0.4,
+    include_confounder = FALSE, 
+    confounder_type = "time_invariant",
+    cov_pq = 0.1,
+
+  )
+}
+clpm_simulation_results <- param_grid |>
+  rowwise() |>
+  mutate(
+    result = list(run_monte_carlo_simulation(
+      x_stab = ar_x,
+      y_stab = ar_y
+    ))
+  ) |>
+  ungroup() |>
+  tidyr::unnest()
+
+```
+```{r}
+param_grid <- expand.grid(
+  ar_x = c(0.5),
+  ar_y = c(0.25, 0.5, 0.75, 1),
+  cl_x = c(0),
+  cl_y = c(0),
+  sample_size = c(5000)
+)
+
+  bias_analysis_summary <- clpm_simulation_results %>%
+    mutate(
+      cross_p_bias = ylag_x - 0.2,
+      cross_q_bias = xlag_y - 0.2,
+      relative_cross_p_bias = (cross_p_bias / 0.2) * 100,
+      relative_cross_q_bias = (cross_q_bias / 0.2) * 100
+    ) |>
+    group_by(across(all_of(names(param_grid)))) |>
+    summarize(
+      mean_cross_p_bias = mean(cross_p_bias, na.rm = TRUE),
+      mean_cross_q_bias = mean(cross_q_bias, na.rm = TRUE),
+      mean_relative_cross_p_bias = mean(relative_cross_p_bias, na.rm = TRUE),
+      mean_relative_cross_q_bias = mean(relative_cross_q_bias, na.rm = TRUE),
+      .groups = "drop"
+    )
+
+bias_analysis_summary |> 
+  select(ar_y, mean_cross_p_bias, mean_cross_q_bias,
+         mean_relative_cross_p_bias, mean_relative_cross_q_bias) |>
+   # pivot_longer(names_to = "parameter", values_to = "bias") |>
+   # pivot_wider(names_from = dgp, values_from = bias) |>
+  rename(    
+     "Bias: Y~X(t-1)" = mean_cross_q_bias,
+     "Bias: X~Y(t-1)" = mean_cross_p_bias,
+     "Relative Bias: Y~X(t-1)" = mean_relative_cross_p_bias,
+     "Relative Bias: X~Y(t-1)" = mean_relative_cross_q_bias,
+     "Autoregression in Y" = ar_y
+  )  |>
+  gt() |>
+  tab_header(
+    title = md("**Monte Carlo Bias Analysis**"),
+    subtitle = "RICLPM Simulation: Varying Autoregressive Parameter in Y Equation"
+  ) |>
+    fmt_number(
+    columns = everything(),  # All numeric columns
+    decimals = 3  # Change this number to control decimals
+  ) |>
+  tab_source_note(
+    source_note = md("*Note*: The results reported here are from 100 simulations.")
+   ) |>
+   tab_footnote(
+     footnote = "Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100",
+     locations = cells_column_labels(columns = starts_with("Y_"))
+   )
+
+
+
+```

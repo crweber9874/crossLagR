@@ -1,0 +1,18 @@
+--- 
+title: "A Course on Regression, Causal Inference, and Data Visualization"
+author: "Christopher Weber"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]
+description: |
+  These notes accompany POL 683
+link-citations: yes
+github-repo: crweber9874/advancedRegression
+---
+
+
+# Introduction
+
+The cross-lagged regression model follows an intuitive structure...
+
