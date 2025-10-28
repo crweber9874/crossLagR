@@ -2,21 +2,27 @@
 % Please edit documentation in R/monteCarlo_OLS.R
 \name{monteCarloOLS}
 \alias{monteCarloOLS}
-\title{monteCarlo_OLS}
+\title{monteCarloOLS}
 \usage{
 monteCarloOLS(
   trials = 10,
   waves = 5,
-  variance.between.x = 0.5,
-  variance.between.y = 0.5,
-  stability.q = 0.25,
-  stability.p = 0.25,
-  cross.p = 0,
-  cross.q = 0,
-  variance.p = 1,
-  variance.q = 1,
+  variance_between_x = 0.5,
+  variance_between_y = 0.5,
+  stability_q = 0.25,
+  stability_p = 0.25,
+  cross_p = 0,
+  cross_q = 0,
+  variance_p = 1,
+  variance_q = 1,
   sample_size = 2500,
   dgp = "riclpm",
+  confounder_p = 0.3,
+  confounder_q = 0.3,
+  confounder_variance = 1,
+  confounder_stability = 0.4,
+  include_confounder = TRUE,
+  confounder_type = "time_variant",
   ...
 )
 }
@@ -25,15 +31,16 @@ monteCarloOLS(
 
 \item{waves}{The number of waves (time points) in the model.}
 
+\item{confounder_type}{Character string specifying confounder type for clpmu dgp.
+Must be one of "time_variant" (default) or "time_invariant".}
+
 \item{model}{Specify whether an "ols" or "clpm" model.}
 
 \item{data_generation}{Specify the data generation method: "clpm", "ri-clpm"}
 
-\item{proportion.change_x}{Proportion of change in x.}
+\item{proportion_change_x}{Proportion of change in x.}
 
-\item{proportion.change_y}{Proportion of change in y.
-
-x @import tidyr dplyr}
+\item{proportion_change_y}{Proportion of change in y.}
 }
 \value{
 A data frame containing the results of the simulation.

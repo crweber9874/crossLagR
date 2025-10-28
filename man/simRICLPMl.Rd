@@ -9,32 +9,32 @@ simRICLPMl(
   num_indicators_x = 2,
   num_indicators_y = 2,
   num_indicators_z = NULL,
-  stability.p = 0.2,
-  stability.q = 0.2,
-  stability.r = NULL,
-  cross.p = 0.1,
-  cross.q = 0.1,
-  cross.zx = NULL,
-  cross.zy = NULL,
+  stability_p = 0.2,
+  stability_q = 0.2,
+  stability_r = NULL,
+  cross_p = 0.1,
+  cross_q = 0.1,
+  cross_zx = NULL,
+  cross_zy = NULL,
   factor_loading_x = 1,
   factor_loading_y = 1,
   factor_loading_z = 1,
   residual_variance_x = 0.5,
   residual_variance_y = 0.5,
   residual_variance_z = 0.5,
-  variance.p = 1,
-  variance.q = 1,
-  variance.r = NULL,
-  cov.pq = 0.1,
-  cov.pr = NULL,
-  cov.qr = NULL,
-  variance.between.x = 1,
-  variance.between.y = 1,
-  variance.between.z = NULL,
-  cov.between.xy = 0.5,
-  cov.between.xz = NULL,
-  cov.between.yz = NULL,
-  sample.size = 1000,
+  variance_p = 1,
+  variance_q = 1,
+  variance_r = NULL,
+  cov_pq = 0.1,
+  cov_pr = NULL,
+  cov_qr = NULL,
+  variance_between_x = 1,
+  variance_between_y = 1,
+  variance_between_z = NULL,
+  cov_between_xy = 0.5,
+  cov_between_xz = NULL,
+  cov_between_yz = NULL,
+  sample_size = 1000,
   ...
 )
 }
@@ -47,19 +47,19 @@ simRICLPMl(
 
 \item{num_indicators_z}{The number of indicators for the Z variable (if specified by user).}
 
-\item{stability.p}{The stability parameter for the latent X variable. This is the autoregressive parameter for X. This should be specified with care, particularly when comparing a CLPM to RI-CLPM.}
+\item{stability_p}{The stability parameter for the latent X variable. This is the autoregressive parameter for X. This should be specified with care, particularly when comparing a CLPM to RI-CLPM.}
 
-\item{stability.q}{The stability parameter for the latent Y variable. This is the autoregressive parameter. This should be specified with care, particularly when comparing a CLPM to RI-CLPM.}
+\item{stability_q}{The stability parameter for the latent Y variable. This is the autoregressive parameter. This should be specified with care, particularly when comparing a CLPM to RI-CLPM.}
 
-\item{stability.r}{The stability parameter for the latent Z variable (autoregressive effect, if applicable).}
+\item{stability_r}{The stability parameter for the latent Z variable (autoregressive effect, if applicable).}
 
-\item{cross.p}{The cross-lagged effect of latent Y on latent X at the next time point.}
+\item{cross_p}{The cross-lagged effect of latent Y on latent X at the next time point.}
 
-\item{cross.q}{The cross-lagged effect of latent X on latent Y at the next time point.}
+\item{cross_q}{The cross-lagged effect of latent X on latent Y at the next time point.}
 
-\item{cross.zx}{The cross-lagged effect of latent Z on latent X at the next time point (if applicable).}
+\item{cross_zx}{The cross-lagged effect of latent Z on latent X at the next time point (if applicable).}
 
-\item{cross.zy}{The cross-lagged effect of latent Z on latent Y at the next time point (if applicable).}
+\item{cross_zy}{The cross-lagged effect of latent Z on latent Y at the next time point (if applicable).}
 
 \item{factor_loading_x}{The factor loadings for the indicators of X. The first loading is implicitly 1,
 and subsequent loadings can be a single value or a vector of length
@@ -82,29 +82,29 @@ vector of length `num_indicators_y`).}
 \item{residual_variance_z}{The residual variances for the indicators of Z (if applicable, can be a
 single value or a vector of length `num_indicators_z`).}
 
-\item{variance.p}{The variance for the latent X variables.}
+\item{variance_p}{The variance for the latent X variables.}
 
-\item{variance.q}{The variance for the latent Y variables.}
+\item{variance_q}{The variance for the latent Y variables.}
 
-\item{variance.r}{The variance for the latent Z variables (if applicable).}
+\item{variance_r}{The variance for the latent Z variables (if applicable).}
 
-\item{cov.pq}{The covariance between latent X and latent Y within the same time point, or wave}
+\item{cov_pq}{The covariance between latent X and latent Y within the same time point, or wave}
 
-\item{cov.pr}{The covariance between latent X and latent Z within the same time point (if specified by user).}
+\item{cov_pr}{The covariance between latent X and latent Z within the same time point (if specified by user).}
 
-\item{cov.qr}{The covariance between latent Y and latent Z within the same time point (if specified by user).}
+\item{cov_qr}{The covariance between latent Y and latent Z within the same time point (if specified by user).}
 
-\item{variance.between.x}{The variance for the random intercept of X.}
+\item{variance_between_x}{The variance for the random intercept of X.}
 
-\item{variance.between.y}{The variance for the random intercept of Y.}
+\item{variance_between_y}{The variance for the random intercept of Y.}
 
-\item{variance.between.z}{The variance for the random intercept of Z (if specified by user).}
+\item{variance_between_z}{The variance for the random intercept of Z (if specified by user).}
 
-\item{cov.between.xy}{The covariance of intercept terms between X and Y.}
+\item{cov_between_xy}{The covariance of intercept terms between X and Y.}
 
-\item{cov.between.xz}{The covariance of intercept terms between X and Z (if applicable).}
+\item{cov_between_xz}{The covariance of intercept terms between X and Z (if applicable).}
 
-\item{cov.between.yz}{The covariance of intercept terms between Y and Z (if applicable).}
+\item{cov_between_yz}{The covariance of intercept terms between Y and Z (if applicable).}
 
 \item{...}{Additional arguments to pass to the `lavaan::simulateData` function.}
 }

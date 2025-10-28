@@ -7,16 +7,39 @@
 monteCarloCLPM(
   trials = 10,
   waves = 5,
-  stability.q = 0.25,
-  stability.p = 0.25,
-  variance.between.y = 0.5,
-  variance.between.x = 0.5,
-  cross.p = 0,
-  cross.q = 0,
-  variance.p = 1,
-  variance.q = 1,
+  stability_q = 0.25,
+  stability_p = 0.25,
+  cross_p = 0,
+  cross_q = 0,
+  variance_p = 1,
+  variance_q = 1,
   sample_size = 2500,
-  dgp = "riclpm",
+  dgp = "clpm",
+  estimator = "clpm",
+  variance_between_x = 0.5,
+  variance_between_y = 0.5,
+  confounder_p = 0.3,
+  confounder_q = 0.3,
+  confounder_variance = 1,
+  confounder_stability = 0.4,
+  include_confounder = TRUE,
+  confounder_type = "time_variant",
+  cov_pq = 0.1,
+  ar_x = -0.15,
+  ar_y = -0.2,
+  cl_x = -0.1,
+  cl_y = -0.1,
+  change_x = 0.08,
+  change_y = 0.08,
+  phi_x = 0.15,
+  phi_y = 0.15,
+  initial_var_x = 1,
+  initial_var_y = 1,
+  constant_change_var_x = 0.5,
+  constant_change_var_y = 0.5,
+  residual_variance_x = 0.5,
+  residual_variance_y = 0.5,
+  verbose = FALSE,
   ...
 )
 }
@@ -25,19 +48,78 @@ monteCarloCLPM(
 
 \item{waves}{The number of waves (time points) in the model.}
 
-\item{model}{Specify whether an "ols" or "clpm" model.}
+\item{stability_q}{Autoregressive effect for q (y) variable}
 
-\item{data_generation}{Specify the data generation method: "clpm", "ri-clpm"}
+\item{stability_p}{Autoregressive effect for p (x) variable}
 
-\item{proportion.change_x}{Proportion of change in x.}
+\item{cross_p}{Cross-lagged effect of y on x}
 
-\item{proportion.change_y}{Proportion of change in y.}
+\item{cross_q}{Cross-lagged effect of x on y}
+
+\item{variance_p}{Within-person variance for p variable}
+
+\item{variance_q}{Within-person variance for q variable}
+
+\item{sample_size}{Sample size for simulation}
+
+\item{dgp}{Specify the data generation method: "riclpm", "clpm", "clpmu", "lchange"}
+
+\item{estimator}{Specify which estimator to use: "clpm" or "clpm_nolag"}
+
+\item{variance_between_x}{Between-person variance for x variable (for RICLPM data)}
+
+\item{variance_between_y}{Between-person variance for y variable (for RICLPM data)}
+
+\item{confounder_p}{Effect of confounder on x variables}
+
+\item{confounder_q}{Effect of confounder on y variables}
+
+\item{confounder_variance}{Variance of the confounder}
+
+\item{confounder_stability}{Autoregressive effect of confounder}
+
+\item{include_confounder}{Whether to include confounder in clpmu model}
+
+\item{confounder_type}{Character string specifying confounder type for clpmu dgp.
+Must be one of "time_variant" (default) or "time_invariant".}
+
+\item{cov_pq}{Covariance between p and q}
+
+\item{ar_x}{Proportional effect for X in lchange dgp}
+
+\item{ar_y}{Proportional effect for Y in lchange dgp}
+
+\item{cl_x}{Coupling effect in lchange dgp}
+
+\item{cl_y}{Coupling effect in lchange dgp}
+
+\item{change_x}{Change-to-change effect in lchange dgp}
+
+\item{change_y}{Change-to-change effect in lchange dgp}
+
+\item{phi_x}{Change autoregression in lchange dgp}
+
+\item{phi_y}{Change autoregression in lchange dgp}
+
+\item{initial_var_x}{Initial variance for X in lchange dgp}
+
+\item{initial_var_y}{Initial variance for Y in lchange dgp}
+
+\item{constant_change_var_x}{Constant change variance for X in lchange dgp}
+
+\item{constant_change_var_y}{Constant change variance for Y in lchange dgp}
+
+\item{residual_variance_x}{Measurement error for X in lchange dgp}
+
+\item{residual_variance_y}{Measurement error for Y in lchange dgp}
+
+\item{verbose}{Whether to print progress and error messages}
 }
 \value{
 A data frame containing the results of the simulation.
 }
 \description{
-A somewhat strange function. It's common to estimate the cross-lagged panel model with two OLS regression models.
-allows the user to specify different Data Generating conditions, and apply the OLS model to the data.
+Monte Carlo simulation for Cross-Lagged Panel Model
+This function combines the estimation and simulation of a CLPM over a fixed number of trials.
 The output is a data frame that includes the estimated coefficients across these trials
 }

@@ -1,0 +1,910 @@
+# Panel Data Models
+
+
+Social scientists often turn to panel data to diagnose causal effects when experiments are impractical \citep{chiu_causal_2025}. Whereas dozens of options exist for analyzing longer time series, researchers wishing to analyze cross-sectionally dominant panel structures -- in which there are more units than time points -- face a more limited set of choices. National surveys like found in the American National Election Studies (ANES) may consist of just a handful of waves, with many respondents interviewed only once or twice. 
+
+
+## The Cross-Lagged Panel Model 
+
+In such cases, researchers have tended to rely upon the cross-lagged panel model (CLPM). The CLPM is appealing for its intuitiveness, flexibility, and ease of implementation.  The cross-lagged regression model follows an intuitive structure. The current realizations $x$ and $y$ are a function of autoregressive and cross lagged effects. As such, the autoregression term(s) capture time dependence, while the cross-lagged terms capture how another variable leads to change in the outcome variable.
+
+Depending on the researcher’s preferences, a CLPM can be as complicated as estimating a series of simultaneous equations with latent variables or as simple as adding lagged variables to an ordinary least squares regression. Yet, given the CLPM’s popularity, there has been a surprising lack of discussion in political science about its statistical properties, especially in comparison to other alternative methods. In fact, in the decade since [@hamaker_critique_2015] published an influential critique of the CLPM, the number of published political science articles using the method has more than doubled (from 74 to 169). 
+
+
+ 
+ $$
+\begin{matrix}
+   y_{it} & = \alpha_{y} + \beta_{1}y_{it-1} + \theta_x x_{it-1} + e_{y,it}\\
+   x_{it} & = \alpha_{x} + \beta_{1}x_{it-1} + \theta_x y_{it-1}+ e_{x,it}\\
+\end{matrix}
+$$ 
+
+
+We closely follow the structure that $\alpha$ correspond to intercepts, which eventually may vary across units. It is also common to write the CLPM with mean centered variables, in which case the intercept is 0. The $\beta$ parameters are autoregressive effects. And the $\theta$ parameters are cross-lagged effects. The error terms $e_{y,it}$ and $e_{x,it}$ are assumed to be normally distributed with mean zero and constant variance, and uncorrelated with each other. In practice, they are often correlated, such that $cov(e^y_{t,i}, e^x_{t,i}) \neq 0$.
+
+
+```{r clpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="Cross-Lagged Panel Model"}
+
+library(DiagrammeR)
+# RI-CLPM with proper residuals as curved self-loops and correlated errors - 5 WAVE
+clpm_diagram <- grViz("
+digraph RICLPM {
+
+  graph [layout = neato, rankdir = TB, bgcolor = white]
+
+  node [shape = box, style = filled, fillcolor = white, fontsize = 11]
+
+  X1 [pos = '-2,2!', label = 'x1', width = 0.6, height = 0.3]
+  X2 [pos = '-1,2!', label = 'x2', width = 0.6, height = 0.3]
+  X3 [pos = '0,2!', label = 'x3', width = 0.6, height = 0.3]
+  X4 [pos = '1,2!', label = 'x4', width = 0.6, height = 0.3]
+  X5 [pos = '2,2!', label = 'x5', width = 0.6, height = 0.3]
+
+  # Within Person X
+  wX1 [pos = '-2,1!', shape = circle, fillcolor = white, label = 'q1']
+  wX2 [pos = '-1,1!', shape = circle, fillcolor = white, label = 'q2']
+  wX3 [pos = '0,1!', shape = circle, fillcolor = white, label = 'q3']
+  wX4 [pos = '1,1!', shape = circle, fillcolor = white, label = 'q4']
+  wX5 [pos = '2,1!', shape = circle, fillcolor = white, label = 'q5']
+
+  #  Within-person  Y
+  wY1 [pos = '-2,-1!', shape = circle, fillcolor = white, label = 'p1']
+  wY2 [pos = '-1,-1!', shape = circle, fillcolor = white, label = 'p2']
+  wY3 [pos = '0,-1!', shape = circle, fillcolor = white, label = 'p3']
+  wY4 [pos = '1,-1!', shape = circle, fillcolor = white, label = 'p4']
+  wY5 [pos = '2,-1!', shape = circle, fillcolor = white, label = 'p5']
+
+  # observed Y variables and RI_Y
+  Y1 [pos = '-2,-2!', label = 'y1', width = 0.6, height = 0.3]
+  Y2 [pos = '-1,-2!', label = 'y2', width = 0.6, height = 0.3]
+  Y3 [pos = '0,-2!', label = 'y3', width = 0.6, height = 0.3]
+  Y4 [pos = '1,-2!', label = 'y4', width = 0.6, height = 0.3]
+  Y5 [pos = '2,-2!', label = 'y5', width = 0.6, height = 0.3]
+
+  # Measurement model paths
+  wX1 -> X1 [label = '1', arrowsize = 0.5]
+  wX2 -> X2 [label = '1', arrowsize = 0.5]
+  wX3 -> X3 [label = '1', arrowsize = 0.5]
+  wX4 -> X4 [label = '1', arrowsize = 0.5]
+  wX5 -> X5 [label = '1', arrowsize = 0.5]
+  wY1 -> Y1 [label = '1', arrowsize = 0.5]
+  wY2 -> Y2 [label = '1', arrowsize = 0.5]
+  wY3 -> Y3 [label = '1', arrowsize = 0.5]
+  wY4 -> Y4 [label = '1', arrowsize = 0.5]
+  wY5 -> Y5 [label = '1', arrowsize = 0.5]
+
+  # Autoregressive paths
+  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]
+
+  # Cross-lagged paths with offset gamma labels and subscripts
+  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]
+
+  # Within-time correlations
+  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+
+
+
+  # Self-loops to repreesnt errors
+  wX2 -> wX2 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s , arrowsize = 0.5]
+  wX3 -> wX3 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX4 -> wX4 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX5 -> wX5 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wY2 -> wY2 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY3 -> wY3 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY4 -> wY4 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY5 -> wY5 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+
+
+  X1 -> X1 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X2 -> X2 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X3 -> X3 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X4 -> X4 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X5 -> X5 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+
+  Y1 -> Y1 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y2 -> Y2 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y3 -> Y3 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y4 -> Y4 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y5 -> Y5 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+
+
+}
+")
+# bookdown::render_book(quiet = FALSE, clean = TRUE)
+# browseURL("_book/introduction.html")
+
+clpm_diagram
+```
+
+It's advantageous to write the CLPM in terms of latent variables -- p and q -- for the simple reason that this formulation can easily be extended to models with measurement error, varying factor structures, and multiple indicators per construct. In this formulation, the $y = p$ and $x = q$. However, the model below constructs latent variables for each time point, with factor loadings, $\lambda$. The model accounts for measurement error. Each indicator is defined by the latent variable, and an error term (the dashed loops). 
+
+```{r error-clpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="Cross-Lagged Panel Model, Multiple Indicators"}
+library(DiagrammeR)
+# CLPM with 3 indicators per latent factor - shorter loadings + error variances (no epsilon labels)
+clpm_diagram <- grViz("
+digraph RICLPM {
+
+  graph [layout = neato, rankdir = TB, bgcolor = white]
+
+  node [shape = box, style = filled, fillcolor = white, fontsize = 10]
+
+  # X indicators (3 per time point) - closer to latents
+  x11 [pos = '-3.2,1.8!', label = 'x₁₁', width = 0.4, height = 0.25]
+  x12 [pos = '-2.8,1.8!', label = 'x₁₂', width = 0.4, height = 0.25] 
+  x13 [pos = '-2.4,1.8!', label = 'x₁₃', width = 0.4, height = 0.25]
+  
+  x21 [pos = '-1.7,1.8!', label = 'x₂₁', width = 0.4, height = 0.25]
+  x22 [pos = '-1.3,1.8!', label = 'x₂₂', width = 0.4, height = 0.25]
+  x23 [pos = '-0.9,1.8!', label = 'x₂₃', width = 0.4, height = 0.25]
+  
+  x31 [pos = '-0.2,1.8!', label = 'x₃₁', width = 0.4, height = 0.25]
+  x32 [pos = '0.2,1.8!', label = 'x₃₂', width = 0.4, height = 0.25]
+  x33 [pos = '0.6,1.8!', label = 'x₃₃', width = 0.4, height = 0.25]
+  
+  x41 [pos = '1.3,1.8!', label = 'x₄₁', width = 0.4, height = 0.25]
+  x42 [pos = '1.7,1.8!', label = 'x₄₂', width = 0.4, height = 0.25]
+  x43 [pos = '2.1,1.8!', label = 'x₄₃', width = 0.4, height = 0.25]
+  
+  x51 [pos = '2.8,1.8!', label = 'x₅₁', width = 0.4, height = 0.25]
+  x52 [pos = '3.2,1.8!', label = 'x₅₂', width = 0.4, height = 0.25]
+  x53 [pos = '3.6,1.8!', label = 'x₅₃', width = 0.4, height = 0.25]
+
+  # Within Person X latents
+  wX1 [pos = '-2.8,1!', shape = circle, fillcolor = white, label = 'q1']
+  wX2 [pos = '-1.3,1!', shape = circle, fillcolor = white, label = 'q2']
+  wX3 [pos = '0.2,1!', shape = circle, fillcolor = white, label = 'q3']
+  wX4 [pos = '1.7,1!', shape = circle, fillcolor = white, label = 'q4']
+  wX5 [pos = '3.2,1!', shape = circle, fillcolor = white, label = 'q5']
+
+  # Within-person Y latents
+  wY1 [pos = '-2.8,-1!', shape = circle, fillcolor = white, label = 'p1']
+  wY2 [pos = '-1.3,-1!', shape = circle, fillcolor = white, label = 'p2']
+  wY3 [pos = '0.2,-1!', shape = circle, fillcolor = white, label = 'p3']
+  wY4 [pos = '1.7,-1!', shape = circle, fillcolor = white, label = 'p4']
+  wY5 [pos = '3.2,-1!', shape = circle, fillcolor = white, label = 'p5']
+
+  # Y indicators (3 per time point) - closer to latents
+  y11 [pos = '-3.2,-1.8!', label = 'y₁₁', width = 0.4, height = 0.25]
+  y12 [pos = '-2.8,-1.8!', label = 'y₁₂', width = 0.4, height = 0.25]
+  y13 [pos = '-2.4,-1.8!', label = 'y₁₃', width = 0.4, height = 0.25]
+  
+  y21 [pos = '-1.7,-1.8!', label = 'y₂₁', width = 0.4, height = 0.25]
+  y22 [pos = '-1.3,-1.8!', label = 'y₂₂', width = 0.4, height = 0.25]
+  y23 [pos = '-0.9,-1.8!', label = 'y₂₃', width = 0.4, height = 0.25]
+  
+  y31 [pos = '-0.2,-1.8!', label = 'y₃₁', width = 0.4, height = 0.25]
+  y32 [pos = '0.2,-1.8!', label = 'y₃₂', width = 0.4, height = 0.25]
+  y33 [pos = '0.6,-1.8!', label = 'y₃₃', width = 0.4, height = 0.25]
+  
+  y41 [pos = '1.3,-1.8!', label = 'y₄₁', width = 0.4, height = 0.25]
+  y42 [pos = '1.7,-1.8!', label = 'y₄₂', width = 0.4, height = 0.25]
+  y43 [pos = '2.1,-1.8!', label = 'y₄₃', width = 0.4, height = 0.25]
+  
+  y51 [pos = '2.8,-1.8!', label = 'y₅₁', width = 0.4, height = 0.25]
+  y52 [pos = '3.2,-1.8!', label = 'y₅₂', width = 0.4, height = 0.25]
+  y53 [pos = '3.6,-1.8!', label = 'y₅₃', width = 0.4, height = 0.25]
+
+  # Measurement model for X with proper subscripts
+  wX1 -> x11 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wX1 -> x12 [label = <λ<sub>12</sub>>, arrowsize = 0.4, fontsize = 8]
+  wX1 -> x13 [label = <λ<sub>13</sub>>, arrowsize = 0.4, fontsize = 8]
+  
+  wX2 -> x21 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wX2 -> x22 [label = <λ<sub>22</sub>>, arrowsize = 0.4, fontsize = 8]
+  wX2 -> x23 [label = <λ<sub>23</sub>>, arrowsize = 0.4, fontsize = 8]
+  
+  wX3 -> x31 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wX3 -> x32 [label = <λ<sub>32</sub>>, arrowsize = 0.4, fontsize = 8]
+  wX3 -> x33 [label = <λ<sub>33</sub>>, arrowsize = 0.4, fontsize = 8]
+  
+  wX4 -> x41 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wX4 -> x42 [label = <λ<sub>42</sub>>, arrowsize = 0.4, fontsize = 8]
+  wX4 -> x43 [label = <λ<sub>43</sub>>, arrowsize = 0.4, fontsize = 8]
+  
+  wX5 -> x51 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wX5 -> x52 [label = <λ<sub>52</sub>>, arrowsize = 0.4, fontsize = 8]
+  wX5 -> x53 [label = <λ<sub>53</sub>>, arrowsize = 0.4, fontsize = 8]
+
+  # Measurement model for Y with proper subscripts
+  wY1 -> y11 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wY1 -> y12 [label = <λ<sub>12</sub>>, arrowsize = 0.4, fontsize = 8]
+  wY1 -> y13 [label = <λ<sub>13</sub>>, arrowsize = 0.4, fontsize = 8]
+  
+  wY2 -> y21 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wY2 -> y22 [label = <λ<sub>22</sub>>, arrowsize = 0.4, fontsize = 8]
+  wY2 -> y23 [label = <λ<sub>23</sub>>, arrowsize = 0.4, fontsize = 8]
+  
+  wY3 -> y31 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wY3 -> y32 [label = <λ<sub>32</sub>>, arrowsize = 0.4, fontsize = 8]
+  wY3 -> y33 [label = <λ<sub>33</sub>>, arrowsize = 0.4, fontsize = 8]
+  
+  wY4 -> y41 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wY4 -> y42 [label = <λ<sub>42</sub>>, arrowsize = 0.4, fontsize = 8]
+  wY4 -> y43 [label = <λ<sub>43</sub>>, arrowsize = 0.4, fontsize = 8]
+  
+  wY5 -> y51 [label = '1', arrowsize = 0.4, fontsize = 8]
+  wY5 -> y52 [label = <λ<sub>52</sub>>, arrowsize = 0.4, fontsize = 8]
+  wY5 -> y53 [label = <λ<sub>53</sub>>, arrowsize = 0.4, fontsize = 8]
+
+  # Autoregressive paths (β parameters) - fontsize 11
+  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
+  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
+  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
+  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
+  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
+  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
+  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
+  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
+
+  # Cross-lagged paths (θ parameters) - fontsize 11
+  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
+  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
+  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
+  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
+  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
+  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
+  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
+  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
+
+  # Within-time correlations
+  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]
+  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]
+  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]
+  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]
+  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]
+
+  # ERROR VARIANCES ON X INDICATORS (north side) - no labels
+  x11 -> x11 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x12 -> x12 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x13 -> x13 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x21 -> x21 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x22 -> x22 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x23 -> x23 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x31 -> x31 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x32 -> x32 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x33 -> x33 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x41 -> x41 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x42 -> x42 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x43 -> x43 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x51 -> x51 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x52 -> x52 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+  x53 -> x53 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.4]
+
+  # ERROR VARIANCES ON Y INDICATORS (south side) - no labels
+  y11 -> y11 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y12 -> y12 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y13 -> y13 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y21 -> y21 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y22 -> y22 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y23 -> y23 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y31 -> y31 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y32 -> y32 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y33 -> y33 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y41 -> y41 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y42 -> y42 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y43 -> y43 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y51 -> y51 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y52 -> y52 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+  y53 -> y53 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.4]
+
+  # Self-loops to represent errors on latent factors
+  wX2 -> wX2 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX3 -> wX3 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX4 -> wX4 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX5 -> wX5 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wY2 -> wY2 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY3 -> wY3 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY4 -> wY4 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY5 -> wY5 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+
+}
+")
+
+clpm_diagram
+```
+
+In addition, insofar as the constructs measured at each time point are modeled as latent variables, the CLPM can be extended to account for correlated errors, factor invariance, and multiple group comparisons. Below we generally write the CLPM in terms of single indicator variables, though these models can all easily account for multiple indicators.
+
+## The Change Score Regression
+
+Panel structures are useful to uncover dynamic relationships in data, in that the researcher may leverage over-time relationships to examine the characteristics of changes, and the relationships of change processes with other covariates [@allison1990]. One popular approach to modeling change is the change score regression model. The change score regression model focuses on the difference between time $t$ and time $t-1$ for each variable. Defining the change scores as $\Delta y_{it}$ and $\Delta x_{it}$, we can rewrite the CLPM in terms of change scores.
+
+$$
+\Delta y_{it} = y_{it} - y_{it-1}\\
+\Delta x_{it} = x_{it} - x_{it-1}
+$$
+
+
+Where the regression model is a model of change, expressed as differences rather than in level form.
+
+
+
+
+ $$
+\begin{matrix}
+   \Delta y_{it} & = \alpha_{y} + \beta_{y}y_{it-1} + \theta_x x_{it-1} + e_{y,it}\\
+   \Delta x_{it} & = \alpha_{x} + \beta_{x}x_{it-1} + \theta_x y_{it-1}+ e_{x,it}\\
+\end{matrix}
+$$ 
+
+The $\beta$ parameter here correspond to a proportional effect. How much does a the prior value of $y$ influence the change from time $t-1$ to time $t$? The $\beta$ parameter is equivalent in the CLPM -- the autoregressive parameter -- is equivalent to $\beta$ here. 
+
+## Algebraic Equivalence
+
+Expressed in this way, the change score model and the CLPM are algebraically equal. Consider $y_{it}$ and $\Delta y_{it}$:
+
+$$
+\begin{matrix}
+  \text{The CLPM:           } &y_{it}  =  \beta_{y}y_{t-1} + \theta_{1y} x_{t-1} + e_{y,it}\\
+  \text{Subtract  } y_{it-1}: &y_{it} - y_{it-1}  =  \beta_{y}y_{t-1} + \theta_{1y} x_{t-1} + e_{y,it}   - y_{it-1}\\  
+  & \Delta y_{it}  =  (\beta_{y} - 1) y_{t-1} + \theta_{y} x_{t-1} + e_{y,it}\\
+  & \Delta y_{it}  =  \tilde{\beta}_y y_{t-1} + \theta_{y} x_{t-1} + e_{y,it}\\
+  \text{Where: } &\tilde{\beta}_y = \beta_{x} - 1
+\end{matrix}
+$$
+The structure of the model remains unchanged. The models are interchangeable, and the lagged and cross-lagged effects simply become **proportional** and **cross-proportional** effects on change scores.
+
+
+
+```{r, echo = FALSE, message = FALSE, error = FALSE}
+library(dplyr)
+devtools::load_all()
+```
+
+```{r, echo = TRUE, message = FALSE, error = FALSE}
+# Simulate a five wave panel, with two variables, x y:
+simCLPM(waves = 5)$data |> 
+# In crossLagR there is a helper function to transform wide to long
+  reshape_long_sim_cr() |> 
+# Id identifies the subject, so use this to construct lags
+  group_by(id) |>
+  mutate(
+    y_lag = lag(y),
+    x_lag = lag(x),
+  # Change Score
+    delta_y = y - lag(y)
+  ) |>
+  ungroup() -> data
+
+head(data)
+```
+
+```{r, echo = FALSE, message = FALSE, error = FALSE}
+lm(delta_y ~ y_lag + x_lag, data = data) |> summary()
+lm(y ~ y_lag + x_lag, data = data) |> summary()
+```
+
+The cross-lagged parameters are equal, the AR parameters by $1-\beta$. 
+
+In the change score model, when $\beta > 1$, then increases in $y$ at time $t-1$ are associated with increases in $y$ at time $t$, what is called "explosive growth." When $\beta < 1$, increases in $y$ at time $t-1$ are associated with proportional change in $y$ at time $t$. The trajectory will decay toward the mean, displaying "regression to the mean." When $\beta = 0$ (and $\theta=0$), there is no association between $y$ at time $t-1$ and $y$ at time $t$ and the model displays a random walk process. 
+
+While not the conventional approach to panel data analysis in the social sciences, the change score method affords greater leverage in understanding the dynamics of a change process. In addition to the algebraic equivalence of the CLPM, extensions to the change score regression model, allow one to decompose change into constituent processes, proportional, constant, and dual change \citep{grimmetal2012}. 
+
+## Decomposing Change
+
+The univariate change score regression model allows us to decompose change into three components: constant, proportional, and dual change processes [@grimmetal2012]. 
+
+$$
+\begin{matrix}
+  \Delta y_{it} & = \alpha_{y} s_i + \beta_{1}y_{it-1} + e_{y,it}\\
+  \Delta x_{it} & = \alpha_{x} s_i + \beta_{1}x_{it-1} + e_{x,it}\\
+\end{matrix}
+$$ 
+
+The $\alpha$ parameters are the effects of a stable trait level component, $s_i$, on the change scores. $s_i$ is a "unit effect" -- corresponding to an estimate of constant change for each row of the data. In a panel, individuals will score higher on this component, indicating they change more in their average change relative to others. The $\alpha$ captures the effect of $s_i$ on the change score at a particular time point.
+
+The $beta$ parameters are the proportional effect of $y$ and $x$ at time $t-1$ on the change score at time $t$. This parameter is the autoregressive parameter in the the CLPM. If $\beta = 0$, then $\alpha$ simply captures how a subject's average change score influences change at time $t$. Combining the two is the "dual-change" model.
+
+When $\beta$ is positive, higher values of $y$ or $x$ at time $t-1$ are associated with increases in the variable at time $t$. When $\beta$ is negative, higher values of $y$ or $x$ at time $t-1$ are associated with decreases in the variable at time $t$. When $\beta$ is zero, there is no association between prior values and change scores, and the model displays a random walk process.
+
+
+It's useful to consider the trajectory of an individual's changes across the length of a panel, or possibly a shorter interval. The trajectory$y$ and $x$ from time $t=1$ to time $t=k$.
+
+$$
+  y_{i,k} = y_{i,t=1} + \sum_{t=2}^{k} \Delta y_{ik} \\
+  x_{i,k} = x_{i,t=1} + \sum_{t=2}^{k} \Delta x_{ik} \\
+$$ 
+
+
+## Bivariate Dual Change 
+
+With cross-lagged effects,
+
+
+$$
+\begin{matrix}
+  \Delta y_{it} & = \alpha_{y} s_i + \beta_{1}y_{it-1} + \theta_x x_{it} + e_{y,it}\\
+  \Delta x_{it} & = \alpha_{x} s_i + \beta_{1}x_{it-1} + \theta_x y_{it}+ e_{x,it}\\
+\end{matrix}
+$$ 
+
+```{r, echo = FALSE, message = FALSE, error = FALSE}
+library(DiagrammeR)
+# RI-CLPM with proper residuals as curved self-loops and correlated errors - 5 WAVE
+lcm <- grViz("
+digraph RICLPM {
+
+  # Graph attributes
+  graph [layout = neato, rankdir = TB, bgcolor = white]
+
+  # Node attributes
+  node [shape = box, style = filled, fillcolor = white, fontsize = 11]
+
+  A_X [pos = '-2.5,1!', shape = circle, fillcolor = white, label = <Δ<sub>x</sub>>,  width = 0.5, height = 0.5]
+  I [pos = '-2.5,0!', shape = triangle, fillcolor = white, label = 'I',  width = 0.5, height = 0.5]
+  X1 [pos = '-2,2.2!', label = 'x1', width = 0.6, height = 0.3]
+  X2 [pos = '-1,2.2!', label = 'x2', width = 0.6, height = 0.3]
+  X3 [pos = '0,2.2!', label = 'x3', width = 0.6, height = 0.3]
+  X4 [pos = '1,2.2!', label = 'x4', width = 0.6, height = 0.3]
+  X5 [pos = '2,2.2!', label = 'x5', width = 0.6, height = 0.3]
+
+  # Row 2: Within-person X latents (middle-upper)
+  wX1 [pos = '-2,1.35!', shape = circle, fillcolor = white, label = 'q1']
+  wX2 [pos = '-1,1.35!', shape = circle, fillcolor = white, label = 'q2']
+  wX3 [pos = '0,1.35!', shape = circle, fillcolor = white, label = 'q3']
+  wX4 [pos = '1,1.35!', shape = circle, fillcolor = white, label = 'q4']
+  wX5 [pos = '2,1.35!', shape = circle, fillcolor = white, label = 'q5']
+
+  # Row 3: Within-person Y latents (middle-lower)
+  wY1 [pos = '-2,-1.35!', shape = circle, fillcolor = white, label = 'p1']
+  wY2 [pos = '-1,-1.35!', shape = circle, fillcolor = white, label = 'p2']
+  wY3 [pos = '0,-1.35!', shape = circle, fillcolor = white, label = 'p3']
+  wY4 [pos = '1,-1.35!', shape = circle, fillcolor = white, label = 'p4']
+  wY5 [pos = '2,-1.35!', shape = circle, fillcolor = white, label = 'p5']
+
+
+  dX2 [pos = '-1,0.5!', shape = circle, fillcolor = white, label = 'Δx2']
+  dX3 [pos = '0,0.5!', shape = circle, fillcolor = white, label = 'Δx3']
+  dX4 [pos = '1,0.5!', shape = circle, fillcolor = white, label = 'Δx4']
+  dX5 [pos = '2,0.5!', shape = circle, fillcolor = white, label = 'Δx5']
+
+  dY2 [pos = '-1,-0.5!', shape = circle, fillcolor = white, label = 'Δy2']
+  dY3 [pos = '0,-0.5!',  shape = circle, fillcolor = white, label = 'Δy3']
+  dY4 [pos = '1,-0.5!',  shape = circle, fillcolor = white, label = 'Δy4']
+  dY5 [pos = '2,-0.5!',  shape = circle, fillcolor = white, label = 'Δy5']
+
+
+
+  # Row 4: observed Y variables and RI_Y (bottom)
+  Y1 [pos = '-2,-2.2!', label = 'y1', width = 0.6, height = 0.3]
+  Y2 [pos = '-1,-2.2!', label = 'y2', width = 0.6, height = 0.3]
+  Y3 [pos = '0,-2.2!', label = 'y3', width = 0.6, height = 0.3]
+  Y4 [pos = '1,-2.2!', label = 'y4', width = 0.6, height = 0.3]
+  Y5 [pos = '2,-2.2!', label = 'y5', width = 0.6, height = 0.3]
+  A_Y [pos = '-2.5,-1!', shape = circle, fillcolor = white, label = <Δ<sub>y</sub>>, width = 0.5, height = 0.5]
+
+
+  # Measurement model paths (RI to observed)
+  A_X -> dX2 [label = '', arrowsize = 0.5, tailport = e, headport = n]
+  A_X -> dX3 [label = '',  arrowsize = 0.5, tailport = e, headport = n]
+  A_X -> dX4 [label = '', arrowsize = 0.5, tailport = e, headport = n]
+  A_X -> dX5 [label = '', arrowsize = 0.5, tailport = e, headport = n]
+
+  A_Y -> dY2 [label = '', arrowsize = 0.5, tailport = e, headport = s]
+  A_Y -> dY3 [label = '',  arrowsize = 0.5, tailport = e, headport = s]
+  A_Y -> dY4 [label = '', arrowsize = 0.5, tailport = e, headport = s]
+  A_Y -> dY5 [label = '', arrowsize = 0.5, tailport = e, headport = s]
+
+  I -> A_X [label = '', arrowsize = 0.5, tailport = n, headport = s]
+  I -> A_Y [label = '', arrowsize = 0.5, tailport = s, headport = n]
+  I -> wX1 [label = '', arrowsize = 0.5, tailport = n, headport = s]
+  I -> wY1 [label = '', arrowsize = 0.5, tailport = s, headport = n]
+
+ 
+  # Measurement model paths (w to observed)
+  wX1 -> X1 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX2 -> X2 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX3 -> X3 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX4 -> X4 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX5 -> X5 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY1 -> Y1 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY2 -> Y2 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY3 -> Y3 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY4 -> Y4 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY5 -> Y5 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY1 -> dY2 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wY2 -> dY3 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wY3 -> dY4 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wY4 -> dY5 [label = 'β', arrowsize = 0.5, fontsize = 10]
+
+  wX1 -> dX2 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wX2 -> dX3 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wX3 -> dX4 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wX4 -> dX5 [label = 'β', arrowsize = 0.5, fontsize = 10]
+
+  wX1 -> dY2 [label = 'θ', arrowsize = 0.5, fontsize = 10]
+  wX2 -> dY3 [label = 'θ', arrowsize = 0.5, fontsize = 10]
+  wX3 -> dY4 [label = 'θ', arrowsize = 0.5, fontsize = 10]
+  wX4 -> dY5 [label = 'θ', arrowsize = 0.5, fontsize = 10]
+
+  wY1 -> dX2 [label = 'θ', arrowsize = 0.5, fontsize = 10]
+  wY2 -> dX3 [label = 'θ', arrowsize = 0.5, fontsize = 10]
+  wY3 -> dX4 [label = 'θ', arrowsize = 0.5, fontsize = 10]
+  wY4 -> dX5 [label = 'θ', arrowsize = 0.5, fontsize = 10]
+
+  # Autoregressive paths
+  wX1 -> wX2 [color = black, penwidth = 1, label = '1', arrowsize = 0.5, fontsize = 11]
+  wX2 -> wX3 [color = black, penwidth = 1, label = '1', arrowsize = 0.5, fontsize = 11]
+  wX3 -> wX4 [color = black, penwidth = 1, label = '1', arrowsize = 0.5, fontsize = 11]
+  wX4 -> wX5 [color = black, penwidth = 1, label = '1', arrowsize = 0.5, fontsize = 11]
+  wY1 -> wY2 [color = black, penwidth = 1, label = '1', arrowsize = 0.5, fontsize = 11]
+  wY2 -> wY3 [color = black, penwidth = 1, label = '1', arrowsize = 0.5, fontsize = 11]
+  wY3 -> wY4 [color = black, penwidth = 1, label = '1', arrowsize = 0.5, fontsize = 11]
+  wY4 -> wY5 [color = black, penwidth = 1, label = '1', arrowsize = 0.5, fontsize = 11]
+
+  # Cross-lagged paths with offset gamma labels and subscripts
+  dX2 -> dY3 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+  dX3 -> dY4 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+  dX4 -> dY5 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+  dY2 -> dX3 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+  dY3 -> dX4 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+  dY4 -> dX5 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+
+  dX2 -> wX2 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+  dX3 -> wX3 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+  dX4 -> wX4 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+  dX5 -> wX5 [color = black, penwidth = 1, arrowsize = 0.5, label = '', fontsize = 11]
+
+  dY2 -> wY2 [color = black, penwidth = 1, arrowsize = 0.5]
+  dY3 -> wY3 [color = black, penwidth = 1, arrowsize = 0.5]
+  dY4 -> wY4 [color = black, penwidth = 1, arrowsize = 0.5]
+  dY5 -> wY5 [color = black, penwidth = 1, arrowsize = 0.5]
+
+
+  # # Within-time correlations - ONLY these are slightly rounded
+  # wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  # wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  # wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  # wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  # wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  # 
+
+
+  # Self-loops connected to bottom of each node using ports
+  dX2 -> dX2 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s , arrowsize = 0.5]
+  dX3 -> dX3 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.5]
+  dX4 -> dX4 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.5]
+  dX5 -> dX5 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.5]
+  dY2 -> dY2 [dir = both, color = black, style = dashed, label = '', tailport = ne, headport = ne, arrowsize = 0.5]
+  dY3 -> dY3 [dir = both, color = black, style = dashed, label = '', tailport = ne, headport = ne, arrowsize = 0.5]
+  dY4 -> dY4 [dir = both, color = black, style = dashed, label = '', tailport = ne, headport = ne, arrowsize = 0.5]
+  dY5 -> dY5 [dir = both, color = black, style = dashed, label = '', tailport = ne, headport = ne, arrowsize = 0.5]
+
+
+
+  # Self-loops connected to bottom of each node using ports
+  # X1 -> X1 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]
+  # X2 -> X2 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]
+  # X3 -> X3 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]
+  # X4 -> X4 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]
+  # X5 -> X5 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]
+  # 
+  # Y1 -> Y1 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]
+  # Y2 -> Y2 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]
+  # Y3 -> Y3 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]
+  # Y4 -> Y4 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]
+  # Y5 -> Y5 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]
+
+  # Self-loops connected to bottom of each node using ports
+   wX1 -> wX1 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s , arrowsize = 0.5, fontsize = 11, labelangle = 45, labeldistance = 2.5]
+   wY1 -> wY1 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]
+
+  # Residuals for random intercepts (epsilon)
+  A_X -> A_X [dir = both, color = black, style = dashed, label = '', labelangle = 135, labeldistance = 1.5, tailport = s, headport = s, arrowsize = 0.5, width = 0.6, height = 0.3]
+  A_Y -> A_Y [dir = both, color = black, style = dashed, label = '', labelangle = 135, labeldistance = 1.5, tailport = n, headport = n, arrowsize = 0.5, width = 0.6, height = 0.3]
+
+}
+")
+lcm
+
+
+```
+
+Unlike the CLPM which captures only proportional change, the change score regression model captures constant, proportional, and dual change processes. 
+
+## The Random Intercept Cross Lagged Regression 
+
+The RICLPM -- a popular approach in psychology -- also explicitly includes trait level variation, but in a manner somewhat different from the difference score approaches described. For the moment, ignoring the lags and cross-lagged effects, let us assume that $x$ and $y$ are each a function of a stable trait level component, plus a time-varying state component. The RICLPM is an extension of the CLPM,
+
+$$
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta_{1y} & \theta_{1x}  \\
+\theta_{2y} & \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{it-1}  
+\end{bmatrix}
++
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+$$
+
+
+But the RICLPM includes a stable trait level component, $\mu_i$, for each individual $i$:
+
+$$
+\begin{bmatrix}
+ y_{it}\\
+ x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mu^y_{i} \\
+\mu^x_{i}
+\end{bmatrix}
++
+\begin{bmatrix}
+y^*_{y,it}\\
+x^*_{x,it}
+\end{bmatrix}
+$$
+The $\mu^x_i$ and $\mu^y_i$ terms are the stable, trait level components for individual $i$. And $x^*_{t,i}$ and $y^*_{t,i}$ terms are the time-varying state components. We can view this formation as providing a decomposition of the total variance in $x$ and $y$ into between-person (trait; $\mu$) and within-person (state, $x^*,y^*$) components. From here, we can rewrite the cross-lagged and lagged effects from the state components alone.
+
+$$
+\begin{bmatrix}
+ y^*_{it}\\
+ x^*_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta^*_{1y} & \theta^*_{1x}  \\
+\theta^*_{2y} & \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{it-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+$$
+Unlike the CLPM, the RICLPM examines residualized change, or change net of stable trait level differences between individuals. The RICLPM thus focuses on within-person effects -- $y^*_{it}$ and $x^*_{it}$ represent deviations from the individual's mean score for $y$ and $x$.
+
+```{r riclpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="Random Intercept Cross-Lagged Panel Model with 5 waves. The model shows autoregressive paths (solid arrows), cross-lagged effects (solid arrows), within-time correlations (dashed curved arrows), and residual terms (self-loops)."}
+
+library(DiagrammeR)
+# RI-CLPM with proper residuals as curved self-loops and correlated errors - 5 WAVE
+riclpm_diagram <- grViz("
+digraph RICLPM {
+
+  graph [layout = neato, rankdir = TB, bgcolor = white]
+
+  node [shape = box, style = filled, fillcolor = white, fontsize = 11]
+
+  RI_X [pos = '-3,2!', shape = circle, fillcolor = white, label = <ξ<sub>x</sub>>,  width = 0.5, height = 0.5]
+  X1 [pos = '-2,2!', label = 'x1', width = 0.6, height = 0.3]
+  X2 [pos = '-1,2!', label = 'x2', width = 0.6, height = 0.3]
+  X3 [pos = '0,2!', label = 'x3', width = 0.6, height = 0.3]
+  X4 [pos = '1,2!', label = 'x4', width = 0.6, height = 0.3]
+  X5 [pos = '2,2!', label = 'x5', width = 0.6, height = 0.3]
+
+  # Within Person X
+  wX1 [pos = '-2,1!', shape = circle, fillcolor = white, label = 'q1']
+  wX2 [pos = '-1,1!', shape = circle, fillcolor = white, label = 'q2']
+  wX3 [pos = '0,1!', shape = circle, fillcolor = white, label = 'q3']
+  wX4 [pos = '1,1!', shape = circle, fillcolor = white, label = 'q4']
+  wX5 [pos = '2,1!', shape = circle, fillcolor = white, label = 'q5']
+
+  #  Within-person  Y
+  wY1 [pos = '-2,-1!', shape = circle, fillcolor = white, label = 'p1']
+  wY2 [pos = '-1,-1!', shape = circle, fillcolor = white, label = 'p2']
+  wY3 [pos = '0,-1!', shape = circle, fillcolor = white, label = 'p3']
+  wY4 [pos = '1,-1!', shape = circle, fillcolor = white, label = 'p4']
+  wY5 [pos = '2,-1!', shape = circle, fillcolor = white, label = 'p5']
+
+  # observed Y variables and RI_Y
+  Y1 [pos = '-2,-2!', label = 'y1', width = 0.6, height = 0.3]
+  Y2 [pos = '-1,-2!', label = 'y2', width = 0.6, height = 0.3]
+  Y3 [pos = '0,-2!', label = 'y3', width = 0.6, height = 0.3]
+  Y4 [pos = '1,-2!', label = 'y4', width = 0.6, height = 0.3]
+  Y5 [pos = '2,-2!', label = 'y5', width = 0.6, height = 0.3]
+  RI_Y [pos = '-3,-2!', shape = circle, fillcolor = white, label = <ξ<sub>y</sub>>, width = 0.5, height = 0.5]
+
+
+  # Measurement model 
+  RI_X -> wX1 [label = '', arrowsize = 0.5]
+  RI_X -> wX2 [label = '', arrowsize = 0.5]
+  RI_X -> wX3 [label = '',  arrowsize = 0.5]
+  RI_X -> wX4 [label = '', arrowsize = 0.5]
+  RI_X -> wX5 [label = '', arrowsize = 0.5]
+  RI_Y -> wY1 [label = '', arrowsize = 0.5]
+  RI_Y -> wY2 [label = '', arrowsize = 0.5]
+  RI_Y -> wY3 [label = '', arrowsize = 0.5]
+  RI_Y -> wY4 [label = '', arrowsize = 0.5]
+  RI_Y -> wY5 [label = '', arrowsize = 0.5]
+
+  # Measurement model paths
+  wX1 -> X1 [label = '1', arrowsize = 0.5]
+  wX2 -> X2 [label = '1', arrowsize = 0.5]
+  wX3 -> X3 [label = '1', arrowsize = 0.5]
+  wX4 -> X4 [label = '1', arrowsize = 0.5]
+  wX5 -> X5 [label = '1', arrowsize = 0.5]
+  wY1 -> Y1 [label = '1', arrowsize = 0.5]
+  wY2 -> Y2 [label = '1', arrowsize = 0.5]
+  wY3 -> Y3 [label = '1', arrowsize = 0.5]
+  wY4 -> Y4 [label = '1', arrowsize = 0.5]
+  wY5 -> Y5 [label = '1', arrowsize = 0.5]
+
+  # Autoregressive paths
+  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]
+
+  # Cross-lagged paths with offset gamma labels and subscripts
+  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]
+
+  # Within-time correlations
+  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+
+  # Random intercept correlation 
+  RI_X -> RI_Y [dir = both, color = black, style = dashed, penwidth = 1, splines = curved, constraint = false,  arrowsize = 0.5]
+
+
+  # Self-loops to repreesnt errors
+  wX2 -> wX2 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s , arrowsize = 0.5]
+  wX3 -> wX3 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX4 -> wX4 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX5 -> wX5 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wY2 -> wY2 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY3 -> wY3 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY4 -> wY4 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY5 -> wY5 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+
+
+  X1 -> X1 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X2 -> X2 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X3 -> X3 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X4 -> X4 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X5 -> X5 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+
+  Y1 -> Y1 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y2 -> Y2 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y3 -> Y3 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y4 -> Y4 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y5 -> Y5 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+
+
+  # Residuals for random effects
+  RI_X -> RI_X [dir = both, color = black, style = dashed, label = 'ε', labelangle = 135, labeldistance = 1.5, tailport = w, headport = s, arrowsize = 0.5, width = 0.6, height = 0.3]
+  RI_Y -> RI_Y [dir = both, color = black, style = dashed, label = 'ε', labelangle = 135, labeldistance = 1.5, tailport = w, headport = n, arrowsize = 0.5, width = 0.6, height = 0.3]
+
+}
+")
+# bookdown::render_book(quiet = FALSE, clean = TRUE)
+# browseURL("_book/introduction.html")
+
+# Display the diagram
+riclpm_diagram
+```
+
+As shown in Figure \@ref(fig:riclpm-diagram), the RI-CLPM separates between-person and within-person effects.
+
+The next section builds on these two models, using synthetic data, to illustrate the similarities and similarities between these approaches.
+
+## Spurious and Causal Effects
+
+Particularly since @hamaker_cross-lagged_2015 who showed that the CLPM conflates between-person and within-person effects, and may produce biased estimates of the cross-lagged effects, insofar that $x$, $y$ or both are stable, relatively enduring traits that don't vary from wave-to-wave. This is conceptually similar to Lord's Paradox.
+
+@allison_toward_2015 elaborates on Lord's Paradox in the context difference score models models. Using a similar description, imagine a two wave panel, in which subjects are assigned to the treatment or control following the pretest. For those assigned to the treatment, the pretest mean and standard deviation are nearly identical to the posttest mean and standard deviation. And, the correlation between $y$ in both waves is less than 1. The description is entirely consist with observing no treatment effect; the means do not change from pretest to posttest for those exposed to the treatment.
+
+But, a variant of the CLPM, where when regresses the 
+
+$$y_{post} = \alpha + \beta \cdot y_{pre} + \gamma \cdot treatment + \epsilon$$
+reports a different estimate of the treatment effect, as it compares the mean differences between those exposed to the treatment versus control condition, controlling for the pretest (baseline) score. This is different from examining the difference in scores among those exposed to the treatment. While Lord's Paradox is not entirely ameliorated by using random assignment, the issue becomes more severe if the treatment is not randomly assigned, and one is simply comparing group mean differences. 
+
+The issue is similarity to the CLPM in that one conflates between-person and within-person effects, by not accounting for unit effects (stable trait level differences between individuals), and one might conclude a cross-lag effect exists -- e.g., x causes a change in y -- when instead the $x$ may be related to $y$ but not necessarily cause a change in $y$.
+
+
+Extending the model, we can use the CLPM and RI-CLPM to produce potential outcomes ; what would $x_{t,i}$ and $y_{t,i}$ be if we intervened on $x$ or $y$ at time $t-1$, $E[x_{i,t}^{y_{t-1}}]$ and $E[y_{i,t}^{x_{t-1}}]$? By assuming that such an intervention is linear, similar to the structure set forth in the CLPM, the marginal effect of the treatment is $\tau$  (Ludtke and Robitzch 2021; Hernan and Robins 2020; Vanderwheele 2015). 
+
+$$
+\begin{aligned}
+E[Y_{i,t}^{x_{t-1}}] = \alpha_{1} + \tau_{1} x_{t-1} \\
+E[X_{i,t}^{y_{t-1}}] = \alpha_{2} + \tau_{2} y_{t-1} \\
+\end{aligned}
+$$
+
+The marginal effects, $\tau$ are calculated by the expectations fixing $x_{t,i}$ and $y_{t,i}$ at a value and integrated over the joint distribution of $x_{t-1}$ and $y_{t-1}$. In a linear model, this is typically just $\hat{\theta_{1y}}$ and $\hat{\theta_{2x}}$, the slopes from a regression equation. If there are unobserved confounders, $Z$, then 
+
+$$
+\begin{aligned}
+E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} =  z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z \\
+E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} = z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z\\
+\end{aligned}
+$$
+
+
+The potential outcome is simply the expectation of $x_{t,i}$ and $_{y,i}$, holding $y_{t-1}$ and $x_{t-1}$ at a fixed value, and averaging over the joint distribution of $x_{t-1}$, $y_{t-1}$, and $z$.
+
+## Confounding Variables
+
+In the presence of confounding variables, $Z$, that influence both $x$ and $y$, the cross-lagged estimates may be biased, in both the CLPM or the RI-CLPM. A confounder, like all variables in a panel design may be *time-varying* or *time-invariant*. Some characteristics fluctuate over time, partially or fully explaining the pattern of relationships between $x$ and $y$, others are stable and tend not to change, but also explain the joint relationship between $x$ and $y$.
+
+If confounder $z$ is time-invariant, the CLPM may be respecified as the RI-CLPM:
+$$
+\begin{bmatrix}
+ y^*_{it}\\
+ x^*_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta^*_{1y} & \theta^*_{1x}  \\
+\theta^*_{2y} & \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{t-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
++
+\begin{bmatrix}
+\alpha_{y}\\
+\alpha_{x}
+\end{bmatrix}
+z_{i}
+}_{Trait}
+$$
+
+* $\mu^x_i$ and $\mu^y_i$ are the stable, trait level components for individual $i$.
+* $x^*_{t,i}$ and $y^*_{t,i}$ are the time-varying state components.
+* $\theta^*_{1y}$ and $\theta^*_{2x}$ are the autoregressive effects for the state components.
+* $\theta^*_{1x}$ and $\theta^*_{1x}$ are the cross-lagged effects for the state components.
+
+When the confounder is "unobserved" and either time-invariant or time-varying, what is the consequence of ignoring that confounder in the CLPM or RI-CLPM? There is some disagreement in the literature on this question.
+
+
+
+

@@ -1,0 +1,14 @@
+panel-data-models
+the-cross-lagged-panel-model
+the-change-score-regression
+algebraic-equivalence
+univariate-change-scores
+the-random-intercept-cross-lagged-regression
+fig:riclpm-diagram
+bivariate-dual-change
+fig:clpm-diagram
+fig:error-clpm-diagram
+deconstructing-change
+decomposing-change
+spurious-and-causal-effects
+confounding-variables

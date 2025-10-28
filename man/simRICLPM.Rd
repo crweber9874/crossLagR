@@ -6,68 +6,68 @@
 \usage{
 simRICLPM(
   waves = 10,
-  stability.p = 0.2,
-  stability.q = 0.2,
-  stability.r = NULL,
-  cross.p = 0.1,
-  cross.q = 0.1,
-  cross.zx = NULL,
-  cross.zy = NULL,
-  variance.p = 1,
-  variance.q = 1,
-  variance.r = NULL,
-  cov.pq = 0.1,
-  cov.pr = NULL,
-  cov.qr = NULL,
-  variance.between.x = 1,
-  variance.between.y = 1,
-  variance.between.z = NULL,
-  cov.between.xy = 0.5,
-  cov.between.xz = NULL,
-  cov.between.yz = NULL,
+  stability_p = 0.2,
+  stability_q = 0.2,
+  stability_r = NULL,
+  cross_p = 0.1,
+  cross_q = 0.1,
+  cross_zx = NULL,
+  cross_zy = NULL,
+  variance_p = 1,
+  variance_q = 1,
+  variance_r = NULL,
+  cov_pq = 0.1,
+  cov_pr = NULL,
+  cov_qr = NULL,
+  variance_between_x = 1,
+  variance_between_y = 1,
+  variance_between_z = NULL,
+  cov_between_xy = 0.5,
+  cov_between_xz = NULL,
+  cov_between_yz = NULL,
   ...
 )
 }
 \arguments{
 \item{waves}{The number of waves (time points) in the model.}
 
-\item{stability.p}{The stability parameter for the X variable (autoregressive effect).}
+\item{stability_p}{The stability parameter for the X variable (autoregressive effect).}
 
-\item{stability.q}{The stability parameter for the Y variable (autoregressive effect).}
+\item{stability_q}{The stability parameter for the Y variable (autoregressive effect).}
 
-\item{stability.r}{The stability parameter for the Z variable (autoregressive effect, if applicable).}
+\item{stability_r}{The stability parameter for the Z variable (autoregressive effect, if applicable).}
 
-\item{cross.p}{The cross-lagged effect of Y on X at the next time point.}
+\item{cross_p}{The cross-lagged effect of Y on X at the next time point.}
 
-\item{cross.q}{The cross-lagged effect of X on Y at the next time point.}
+\item{cross_q}{The cross-lagged effect of X on Y at the next time point.}
 
-\item{cross.zx}{The cross-lagged effect of Z on X at the next time point (if applicable).}
+\item{cross_zx}{The cross-lagged effect of Z on X at the next time point (if applicable).}
 
-\item{cross.zy}{The cross-lagged effect of Z on Y at the next time point (if applicable).}
+\item{cross_zy}{The cross-lagged effect of Z on Y at the next time point (if applicable).}
 
-\item{variance.p}{The variance for the latent X variables.}
+\item{variance_p}{The variance for the latent X variables.}
 
-\item{variance.q}{The variance for the latent Y variables.}
+\item{variance_q}{The variance for the latent Y variables.}
 
-\item{variance.r}{The variance for the latent Z variables (if applicable).}
+\item{variance_r}{The variance for the latent Z variables (if applicable).}
 
-\item{cov.pq}{The covariance between X and Y within the same time point.}
+\item{cov_pq}{The covariance between X and Y within the same time point.}
 
-\item{cov.pr}{The covariance between X and Z within the same time point (if applicable).}
+\item{cov_pr}{The covariance between X and Z within the same time point (if applicable).}
 
-\item{cov.qr}{The covariance between Y and Z within the same time point (if applicable).}
+\item{cov_qr}{The covariance between Y and Z within the same time point (if applicable).}
 
-\item{variance.between.x}{The variance for the random intercept of X.}
+\item{variance_between_x}{The variance for the random intercept of X.}
 
-\item{variance.between.y}{The variance for the random intercept of Y.}
+\item{variance_between_y}{The variance for the random intercept of Y.}
 
-\item{variance.between.z}{The variance for the random intercept of Z (if applicable).}
+\item{variance_between_z}{The variance for the random intercept of Z (if applicable).}
 
-\item{cov.between.xy}{The covariance of intercept terms between X and Y.}
+\item{cov_between_xy}{The covariance of intercept terms between X and Y.}
 
-\item{cov.between.xz}{The covariance of intercept terms between X and Z (if applicable).}
+\item{cov_between_xz}{The covariance of intercept terms between X and Z (if applicable).}
 
-\item{cov.between.yz}{The covariance of intercept terms between Y and Z (if applicable).}
+\item{cov_between_yz}{The covariance of intercept terms between Y and Z (if applicable).}
 
 \item{...}{Additional arguments to pass to the `lavaan::simulateData` function.}
 }

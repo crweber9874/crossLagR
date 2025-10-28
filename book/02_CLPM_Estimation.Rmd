@@ -1,0 +1,161 @@
+# Simulation and Estimation
+
+The $\texttt{crossLagR}$ package includes several functions to simulate data.
+
+$\texttt{simRICLPM()}$ simulates data from a random intercept cross-lagged panel model.
+
+$\texttt{simCLPM()}$ simulates data from a cross-lagged panel model.
+
+$\texttt{reshape\_long\_sim\_cr()}$ Takes a wide data frame, pivots to wide format, includes lags.
+
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE }
+# devtools::load_all()
+library(dplyr)
+
+df = simCLPM(waves = 5,
+             variance_p = 0.5,      # underscore
+             variance_q = 0.5,      # underscore
+             stability_p = 0.9,      # underscore
+             stability_q = 0.9,      # underscore
+             cross_q = 0,
+             cross_p = 0,
+             cov_pq = 0.00,
+             means_p = c(1,1.1,1.2,1.3,1.4),
+             sample.nobs = 1000)$data
+  df |>
+  mutate(id = seq(1:nrow(df)))  |>
+  reshape_long_sim_cr() -> dat_long
+head(dat_long)
+lm(y ~  ylag + xlag, data = dat_long)
+```
+### Trajectories
+
+```{r}
+library(dplyr)
+library(ggplot2)
+dat_long |> 
+  ggplot(aes(x = wave, y = y, group = id)) +
+  geom_line(alpha = 0.1, color = "black", position = position_jitter(width = 0.1, height = 0.2)) +
+  # geom_point(alpha = 0.3, size = 0.5, position = position_jitter(width = 0.1, height = 0.2)) +
+  stat_summary(aes(group = 1), fun = mean, geom = "line", 
+               color = "lightblue", size = 1, alpha = 0.8) +
+  stat_summary(aes(group = 1), fun = mean, geom = "point", 
+               color = "lightblue", size = 1) +
+  labs(
+    title = "Individual Trajectories: Simulated Data",
+    subtitle = "Linear Trend",
+    x = "Survey Wave",
+    y = "Response"
+  ) +
+  theme_minimal() +
+  scale_y_continuous(limits = c(-5, 6) ) +
+  theme(strip.text = element_text(color = "black")) -> plot
+print(plot)
+```
+
+```{r}
+dat_long <- dat_long |>
+  mutate(
+    # xlag = if_else(is.na(xlag), mean(x, na.rm = TRUE), xlag),
+    # ylag = if_else(is.na(ylag), mean(y, na.rm = TRUE), ylag),
+    predicted = predict(lm(y ~ ylag + xlag, data = dat_long), newdata = dat_long)
+  )
+dat_long |> 
+  ggplot(aes(x = wave, y = y, group = id)) +
+  geom_line(alpha = 0.1, color = "black", position = position_jitter(width = 0.1, height = 0.2)) +
+  # Observed mean trend
+  stat_summary(aes(group = 1), fun = mean, geom = "line", 
+               color = "lightblue", size = 1, alpha = 0.8) +
+  stat_summary(aes(group = 1), fun = mean, geom = "point", 
+               color = "lightblue", size = 1) +
+  # Model predictions mean trend
+  stat_summary(aes(y = predicted, group = 1), fun = mean, geom = "line", 
+               color = "red", size = 1, alpha = 0.8, na.rm = TRUE) +
+  stat_summary(aes(y = predicted, group = 1), fun = mean, geom = "point", 
+               color = "red", size = 1, na.rm = TRUE) +
+  labs(
+    title = "Individual Trajectories: Simulated Data",
+    subtitle = "Observed (blue) vs CLPM Predicted (red) trends",
+    x = "Survey Wave",
+    y = "Response"
+  ) +
+  theme_minimal() +
+  scale_y_continuous(limits = c(-5, 6)) +
+  theme(strip.text = element_text(color = "black"))
+
+
+```
+### Cross-Lagged Panel Model
+
+Let's fit several models under a random intercept cross lagged panel data generating process.
+
+```{r}
+library(crossLagR)
+library(lavaan)
+# Simulate Data Under RI CLPM
+df = simRICLPM(waves = 5,
+                variance.p = 0.5,
+                variance.q = 0.5,
+                stability.p = 0.20,
+                stability.q = 0.20,
+                cross.q = 0.30,
+                cross.p = 0.30,
+                cov.pq = 0.00,
+                variance.between.x = 0.5,
+                variance.between.y = 0.5,
+                cov.between = 0,
+                sample.nobs = 10e2)
+df[[2]] %>%
+  mutate(id = seq(1:nrow(df[[2]])))  -> dat
+dat %>%
+  reshape_long_sim_cr() -> dat_long
+
+fit1 <- lavaan(estimateCLPM(waves = 5),
+              data = dat,
+              int.ov.free = TRUE, # Fix intercepts to zero
+              estimator="ml")
+
+summary(fit1)
+```
+
+### Random Intercept Cross-Lagged Panel Model
+
+```{r}
+devtools::load_all()
+library(lavaan)
+WAVES = 5
+
+fit2 <- lavaan(estimateRICLPM(data= dat,
+                              waves = WAVES, 
+                              time_varying_x = paste0("x", 1:WAVES), 
+                              time_varying_y = paste0("y", 1:WAVES)),
+              data = dat,
+              int.ov.free = TRUE, # Fix intercepts to zero
+              estimator="ml")
+
+summary(fit2)
+```
+
+The CLPM clearly does not fit the data well, and provides rather inaccurate estimates.
+
+### Hiearchical Linear Model, Random Intercepts and Slopes
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+model = estimateHLM(data = dat_long, residual_correlation = FALSE)
+summary(model)
+```
+
+### Continuous Time Model
+
+```{r, echo = FALSE, message = FALSE, warning = FALSE}
+dat_long %>%
+  select(id, wave, x, y) -> ct_sem_data
+# ctsem package Follows this convention:
+names(ct_sem_data) = c("id", "time", "x", "y")
+model = estimateCTSEM(data = ct_sem_data)
+# [1] Returns a list; Extract cstem model
+# [2] Return a discrete time CL and AR model
+summary(model[[1]])$parmatrices
+print(model[[2]] %>% t())
+```

@@ -3,7 +3,7 @@ bookdown::gitbook:
   config:
     toc:
       before: |
-        <li><a href="./">POL 683</a></li>
+        <li><a href="./">CrossLagR</a></li>
     edit: https://github.com/USERNAME/REPO/edit/BRANCH/%s
   always_allow_html: true
 

@@ -4,24 +4,26 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Preface | mypackage_book.knit</title>
-  <meta name="description" content="" />
+  <title>Cross Lagged Regression</title>
+  <meta name="description" content="Cross Lagged Regression" />
   <meta name="generator" content="bookdown 0.45 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Preface | mypackage_book.knit" />
+  <meta property="og:title" content="Cross Lagged Regression" />
   <meta property="og:type" content="book" />
   
-  
-  
+  <meta property="og:description" content="Cross Lagged Regression" />
+  <meta name="github-repo" content="crweber9874/advancedRegression" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Preface | mypackage_book.knit" />
+  <meta name="twitter:title" content="Cross Lagged Regression" />
   
-  
+  <meta name="twitter:description" content="Cross Lagged Regression" />
   
 
+<meta name="author" content="Christopher Weber" />
 
 
+<meta name="date" content="2025-10-23" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -29,7 +31,7 @@
   
   
 
-
+<link rel="next" href="panel-data-models.html"/>
 <script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
 <link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
@@ -50,12 +52,40 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
+<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding-1.0.11/grViz.js"></script>
 
 
 
 <style type="text/css">
   
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -71,10 +101,18 @@
       <nav role="navigation">
 
 <ul class="summary">
-<li><a href="./">My Package Documentation</a></li>
+<li><a href="./">CrossLagR</a></li>
 
 <li class="divider"></li>
-<li class="chapter" data-level="" data-path=""><a href="#preface"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="panel-data-models.html"><a href="panel-data-models.html"><i class="fa fa-check"></i><b>1</b> Panel Data Models</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="panel-data-models.html"><a href="panel-data-models.html#the-cross-lagged-panel-model"><i class="fa fa-check"></i><b>1.1</b> The Cross-Lagged Panel Model</a></li>
+<li class="chapter" data-level="1.2" data-path="panel-data-models.html"><a href="panel-data-models.html#the-change-score-regression"><i class="fa fa-check"></i><b>1.2</b> The Change Score Regression</a></li>
+<li class="chapter" data-level="1.3" data-path="panel-data-models.html"><a href="panel-data-models.html#algebraic-equivalence"><i class="fa fa-check"></i><b>1.3</b> Algebraic Equivalence</a></li>
+<li class="chapter" data-level="1.4" data-path="panel-data-models.html"><a href="panel-data-models.html#univariate-change-scores"><i class="fa fa-check"></i><b>1.4</b> Univariate Change Scores</a></li>
+<li class="chapter" data-level="1.5" data-path="panel-data-models.html"><a href="panel-data-models.html#the-random-intercept-cross-lagged-regression"><i class="fa fa-check"></i><b>1.5</b> The Random Intercept Cross Lagged Regression</a></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -84,7 +122,7 @@
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./"></a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Cross Lagged Regression</a>
           </h1>
         </div>
 
@@ -92,12 +130,20 @@
           <div class="page-inner">
 
             <section class="normal" id="section-">
-<!--bookdown:title:end-->
-<!--bookdown:title:start-->
+<div id="header">
+<h1 class="title">Cross Lagged Regression</h1>
+<p class="author"><em>Christopher Weber</em></p>
+<p class="date"><em>2025-10-23</em></p>
+</div>
 <div id="preface" class="section level1 unnumbered hasAnchor">
-<h1>Preface<a href="#preface" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-
-
+<h1>Preface<a href="index.html#preface" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The Cross-Lagged Panel Model (CLPM) is widely accepted as a standard method for longitudinal causal analysis in political science. Its application, however, is often susceptible to unaccounted time-invariant confounders and measurement error, leading to spurious estimates of autoregressive and cross-lagged relationships, as well as bias in statistical inferences and substantive conclusions. In these documentation files, I demonstrate the similarities and differences between different panel analysis models, showing in particular, that the standard CLPM is strongly related to a more flexible and robust alternatives, the change score regression model and the random-intercept cross-lagged regression model. Both the Latent Change Model (LCM) and the Random Intercept Cross-Lagged Panel Model (RI-CLPM) extend the standard CLPM by explicitly modeling “unit level” effects. In simulations and empirical examples, we show the myriad paths by which the CLPM produces biased parameter estimates due to unmodeled, stable-unit effects. Both approaches allow for “constant” differences between units over time: In the RI-CLPM, this is represented by a factor corresponding to unit-mean variation in the observed variables, a “random-intercept” while in the LCM, this is captured through a factor corresponding to unit-level change over time, a “random slope.”</p>
+<p>This documentation elaborates upon:</p>
+<ul>
+<li>The theoretical background for the CLPM, RI-CLPM, and LCM, highlighting their similarities and differences.</li>
+<li>An introduction to the <code>crossLagR</code> package, which includes various utilities to estimate and simulate effects from these models.</li>
+<li>A Monte Carlo simulation procedure that examines the degree of bias in parameter estimates from the CLPM, RI-CLPM, and LCM under different data-generating processes.</li>
+</ul>
 
 </div>
             </section>
@@ -106,7 +152,7 @@
         </div>
       </div>
 
-
+<a href="panel-data-models.html" class="navigation navigation-next navigation-unique" aria-label="Next page"><i class="fa fa-angle-right"></i></a>
     </div>
   </div>
 <script src="libs/gitbook-2.6.7/js/app.min.js"></script>
@@ -137,8 +183,8 @@ gitbook.start({
     "size": 2
   },
   "edit": {
-    "link": null,
-    "text": null
+    "link": "https://github.com/USERNAME/REPO/edit/BRANCH/index.Rmd",
+    "text": "Edit"
   },
   "history": {
     "link": null,
@@ -148,18 +194,32 @@ gitbook.start({
     "link": null,
     "text": null
   },
-  "download": ["mypackage_book.pdf", "mypackage_book.epub"],
+  "download": null,
   "search": {
     "engine": "fuse",
     "options": null
   },
   "toc": {
-    "collapse": "section"
+    "collapse": "subsection"
   }
 });
 });
 </script>
 
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
 </body>
 
 </html>

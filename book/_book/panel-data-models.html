@@ -1,0 +1,601 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 1 Panel Data Models | Cross Lagged Regression</title>
+  <meta name="description" content="Chapter 1 Panel Data Models | Cross Lagged Regression" />
+  <meta name="generator" content="bookdown 0.45 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 1 Panel Data Models | Cross Lagged Regression" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Chapter 1 Panel Data Models | Cross Lagged Regression" />
+  <meta name="github-repo" content="crweber9874/advancedRegression" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 1 Panel Data Models | Cross Lagged Regression" />
+  
+  <meta name="twitter:description" content="Chapter 1 Panel Data Models | Cross Lagged Regression" />
+  
+
+<meta name="author" content="Christopher Weber" />
+
+
+<meta name="date" content="2025-10-25" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="index.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
+<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding-1.0.11/grViz.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">CrossLagR</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="panel-data-models.html"><a href="panel-data-models.html"><i class="fa fa-check"></i><b>1</b> Panel Data Models</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="panel-data-models.html"><a href="panel-data-models.html#the-cross-lagged-panel-model"><i class="fa fa-check"></i><b>1.1</b> The Cross-Lagged Panel Model</a></li>
+<li class="chapter" data-level="1.2" data-path="panel-data-models.html"><a href="panel-data-models.html#the-change-score-regression"><i class="fa fa-check"></i><b>1.2</b> The Change Score Regression</a></li>
+<li class="chapter" data-level="1.3" data-path="panel-data-models.html"><a href="panel-data-models.html#algebraic-equivalence"><i class="fa fa-check"></i><b>1.3</b> Algebraic Equivalence</a></li>
+<li class="chapter" data-level="1.4" data-path="panel-data-models.html"><a href="panel-data-models.html#decomposing-change"><i class="fa fa-check"></i><b>1.4</b> Decomposing Change</a></li>
+<li class="chapter" data-level="1.5" data-path="panel-data-models.html"><a href="panel-data-models.html#bivariate-dual-change"><i class="fa fa-check"></i><b>1.5</b> Bivariate Dual Change</a></li>
+<li class="chapter" data-level="1.6" data-path="panel-data-models.html"><a href="panel-data-models.html#the-random-intercept-cross-lagged-regression"><i class="fa fa-check"></i><b>1.6</b> The Random Intercept Cross Lagged Regression</a></li>
+<li class="chapter" data-level="1.7" data-path="panel-data-models.html"><a href="panel-data-models.html#spurious-and-causal-effects"><i class="fa fa-check"></i><b>1.7</b> Spurious and Causal Effects</a></li>
+<li class="chapter" data-level="1.8" data-path="panel-data-models.html"><a href="panel-data-models.html#confounding-variables"><i class="fa fa-check"></i><b>1.8</b> Confounding Variables</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Cross Lagged Regression</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="panel-data-models" class="section level1 hasAnchor" number="1">
+<h1><span class="header-section-number">Chapter 1</span> Panel Data Models<a href="panel-data-models.html#panel-data-models" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>Social scientists often turn to panel data to diagnose causal effects when experiments are impractical . Whereas dozens of options exist for analyzing longer time series, researchers wishing to analyze cross-sectionally dominant panel structures – in which there are more units than time points – face a more limited set of choices. National surveys like found in the American National Election Studies (ANES) may consist of just a handful of waves, with many respondents interviewed only once or twice.</p>
+<div id="the-cross-lagged-panel-model" class="section level2 hasAnchor" number="1.1">
+<h2><span class="header-section-number">1.1</span> The Cross-Lagged Panel Model<a href="panel-data-models.html#the-cross-lagged-panel-model" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In such cases, researchers have tended to rely upon the cross-lagged panel model (CLPM). The CLPM is appealing for its intuitiveness, flexibility, and ease of implementation. The cross-lagged regression model follows an intuitive structure. The current realizations <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are a function of autoregressive and cross lagged effects. As such, the autoregression term(s) capture time dependence, while the cross-lagged terms capture how another variable leads to change in the outcome variable.</p>
+<p>Depending on the researcher’s preferences, a CLPM can be as complicated as estimating a series of simultaneous equations with latent variables or as simple as adding lagged variables to an ordinary least squares regression. Yet, given the CLPM’s popularity, there has been a surprising lack of discussion in political science about its statistical properties, especially in comparison to other alternative methods. In fact, in the decade since <span class="citation">(<a href="#ref-hamaker_critique_2015">Hamaker, Kuiper, and Grasman 2015</a>)</span> published an influential critique of the CLPM, the number of published political science articles using the method has more than doubled (from 74 to 169).</p>
+<p><span class="math display">\[
+\begin{matrix}
+   y_{it} &amp; = \alpha_{y} + \beta_{1}y_{it-1} + \theta_x x_{it-1} + e_{y,it}\\
+   x_{it} &amp; = \alpha_{x} + \beta_{1}x_{it-1} + \theta_x y_{it-1}+ e_{x,it}\\
+\end{matrix}
+\]</span></p>
+<p>We closely follow the structure that <span class="math inline">\(\alpha\)</span> correspond to intercepts, which eventually may vary across units. It is also common to write the CLPM with mean centered variables, in which case the intercept is 0. The <span class="math inline">\(\beta\)</span> parameters are autoregressive effects. And the <span class="math inline">\(\theta\)</span> parameters are cross-lagged effects. The error terms <span class="math inline">\(e_{y,it}\)</span> and <span class="math inline">\(e_{x,it}\)</span> are assumed to be normally distributed with mean zero and constant variance, and uncorrelated with each other. In practice, they are often correlated, such that <span class="math inline">\(cov(e^y_{t,i}, e^x_{t,i}) \neq 0\)</span>.</p>
+<div class="figure"><span style="display:block;" id="fig:clpm-diagram"></span>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-7c999f5378e6b9afd14f" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-7c999f5378e6b9afd14f">{"x":{"diagram":"\ndigraph RICLPM {\n\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  X1 [pos = \"-2,2!\", label = \"x1\", width = 0.6, height = 0.3]\n  X2 [pos = \"-1,2!\", label = \"x2\", width = 0.6, height = 0.3]\n  X3 [pos = \"0,2!\", label = \"x3\", width = 0.6, height = 0.3]\n  X4 [pos = \"1,2!\", label = \"x4\", width = 0.6, height = 0.3]\n  X5 [pos = \"2,2!\", label = \"x5\", width = 0.6, height = 0.3]\n\n  # Within Person X\n  wX1 [pos = \"-2,1!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1,1!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0,1!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1,1!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"2,1!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  #  Within-person  Y\n  wY1 [pos = \"-2,-1!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1,-1!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0,-1!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1,-1!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"2,-1!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n  # observed Y variables and RI_Y\n  Y1 [pos = \"-2,-2!\", label = \"y1\", width = 0.6, height = 0.3]\n  Y2 [pos = \"-1,-2!\", label = \"y2\", width = 0.6, height = 0.3]\n  Y3 [pos = \"0,-2!\", label = \"y3\", width = 0.6, height = 0.3]\n  Y4 [pos = \"1,-2!\", label = \"y4\", width = 0.6, height = 0.3]\n  Y5 [pos = \"2,-2!\", label = \"y5\", width = 0.6, height = 0.3]\n\n  # Measurement model paths\n  wX1 -> X1 [label = \"1\", arrowsize = 0.5]\n  wX2 -> X2 [label = \"1\", arrowsize = 0.5]\n  wX3 -> X3 [label = \"1\", arrowsize = 0.5]\n  wX4 -> X4 [label = \"1\", arrowsize = 0.5]\n  wX5 -> X5 [label = \"1\", arrowsize = 0.5]\n  wY1 -> Y1 [label = \"1\", arrowsize = 0.5]\n  wY2 -> Y2 [label = \"1\", arrowsize = 0.5]\n  wY3 -> Y3 [label = \"1\", arrowsize = 0.5]\n  wY4 -> Y4 [label = \"1\", arrowsize = 0.5]\n  wY5 -> Y5 [label = \"1\", arrowsize = 0.5]\n\n  # Autoregressive paths\n  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]\n\n  # Cross-lagged paths with offset gamma labels and subscripts\n  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]\n\n  # Within-time correlations\n  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n\n\n\n  # Self-loops to repreesnt errors\n  wX2 -> wX2 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s , arrowsize = 0.5]\n  wX3 -> wX3 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX4 -> wX4 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX5 -> wX5 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wY2 -> wY2 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY3 -> wY3 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY4 -> wY4 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY5 -> wY5 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n\n\n  X1 -> X1 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n  X2 -> X2 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n  X3 -> X3 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n  X4 -> X4 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n  X5 -> X5 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n\n  Y1 -> Y1 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n  Y2 -> Y2 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n  Y3 -> Y3 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n  Y4 -> Y4 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n  Y5 -> Y5 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+Figure 1.1: Cross-Lagged Panel Model
+</p>
+</div>
+<p>It’s advantageous to write the CLPM in terms of latent variables – p and q – for the simple reason that this formulation can easily be extended to models with measurement error, varying factor structures, and multiple indicators per construct. In this formulation, the <span class="math inline">\(y = p\)</span> and <span class="math inline">\(x = q\)</span>. However, the model below constructs latent variables for each time point, with factor loadings, <span class="math inline">\(\lambda\)</span>. The model accounts for measurement error. Each indicator is defined by the latent variable, and an error term (the dashed loops).</p>
+<div class="figure"><span style="display:block;" id="fig:error-clpm-diagram"></span>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-5bd9829e574e007c8521" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-5bd9829e574e007c8521">{"x":{"diagram":"\ndigraph RICLPM {\n\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  node [shape = box, style = filled, fillcolor = white, fontsize = 10]\n\n  # X indicators (3 per time point) - closer to latents\n  x11 [pos = \"-3.2,1.8!\", label = \"x₁₁\", width = 0.4, height = 0.25]\n  x12 [pos = \"-2.8,1.8!\", label = \"x₁₂\", width = 0.4, height = 0.25] \n  x13 [pos = \"-2.4,1.8!\", label = \"x₁₃\", width = 0.4, height = 0.25]\n  \n  x21 [pos = \"-1.7,1.8!\", label = \"x₂₁\", width = 0.4, height = 0.25]\n  x22 [pos = \"-1.3,1.8!\", label = \"x₂₂\", width = 0.4, height = 0.25]\n  x23 [pos = \"-0.9,1.8!\", label = \"x₂₃\", width = 0.4, height = 0.25]\n  \n  x31 [pos = \"-0.2,1.8!\", label = \"x₃₁\", width = 0.4, height = 0.25]\n  x32 [pos = \"0.2,1.8!\", label = \"x₃₂\", width = 0.4, height = 0.25]\n  x33 [pos = \"0.6,1.8!\", label = \"x₃₃\", width = 0.4, height = 0.25]\n  \n  x41 [pos = \"1.3,1.8!\", label = \"x₄₁\", width = 0.4, height = 0.25]\n  x42 [pos = \"1.7,1.8!\", label = \"x₄₂\", width = 0.4, height = 0.25]\n  x43 [pos = \"2.1,1.8!\", label = \"x₄₃\", width = 0.4, height = 0.25]\n  \n  x51 [pos = \"2.8,1.8!\", label = \"x₅₁\", width = 0.4, height = 0.25]\n  x52 [pos = \"3.2,1.8!\", label = \"x₅₂\", width = 0.4, height = 0.25]\n  x53 [pos = \"3.6,1.8!\", label = \"x₅₃\", width = 0.4, height = 0.25]\n\n  # Within Person X latents\n  wX1 [pos = \"-2.8,1!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1.3,1!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0.2,1!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1.7,1!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"3.2,1!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  # Within-person Y latents\n  wY1 [pos = \"-2.8,-1!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1.3,-1!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0.2,-1!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1.7,-1!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"3.2,-1!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n  # Y indicators (3 per time point) - closer to latents\n  y11 [pos = \"-3.2,-1.8!\", label = \"y₁₁\", width = 0.4, height = 0.25]\n  y12 [pos = \"-2.8,-1.8!\", label = \"y₁₂\", width = 0.4, height = 0.25]\n  y13 [pos = \"-2.4,-1.8!\", label = \"y₁₃\", width = 0.4, height = 0.25]\n  \n  y21 [pos = \"-1.7,-1.8!\", label = \"y₂₁\", width = 0.4, height = 0.25]\n  y22 [pos = \"-1.3,-1.8!\", label = \"y₂₂\", width = 0.4, height = 0.25]\n  y23 [pos = \"-0.9,-1.8!\", label = \"y₂₃\", width = 0.4, height = 0.25]\n  \n  y31 [pos = \"-0.2,-1.8!\", label = \"y₃₁\", width = 0.4, height = 0.25]\n  y32 [pos = \"0.2,-1.8!\", label = \"y₃₂\", width = 0.4, height = 0.25]\n  y33 [pos = \"0.6,-1.8!\", label = \"y₃₃\", width = 0.4, height = 0.25]\n  \n  y41 [pos = \"1.3,-1.8!\", label = \"y₄₁\", width = 0.4, height = 0.25]\n  y42 [pos = \"1.7,-1.8!\", label = \"y₄₂\", width = 0.4, height = 0.25]\n  y43 [pos = \"2.1,-1.8!\", label = \"y₄₃\", width = 0.4, height = 0.25]\n  \n  y51 [pos = \"2.8,-1.8!\", label = \"y₅₁\", width = 0.4, height = 0.25]\n  y52 [pos = \"3.2,-1.8!\", label = \"y₅₂\", width = 0.4, height = 0.25]\n  y53 [pos = \"3.6,-1.8!\", label = \"y₅₃\", width = 0.4, height = 0.25]\n\n  # Measurement model for X with proper subscripts\n  wX1 -> x11 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX1 -> x12 [label = <λ<sub>12<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX1 -> x13 [label = <λ<sub>13<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX2 -> x21 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX2 -> x22 [label = <λ<sub>22<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX2 -> x23 [label = <λ<sub>23<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX3 -> x31 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX3 -> x32 [label = <λ<sub>32<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX3 -> x33 [label = <λ<sub>33<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX4 -> x41 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX4 -> x42 [label = <λ<sub>42<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX4 -> x43 [label = <λ<sub>43<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX5 -> x51 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX5 -> x52 [label = <λ<sub>52<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX5 -> x53 [label = <λ<sub>53<\/sub>>, arrowsize = 0.4, fontsize = 8]\n\n  # Measurement model for Y with proper subscripts\n  wY1 -> y11 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY1 -> y12 [label = <λ<sub>12<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY1 -> y13 [label = <λ<sub>13<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY2 -> y21 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY2 -> y22 [label = <λ<sub>22<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY2 -> y23 [label = <λ<sub>23<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY3 -> y31 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY3 -> y32 [label = <λ<sub>32<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY3 -> y33 [label = <λ<sub>33<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY4 -> y41 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY4 -> y42 [label = <λ<sub>42<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY4 -> y43 [label = <λ<sub>43<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY5 -> y51 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY5 -> y52 [label = <λ<sub>52<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY5 -> y53 [label = <λ<sub>53<\/sub>>, arrowsize = 0.4, fontsize = 8]\n\n  # Autoregressive paths (β parameters) - fontsize 11\n  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n\n  # Cross-lagged paths (θ parameters) - fontsize 11\n  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"θ\", fontsize = 11]\n  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"θ\", fontsize = 11]\n  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"θ\", fontsize = 11]\n  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"θ\", fontsize = 11]\n  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"θ\", fontsize = 11]\n  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"θ\", fontsize = 11]\n  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"θ\", fontsize = 11]\n  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"θ\", fontsize = 11]\n\n  # Within-time correlations\n  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n\n  # ERROR VARIANCES ON X INDICATORS (north side) - no labels\n  x11 -> x11 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x12 -> x12 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x13 -> x13 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x21 -> x21 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x22 -> x22 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x23 -> x23 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x31 -> x31 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x32 -> x32 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x33 -> x33 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x41 -> x41 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x42 -> x42 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x43 -> x43 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x51 -> x51 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x52 -> x52 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x53 -> x53 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n\n  # ERROR VARIANCES ON Y INDICATORS (south side) - no labels\n  y11 -> y11 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y12 -> y12 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y13 -> y13 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y21 -> y21 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y22 -> y22 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y23 -> y23 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y31 -> y31 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y32 -> y32 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y33 -> y33 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y41 -> y41 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y42 -> y42 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y43 -> y43 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y51 -> y51 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y52 -> y52 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y53 -> y53 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n\n  # Self-loops to represent errors on latent factors\n  wX2 -> wX2 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX3 -> wX3 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX4 -> wX4 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX5 -> wX5 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wY2 -> wY2 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY3 -> wY3 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY4 -> wY4 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY5 -> wY5 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+Figure 1.2: Cross-Lagged Panel Model, Multiple Indicators
+</p>
+</div>
+<p>In addition, insofar as the constructs measured at each time point are modeled as latent variables, the CLPM can be extended to account for correlated errors, factor invariance, and multiple group comparisons. Below we generally write the CLPM in terms of single indicator variables, though these models can all easily account for multiple indicators.</p>
+</div>
+<div id="the-change-score-regression" class="section level2 hasAnchor" number="1.2">
+<h2><span class="header-section-number">1.2</span> The Change Score Regression<a href="panel-data-models.html#the-change-score-regression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Panel structures are useful to uncover dynamic relationships in data, in that the researcher may leverage over-time relationships to examine the characteristics of changes, and the relationships of change processes with other covariates <span class="citation">(<a href="#ref-allison1990">Allison 1990</a>)</span>. One popular approach to modeling change is the change score regression model. The change score regression model focuses on the difference between time <span class="math inline">\(t\)</span> and time <span class="math inline">\(t-1\)</span> for each variable. Defining the change scores as <span class="math inline">\(\Delta y_{it}\)</span> and <span class="math inline">\(\Delta x_{it}\)</span>, we can rewrite the CLPM in terms of change scores.</p>
+<p><span class="math display">\[
+\Delta y_{it} = y_{it} - y_{it-1}\\
+\Delta x_{it} = x_{it} - x_{it-1}
+\]</span></p>
+<p>Where the regression model is a model of change, expressed as differences rather than in level form.</p>
+<p><span class="math display">\[
+\begin{matrix}
+   \Delta y_{it} &amp; = \alpha_{y} + \beta_{y}y_{it-1} + \theta_x x_{it-1} + e_{y,it}\\
+   \Delta x_{it} &amp; = \alpha_{x} + \beta_{x}x_{it-1} + \theta_x y_{it-1}+ e_{x,it}\\
+\end{matrix}
+\]</span></p>
+<p>The <span class="math inline">\(\beta\)</span> parameter here correspond to a proportional effect. How much does a the prior value of <span class="math inline">\(y\)</span> influence the change from time <span class="math inline">\(t-1\)</span> to time <span class="math inline">\(t\)</span>? The <span class="math inline">\(\beta\)</span> parameter is equivalent in the CLPM – the autoregressive parameter – is equivalent to <span class="math inline">\(\beta\)</span> here.</p>
+</div>
+<div id="algebraic-equivalence" class="section level2 hasAnchor" number="1.3">
+<h2><span class="header-section-number">1.3</span> Algebraic Equivalence<a href="panel-data-models.html#algebraic-equivalence" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Expressed in this way, the change score model and the CLPM are algebraically equal. Consider <span class="math inline">\(y_{it}\)</span> and <span class="math inline">\(\Delta y_{it}\)</span>:</p>
+<p><span class="math display">\[
+\begin{matrix}
+  \text{The CLPM:           } &amp;y_{it}  =  \beta_{y}y_{t-1} + \theta_{1y} x_{t-1} + e_{y,it}\\
+  \text{Subtract  } y_{it-1}: &amp;y_{it} - y_{it-1}  =  \beta_{y}y_{t-1} + \theta_{1y} x_{t-1} + e_{y,it}   - y_{it-1}\\  
+  &amp; \Delta y_{it}  =  (\beta_{y} - 1) y_{t-1} + \theta_{y} x_{t-1} + e_{y,it}\\
+  &amp; \Delta y_{it}  =  \tilde{\beta}_y y_{t-1} + \theta_{y} x_{t-1} + e_{y,it}\\
+  \text{Where: } &amp;\tilde{\beta}_y = \beta_{x} - 1
+\end{matrix}
+\]</span>
+The structure of the model remains unchanged. The models are interchangeable, and the lagged and cross-lagged effects simply become <strong>proportional</strong> and <strong>cross-proportional</strong> effects on change scores.</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="panel-data-models.html#cb1-1" tabindex="-1"></a><span class="co"># Simulate a five wave panel, with two variables, x y:</span></span>
+<span id="cb1-2"><a href="panel-data-models.html#cb1-2" tabindex="-1"></a><span class="fu">simCLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>)<span class="sc">$</span>data <span class="sc">|&gt;</span> </span>
+<span id="cb1-3"><a href="panel-data-models.html#cb1-3" tabindex="-1"></a><span class="co"># In crossLagR there is a helper function to transform wide to long</span></span>
+<span id="cb1-4"><a href="panel-data-models.html#cb1-4" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="sc">|&gt;</span> </span>
+<span id="cb1-5"><a href="panel-data-models.html#cb1-5" tabindex="-1"></a><span class="co"># Id identifies the subject, so use this to construct lags</span></span>
+<span id="cb1-6"><a href="panel-data-models.html#cb1-6" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span></span>
+<span id="cb1-7"><a href="panel-data-models.html#cb1-7" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb1-8"><a href="panel-data-models.html#cb1-8" tabindex="-1"></a>    <span class="at">y_lag =</span> <span class="fu">lag</span>(y),</span>
+<span id="cb1-9"><a href="panel-data-models.html#cb1-9" tabindex="-1"></a>    <span class="at">x_lag =</span> <span class="fu">lag</span>(x),</span>
+<span id="cb1-10"><a href="panel-data-models.html#cb1-10" tabindex="-1"></a>  <span class="co"># Change Score</span></span>
+<span id="cb1-11"><a href="panel-data-models.html#cb1-11" tabindex="-1"></a>    <span class="at">delta_y =</span> y <span class="sc">-</span> <span class="fu">lag</span>(y)</span>
+<span id="cb1-12"><a href="panel-data-models.html#cb1-12" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb1-13"><a href="panel-data-models.html#cb1-13" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span> data</span>
+<span id="cb1-14"><a href="panel-data-models.html#cb1-14" tabindex="-1"></a></span>
+<span id="cb1-15"><a href="panel-data-models.html#cb1-15" tabindex="-1"></a><span class="fu">head</span>(data)</span></code></pre></div>
+<pre><code>## # A tibble: 6 × 13
+##      id  wave       x       y    xlag  xlagw   ylag  ylagw within.x within.y
+##   &lt;int&gt; &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;   &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;  &lt;dbl&gt;    &lt;dbl&gt;    &lt;dbl&gt;
+## 1     1     1 -1.06    0.412  NA      NA     NA     NA       -1.35    0.360 
+## 2     1     2 -0.0626  1.29   -1.06   -1.35   0.412  0.360   -0.354   1.23  
+## 3     1     3  0.676  -0.579  -0.0626 -0.354  1.29   1.23     0.385  -0.631 
+## 4     1     4  0.668  -0.940   0.676   0.385 -0.579 -0.631    0.376  -0.992 
+## 5     1     5  1.23    0.0795  0.668   0.376 -0.940 -0.992    0.940   0.0275
+## 6     2     1  0.529   2.08   NA      NA     NA     NA        0.414   1.67  
+## # ℹ 3 more variables: y_lag &lt;dbl&gt;, x_lag &lt;dbl&gt;, delta_y &lt;dbl&gt;</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = delta_y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.5822 -0.6563  0.0090  0.6639  4.5327 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.02723    0.02202  -1.236    0.217    
+## y_lag       -0.81301    0.02253 -36.078  &lt; 2e-16 ***
+## x_lag        0.10166    0.02135   4.762 2.06e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.9847 on 1997 degrees of freedom
+##   (500 observations deleted due to missingness)
+## Multiple R-squared:  0.3949, Adjusted R-squared:  0.3943 
+## F-statistic: 651.6 on 2 and 1997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.5822 -0.6563  0.0090  0.6639  4.5327 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.02723    0.02202  -1.236    0.217    
+## y_lag        0.18699    0.02253   8.298  &lt; 2e-16 ***
+## x_lag        0.10166    0.02135   4.762 2.06e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.9847 on 1997 degrees of freedom
+##   (500 observations deleted due to missingness)
+## Multiple R-squared:  0.0511, Adjusted R-squared:  0.05015 
+## F-statistic: 53.77 on 2 and 1997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>The cross-lagged parameters are equal, the AR parameters by <span class="math inline">\(1-\beta\)</span>.</p>
+<p>In the change score model, when <span class="math inline">\(\beta &gt; 1\)</span>, then increases in <span class="math inline">\(y\)</span> at time <span class="math inline">\(t-1\)</span> are associated with increases in <span class="math inline">\(y\)</span> at time <span class="math inline">\(t\)</span>, what is called “explosive growth.” When <span class="math inline">\(\beta &lt; 1\)</span>, increases in <span class="math inline">\(y\)</span> at time <span class="math inline">\(t-1\)</span> are associated with proportional change in <span class="math inline">\(y\)</span> at time <span class="math inline">\(t\)</span>. The trajectory will decay toward the mean, displaying “regression to the mean.” When <span class="math inline">\(\beta = 0\)</span> (and <span class="math inline">\(\theta=0\)</span>), there is no association between <span class="math inline">\(y\)</span> at time <span class="math inline">\(t-1\)</span> and <span class="math inline">\(y\)</span> at time <span class="math inline">\(t\)</span> and the model displays a random walk process.</p>
+<p>While not the conventional approach to panel data analysis in the social sciences, the change score method affords greater leverage in understanding the dynamics of a change process. In addition to the algebraic equivalence of the CLPM, extensions to the change score regression model, allow one to decompose change into constituent processes, proportional, constant, and dual change .</p>
+</div>
+<div id="decomposing-change" class="section level2 hasAnchor" number="1.4">
+<h2><span class="header-section-number">1.4</span> Decomposing Change<a href="panel-data-models.html#decomposing-change" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The univariate change score regression model allows us to decompose change into three components: constant, proportional, and dual change processes <span class="citation">(<a href="#ref-grimmetal2012">Grimm et al. 2012</a>)</span>.</p>
+<p><span class="math display">\[
+\begin{matrix}
+  \Delta y_{it} &amp; = \alpha_{y} s_i + \beta_{1}y_{it-1} + e_{y,it}\\
+  \Delta x_{it} &amp; = \alpha_{x} s_i + \beta_{1}x_{it-1} + e_{x,it}\\
+\end{matrix}
+\]</span></p>
+<p>The <span class="math inline">\(\alpha\)</span> parameters are the effects of a stable trait level component, <span class="math inline">\(s_i\)</span>, on the change scores. <span class="math inline">\(s_i\)</span> is a “unit effect” – corresponding to an estimate of constant change for each row of the data. In a panel, individuals will score higher on this component, indicating they change more in their average change relative to others. The <span class="math inline">\(\alpha\)</span> captures the effect of <span class="math inline">\(s_i\)</span> on the change score at a particular time point.</p>
+<p>The <span class="math inline">\(beta\)</span> parameters are the proportional effect of <span class="math inline">\(y\)</span> and <span class="math inline">\(x\)</span> at time <span class="math inline">\(t-1\)</span> on the change score at time <span class="math inline">\(t\)</span>. This parameter is the autoregressive parameter in the the CLPM. If <span class="math inline">\(\beta = 0\)</span>, then <span class="math inline">\(\alpha\)</span> simply captures how a subject’s average change score influences change at time <span class="math inline">\(t\)</span>. Combining the two is the “dual-change” model.</p>
+<p>When <span class="math inline">\(\beta\)</span> is positive, higher values of <span class="math inline">\(y\)</span> or <span class="math inline">\(x\)</span> at time <span class="math inline">\(t-1\)</span> are associated with increases in the variable at time <span class="math inline">\(t\)</span>. When <span class="math inline">\(\beta\)</span> is negative, higher values of <span class="math inline">\(y\)</span> or <span class="math inline">\(x\)</span> at time <span class="math inline">\(t-1\)</span> are associated with decreases in the variable at time <span class="math inline">\(t\)</span>. When <span class="math inline">\(\beta\)</span> is zero, there is no association between prior values and change scores, and the model displays a random walk process.</p>
+<p>It’s useful to consider the trajectory of an individual’s changes across the length of a panel, or possibly a shorter interval. The trajectory<span class="math inline">\(y\)</span> and <span class="math inline">\(x\)</span> from time <span class="math inline">\(t=1\)</span> to time <span class="math inline">\(t=k\)</span>.</p>
+<p><span class="math display">\[
+  y_{i,k} = y_{i,t=1} + \sum_{t=2}^{k} \Delta y_{ik} \\
+  x_{i,k} = x_{i,t=1} + \sum_{t=2}^{k} \Delta x_{ik} \\
+\]</span></p>
+</div>
+<div id="bivariate-dual-change" class="section level2 hasAnchor" number="1.5">
+<h2><span class="header-section-number">1.5</span> Bivariate Dual Change<a href="panel-data-models.html#bivariate-dual-change" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>With cross-lagged effects,</p>
+<p><span class="math display">\[
+\begin{matrix}
+  \Delta y_{it} &amp; = \alpha_{y} s_i + \beta_{1}y_{it-1} + \theta_x x_{it} + e_{y,it}\\
+  \Delta x_{it} &amp; = \alpha_{x} s_i + \beta_{1}x_{it-1} + \theta_x y_{it}+ e_{x,it}\\
+\end{matrix}
+\]</span></p>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-ef7cc5b6cf19bab4155a" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-ef7cc5b6cf19bab4155a">{"x":{"diagram":"\ndigraph RICLPM {\n\n  # Graph attributes\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  # Node attributes\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  A_X [pos = \"-2.5,1!\", shape = circle, fillcolor = white, label = <Δ<sub>x<\/sub>>,  width = 0.5, height = 0.5]\n  I [pos = \"-2.5,0!\", shape = triangle, fillcolor = white, label = \"I\",  width = 0.5, height = 0.5]\n  X1 [pos = \"-2,2.2!\", label = \"x1\", width = 0.6, height = 0.3]\n  X2 [pos = \"-1,2.2!\", label = \"x2\", width = 0.6, height = 0.3]\n  X3 [pos = \"0,2.2!\", label = \"x3\", width = 0.6, height = 0.3]\n  X4 [pos = \"1,2.2!\", label = \"x4\", width = 0.6, height = 0.3]\n  X5 [pos = \"2,2.2!\", label = \"x5\", width = 0.6, height = 0.3]\n\n  # Row 2: Within-person X latents (middle-upper)\n  wX1 [pos = \"-2,1.35!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1,1.35!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0,1.35!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1,1.35!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"2,1.35!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  # Row 3: Within-person Y latents (middle-lower)\n  wY1 [pos = \"-2,-1.35!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1,-1.35!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0,-1.35!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1,-1.35!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"2,-1.35!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n\n  dX2 [pos = \"-1,0.5!\", shape = circle, fillcolor = white, label = \"Δx2\"]\n  dX3 [pos = \"0,0.5!\", shape = circle, fillcolor = white, label = \"Δx3\"]\n  dX4 [pos = \"1,0.5!\", shape = circle, fillcolor = white, label = \"Δx4\"]\n  dX5 [pos = \"2,0.5!\", shape = circle, fillcolor = white, label = \"Δx5\"]\n\n  dY2 [pos = \"-1,-0.5!\", shape = circle, fillcolor = white, label = \"Δy2\"]\n  dY3 [pos = \"0,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy3\"]\n  dY4 [pos = \"1,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy4\"]\n  dY5 [pos = \"2,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy5\"]\n\n\n\n  # Row 4: observed Y variables and RI_Y (bottom)\n  Y1 [pos = \"-2,-2.2!\", label = \"y1\", width = 0.6, height = 0.3]\n  Y2 [pos = \"-1,-2.2!\", label = \"y2\", width = 0.6, height = 0.3]\n  Y3 [pos = \"0,-2.2!\", label = \"y3\", width = 0.6, height = 0.3]\n  Y4 [pos = \"1,-2.2!\", label = \"y4\", width = 0.6, height = 0.3]\n  Y5 [pos = \"2,-2.2!\", label = \"y5\", width = 0.6, height = 0.3]\n  A_Y [pos = \"-2.5,-1!\", shape = circle, fillcolor = white, label = <Δ<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n\n  # Measurement model paths (RI to observed)\n  A_X -> dX2 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX3 [label = \"\",  arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX4 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX5 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n\n  A_Y -> dY2 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY3 [label = \"\",  arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY4 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY5 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n\n  I -> A_X [label = \"\", arrowsize = 0.5, tailport = n, headport = s]\n  I -> A_Y [label = \"\", arrowsize = 0.5, tailport = s, headport = n]\n  I -> wX1 [label = \"\", arrowsize = 0.5, tailport = n, headport = s]\n  I -> wY1 [label = \"\", arrowsize = 0.5, tailport = s, headport = n]\n\n \n  # Measurement model paths (w to observed)\n  wX1 -> X1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> X2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> X3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> X4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX5 -> X5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> Y1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> Y2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> Y3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> Y4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY5 -> Y5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> dY2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dY3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dY4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dY5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dX2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dX3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dX4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dX5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dY2 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dY3 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dY4 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dY5 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n\n  wY1 -> dX2 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dX3 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dX4 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dX5 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n\n  # Autoregressive paths\n  wX1 -> wX2 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> wX3 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> wX4 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> wX5 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> wY2 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> wY3 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> wY4 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> wY5 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  # Cross-lagged paths with offset gamma labels and subscripts\n  dX2 -> dY3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX3 -> dY4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX4 -> dY5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY2 -> dX3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY3 -> dX4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY4 -> dX5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n\n  dX2 -> wX2 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX3 -> wX3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX4 -> wX4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX5 -> wX5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n\n  dY2 -> wY2 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY3 -> wY3 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY4 -> wY4 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY5 -> wY5 [color = black, penwidth = 1, arrowsize = 0.5]\n\n\n  # # Within-time correlations - ONLY these are slightly rounded\n  # wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # \n\n\n  # Self-loops connected to bottom of each node using ports\n  dX2 -> dX2 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s , arrowsize = 0.5]\n  dX3 -> dX3 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dX4 -> dX4 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dX5 -> dX5 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dY2 -> dY2 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY3 -> dY3 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY4 -> dY4 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY5 -> dY5 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n\n\n\n  # Self-loops connected to bottom of each node using ports\n  # X1 -> X1 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X2 -> X2 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X3 -> X3 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X4 -> X4 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X5 -> X5 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # \n  # Y1 -> Y1 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y2 -> Y2 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y3 -> Y3 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y4 -> Y4 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y5 -> Y5 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n\n  # Self-loops connected to bottom of each node using ports\n   wX1 -> wX1 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11, labelangle = 45, labeldistance = 2.5]\n   wY1 -> wY1 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n\n  # Residuals for random intercepts (epsilon)\n  A_X -> A_X [dir = both, color = black, style = dashed, label = \"\", labelangle = 135, labeldistance = 1.5, tailport = s, headport = s, arrowsize = 0.5, width = 0.6, height = 0.3]\n  A_Y -> A_Y [dir = both, color = black, style = dashed, label = \"\", labelangle = 135, labeldistance = 1.5, tailport = n, headport = n, arrowsize = 0.5, width = 0.6, height = 0.3]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p>Unlike the CLPM which captures only proportional change, the change score regression model captures constant, proportional, and dual change processes.</p>
+</div>
+<div id="the-random-intercept-cross-lagged-regression" class="section level2 hasAnchor" number="1.6">
+<h2><span class="header-section-number">1.6</span> The Random Intercept Cross Lagged Regression<a href="panel-data-models.html#the-random-intercept-cross-lagged-regression" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The RICLPM – a popular approach in psychology – also explicitly includes trait level variation, but in a manner somewhat different from the difference score approaches described. For the moment, ignoring the lags and cross-lagged effects, let us assume that <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> are each a function of a stable trait level component, plus a time-varying state component. The RICLPM is an extension of the CLPM,</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+y_{it}\\
+x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta_{1y} &amp; \theta_{1x}  \\
+\theta_{2y} &amp; \theta_{2x}  
+\end{bmatrix}
+\begin{bmatrix}
+y_{it-1} \\ x_{it-1}  
+\end{bmatrix}
++
+\begin{bmatrix}
+e_{y,it}\\
+e_{x,it}
+\end{bmatrix}
+\]</span></p>
+<p>But the RICLPM includes a stable trait level component, <span class="math inline">\(\mu_i\)</span>, for each individual <span class="math inline">\(i\)</span>:</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+y_{it}\\
+x_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\mu^y_{i} \\
+\mu^x_{i}
+\end{bmatrix}
++
+\begin{bmatrix}
+y^*_{y,it}\\
+x^*_{x,it}
+\end{bmatrix}
+\]</span>
+The <span class="math inline">\(\mu^x_i\)</span> and <span class="math inline">\(\mu^y_i\)</span> terms are the stable, trait level components for individual <span class="math inline">\(i\)</span>. And <span class="math inline">\(x^*_{t,i}\)</span> and <span class="math inline">\(y^*_{t,i}\)</span> terms are the time-varying state components. We can view this formation as providing a decomposition of the total variance in <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> into between-person (trait; <span class="math inline">\(\mu\)</span>) and within-person (state, <span class="math inline">\(x^*,y^*\)</span>) components. From here, we can rewrite the cross-lagged and lagged effects from the state components alone.</p>
+<p><span class="math display">\[
+\begin{bmatrix}
+y^*_{it}\\
+x^*_{it}
+\end{bmatrix}
+=
+\begin{bmatrix}
+\theta^*_{1y} &amp; \theta^*_{1x}  \\
+\theta^*_{2y} &amp; \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{it-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+\]</span>
+Unlike the CLPM, the RICLPM examines residualized change, or change net of stable trait level differences between individuals. The RICLPM thus focuses on within-person effects – <span class="math inline">\(y^*_{it}\)</span> and <span class="math inline">\(x^*_{it}\)</span> represent deviations from the individual’s mean score for <span class="math inline">\(y\)</span> and <span class="math inline">\(x\)</span>.</p>
+<div class="figure"><span style="display:block;" id="fig:riclpm-diagram"></span>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-7f28c7cd529581275efb" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-7f28c7cd529581275efb">{"x":{"diagram":"\ndigraph RICLPM {\n\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  RI_X [pos = \"-3,2!\", shape = circle, fillcolor = white, label = <ξ<sub>x<\/sub>>,  width = 0.5, height = 0.5]\n  X1 [pos = \"-2,2!\", label = \"x1\", width = 0.6, height = 0.3]\n  X2 [pos = \"-1,2!\", label = \"x2\", width = 0.6, height = 0.3]\n  X3 [pos = \"0,2!\", label = \"x3\", width = 0.6, height = 0.3]\n  X4 [pos = \"1,2!\", label = \"x4\", width = 0.6, height = 0.3]\n  X5 [pos = \"2,2!\", label = \"x5\", width = 0.6, height = 0.3]\n\n  # Within Person X\n  wX1 [pos = \"-2,1!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1,1!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0,1!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1,1!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"2,1!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  #  Within-person  Y\n  wY1 [pos = \"-2,-1!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1,-1!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0,-1!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1,-1!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"2,-1!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n  # observed Y variables and RI_Y\n  Y1 [pos = \"-2,-2!\", label = \"y1\", width = 0.6, height = 0.3]\n  Y2 [pos = \"-1,-2!\", label = \"y2\", width = 0.6, height = 0.3]\n  Y3 [pos = \"0,-2!\", label = \"y3\", width = 0.6, height = 0.3]\n  Y4 [pos = \"1,-2!\", label = \"y4\", width = 0.6, height = 0.3]\n  Y5 [pos = \"2,-2!\", label = \"y5\", width = 0.6, height = 0.3]\n  RI_Y [pos = \"-3,-2!\", shape = circle, fillcolor = white, label = <ξ<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n\n  # Measurement model \n  RI_X -> wX1 [label = \"\", arrowsize = 0.5]\n  RI_X -> wX2 [label = \"\", arrowsize = 0.5]\n  RI_X -> wX3 [label = \"\",  arrowsize = 0.5]\n  RI_X -> wX4 [label = \"\", arrowsize = 0.5]\n  RI_X -> wX5 [label = \"\", arrowsize = 0.5]\n  RI_Y -> wY1 [label = \"\", arrowsize = 0.5]\n  RI_Y -> wY2 [label = \"\", arrowsize = 0.5]\n  RI_Y -> wY3 [label = \"\", arrowsize = 0.5]\n  RI_Y -> wY4 [label = \"\", arrowsize = 0.5]\n  RI_Y -> wY5 [label = \"\", arrowsize = 0.5]\n\n  # Measurement model paths\n  wX1 -> X1 [label = \"1\", arrowsize = 0.5]\n  wX2 -> X2 [label = \"1\", arrowsize = 0.5]\n  wX3 -> X3 [label = \"1\", arrowsize = 0.5]\n  wX4 -> X4 [label = \"1\", arrowsize = 0.5]\n  wX5 -> X5 [label = \"1\", arrowsize = 0.5]\n  wY1 -> Y1 [label = \"1\", arrowsize = 0.5]\n  wY2 -> Y2 [label = \"1\", arrowsize = 0.5]\n  wY3 -> Y3 [label = \"1\", arrowsize = 0.5]\n  wY4 -> Y4 [label = \"1\", arrowsize = 0.5]\n  wY5 -> Y5 [label = \"1\", arrowsize = 0.5]\n\n  # Autoregressive paths\n  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]\n\n  # Cross-lagged paths with offset gamma labels and subscripts\n  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]\n  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]\n  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]\n\n  # Within-time correlations\n  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n\n  # Random intercept correlation \n  RI_X -> RI_Y [dir = both, color = black, style = dashed, penwidth = 1, splines = curved, constraint = false,  arrowsize = 0.5]\n\n\n  # Self-loops to repreesnt errors\n  wX2 -> wX2 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s , arrowsize = 0.5]\n  wX3 -> wX3 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX4 -> wX4 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX5 -> wX5 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wY2 -> wY2 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY3 -> wY3 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY4 -> wY4 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY5 -> wY5 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n\n\n  X1 -> X1 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n  X2 -> X2 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n  X3 -> X3 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n  X4 -> X4 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n  X5 -> X5 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5]\n\n  Y1 -> Y1 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n  Y2 -> Y2 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n  Y3 -> Y3 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n  Y4 -> Y4 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n  Y5 -> Y5 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5]\n\n\n  # Residuals for random effects\n  RI_X -> RI_X [dir = both, color = black, style = dashed, label = \"ε\", labelangle = 135, labeldistance = 1.5, tailport = w, headport = s, arrowsize = 0.5, width = 0.6, height = 0.3]\n  RI_Y -> RI_Y [dir = both, color = black, style = dashed, label = \"ε\", labelangle = 135, labeldistance = 1.5, tailport = w, headport = n, arrowsize = 0.5, width = 0.6, height = 0.3]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+Figure 1.3: Random Intercept Cross-Lagged Panel Model with 5 waves. The model shows autoregressive paths (solid arrows), cross-lagged effects (solid arrows), within-time correlations (dashed curved arrows), and residual terms (self-loops).
+</p>
+</div>
+<p>As shown in Figure <a href="panel-data-models.html#fig:riclpm-diagram">1.3</a>, the RI-CLPM separates between-person and within-person effects.</p>
+<p>The next section builds on these two models, using synthetic data, to illustrate the similarities and similarities between these approaches.</p>
+</div>
+<div id="spurious-and-causal-effects" class="section level2 hasAnchor" number="1.7">
+<h2><span class="header-section-number">1.7</span> Spurious and Causal Effects<a href="panel-data-models.html#spurious-and-causal-effects" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Particularly since <span class="citation">(<a href="#ref-hamaker_cross-lagged_2015"><strong>hamaker_cross-lagged_2015?</strong></a>)</span> who showed that the CLPM conflates between-person and within-person effects, and may produce biased estimates of the cross-lagged effects, insofar that <span class="math inline">\(x\)</span>, <span class="math inline">\(y\)</span> or both are stable, relatively enduring traits that don’t vary from wave-to-wave. This is conceptually similar to Lord’s Paradox.</p>
+<p><span class="citation">(<a href="#ref-allison_toward_2015"><strong>allison_toward_2015?</strong></a>)</span> elaborates on Lord’s Paradox in the context difference score models models. Using a similar description, imagine a two wave panel, in which subjects are assigned to the treatment or control following the pretest. For those assigned to the treatment, the pretest mean and standard deviation are nearly identical to the posttest mean and standard deviation. And, the correlation between <span class="math inline">\(y\)</span> in both waves is less than 1. The description is entirely consist with observing no treatment effect; the means do not change from pretest to posttest for those exposed to the treatment.</p>
+<p>But, a variant of the CLPM, where when regresses the</p>
+<p><span class="math display">\[y_{post} = \alpha + \beta \cdot y_{pre} + \gamma \cdot treatment + \epsilon\]</span>
+reports a different estimate of the treatment effect, as it compares the mean differences between those exposed to the treatment versus control condition, controlling for the pretest (baseline) score. This is different from examining the difference in scores among those exposed to the treatment. While Lord’s Paradox is not entirely ameliorated by using random assignment, the issue becomes more severe if the treatment is not randomly assigned, and one is simply comparing group mean differences.</p>
+<p>The issue is similarity to the CLPM in that one conflates between-person and within-person effects, by not accounting for unit effects (stable trait level differences between individuals), and one might conclude a cross-lag effect exists – e.g., x causes a change in y – when instead the <span class="math inline">\(x\)</span> may be related to <span class="math inline">\(y\)</span> but not necessarily cause a change in <span class="math inline">\(y\)</span>.</p>
+<p>Extending the model, we can use the CLPM and RI-CLPM to produce potential outcomes ; what would <span class="math inline">\(x_{t,i}\)</span> and <span class="math inline">\(y_{t,i}\)</span> be if we intervened on <span class="math inline">\(x\)</span> or <span class="math inline">\(y\)</span> at time <span class="math inline">\(t-1\)</span>, <span class="math inline">\(E[x_{i,t}^{y_{t-1}}]\)</span> and <span class="math inline">\(E[y_{i,t}^{x_{t-1}}]\)</span>? By assuming that such an intervention is linear, similar to the structure set forth in the CLPM, the marginal effect of the treatment is <span class="math inline">\(\tau\)</span> (Ludtke and Robitzch 2021; Hernan and Robins 2020; Vanderwheele 2015).</p>
+<p><span class="math display">\[
+\begin{aligned}
+E[Y_{i,t}^{x_{t-1}}] = \alpha_{1} + \tau_{1} x_{t-1} \\
+E[X_{i,t}^{y_{t-1}}] = \alpha_{2} + \tau_{2} y_{t-1} \\
+\end{aligned}
+\]</span></p>
+<p>The marginal effects, <span class="math inline">\(\tau\)</span> are calculated by the expectations fixing <span class="math inline">\(x_{t,i}\)</span> and <span class="math inline">\(y_{t,i}\)</span> at a value and integrated over the joint distribution of <span class="math inline">\(x_{t-1}\)</span> and <span class="math inline">\(y_{t-1}\)</span>. In a linear model, this is typically just <span class="math inline">\(\hat{\theta_{1y}}\)</span> and <span class="math inline">\(\hat{\theta_{2x}}\)</span>, the slopes from a regression equation. If there are unobserved confounders, <span class="math inline">\(Z\)</span>, then</p>
+<p><span class="math display">\[
+\begin{aligned}
+E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} =  z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z \\
+E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} = z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z\\
+\end{aligned}
+\]</span></p>
+<p>The potential outcome is simply the expectation of <span class="math inline">\(x_{t,i}\)</span> and <span class="math inline">\(_{y,i}\)</span>, holding <span class="math inline">\(y_{t-1}\)</span> and <span class="math inline">\(x_{t-1}\)</span> at a fixed value, and averaging over the joint distribution of <span class="math inline">\(x_{t-1}\)</span>, <span class="math inline">\(y_{t-1}\)</span>, and <span class="math inline">\(z\)</span>.</p>
+</div>
+<div id="confounding-variables" class="section level2 hasAnchor" number="1.8">
+<h2><span class="header-section-number">1.8</span> Confounding Variables<a href="panel-data-models.html#confounding-variables" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>In the presence of confounding variables, <span class="math inline">\(Z\)</span>, that influence both <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, the cross-lagged estimates may be biased, in both the CLPM or the RI-CLPM. A confounder, like all variables in a panel design may be <em>time-varying</em> or <em>time-invariant</em>. Some characteristics fluctuate over time, partially or fully explaining the pattern of relationships between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>, others are stable and tend not to change, but also explain the joint relationship between <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>.</p>
+<p>If confounder <span class="math inline">\(z\)</span> is time-invariant, the CLPM may be respecified as the RI-CLPM:
+<span class="math display">\[
+\begin{bmatrix}
+y^*_{it}\\
+x^*_{it}
+\end{bmatrix}
+=
+\underbrace{
+\begin{bmatrix}
+\theta^*_{1y} &amp; \theta^*_{1x}  \\
+\theta^*_{2y} &amp; \theta^*_{2x}
+\end{bmatrix}
+\begin{bmatrix}
+y^*_{it-1} \\ x^*_{t-1}
+\end{bmatrix}
++
+\begin{bmatrix}
+e^*_{y,it}\\
+e^*_{x,it}
+\end{bmatrix}
+}_{State}
++
+\underbrace{
+\begin{bmatrix}
+\mu_{y,i}\\
+\mu_{x,i}
+\end{bmatrix}
++
+\begin{bmatrix}
+\alpha_{y}\\
+\alpha_{x}
+\end{bmatrix}
+z_{i}
+}_{Trait}
+\]</span></p>
+<ul>
+<li><span class="math inline">\(\mu^x_i\)</span> and <span class="math inline">\(\mu^y_i\)</span> are the stable, trait level components for individual <span class="math inline">\(i\)</span>.</li>
+<li><span class="math inline">\(x^*_{t,i}\)</span> and <span class="math inline">\(y^*_{t,i}\)</span> are the time-varying state components.</li>
+<li><span class="math inline">\(\theta^*_{1y}\)</span> and <span class="math inline">\(\theta^*_{2x}\)</span> are the autoregressive effects for the state components.</li>
+<li><span class="math inline">\(\theta^*_{1x}\)</span> and <span class="math inline">\(\theta^*_{1x}\)</span> are the cross-lagged effects for the state components.</li>
+</ul>
+<p>When the confounder is “unobserved” and either time-invariant or time-varying, what is the consequence of ignoring that confounder in the CLPM or RI-CLPM? There is some disagreement in the literature on this question.</p>
+
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div class="csl-entry">
+Allison, Paul D. 1990. <span>“Change Scores as Dependent Variables in Regression Analysis.”</span> <em>Sociological Methodology</em>, 93–114.
+</div>
+<div class="csl-entry">
+Grimm, Kevin J, Yang An, John J McArdle, Alan B Zonderman, and Susan M Resnick. 2012. <span>“Recent Changes Leading to Subsequent Changes: Extensions of Multivariate Latent Difference Score Models.”</span> <em>Structural Equation Modeling: A Multidisciplinary Journal</em> 19 (2): 268–92.
+</div>
+<div class="csl-entry">
+Hamaker, Ellen L., Rebecca M. Kuiper, and Raoul P. P. P. Grasman. 2015. <span>“A Critique of the Cross-Lagged Panel Model.”</span> <em>Psychological Methods</em> 20 (1): 102–16. <a href="https://doi.org/10.1037/a0038889">https://doi.org/10.1037/a0038889</a>.
+</div>
+</div>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-allison1990" class="csl-entry">
+Allison, Paul D. 1990. <span>“Change Scores as Dependent Variables in Regression Analysis.”</span> <em>Sociological Methodology</em>, 93–114.
+</div>
+<div id="ref-grimmetal2012" class="csl-entry">
+Grimm, Kevin J, Yang An, John J McArdle, Alan B Zonderman, and Susan M Resnick. 2012. <span>“Recent Changes Leading to Subsequent Changes: Extensions of Multivariate Latent Difference Score Models.”</span> <em>Structural Equation Modeling: A Multidisciplinary Journal</em> 19 (2): 268–92.
+</div>
+<div id="ref-hamaker_critique_2015" class="csl-entry">
+Hamaker, Ellen L., Rebecca M. Kuiper, and Raoul P. P. P. Grasman. 2015. <span>“A Critique of the Cross-Lagged Panel Model.”</span> <em>Psychological Methods</em> 20 (1): 102–16. <a href="https://doi.org/10.1037/a0038889">https://doi.org/10.1037/a0038889</a>.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="index.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/USERNAME/REPO/edit/BRANCH/01_Panel_Models.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

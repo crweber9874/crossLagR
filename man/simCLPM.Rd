@@ -6,28 +6,38 @@
 \usage{
 simCLPM(
   waves = 10,
-  stability.p = 0.2,
-  stability.q = 0.2,
-  cross.p = 0.1,
-  cross.q = 0.1,
-  variance.p = 1,
-  variance.q = 1,
-  cov.pq = 0.1,
+  stability_p = 0.2,
+  stability_q = 0.2,
+  cross_p = 0.1,
+  cross_q = 0.1,
+  variance_p = 1,
+  variance_q = 1,
+  cov_pq = 0.1,
+  means_p = NULL,
+  means_q = NULL,
   ...
 )
 }
 \arguments{
 \item{waves}{The number of waves (time points) in the model.}
 
-\item{stability.p}{The stability parameter for the x variable (autoregressive effect).}
+\item{stability_p}{The stability parameter for the x variable (autoregressive effect).}
 
-\item{stability.q}{The stability parameter for the y variable (autoregressive effect).}
+\item{stability_q}{The stability parameter for the y variable (autoregressive effect).}
 
-\item{cross.p}{The cross-lagged effect of y on x at the next time point.}
+\item{cross_p}{The cross-lagged effect of y on x at the next time point.}
 
-\item{cross.q}{The cross-lagged effect of x on y at the next time point.}
+\item{cross_q}{The cross-lagged effect of x on y at the next time point.}
 
-\item{cov.pq}{The covariance between x and y within the same time point.}
+\item{variance_p}{The variance parameter for the x variable.}
+
+\item{variance_q}{The variance parameter for the y variable.}
+
+\item{cov_pq}{The covariance between x and y within the same time point.}
+
+\item{means_p}{Vector of means for p across waves. If NULL, defaults to 0 for all waves.}
+
+\item{means_q}{Vector of means for q across waves. If NULL, defaults to 0 for all waves.}
 
 \item{...}{Additional arguments to pass to the `lavaan::simulateData` function.}
 }
