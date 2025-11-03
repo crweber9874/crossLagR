@@ -10,7 +10,6 @@
 #' @param constrain_omega  Logical. If TRUE, constrains cross-lagged (coupling) effects to equality. Default is FALSE for bivariate.
 #' @param estimate_change_to_change Logical. Extension to the Latent Change Model. Estimate lagged difference effects -- autoregressive and cross lagged. Requires 4 or more waves of data. Default is FALSE for bivariate.
 #' @param constrain_change_to_change  Logical. Extension to the Latent Change Model. Constrain change to change (AR) parameters to equality. Default is FALSE for bivariate.
-#' @param constrain_change_to_change_cross_lag  Logical. Extension to the Latent Change Model. Constrain change to change cross-lagged parameters to equality. Default is FALSE for bivariate.
 #'
 #' @return A character string containing the Lavaan model syntax for the latent change score model.
 
@@ -63,7 +62,7 @@ estimateLChange <- function(waves = 10,
                             constrain_indicator_variances = TRUE,  # Constrain measurement error variances to equality
                             constrain_beta = TRUE,
                             constrain_omega = TRUE,
-                            estimate_change_to_change = FALSE
+                            estimate_change_to_change = FALSE,
                             change_to_change = FALSE,
                             constrain_change_cross_lag = FALSE
 ) {
@@ -180,7 +179,7 @@ estimateLChange <- function(waves = 10,
     }
 
     # Observed residual variances (constrained to equality)
-    if (constrain_loadings) {
+    if (constrain_indicator_variances) {
       for (w in 1:waves) {
         model_string <- paste0(model_string, "    x", w, " ~~ indicator_variance_x*x", w, "\n")
       }
@@ -261,7 +260,7 @@ estimateLChange <- function(waves = 10,
     }
 
     # Observed residual variances (constrained to equality)
-    if (constrain_loadings) {
+    if (constrain_indicator_variances) {
       for (w in 1:waves) {
         model_string <- paste0(model_string, "    y", w, " ~~ indicator_variance_y*y", w, "\n")
       }
@@ -334,8 +333,6 @@ estimateLChange <- function(waves = 10,
     }
 
 ################################################################################################################
-
-
 ### Exensions: Coupling and Change Parameters
 ### Change to Change Additions: This is an extension to the basic bivariate LCSM
 # Lags and Autoregression of Change Parameters
@@ -365,8 +362,7 @@ if (constrain_change_to_change) {
     }
 }
 
-if(change_to_change_cross_lag){
-    if (constrain_change_cross_lag) {
+  if (constrain_change_cross_lag) {
       for (w in 3:waves) {
         model_string <- paste0(model_string, "    ld_x", w, " ~ cross_change_x*ld_y", w - 1, "\n")
         model_string <- paste0(model_string, "    ld_y", w, " ~ cross-change_y*ld_x", w - 1, "\n")
@@ -376,7 +372,7 @@ if(change_to_change_cross_lag){
         model_string <- paste0(model_string, "    ld_x", w, " ~ ld_y", w - 1, "\n")
         model_string <- paste0(model_string, "    ld_y", w, " ~ ld_x", w - 1, "\n")
       }
-    }
+
 }
 
 # -------------------- COVARIANCES --------------------

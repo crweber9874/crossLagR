@@ -6,73 +6,75 @@
 \usage{
 estimateLChange(
   waves = 10,
-  model_type = c("latent_change", "dual_change"),
-  constrain_loadings = TRUE,
-  constrain_ar = TRUE,
-  constrain_coupling = TRUE,
-  constrain_change_to_change = TRUE,
-  constrain_phi = TRUE
+  variable_type = c("univariate", "bivariate"),
+  constrain_indicator_variances = TRUE,
+  constrain_beta = TRUE,
+  constrain_omega = TRUE,
+  estimate_change_to_change = FALSE,
+  change_to_change = FALSE,
+  constrain_change_cross_lag = FALSE
 )
 }
 \arguments{
 \item{waves}{The number of waves (time points) in the model.}
 
-\item{model_type}{Specify whether estimating "latent_change" (single variable) or "dual_change" (bivariate).}
+\item{variable_type}{Specify whether estimating "univariate" (single variable) or "bivariate" (dual variable). The "bivariate" option allows for cross-lagged effects between two variables.}
 
-\item{constrain_loadings}{Logical. If TRUE, constrains factor loadings to equality across waves. Default is TRUE.}
+\item{constrain_indicator_variances}{Logical. If TRUE, constrains indicator latent variances (true scores) to equality across waves. Default is TRUE.}
 
-\item{constrain_ar}{Logical. If TRUE, constrains proportional effects (autoregressive) to equality. Default is TRUE.}
+\item{constrain_beta}{Logical. If TRUE, constrains proportional effects (autoregressive) to equality across waves. Default is TRUE.}
 
-\item{constrain_coupling}{Logical. If TRUE, constrains coupling effects to equality. Default is TRUE for dual_change.}
+\item{constrain_omega}{Logical. If TRUE, constrains cross-lagged (coupling) effects to equality. Default is FALSE for bivariate.}
 
-\item{constrain_change_to_change}{Logical. If TRUE, constrains change-to-change effects to equality. Default is TRUE for dual_change.}
+\item{estimate_change_to_change}{Logical. Extension to the Latent Change Model. Estimate lagged difference effects -- autoregressive and cross lagged. Requires 4 or more waves of data. Default is FALSE for bivariate.}
 
-\item{constrain_phi}{Logical. If TRUE, constrains change autoregressions to equality. Default is TRUE for dual_change.}
+\item{constrain_change_to_change}{Logical. Extension to the Latent Change Model. Constrain change to change (AR) parameters to equality. Default is FALSE for bivariate.}
 }
 \value{
 A character string containing the Lavaan model syntax for the latent change score model.
 }
 \description{
-Generates model syntax for Latent Change Score Models
+Syntax to estimate single and two variable latent change models. The function returns the lavaan model syntax, with options to constrain parameters, estimate various change components:
+like the bivariate change model, the dual change model, and change to change parameters. Three or more waves of data are required for estimation absent change-to-change parameters. Change-to-Change
+specification requires four or more waves of data.
 }
 \details{
 This function generates the model syntax for a Latent Change Score Model with a specified
 number of waves.
 
-For single variable models (model_type = "latent_change"):
+For single variable models (variable_type = "univariate"):
 - Latent true scores at each wave
 - Latent change scores from wave 2 onwards
 - A constant change factor
 - Proportional effects (level affecting own change)
 
-For dual change models (model_type = "dual_change"):
+For dual change models (variable_type = "bivariate"):
 - All components from single variable model for both X and Y
 - Coupling effects (X level affecting Y change and vice versa)
-- Change-to-change cross-lagged effects
-- Change autoregression effects
+For bivariate change models (variable_type = "bivariate", constrain_change_to_change_estimates = FALSE ):
+- All components from single variable model for both X and Y
+- Coupling effects (X level affecting Y change and vice versa)
+For bivariate dual change models (variable_type = "bivariate", constrain_change_to_change_estimates = TRUE ):
+- All components from single variable model for both X and Y
+- Cross-lagged (coupling) effects (X level affecting Y change and vice versa)
+- Change-to-change effects (autoregressive and cross-lagged).
 
 Key parameters estimated:
-- ar_x, ar_y: Proportional effects (level -> own change)
-- cl_x, cl_y: Coupling effects (other level -> change)
-- change_x, change_y: Change-to-change effects
-- phi_x, phi_y: Change autoregression
-- alpha_g2: Constant change factor mean for X
-- sigma2_lx1, sigma2_g2: Variances for initial level and constant change
-- sigma2_u, sigma2_e: Measurement error variances
+- beta_x, beta_y: Proportional effects (level -> own change)
+- omega_x, omega_y: Cross-lagged effects (other level -> change)
+- phi_x, phi_y: Change-to-change effects
+- cross_change_x, cross_change_y: Change-to-change cross-lagged effects
+- constant_mean_x, constant_mean_y: Means of constant change factors
+- latent_variance_x, latent_variance_y: Variances of constant change factors
+- indicator_variance_x, indicator_variance_y: Measurement error variances
 }
 \examples{
 # Single variable latent change model
-model_syntax_single <- estimateLChange(waves = 5, model_type = "latent_change")
+model_syntax_single <- estimateLChange(waves = 5, variable_type = "univariate")
 cat(model_syntax_single)
 
 # Dual change model
-model_syntax_dual <- estimateLChange(waves = 5, model_type = "dual_change")
+model_syntax_dual <- estimateLChange(waves = 5, variable_type = "bivariate")
 cat(model_syntax_dual)
-
-# Fit the model
-library(lavaan)
-data <- simLChange(waves = 5, model_type = "dual_change", sample.nobs = 1000)$data
-fit <- lavaan(model_syntax_dual, data = data)
-summary(fit)
 
 }

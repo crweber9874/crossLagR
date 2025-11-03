@@ -12,3 +12,17 @@ deconstructing-change
 decomposing-change
 spurious-and-causal-effects
 confounding-variables
+simulation-and-estimation
+trajectories
+cross-lagged-panel-model
+random-intercept-cross-lagged-panel-model
+hiearchical-linear-model-random-intercepts-and-slopes
+continuous-time-model
+example-clpm-and-change-score-regression
+change-processes
+unit-effects
+latent-growth
+types-of-change
+fig:lgm-diagram
+the-latent-growth-model
+measurement-error

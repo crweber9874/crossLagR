@@ -1,4 +1,123 @@
-# Simulation and Estimation
+# Panel Data Analysis
+
+The package that accompanies this summary, `crossLagR`, includes functions to estimate several panel data models.
+
+**Install and Load**
+
+```{r}
+devtools::install_github("https://github.com/crweber9874/crossLagR/crossLagR")
+library(crossLagR)
+```
+
+* `estimateCLPM()` generates the syntax for cross-lagged panel models. Use `help(estimateRICLPM)` to modify constraints and number of waves.
+* `estimateRICLPM()` generates the syntax for random-intercept cross-lagged panel models. Use `help(estimateRICLPM)` to modify constraints and number of waves.
+* `estimateLChange()` generates the syntax for latent change score model. Use `help(estimateLChange)` to modify constraints and number of waves.
+
+
+
+
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE }
+rm(list = ls())
+devtools::load_all()
+estimateLChange(waves = 3,
+                variable_type = "bivariate",
+                constrain_omega = TRUE,
+                constrain_beta =  TRUE) |>
+  cat()
+```
+
+
+
+
+
+including the Cross-Lagged Panel Model (CLPM), the Random-Intercept Cross-Lagged Panel Model (RICLPM), and the Latent Change Score Model (LCSM).
+
+
+Several functions are used to generate the data, estimate the models, and then run the monte carlo simulations. All of these functions are located in the `\R` folder of the package. 
+
+* `estimageLChange` generates the syntax for change score models, bivariate and univariate.
+* `simLChange` simulates data from a latent change score model.
+
+This is the code to generate a dual change bivariate latent change score model with 3 waves, constraining the omega (cl) and beta (ar) parameters to be equal across waves
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE }
+rm(list = ls())
+devtools::load_all()
+estimateLChange(waves = 3,
+                variable_type = "bivariate",
+                constrain_omega = TRUE,
+                constrain_beta =  TRUE) |>
+  cat()
+```
+
+
+We can simulate data from this model as follows:
+
+`crossLagR::simLChange()` generates data from a latent change score model. Here is an example of simulating data from a bivariate latent change score model with 5 waves and specified parameters.
+
+```{r, echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE }
+single_change_data <- simLChange(
+  waves = 5,
+  variable_type = "bivariate",
+  beta_x = -0.3,
+  beta_y = -0.3,
+  omega_x = 0.3,
+  omega_y = 0.3,
+  sample.nobs = 5000
+)$data -> dat
+
+model = lavaan::lavaan(
+  model = estimateLChange(waves = 5,
+                variable_type = "bivariate",
+                constrain_omega = TRUE,
+                constrain_beta =  TRUE),
+  data = dat) 
+
+summary(model)
+```
+
+It's pretty clear that the latent change score model recovers the parameters well. The model assumes a "proportional" change -- which is interchangeable with the AR parameter in a CLPM -- as well as a "constant" change. When the two joinl
+
+We can similarly estimate a five wave CLPM. The 
+
+```{r}
+library(lavaan)
+library(tidyverse)
+fit = lavaan(
+  model = estimateCLPM(waves = 5),
+  data = dat) 
+parameterEstimates(fit)  |>
+  as.tibble() |>
+  filter(label == "ar_yeqn"  & rhs == "p1") |>
+  select(est)
+```
+But, according to the data generating process, the auto-regressive parameter should be approximately 0.7. The RICLPM gets this correct.
+
+```{r}
+
+single_change_data <- simLChange(
+  waves = 5,
+  variable_type = "bivariate",
+  beta_x = -0.3,
+  beta_y = -0.3,
+  omega_x = 0.3,
+  omega_y = 0.3,
+  sample.nobs = 1000
+)$data -> dat
+
+model = lavaan::lavaan(
+  model = estimateRICLPM(waves = 5,
+                         time_varying_x = paste0("x", 1:5),
+                         time_varying_y = paste0("y", 1:5)),
+  data = dat)
+summary(model)
+```
+```
+
+* `simCLPM` generates data from a standard cross-lagged panel model.
+* `simRICLPM` generates data from a random-intercept cross-lagged panel model.
+
 
 The $\texttt{crossLagR}$ package includes several functions to simulate data.
 

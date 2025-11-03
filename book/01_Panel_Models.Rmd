@@ -1,29 +1,42 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Panel Data Models
 
 
-Social scientists often turn to panel data to diagnose causal effects when experiments are impractical \citep{chiu_causal_2025}. Whereas dozens of options exist for analyzing longer time series, researchers wishing to analyze cross-sectionally dominant panel structures -- in which there are more units than time points -- face a more limited set of choices. National surveys like found in the American National Election Studies (ANES) may consist of just a handful of waves, with many respondents interviewed only once or twice. 
+Social scientists often turn to panel data to diagnose causal effects when experiments are impractical [@chiu_causal_2025]. Whereas dozens of options exist for analyzing longer time series, researchers wishing to analyze cross-sectionally dominant panel structures -- in which there are more units than time points -- face a more limited set of choices. National surveys like found in the American National Election Studies (ANES) may consist of just a handful of waves, with many respondents interviewed only once or twice.
+
+We consider of the popular methods for analyzing panel data in political science. We start by focusing on a common approach to estimate dynamic processes in panel data (particularly public opinion panel data that are "cross section" dominant, with far more respondents than panel waves: the cross-lagged panel model (CLPM). The CLPM -- introduced by @stanley1963 and extended on by @kenny1975 -- has been widely used to study reciprocal relationships between variables over time. These methods first appeared in the political science literature in the late 1970s [e.g, ;@abramowitz_impact_1978; @campbell_style_1979; @iyengar_testing_1978; @jennings_effect_1977; @markus_political_1979; @markus_dynamic_1979,@meier_issue_1979]. The availability of two large panel surveys with rich political content – Jennings and Niemi’s @jennings_political_1974 socialization study and the ANES 1972-1974-1976 panel – likely promoted the CLPM's adoption, as most of the cross-lagged analyses published in this era analyze these two datasets. Another factor leading to the widespread adoption of the CLPM was the availability of Jöreskog’s LISREL software, which allowed researchers to quickly and easily solve systems of equations using maximum likelihood [@markus_analyzing_1979; @mccullough_effects_1978; @shingles_causal_1976].
+
+Much of the CLPM's appeal lies in its intuitive structure, flexibility, and ease of implementation. In the half century after its introduction, the CLPM has also been refined and extended, due to important limitations in its original formulation. For instance, the model can  account for unobserved heterogeneity across individuals -- stable characteristics of individuals that  confound the "dynamic" estimates in the CLPM [@usami2015; @usami2021; @klopack_and_wickrama2020; @kim_and_steiner2021; @ludtke2022; @mcardle2009]. Because the CLPM does not account for stable unit effects, the cross-lagged estimates will tend to be biased (upwards), as they conflate within-person dynamics with between-person differences. Though not directly referenced as a critique of the CLPM, @hsiao2022 shows that including a lagged dependent variable will produce a biased estimate of the lagged effect, because the variable is correlated with the error term. The correlation arises from the failure to account for "between unit" heterogeneity (pp. 64 -67). As a consequence, CLPM estimates may be biased, especially when the variables of interest exhibit high stability over time [@hamaker_critique_2015; @usami2015; @ludtke2022].
+
+This problem is elaborated on in@hsiao2022. Dynamic models -- models that include lagged dependent variables -- often result in correlations between the observed variables and the error terms, leading to biased estimates. @hsiao2022 proposes and **instrumental variable** approach using lagged values of the dependent variable as instruments. When stable unit effects are ignored, the lagged dependent variable becomes correlated with the error term, violating the **exogeneity** assumption. This correlation leads to biased estimates of the lagged effect. 
+
+Another popular extension to the CLPM is the random intercept cross-lagged panel model (RI-CLPM) proposed in @hamaker2015, which separates within-person dynamics from between-person "trait" effects [@usami2015; @ludtke2022]. Another approach is the Latent Change Score Model (LSCM), which focuses more directly on estimating different change processes; the LCSM  also accounts for stable unit effects, by accounting for unit averaged change [@usami2015; @mcardle2009; @kim_and_steiner2021]. Another alternative is the latent growth model (LGM), which models individual trajectories over time [@usami2015; @mcardle2003].
+
+Ultimately,preference for one model over another is strongly tied to data access and availability. While the CLPM and a restrictive version of the LCSM can be estimated with as few as two waves of data, the RI-CLPM, LGM, and LCSM require more panel waves to properly identify the models. Data with three or more waves of data afford more leverage to estimate dynamic relationships. In this project, we elaborate on these models, beginning with the CLPM and change score approach to modeling dynamic relationships. 
 
 
 ## The Cross-Lagged Panel Model 
 
-In such cases, researchers have tended to rely upon the cross-lagged panel model (CLPM). The CLPM is appealing for its intuitiveness, flexibility, and ease of implementation.  The cross-lagged regression model follows an intuitive structure. The current realizations $x$ and $y$ are a function of autoregressive and cross lagged effects. As such, the autoregression term(s) capture time dependence, while the cross-lagged terms capture how another variable leads to change in the outcome variable.
+The cross-lagged regression model follows an intuitive structure. The current realizations $x$ and $y$ are a function of autoregressive and cross lagged effects. The autoregression terms capture time dependence, while the cross-lagged terms capture how another variable leads to change in the outcome variable.
 
-Depending on the researcher’s preferences, a CLPM can be as complicated as estimating a series of simultaneous equations with latent variables or as simple as adding lagged variables to an ordinary least squares regression. Yet, given the CLPM’s popularity, there has been a surprising lack of discussion in political science about its statistical properties, especially in comparison to other alternative methods. In fact, in the decade since [@hamaker_critique_2015] published an influential critique of the CLPM, the number of published political science articles using the method has more than doubled (from 74 to 169). 
+The CLPM can may be estimated as series of simultaneous equations with lagged realizations of the $x_i$ and $y_i$.
 
-
- 
  $$
 \begin{matrix}
-   y_{it} & = \alpha_{y} + \beta_{1}y_{it-1} + \theta_x x_{it-1} + e_{y,it}\\
-   x_{it} & = \alpha_{x} + \beta_{1}x_{it-1} + \theta_x y_{it-1}+ e_{x,it}\\
+   y_{it} & = \alpha_{y} + \beta_{1}y_{it-1} + \omega_x x_{it-1} + e_{y,it}\\
+   x_{it} & = \alpha_{x} + \beta_{1}x_{it-1} + \omega_x y_{it-1}+ e_{x,it}\\
 \end{matrix}
 $$ 
 
 
-We closely follow the structure that $\alpha$ correspond to intercepts, which eventually may vary across units. It is also common to write the CLPM with mean centered variables, in which case the intercept is 0. The $\beta$ parameters are autoregressive effects. And the $\theta$ parameters are cross-lagged effects. The error terms $e_{y,it}$ and $e_{x,it}$ are assumed to be normally distributed with mean zero and constant variance, and uncorrelated with each other. In practice, they are often correlated, such that $cov(e^y_{t,i}, e^x_{t,i}) \neq 0$.
+$\alpha$ correspond to intercepts, which may vary across units (e.g., survey respondents) as well as panel wave. It is common to write the CLPM with mean centered variables, in which case the intercept is 0. The $\beta$ parameters are autoregressive effects. And the $\omega$ parameters are cross-lagged effects. 
 
 
-```{r clpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="Cross-Lagged Panel Model"}
+```{r clpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="The Cross-Lagged Panel Model"}
 
 library(DiagrammeR)
 # RI-CLPM with proper residuals as curved self-loops and correlated errors - 5 WAVE
@@ -133,10 +146,9 @@ digraph RICLPM {
 
 clpm_diagram
 ```
+It's useful to write the CLPM in terms of latent variables -- "p" and "q" -- for the simple reason that this formulation can easily be extended to models with measurement error, varying factor structures, and multiple indicators per construct. In a "single indicator" latent variable model, $y = p$ and $x = q$. With multiple indicators, the CLPM can account for measurement error. Each indicator is defined by the latent variable, and an error term (the dashed loops). 
 
-It's advantageous to write the CLPM in terms of latent variables -- p and q -- for the simple reason that this formulation can easily be extended to models with measurement error, varying factor structures, and multiple indicators per construct. In this formulation, the $y = p$ and $x = q$. However, the model below constructs latent variables for each time point, with factor loadings, $\lambda$. The model accounts for measurement error. Each indicator is defined by the latent variable, and an error term (the dashed loops). 
-
-```{r error-clpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="Cross-Lagged Panel Model, Multiple Indicators"}
+```{r error-clpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="The Cross-Lagged Panel Model with Multiple Indicators"}
 library(DiagrammeR)
 # CLPM with 3 indicators per latent factor - shorter loadings + error variances (no epsilon labels)
 clpm_diagram <- grViz("
@@ -254,16 +266,17 @@ digraph RICLPM {
   wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
   wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = 'β', fontsize = 11]
 
-  # Cross-lagged paths (θ parameters) - fontsize 11
-  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
-  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
-  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
-  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
-  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
-  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
-  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
-  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = 'θ', fontsize = 11]
-
+# Cross-lagged paths (ω parameters) - fontsize 11
+  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = 'ω', fontsize = 11]
+  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = 'ω', fontsize = 11]
+  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = 'ω', fontsize = 11]
+  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = 'ω', fontsize = 11]
+  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = 'ω', fontsize = 11]
+  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = 'ω', fontsize = 11]
+  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = 'ω', fontsize = 11]
+  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = 'ω', fontsize = 11]
+  
+  
   # Within-time correlations
   wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]
   wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]
@@ -321,11 +334,11 @@ digraph RICLPM {
 clpm_diagram
 ```
 
-In addition, insofar as the constructs measured at each time point are modeled as latent variables, the CLPM can be extended to account for correlated errors, factor invariance, and multiple group comparisons. Below we generally write the CLPM in terms of single indicator variables, though these models can all easily account for multiple indicators.
+In addition, insofar as the constructs measured at each time point are modeled as latent variables, the CLPM can be extended to account for correlated errors, factor invariance, and multiple group comparisons. Below we write the CLPM and alternatives in terms of single indicator variables, though importantly, these models can all easily account for multiple indicators.
 
 ## The Change Score Regression
 
-Panel structures are useful to uncover dynamic relationships in data, in that the researcher may leverage over-time relationships to examine the characteristics of changes, and the relationships of change processes with other covariates [@allison1990]. One popular approach to modeling change is the change score regression model. The change score regression model focuses on the difference between time $t$ and time $t-1$ for each variable. Defining the change scores as $\Delta y_{it}$ and $\Delta x_{it}$, we can rewrite the CLPM in terms of change scores.
+The CLPM is related to the change score regression model [@allison1990]. The change score regression directly constructs change between time points (e.g, $\Delta y_{i,t} = y_{it} - y{i,t-1}$). 
 
 $$
 \Delta y_{it} = y_{it} - y_{it-1}\\
@@ -333,10 +346,7 @@ $$
 $$
 
 
-Where the regression model is a model of change, expressed as differences rather than in level form.
-
-
-
+And 
 
  $$
 \begin{matrix}
@@ -345,11 +355,7 @@ Where the regression model is a model of change, expressed as differences rather
 \end{matrix}
 $$ 
 
-The $\beta$ parameter here correspond to a proportional effect. How much does a the prior value of $y$ influence the change from time $t-1$ to time $t$? The $\beta$ parameter is equivalent in the CLPM -- the autoregressive parameter -- is equivalent to $\beta$ here. 
-
-## Algebraic Equivalence
-
-Expressed in this way, the change score model and the CLPM are algebraically equal. Consider $y_{it}$ and $\Delta y_{it}$:
+The $\beta$ parameter here corresponds to a "proportional" effect. Does the prior value $y_{t-1}$ influence the amount of change in $y$ from time $t-1$ to time $t$? 
 
 $$
 \begin{matrix}
@@ -360,9 +366,11 @@ $$
   \text{Where: } &\tilde{\beta}_y = \beta_{x} - 1
 \end{matrix}
 $$
-The structure of the model remains unchanged. The models are interchangeable, and the lagged and cross-lagged effects simply become **proportional** and **cross-proportional** effects on change scores.
 
 
+The change regression and CLPM are interchangeable, and the lagged and cross-lagged effects simply become **proportional** and **cross-proportional** effects on change scores. . 
+
+## Example: CLPM and Change Score Regression
 
 ```{r, echo = FALSE, message = FALSE, error = FALSE}
 library(dplyr)
@@ -392,13 +400,9 @@ lm(delta_y ~ y_lag + x_lag, data = data) |> summary()
 lm(y ~ y_lag + x_lag, data = data) |> summary()
 ```
 
-The cross-lagged parameters are equal, the AR parameters by $1-\beta$. 
+The cross-lagged parameters are equal, the AR parameters by $1-\beta$. In the latent change score model (an extension of the change score regression), one can explicitly model change as a latent variable, and decompose change into constituent processes, "proportional change," "constant change," and "dual change" [@grimmetal2012].
 
-In the change score model, when $\beta > 1$, then increases in $y$ at time $t-1$ are associated with increases in $y$ at time $t$, what is called "explosive growth." When $\beta < 1$, increases in $y$ at time $t-1$ are associated with proportional change in $y$ at time $t$. The trajectory will decay toward the mean, displaying "regression to the mean." When $\beta = 0$ (and $\theta=0$), there is no association between $y$ at time $t-1$ and $y$ at time $t$ and the model displays a random walk process. 
-
-While not the conventional approach to panel data analysis in the social sciences, the change score method affords greater leverage in understanding the dynamics of a change process. In addition to the algebraic equivalence of the CLPM, extensions to the change score regression model, allow one to decompose change into constituent processes, proportional, constant, and dual change \citep{grimmetal2012}. 
-
-## Decomposing Change
+## Types of Change
 
 The univariate change score regression model allows us to decompose change into three components: constant, proportional, and dual change processes [@grimmetal2012]. 
 
@@ -409,30 +413,23 @@ $$
 \end{matrix}
 $$ 
 
-The $\alpha$ parameters are the effects of a stable trait level component, $s_i$, on the change scores. $s_i$ is a "unit effect" -- corresponding to an estimate of constant change for each row of the data. In a panel, individuals will score higher on this component, indicating they change more in their average change relative to others. The $\alpha$ captures the effect of $s_i$ on the change score at a particular time point.
+The $\alpha$ parameters are the effects of a stable trait level component, $s_i$, on the change scores. The $\alpha$ parameter captures the effect of $s_i$ on the change score at a particular time point.
 
-The $beta$ parameters are the proportional effect of $y$ and $x$ at time $t-1$ on the change score at time $t$. This parameter is the autoregressive parameter in the the CLPM. If $\beta = 0$, then $\alpha$ simply captures how a subject's average change score influences change at time $t$. Combining the two is the "dual-change" model.
+The $\beta$ parameters are the proportional effect of $y$ and $x$ at time $t-1$ on the change score at time $t$. 
 
-When $\beta$ is positive, higher values of $y$ or $x$ at time $t-1$ are associated with increases in the variable at time $t$. When $\beta$ is negative, higher values of $y$ or $x$ at time $t-1$ are associated with decreases in the variable at time $t$. When $\beta$ is zero, there is no association between prior values and change scores, and the model displays a random walk process.
-
-
-It's useful to consider the trajectory of an individual's changes across the length of a panel, or possibly a shorter interval. The trajectory$y$ and $x$ from time $t=1$ to time $t=k$.
+The trajectory$y$ and $x$ from time $t=1$ to time $t=k$.
 
 $$
   y_{i,k} = y_{i,t=1} + \sum_{t=2}^{k} \Delta y_{ik} \\
   x_{i,k} = x_{i,t=1} + \sum_{t=2}^{k} \Delta x_{ik} \\
 $$ 
 
-
-## Bivariate Dual Change 
-
-With cross-lagged effects,
-
+Cross-lagged effects can also be included in the change score regression model, allowing us to examine how change in one variable is influenced by the level of another variable at the prior time point. Cross-lagged coefficients can be interpreted as cross-proportional effects, indicating how much that variable changes the trajectory of change in the dependent variable.
 
 $$
 \begin{matrix}
-  \Delta y_{it} & = \alpha_{y} s_i + \beta_{1}y_{it-1} + \theta_x x_{it} + e_{y,it}\\
-  \Delta x_{it} & = \alpha_{x} s_i + \beta_{1}x_{it-1} + \theta_x y_{it}+ e_{x,it}\\
+  \Delta y_{it} & = \alpha_{y} s_i + \beta_{1}y_{it-1} + \theta_x x_{it-1} + e_{y,it}\\
+  \Delta x_{it} & = \alpha_{x} s_i + \beta_{1}x_{it-1} + \theta_x y_{it-1}+ e_{x,it}\\
 \end{matrix}
 $$ 
 
@@ -618,73 +615,82 @@ lcm
 
 ```
 
-Unlike the CLPM which captures only proportional change, the change score regression model captures constant, proportional, and dual change processes. 
+## Unit Effects
+
+Some researchers have proposed including unit-level fixed effects in the CLPM to account for stable between-person differences. Following Hsiao (2021), the "fixed effects" model either includes dummy variables for each unit, or equivalently, subtracts the unit average from the dependent variable.
+
+Assume the true data generating process is a CLPM with dummy indicator in the error equation, $s_i$:
+
+$$
+\begin{matrix}
+   y_{it} & = \alpha_{y} + \beta_{1}y_{it-1} + \omega_x x_{it-1} + e_{y,it}\\
+   x_{it} & = \alpha_{x} + \beta_{1}x_{it-1} + \omega_x y_{it-1} + e_{x,it}\\
+   e_{y,it} & =  s_i + u_{y,it}\\
+   e_{x,it} & =  s_i + u_{x,it}\\
+\end{matrix}
+$$ 
+Setting aside the cross-lagged coefficient, i.e, $\omega_x = 0$, if one fits the standard CLPM without accounting for $s_i$, the estimates will be biased. 
+
+
+$$
+\begin{matrix}
+   y_{it} & = \alpha_{y} + \beta_{y}y_{it-1} + e_{y,it}\\
+   x_{it} & = \alpha_{x} + \beta_{x}x_{it-1} + e_{x,it}\\
+\end{matrix}
+$$ 
+
+In this model, $\hat\beta$ corresponds to 
+
+
+$$
+\begin{matrix}
+\hat\beta_y &=& {cov(y_{it}, y_{it-1}) \over var(y_{it-1})}\\
+&=& {cov(\beta y_{it-1} + s_i + u_{y,it}, y_{it-1}) \over var(y_{it-1})}\\
+&=& \frac{cov(\beta_y y_{it-1}, y_{it-1}) + cov(s_i, y_{it-1}) + cov(u_{y,it}, y_{it-1})}{var(y_{it-1})}\\
+(\text{Exogeneity}) &=& \frac{\beta_y \cdot var(y_{it-1}) + cov(s_i, y_{it-1})}{var(y_{it-1})}\\
+&=& \beta_y + \frac{cov(s_i, y_{it-1})}{var(y_{it-1})}\\
+\end{matrix}
+$$
+
+The stable unit level effect, $s_i$ -- invariant across time -- is part of the error. Unless it is uncorrelated with $y_{it-1}$, $\hat\beta_y$ will be biased. 
+
+Conditioning on $s_i$ -- including a fixed or random effect for each unit -- attempts to remove this source of bias. For instance, the Random Intercept Cross Lagged Regression Model models "within" versus "between" person effects. A stable, trait level component -- invariant across time -- is modeled alongside "within" person fluctuations around this stable estimate.
 
 ## The Random Intercept Cross Lagged Regression 
 
 The RICLPM -- a popular approach in psychology -- also explicitly includes trait level variation, but in a manner somewhat different from the difference score approaches described. For the moment, ignoring the lags and cross-lagged effects, let us assume that $x$ and $y$ are each a function of a stable trait level component, plus a time-varying state component. The RICLPM is an extension of the CLPM,
 
 $$
-\begin{bmatrix}
- y_{it}\\
- x_{it}
-\end{bmatrix}
-=
-\begin{bmatrix}
-\theta_{1y} & \theta_{1x}  \\
-\theta_{2y} & \theta_{2x}  
-\end{bmatrix}
-\begin{bmatrix}
-y_{it-1} \\ x_{it-1}  
-\end{bmatrix}
-+
-\begin{bmatrix}
-e_{y,it}\\
-e_{x,it}
-\end{bmatrix}
+\begin{matrix}
+   y_{it} & = \alpha_{y} + \beta_{y}y_{it-1} + e_{y,it}\\
+   x_{it} & = \alpha_{x} + \beta_{x}x_{it-1} + e_{x,it}\\
+\end{matrix}
 $$
 
 
 But the RICLPM includes a stable trait level component, $\mu_i$, for each individual $i$:
 
 $$
-\begin{bmatrix}
- y_{it}\\
- x_{it}
-\end{bmatrix}
-=
-\begin{bmatrix}
-\mu^y_{i} \\
-\mu^x_{i}
-\end{bmatrix}
-+
-\begin{bmatrix}
-y^*_{y,it}\\
-x^*_{x,it}
-\end{bmatrix}
+\begin{matrix}
+ y_{it} = \mu^y_{i} + y^*_{y,it}\\
+ x_{it} = \mu^x_{i} + x^*_{x,it}\\
+\end{matrix}
 $$
 The $\mu^x_i$ and $\mu^y_i$ terms are the stable, trait level components for individual $i$. And $x^*_{t,i}$ and $y^*_{t,i}$ terms are the time-varying state components. We can view this formation as providing a decomposition of the total variance in $x$ and $y$ into between-person (trait; $\mu$) and within-person (state, $x^*,y^*$) components. From here, we can rewrite the cross-lagged and lagged effects from the state components alone.
 
+
+
+
+
 $$
-\begin{bmatrix}
- y^*_{it}\\
- x^*_{it}
-\end{bmatrix}
-=
-\begin{bmatrix}
-\theta^*_{1y} & \theta^*_{1x}  \\
-\theta^*_{2y} & \theta^*_{2x}
-\end{bmatrix}
-\begin{bmatrix}
-y^*_{it-1} \\ x^*_{it-1}
-\end{bmatrix}
-+
-\begin{bmatrix}
-e^*_{y,it}\\
-e^*_{x,it}
-\end{bmatrix}
+\begin{matrix}
+   y^*_{it} & = \beta_{y}y^*_{it-1} +  \omega_{y}x^*_{it-1} + e^*_{y,it}\\
+   x^*_{it} & =  \beta_{x}x^*_{it-1} +  \omega_{x}y^*_{it-1} + e^*_{x,it}\\
+\end{matrix}
 $$
-Unlike the CLPM, the RICLPM examines residualized change, or change net of stable trait level differences between individuals. The RICLPM thus focuses on within-person effects -- $y^*_{it}$ and $x^*_{it}$ represent deviations from the individual's mean score for $y$ and $x$.
+
+
+Unlike the CLPM, the RICLPM examines residualized change, or change net of stable trait level differences between individuals. The "dynamic" part of the model captures whether fluctation around the respondent's mean on $x$ relates to fluctuations around the respondent's mean on $y$ at the next time point, and vice versa. The RICLPM thus focuses on within-person effects -- $y^*_{it}$ and $x^*_{it}$ represent deviations from the individual's mean score for $y$ and $x$.
 
 ```{r riclpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="Random Intercept Cross-Lagged Panel Model with 5 waves. The model shows autoregressive paths (solid arrows), cross-lagged effects (solid arrows), within-time correlations (dashed curved arrows), and residual terms (self-loops)."}
 
@@ -823,87 +829,264 @@ As shown in Figure \@ref(fig:riclpm-diagram), the RI-CLPM separates between-pers
 
 The next section builds on these two models, using synthetic data, to illustrate the similarities and similarities between these approaches.
 
-## Spurious and Causal Effects
+## The Latent Growth Model
 
-Particularly since @hamaker_cross-lagged_2015 who showed that the CLPM conflates between-person and within-person effects, and may produce biased estimates of the cross-lagged effects, insofar that $x$, $y$ or both are stable, relatively enduring traits that don't vary from wave-to-wave. This is conceptually similar to Lord's Paradox.
+The Latent Growth Model (LGM) provides another approach. As opposed to modeling autoregressive and cross-lagged effects directly, the LGCM models change over time using latent intercept and slope factors. The model imposes a particular type of growth on all units -- linear, quadratic, exponential -- but otherwise growth trajectories can be estimated for each unit. 
 
-@allison_toward_2015 elaborates on Lord's Paradox in the context difference score models models. Using a similar description, imagine a two wave panel, in which subjects are assigned to the treatment or control following the pretest. For those assigned to the treatment, the pretest mean and standard deviation are nearly identical to the posttest mean and standard deviation. And, the correlation between $y$ in both waves is less than 1. The description is entirely consist with observing no treatment effect; the means do not change from pretest to posttest for those exposed to the treatment.
+```{r lgm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="Latent Growth Model, Linear Trend. "}
 
-But, a variant of the CLPM, where when regresses the 
+library(DiagrammeR)
+lgm_diagram <- grViz("
+digraph RICLPM {
 
-$$y_{post} = \alpha + \beta \cdot y_{pre} + \gamma \cdot treatment + \epsilon$$
-reports a different estimate of the treatment effect, as it compares the mean differences between those exposed to the treatment versus control condition, controlling for the pretest (baseline) score. This is different from examining the difference in scores among those exposed to the treatment. While Lord's Paradox is not entirely ameliorated by using random assignment, the issue becomes more severe if the treatment is not randomly assigned, and one is simply comparing group mean differences. 
+  graph [layout = neato, rankdir = TB, bgcolor = white]
 
-The issue is similarity to the CLPM in that one conflates between-person and within-person effects, by not accounting for unit effects (stable trait level differences between individuals), and one might conclude a cross-lag effect exists -- e.g., x causes a change in y -- when instead the $x$ may be related to $y$ but not necessarily cause a change in $y$.
+  node [shape = box, style = filled, fillcolor = white, fontsize = 11]
+
+  X1 [pos = '-2,2!', label = 'x1', width = 0.6, height = 0.3]
+  X2 [pos = '-1,2!', label = 'x2', width = 0.6, height = 0.3]
+  X3 [pos = '0,2!', label = 'x3', width = 0.6, height = 0.3]
+  X4 [pos = '1,2!', label = 'x4', width = 0.6, height = 0.3]
+  X5 [pos = '2,2!', label = 'x5', width = 0.6, height = 0.3]
+
+  # Within Person X
+  wX1 [pos = '-2,1!', shape = circle, fillcolor = white, label = 'q1']
+  wX2 [pos = '-1,1!', shape = circle, fillcolor = white, label = 'q2']
+  wX3 [pos = '0,1!', shape = circle, fillcolor = white, label = 'q3']
+  wX4 [pos = '1,1!', shape = circle, fillcolor = white, label = 'q4']
+  wX5 [pos = '2,1!', shape = circle, fillcolor = white, label = 'q5']
+
+  #  Within-person  Y
+  wY1 [pos = '-2,-1!', shape = circle, fillcolor = white, label = 'p1']
+  wY2 [pos = '-1,-1!', shape = circle, fillcolor = white, label = 'p2']
+  wY3 [pos = '0,-1!', shape = circle, fillcolor = white, label = 'p3']
+  wY4 [pos = '1,-1!', shape = circle, fillcolor = white, label = 'p4']
+  wY5 [pos = '2,-1!', shape = circle, fillcolor = white, label = 'p5']
+
+  # observed Y variables and RI_Y
+  Y1 [pos = '-2,-2!', label = 'y1', width = 0.6, height = 0.3]
+  Y2 [pos = '-1,-2!', label = 'y2', width = 0.6, height = 0.3]
+  Y3 [pos = '0,-2!', label = 'y3', width = 0.6, height = 0.3]
+  Y4 [pos = '1,-2!', label = 'y4', width = 0.6, height = 0.3]
+  Y5 [pos = '2,-2!', label = 'y5', width = 0.6, height = 0.3]
+  I_Y [pos = '-3.2, -1.8!', shape = circle, fillcolor = white, label = <I<sub>y</sub>>, width = 0.5, height = 0.5]
+  S_Y [pos = '-3, -0.4!', shape = circle, fillcolor = white, label = <S<sub>y</sub>>, width = 0.5, height = 0.5]
+  I_X [pos = '-3.2, 1.8!', shape = circle, fillcolor = white, label = <I<sub>x</sub>>, width = 0.5, height = 0.5]
+  S_X [pos = '-3.75, 0.4!', shape = circle, fillcolor = white, label = <S<sub>x</sub>>, width = 0.5, height = 0.5]
+
+  intercepts [pos = '-5, 0!', shape = triangle, fillcolor = white, label = <I>, width = 0.5, height = 0.5]
+
+  # Measurement model 
+  I_X -> wX1 [label = '1', arrowsize = 0.5]
+  I_X -> wX2 [label = '1', arrowsize = 0.5]
+  I_X -> wX3 [label = '1',  arrowsize = 0.5]
+  I_X -> wX4 [label = '1', arrowsize = 0.5]
+  I_X -> wX5 [label = '1', arrowsize = 0.5]
+  S_X -> wX1 [label = '', arrowsize = 0.5]
+  S_X -> wX2 [label = '', arrowsize = 0.5]
+  S_X -> wX3 [label = '',  arrowsize = 0.5]
+  S_X -> wX4 [label = '', arrowsize = 0.5]
+  S_X -> wX5 [label = '', arrowsize = 0.5]
+  
+  I_Y -> wY1 [label = '1', arrowsize = 0.5]
+  I_Y -> wY2 [label = '1', arrowsize = 0.5]
+  I_Y -> wY3 [label = '1',  arrowsize = 0.5]
+  I_Y -> wY4 [label = '1', arrowsize = 0.5]
+  I_Y -> wY5 [label = '1', arrowsize = 0.5]
+  S_Y -> wY1 [label = '', arrowsize = 0.5]
+  S_Y -> wY2 [label = '', arrowsize = 0.5]
+  S_Y -> wY3 [label = '',  arrowsize = 0.5]
+  S_Y -> wY4 [label = '', arrowsize = 0.5]
+  S_Y -> wY5 [label = '', arrowsize = 0.5]
+  
+  # Measurement model paths
+  wX1 -> X1 [label = '1', arrowsize = 0.5]
+  wX2 -> X2 [label = '1', arrowsize = 0.5]
+  wX3 -> X3 [label = '1', arrowsize = 0.5]
+  wX4 -> X4 [label = '1', arrowsize = 0.5]
+  wX5 -> X5 [label = '1', arrowsize = 0.5]
+  wY1 -> Y1 [label = '1', arrowsize = 0.5]
+  wY2 -> Y2 [label = '1', arrowsize = 0.5]
+  wY3 -> Y3 [label = '1', arrowsize = 0.5]
+  wY4 -> Y4 [label = '1', arrowsize = 0.5]
+  wY5 -> Y5 [label = '1', arrowsize = 0.5]
+
+  intercepts -> S_Y [label = '1', arrowsize = 0.5,   headport = w, tailport = e]
+  intercepts -> S_X [label = '1', arrowsize = 0.5,   headport = w, tailport = e]
+  intercepts -> I_Y [label = '1', arrowsize = 0.5,   headport = w, tailport = e]
+  intercepts -> I_X [label = '1', arrowsize = 0.5,   headport = w, tailport = e]
+  
+  # Within-time correlations
+   wX1 -> wY1 [dir = both, penwidth = 1.5, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]
+  wX2 -> wY2 [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX3 -> wY3 [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX4 -> wY4 [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX5 -> wY5 [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
 
 
-Extending the model, we can use the CLPM and RI-CLPM to produce potential outcomes ; what would $x_{t,i}$ and $y_{t,i}$ be if we intervened on $x$ or $y$ at time $t-1$, $E[x_{i,t}^{y_{t-1}}]$ and $E[y_{i,t}^{x_{t-1}}]$? By assuming that such an intervention is linear, similar to the structure set forth in the CLPM, the marginal effect of the treatment is $\tau$  (Ludtke and Robitzch 2021; Hernan and Robins 2020; Vanderwheele 2015). 
+S_X -> S_X [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5, tailport = w, headport = w]
 
-$$
-\begin{aligned}
-E[Y_{i,t}^{x_{t-1}}] = \alpha_{1} + \tau_{1} x_{t-1} \\
-E[X_{i,t}^{y_{t-1}}] = \alpha_{2} + \tau_{2} y_{t-1} \\
-\end{aligned}
-$$
+I_X -> I_X [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5, tailport = w, headport = w]
 
-The marginal effects, $\tau$ are calculated by the expectations fixing $x_{t,i}$ and $y_{t,i}$ at a value and integrated over the joint distribution of $x_{t-1}$ and $y_{t-1}$. In a linear model, this is typically just $\hat{\theta_{1y}}$ and $\hat{\theta_{2x}}$, the slopes from a regression equation. If there are unobserved confounders, $Z$, then 
+S_Y -> S_Y [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5, tailport = w, headport = w]
 
-$$
-\begin{aligned}
-E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} =  z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z \\
-E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} = z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z\\
-\end{aligned}
-$$
+I_Y -> I_Y [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5, tailport = w, headport = w]
+
+I_X -> S_X [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1]
+
+I_X -> S_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1, tailport = e, headport = e]
+
+S_X -> S_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1, tailport = e, headport = w]
+
+S_X -> I_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1]
+
+I_Y -> S_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1]
+
+I_X -> I_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1,  tailport = w, headport = n]
+
+  # Self-loops to repreesnt errors
+  wX1 -> wX1 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s , arrowsize = 0.5]
+  wX2 -> wX2 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s , arrowsize = 0.5]
+  wX3 -> wX3 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.5]
+  wX4 -> wX4 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.5]
+  wX5 -> wX5 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.5]
+  wY1 -> wY1 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
+  wY2 -> wY2 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
+  wY3 -> wY3 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
+  wY4 -> wY4 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
+  wY5 -> wY5 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
 
 
-The potential outcome is simply the expectation of $x_{t,i}$ and $_{y,i}$, holding $y_{t-1}$ and $x_{t-1}$ at a fixed value, and averaging over the joint distribution of $x_{t-1}$, $y_{t-1}$, and $z$.
+  X1 -> X1 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X2 -> X2 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X3 -> X3 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X4 -> X4 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X5 -> X5 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
 
-## Confounding Variables
+  Y1 -> Y1 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y2 -> Y2 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y3 -> Y3 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y4 -> Y4 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y5 -> Y5 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
 
-In the presence of confounding variables, $Z$, that influence both $x$ and $y$, the cross-lagged estimates may be biased, in both the CLPM or the RI-CLPM. A confounder, like all variables in a panel design may be *time-varying* or *time-invariant*. Some characteristics fluctuate over time, partially or fully explaining the pattern of relationships between $x$ and $y$, others are stable and tend not to change, but also explain the joint relationship between $x$ and $y$.
+}
+")
+# bookdown::render_book(quiet = FALSE, clean = TRUE)
+# browseURL("_book/introduction.html")
 
-If confounder $z$ is time-invariant, the CLPM may be respecified as the RI-CLPM:
-$$
-\begin{bmatrix}
- y^*_{it}\\
- x^*_{it}
-\end{bmatrix}
-=
-\underbrace{
-\begin{bmatrix}
-\theta^*_{1y} & \theta^*_{1x}  \\
-\theta^*_{2y} & \theta^*_{2x}
-\end{bmatrix}
-\begin{bmatrix}
-y^*_{it-1} \\ x^*_{t-1}
-\end{bmatrix}
-+
-\begin{bmatrix}
-e^*_{y,it}\\
-e^*_{x,it}
-\end{bmatrix}
-}_{State}
-+
-\underbrace{
-\begin{bmatrix}
-\mu_{y,i}\\
-\mu_{x,i}
-\end{bmatrix}
-+
-\begin{bmatrix}
-\alpha_{y}\\
-\alpha_{x}
-\end{bmatrix}
-z_{i}
-}_{Trait}
-$$
+# Display the diagram
+lgm_diagram
+```
+ What's particularly useful about this approach is that one can model individual differences in growth trajectories.  This is indicated by the triangle shaped intercept term on the left -- the model allows one to estimate unit values on all intercept and slope factors.The correlations between the latent growth factors, the intercepts $I$ and slopes, $S$ for both $x$ and $y$ capture unique relationships.
 
-* $\mu^x_i$ and $\mu^y_i$ are the stable, trait level components for individual $i$.
-* $x^*_{t,i}$ and $y^*_{t,i}$ are the time-varying state components.
-* $\theta^*_{1y}$ and $\theta^*_{2x}$ are the autoregressive effects for the state components.
-* $\theta^*_{1x}$ and $\theta^*_{1x}$ are the cross-lagged effects for the state components.
+* $cor(S_X, I_X)$: Captures whether individuals with higher initial levels of $x$ also tend to have more rapid growth in $x$ over time.
+* $cor(S_Y, I_Y)$: Captures whether individuals with higher initial levels of $y$ also tend to have more rapid growth in $Y$ over time.
+* $cor(S_X, S_Y)$: Captures whether individuals who experience more rapid growth in $x$ also experience more rapid growth in $y$ over time.
+* $cor(I_X, I_Y)$: Captures whether individuals with higher initial values (i.e., wave 1) of $x$ also have higher starting values on $y$. 
+* $cor(S_X, I_Y)$: Captures whether individuals with higher initial values for $y$ tend to experience more growth in $x$ over time.
+* $cor(S_Y, I_X)$: Captures whether individuals with higher initial values for $x$ tend to experience more growth in $y$ over time.
 
-When the confounder is "unobserved" and either time-invariant or time-varying, what is the consequence of ignoring that confounder in the CLPM or RI-CLPM? There is some disagreement in the literature on this question.
+The latent growth model requires a minimum of two waves to estimate linear growth, and three or more waves to estimate quadratic growth. 
+
+## Measurement Error
+
+Using latent variable structural equation models to estimate panel data relationships, whether that be change, growth, autoregression, and cross-lagged effects, allows researchers to remove measurement error by specifying multiple-indicator latent variables [@bollen_structural_1989; @sullivan_multiple_1979]. While less effective than latent variable modelling, averaging multiple items to create scales can also be effective at reducing measurement error [@ansolabehere_strength_2008]. Measurement error can pose serious challenges to correctly obtaining cross-lagged parameters from CLPMs and change score models. Moreover, the resulting bias is not random. Instead, it will systematically inflate the size of the cross-lagged parameter estimates and increase the risk of false positives. 
+
+
+In the next section, these models are estimated and compared using synthetic data.
+
+<!-- ## Spurious and Causal Effects -->
+
+<!-- Particularly since @hamaker_cross-lagged_2015 who showed that the CLPM conflates between-person and within-person effects, and may produce biased estimates of the cross-lagged effects, insofar that $x$, $y$ or both are stable, relatively enduring traits that don't vary from wave-to-wave. This is conceptually similar to Lord's Paradox. -->
+
+<!-- @allison_toward_2015 elaborates on Lord's Paradox in the context difference score models models. Using a similar description, imagine a two wave panel, in which subjects are assigned to the treatment or control following the pretest. For those assigned to the treatment, the pretest mean and standard deviation are nearly identical to the posttest mean and standard deviation. And, the correlation between $y$ in both waves is less than 1. The description is entirely consist with observing no treatment effect; the means do not change from pretest to posttest for those exposed to the treatment. -->
+
+<!-- But, a variant of the CLPM, where when regresses the  -->
+
+<!-- $$y_{post} = \alpha + \beta \cdot y_{pre} + \gamma \cdot treatment + \epsilon$$ -->
+<!-- reports a different estimate of the treatment effect, as it compares the mean differences between those exposed to the treatment versus control condition, controlling for the pretest (baseline) score. This is different from examining the difference in scores among those exposed to the treatment. While Lord's Paradox is not entirely ameliorated by using random assignment, the issue becomes more severe if the treatment is not randomly assigned, and one is simply comparing group mean differences.  -->
+
+<!-- The issue is similarity to the CLPM in that one conflates between-person and within-person effects, by not accounting for unit effects (stable trait level differences between individuals), and one might conclude a cross-lag effect exists -- e.g., x causes a change in y -- when instead the $x$ may be related to $y$ but not necessarily cause a change in $y$. -->
+
+
+<!-- Extending the model, we can use the CLPM and RI-CLPM to produce potential outcomes ; what would $x_{t,i}$ and $y_{t,i}$ be if we intervened on $x$ or $y$ at time $t-1$, $E[x_{i,t}^{y_{t-1}}]$ and $E[y_{i,t}^{x_{t-1}}]$? By assuming that such an intervention is linear, similar to the structure set forth in the CLPM, the marginal effect of the treatment is $\tau$  (Ludtke and Robitzch 2021; Hernan and Robins 2020; Vanderwheele 2015).  -->
+
+<!-- $$ -->
+<!-- \begin{aligned} -->
+<!-- E[Y_{i,t}^{x_{t-1}}] = \alpha_{1} + \tau_{1} x_{t-1} \\ -->
+<!-- E[X_{i,t}^{y_{t-1}}] = \alpha_{2} + \tau_{2} y_{t-1} \\ -->
+<!-- \end{aligned} -->
+<!-- $$ -->
+
+<!-- The marginal effects, $\tau$ are calculated by the expectations fixing $x_{t,i}$ and $y_{t,i}$ at a value and integrated over the joint distribution of $x_{t-1}$ and $y_{t-1}$. In a linear model, this is typically just $\hat{\theta_{1y}}$ and $\hat{\theta_{2x}}$, the slopes from a regression equation. If there are unobserved confounders, $Z$, then  -->
+
+<!-- $$ -->
+<!-- \begin{aligned} -->
+<!-- E[X_{i,t}^{y_{t-1}}]  = \tau_{1,1} = \int E[X_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} =  z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z \\ -->
+<!-- E[Y_{i,t}^{x_{t-1}}]  = \tau_{1,2} =  \int E[Y_{i,t} | X_{i, t-1} = x_{t-1}, Y = y_{i,t-1}, \textbf{Z} = z] f(x_{t-1}, y_{t-1}, z) dx_{t-1}dy_{t-1}d_z\\ -->
+<!-- \end{aligned} -->
+<!-- $$ -->
+
+
+<!-- The potential outcome is simply the expectation of $x_{t,i}$ and $_{y,i}$, holding $y_{t-1}$ and $x_{t-1}$ at a fixed value, and averaging over the joint distribution of $x_{t-1}$, $y_{t-1}$, and $z$. -->
+
+
+<!-- ## Latent Growth  -->
+
+
+
+<!-- ## Confounding Variables -->
+
+<!-- In the presence of confounding variables, $Z$, that influence both $x$ and $y$, the cross-lagged estimates may be biased, in both the CLPM or the RI-CLPM. A confounder, like all variables in a panel design may be *time-varying* or *time-invariant*. Some characteristics fluctuate over time, partially or fully explaining the pattern of relationships between $x$ and $y$, others are stable and tend not to change, but also explain the joint relationship between $x$ and $y$. -->
+
+<!-- If confounder $z$ is time-invariant, the CLPM may be respecified as the RI-CLPM: -->
+<!-- $$ -->
+<!-- \begin{bmatrix} -->
+<!--  y^*_{it}\\ -->
+<!--  x^*_{it} -->
+<!-- \end{bmatrix} -->
+<!-- = -->
+<!-- \underbrace{ -->
+<!-- \begin{bmatrix} -->
+<!-- \theta^*_{1y} & \theta^*_{1x}  \\ -->
+<!-- \theta^*_{2y} & \theta^*_{2x} -->
+<!-- \end{bmatrix} -->
+<!-- \begin{bmatrix} -->
+<!-- y^*_{it-1} \\ x^*_{t-1} -->
+<!-- \end{bmatrix} -->
+<!-- + -->
+<!-- \begin{bmatrix} -->
+<!-- e^*_{y,it}\\ -->
+<!-- e^*_{x,it} -->
+<!-- \end{bmatrix} -->
+<!-- }_{State} -->
+<!-- + -->
+<!-- \underbrace{ -->
+<!-- \begin{bmatrix} -->
+<!-- \mu_{y,i}\\ -->
+<!-- \mu_{x,i} -->
+<!-- \end{bmatrix} -->
+<!-- + -->
+<!-- \begin{bmatrix} -->
+<!-- \alpha_{y}\\ -->
+<!-- \alpha_{x} -->
+<!-- \end{bmatrix} -->
+<!-- z_{i} -->
+<!-- }_{Trait} -->
+<!-- $$ -->
+
+<!-- * $\mu^x_i$ and $\mu^y_i$ are the stable, trait level components for individual $i$. -->
+<!-- * $x^*_{t,i}$ and $y^*_{t,i}$ are the time-varying state components. -->
+<!-- * $\theta^*_{1y}$ and $\theta^*_{2x}$ are the autoregressive effects for the state components. -->
+<!-- * $\theta^*_{1x}$ and $\theta^*_{1x}$ are the cross-lagged effects for the state components. -->
+
+<!-- When the confounder is "unobserved" and either time-invariant or time-varying, what is the consequence of ignoring that confounder in the CLPM or RI-CLPM? There is some disagreement in the literature on this question. -->
 
 
 

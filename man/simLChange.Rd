@@ -6,72 +6,73 @@
 \usage{
 simLChange(
   waves = 10,
-  model_type = "dual_change",
+  variable_type = c("univariate", "bivariate"),
   initial_mean_x = 0,
   initial_mean_y = 0,
   initial_var_x = 1,
   initial_var_y = 1,
-  constant_change_mean_x = 0.5,
-  constant_change_mean_y = 0.5,
-  constant_change_var_x = 1,
-  constant_change_var_y = 1,
-  ar_x = -0.2,
-  ar_y = -0.2,
-  cl_x = -0.1,
-  cl_y = -0.1,
-  change_x = 0.1,
-  change_y = 0.1,
+  constant_mean_x = 0.5,
+  constant_mean_y = 0.5,
+  latent_variance_x = 1,
+  latent_variance_y = 1,
+  beta_x = -0.2,
+  beta_y = -0.2,
+  omega_x = -0.1,
+  omega_y = -0.1,
+  cross_change_x = 0.1,
+  cross_change_y = 0.1,
   phi_x = 0.1,
   phi_y = 0.1,
-  residual_variance_x = 0.5,
-  residual_variance_y = 0.5,
+  indicator_variance_x = 0.5,
+  indicator_variance_y = 0.5,
   cov_initial_xy = 0.3,
   cov_constant_change_xy = 0.3,
   cov_initial_x_constant_y = 0.2,
   cov_initial_y_constant_x = 0.2,
+  estimate_change_to_change = FALSE,
   ...
 )
 }
 \arguments{
 \item{waves}{The number of waves (time points) in the model.}
 
-\item{model_type}{Type of latent change model: "latent_change" (single variable) or "dual_change" (bivariate).}
+\item{variable_type}{Type of latent change model: "univariate" (single variable) or "bivariate" (dual variable).}
 
 \item{initial_mean_x}{Mean of the initial true score for X.}
 
-\item{initial_mean_y}{Mean of the initial true score for Y (for dual_change only).}
+\item{initial_mean_y}{Mean of the initial true score for Y (for bivariate only).}
 
 \item{initial_var_x}{Variance of the initial true score for X.}
 
-\item{initial_var_y}{Variance of the initial true score for Y (for dual_change only).}
+\item{initial_var_y}{Variance of the initial true score for Y (for bivariate only).}
 
-\item{constant_change_mean_x}{Mean of the constant change factor for X.}
+\item{constant_mean_x}{Mean of the constant change factor for X.}
 
-\item{constant_change_mean_y}{Mean of the constant change factor for Y (for dual_change only).}
+\item{constant_mean_y}{Mean of the constant change factor for Y (for bivariate only).}
 
-\item{constant_change_var_x}{Variance of the constant change factor for X.}
+\item{latent_variance_x}{Variance of the constant change factor for X.}
 
-\item{constant_change_var_y}{Variance of the constant change factor for Y (for dual_change only).}
+\item{latent_variance_y}{Variance of the constant change factor for Y (for bivariate only).}
 
-\item{ar_x}{Proportional effect (autoregressive) for X - effect of X level on X change.}
+\item{beta_x}{Proportional effect for X - effect of X level on X change.}
 
-\item{ar_y}{Proportional effect (autoregressive) for Y - effect of Y level on Y change.}
+\item{beta_y}{Proportional effect for Y - effect of Y level on Y change.}
 
-\item{cl_x}{Coupling parameter - effect of Y level on X change.}
+\item{omega_x}{Coupling parameter - effect of Y level on X change.}
 
-\item{cl_y}{Coupling parameter - effect of X level on Y change.}
+\item{omega_y}{Coupling parameter - effect of X level on Y change.}
 
-\item{change_x}{Change-to-change effect - effect of Y change on X change.}
+\item{cross_change_x}{Change-to-change cross-lagged effect - effect of Y change on X change.}
 
-\item{change_y}{Change-to-change effect - effect of X change on Y change.}
+\item{cross_change_y}{Change-to-change cross-lagged effect - effect of X change on Y change.}
 
 \item{phi_x}{Change autoregression - effect of prior X change on current X change.}
 
 \item{phi_y}{Change autoregression - effect of prior Y change on current Y change.}
 
-\item{residual_variance_x}{Measurement error variance for X indicators.}
+\item{indicator_variance_x}{Measurement error variance for X indicators.}
 
-\item{residual_variance_y}{Measurement error variance for Y indicators.}
+\item{indicator_variance_y}{Measurement error variance for Y indicators.}
 
 \item{cov_initial_xy}{Covariance between initial X and Y true scores.}
 
@@ -80,6 +81,8 @@ simLChange(
 \item{cov_initial_x_constant_y}{Covariance between initial X and constant change Y.}
 
 \item{cov_initial_y_constant_x}{Covariance between initial Y and constant change X.}
+
+\item{estimate_change_to_change}{Logical. Whether to include change-to-change effects.}
 
 \item{...}{Additional arguments to pass to the `lavaan::simulateData` function.}
 }
@@ -92,40 +95,41 @@ A list containing two elements:
 Simulate data from a Latent Change Score Model
 
 This function creates synthetic data for either a single-variable or dual-variable
-latent change score model with specified structural parameters.
+latent change score model with specified structural parameters that match the
+estimateLChange function schema.
 }
 \details{
-For the single variable latent change model (model_type = "latent_change"),
+For the single variable latent change model (variable_type = "univariate"),
 only X-related parameters are used.
 
-For the dual change model (model_type = "dual_change"), the model includes:
+For the dual change model (variable_type = "bivariate"), the model includes:
 - Latent true scores (cf_x, cf_y) at each wave
 - Latent change scores (ld_x, ld_y) from wave 2 onwards
 - Constant change factors (general_x, general_y)
 - Proportional effects (levels affecting own changes)
 - Coupling effects (levels affecting other variable's changes)
-- Change-to-change effects (lagged changes affecting current changes)
+- Change-to-change effects (lagged changes affecting current changes) if enabled
 }
 \examples{
 # Single variable latent change model
 single_change_data <- simLChange(
   waves = 5,
-  model_type = "latent_change",
-  ar_x = -0.2,
-  constant_change_mean_x = 0.5,
+  variable_type = "univariate",
+  beta_x = -0.2,
+  constant_mean_x = 0.5,
   sample.nobs = 1000
 )
 
 # Dual change model
 dual_change_data <- simLChange(
   waves = 5,
-  model_type = "dual_change",
-  ar_x = -0.2,
-  ar_y = -0.3,
-  cl_x = -0.15,
-  cl_y = -0.15,
-  change_x = 0.1,
-  change_y = 0.1,
+  variable_type = "bivariate",
+  beta_x = -0.2,
+  beta_y = -0.3,
+  omega_x = -0.15,
+  omega_y = -0.15,
+  cross_change_x = 0.1,
+  cross_change_y = 0.1,
   sample.nobs = 1000
 )
 
