@@ -5,7 +5,7 @@ The package that accompanies this summary, `crossLagR`, includes functions to es
 **Install and Load**
 
 ```{r}
-devtools::install_github("https://github.com/crweber9874/crossLagR/crossLagR")
+# devtools::install_github("https://github.com/crweber9874/crossLagR/crossLagR")
 library(crossLagR)
 ```
 
