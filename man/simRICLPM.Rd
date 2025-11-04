@@ -5,78 +5,166 @@
 \title{simRICLPM}
 \usage{
 simRICLPM(
-  waves = 10,
-  stability_p = 0.2,
-  stability_q = 0.2,
-  stability_r = NULL,
-  cross_p = 0.1,
-  cross_q = 0.1,
-  cross_zx = NULL,
-  cross_zy = NULL,
-  variance_p = 1,
-  variance_q = 1,
-  variance_r = NULL,
+  waves = 5,
+  sample.nobs = 1000,
+  include_z = FALSE,
+  beta_x = 0.3,
+  beta_y = 0.3,
+  beta_z = 0.3,
+  omega_xy = 0.1,
+  omega_yx = 0.1,
+  omega_zx = 0.1,
+  omega_zy = 0.1,
+  omega_xz = 0.1,
+  omega_yz = 0.1,
+  var_p = 1,
+  var_q = 1,
+  var_r = 1,
   cov_pq = 0.1,
-  cov_pr = NULL,
-  cov_qr = NULL,
-  variance_between_x = 1,
-  variance_between_y = 1,
-  variance_between_z = NULL,
-  cov_between_xy = 0.5,
-  cov_between_xz = NULL,
-  cov_between_yz = NULL,
+  cov_pr = 0.1,
+  cov_qr = 0.1,
+  var_BX = 1.5,
+  var_BY = 1.5,
+  var_BZ = 1.5,
+  cov_BXBY = 0.5,
+  cov_BXBZ = 0.5,
+  cov_BYBZ = 0.5,
+  mean_BX = 0,
+  mean_BY = 0,
+  mean_BZ = 0,
+  constrain_beta = TRUE,
+  constrain_omega = TRUE,
+  constrain_residual_variances = TRUE,
+  constrain_residual_covariances = TRUE,
+  estimate_means = FALSE,
   ...
 )
 }
 \arguments{
-\item{waves}{The number of waves (time points) in the model.}
+\item{waves}{The number of waves (time points) in the model. Must be at least 2.}
 
-\item{stability_p}{The stability parameter for the X variable (autoregressive effect).}
+\item{sample.nobs}{The number of observations (participants) to simulate. Default is 1000.}
 
-\item{stability_q}{The stability parameter for the Y variable (autoregressive effect).}
+\item{include_z}{Logical. If TRUE, includes a third variable Z in the model. Default is FALSE.}
 
-\item{stability_r}{The stability parameter for the Z variable (autoregressive effect, if applicable).}
+\item{beta_x}{Autoregressive effect for X (X(t-1) -> X(t)). Default is 0.3.}
 
-\item{cross_p}{The cross-lagged effect of Y on X at the next time point.}
+\item{beta_y}{Autoregressive effect for Y (Y(t-1) -> Y(t)). Default is 0.3.}
 
-\item{cross_q}{The cross-lagged effect of X on Y at the next time point.}
+\item{beta_z}{Autoregressive effect for Z (Z(t-1) -> Z(t)), if included. Default is 0.3.}
 
-\item{cross_zx}{The cross-lagged effect of Z on X at the next time point (if applicable).}
+\item{omega_xy}{Cross-lagged effect of Y on X (Y(t-1) -> X(t)). Default is 0.1.}
 
-\item{cross_zy}{The cross-lagged effect of Z on Y at the next time point (if applicable).}
+\item{omega_yx}{Cross-lagged effect of X on Y (X(t-1) -> Y(t)). Default is 0.1.}
 
-\item{variance_p}{The variance for the latent X variables.}
+\item{omega_zx}{Cross-lagged effect of Z on X (Z(t-1) -> X(t)), if Z included. Default is 0.1.}
 
-\item{variance_q}{The variance for the latent Y variables.}
+\item{omega_zy}{Cross-lagged effect of Z on Y (Z(t-1) -> Y(t)), if Z included. Default is 0.1.}
 
-\item{variance_r}{The variance for the latent Z variables (if applicable).}
+\item{omega_xz}{Cross-lagged effect of X on Z (X(t-1) -> Z(t)), if Z included. Default is 0.1.}
 
-\item{cov_pq}{The covariance between X and Y within the same time point.}
+\item{omega_yz}{Cross-lagged effect of Y on Z (Y(t-1) -> Z(t)), if Z included. Default is 0.1.}
 
-\item{cov_pr}{The covariance between X and Z within the same time point (if applicable).}
+\item{var_p}{Residual variance for within-person X factors. Default is 1.}
 
-\item{cov_qr}{The covariance between Y and Z within the same time point (if applicable).}
+\item{var_q}{Residual variance for within-person Y factors. Default is 1.}
 
-\item{variance_between_x}{The variance for the random intercept of X.}
+\item{var_r}{Residual variance for within-person Z factors, if included. Default is 1.}
 
-\item{variance_between_y}{The variance for the random intercept of Y.}
+\item{cov_pq}{Residual covariance between within-person X and Y factors. Default is 0.1.}
 
-\item{variance_between_z}{The variance for the random intercept of Z (if applicable).}
+\item{cov_pr}{Residual covariance between within-person X and Z factors, if Z included. Default is 0.1.}
 
-\item{cov_between_xy}{The covariance of intercept terms between X and Y.}
+\item{cov_qr}{Residual covariance between within-person Y and Z factors, if Z included. Default is 0.1.}
 
-\item{cov_between_xz}{The covariance of intercept terms between X and Z (if applicable).}
+\item{var_BX}{Variance of random intercept for X. Default is 1.5.}
 
-\item{cov_between_yz}{The covariance of intercept terms between Y and Z (if applicable).}
+\item{var_BY}{Variance of random intercept for Y. Default is 1.5.}
 
-\item{...}{Additional arguments to pass to the `lavaan::simulateData` function.}
+\item{var_BZ}{Variance of random intercept for Z, if included. Default is 1.5.}
+
+\item{cov_BXBY}{Covariance between random intercepts for X and Y. Default is 0.5.}
+
+\item{cov_BXBZ}{Covariance between random intercepts for X and Z, if Z included. Default is 0.5.}
+
+\item{cov_BYBZ}{Covariance between random intercepts for Y and Z, if Z included. Default is 0.5.}
+
+\item{mean_BX}{Mean of random intercept for X. Default is 0.}
+
+\item{mean_BY}{Mean of random intercept for Y. Default is 0.}
+
+\item{mean_BZ}{Mean of random intercept for Z, if included. Default is 0.}
+
+\item{constrain_beta}{Logical. If TRUE, constrains autoregressive effects to equality across waves. Default is TRUE.}
+
+\item{constrain_omega}{Logical. If TRUE, constrains cross-lagged effects to equality across waves. Default is TRUE.}
+
+\item{constrain_residual_variances}{Logical. If TRUE, constrains residual variances to equality across waves. Default is TRUE.}
+
+\item{constrain_residual_covariances}{Logical. If TRUE, constrains residual covariances to equality across waves. Default is TRUE.}
+
+\item{estimate_means}{Logical. If TRUE, estimates means for within-person factors. Default is FALSE.}
+
+\item{...}{Additional arguments to pass to lavaan::simulateData.}
 }
 \value{
-A list containing two elements:
-   * `model`: The Lavaan model syntax used for data simulation.
-   * `data`: The simulated data in a data frame format.
+A list containing:
+  \itemize{
+    \item \code{model}: The Lavaan model syntax used for data simulation
+    \item \code{data}: The simulated data in a data frame format
+    \item \code{parameters}: A list of the parameters used in simulation
+  }
 }
 \description{
-Simulate data from an observed, random intercept cross-lagged regression (RI-CLR) model,
-including an optional third variable that can interact with X and Y.
+Simulate data from a Random Intercept Cross-Lagged Panel Model (RICLPM) with proper intercept structure
+
+This function creates synthetic data for a Random Intercept Cross-Lagged Panel Model (RICLPM)
+that matches the parameter structure and identification constraints of the estimateRICLPM function.
+The model separates stable between-person differences (random intercepts) from within-person
+dynamics (autoregressive and cross-lagged effects).
+}
+\details{
+The Random Intercept Cross-Lagged Panel Model (RICLPM) decomposes each observed variable into:
+- A stable between-person component (random intercept)
+- A time-varying within-person component (within-person factor)
+- Measurement error (fixed to 0 for perfect indicators)
+
+Variable naming convention:
+- X variables: x1, x2, x3, ..., x[waves]
+- Y variables: y1, y2, y3, ..., y[waves]
+- Z variables (if included): z1, z2, z3, ..., z[waves]
+
+Model identification follows standard RICLPM practices:
+- Random intercept means are estimated (unless estimate_means = FALSE)
+- Within-person factor means are typically fixed to 0 (representing deviations)
+- Random intercepts don't correlate with first wave within-person factors
+- Observed variable residuals are fixed to 0 (perfect indicators)
+}
+\examples{
+# Basic RICLPM simulation
+riclpm_data <- simRICLPM(waves = 4, sample.nobs = 500)
+
+# RICLPM with stronger cross-lagged effects
+riclpm_strong <- simRICLPM(
+  waves = 5,
+  omega_xy = 0.3,
+  omega_yx = 0.3,
+  sample.nobs = 1000
+)
+
+# RICLPM with third variable
+riclpm_3var <- simRICLPM(
+  waves = 4,
+  include_z = TRUE,
+  sample.nobs = 800
+)
+
+# RICLPM with unconstrained parameters
+riclpm_free <- simRICLPM(
+  waves = 4,
+  constrain_beta = FALSE,
+  constrain_omega = FALSE,
+  sample.nobs = 600
+)
+
 }

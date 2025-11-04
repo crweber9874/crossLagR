@@ -2,27 +2,51 @@
 % Please edit documentation in R/estimateCLPM.R
 \name{estimateCLPM}
 \alias{estimateCLPM}
-\title{model_syntax_clpm}
+\title{estimateCLPM}
 \usage{
-estimateCLPM(waves = 10)
+estimateCLPM(
+  waves = 5,
+  constrain_beta = TRUE,
+  constrain_omega = TRUE,
+  constrain_residual_variances = TRUE,
+  constrain_residual_covariances = TRUE,
+  estimate_means = TRUE,
+  start_values = FALSE
+)
 }
 \arguments{
 \item{waves}{The number of waves (time points) in the model.}
+
+\item{constrain_beta}{Logical. If TRUE, constrains autoregressive effects to equality across waves. Default is TRUE.}
+
+\item{constrain_omega}{Logical. If TRUE, constrains cross-lagged effects to equality across waves. Default is TRUE.}
+
+\item{constrain_residual_variances}{Logical. If TRUE, constrains residual variances to equality across waves. Default is TRUE.}
+
+\item{constrain_residual_covariances}{Logical. If TRUE, constrains residual covariances to equality across waves. Default is TRUE.}
+
+\item{estimate_means}{Logical. If TRUE, estimates means for the first wave. Default is TRUE.}
+
+\item{start_values}{Logical. If TRUE, provides starting values for key parameters. Default is FALSE.}
 }
 \value{
-A character string containing the Lavaan model syntax for RICLPM.
-   * `model`: The Lavaan model syntax used for data simulation.
+A character string containing the Lavaan model syntax for CLPM.
 }
 \description{
-Generates model syntax for  Cross-Lagged Panel Model (CLPM)
+Generates model syntax for Cross-Lagged Panel Model (CLPM) with options to constrain parameters across waves.
 }
 \details{
 This function generates the model syntax for a Cross-Lagged Panel Model (CLPM)
-with a specified number of waves.
-}
-\examples{
-# Not Run
-# Generate model syntax for a RICLPM with 5 waves
-#  model_syntax = estimateCLPM(waves = 5)
-#  cat(model_syntax)
+with a specified number of waves. The CLPM examines reciprocal relationships
+between two variables over time without separating stable between-person
+differences from within-person effects.
+
+Key parameters estimated:
+- beta_y, beta_x: Autoregressive effects (stability parameters)
+- omega_xy, omega_yx: Cross-lagged effects (reciprocal influences)
+- var_x, var_y: Residual variances
+- cov_xy: Residual covariances (within-time associations)
+
+The model assumes that all effects are due to within-person processes,
+unlike the RI-CLPM which separates stable traits from dynamic effects.
 }

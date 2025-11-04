@@ -1,3 +1,60 @@
+--- 
+title: "Cross Lagged Regression"
+author: "Christopher Weber"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]  # ← First one
+description: |
+  Cross Lagged Regression
+link-citations: yes
+github-repo: crweber9874/advancedRegression
+---
+--- 
+title: "Cross Lagged Regression"
+author: "Christopher Weber"
+date: "`r Sys.Date()`"
+site: bookdown::bookdown_site
+documentclass: book
+bibliography: [book.bib, packages.bib]  # ← First one
+description: |
+  Cross Lagged Regression
+link-citations: yes
+github-repo: crweber9874/advancedRegression
+---
+
+
+# Preface {-}
+
+The Cross-Lagged Panel Model (CLPM) is widely accepted as a standard method for longitudinal causal analysis in political science. Its application, however, is often susceptible to unaccounted time-invariant confounders and measurement error, leading to spurious estimates of autoregressive and cross-lagged relationships, as well as bias in statistical inferences and substantive conclusions. In these documentation files, I demonstrate the similarities and differences between different panel analysis models, showing in particular, that the standard CLPM is strongly related to a more flexible and robust alternatives, the change score regression model and the random-intercept cross-lagged regression model. Both the Latent Change Model (LCM) and the Random Intercept Cross-Lagged Panel Model (RI-CLPM) extend the standard CLPM by explicitly modeling "unit level" effects. In simulations and empirical examples, we show the myriad paths by which the CLPM produces biased parameter estimates due to unmodeled, stable-unit effects. Both approaches allow for "constant" differences between units over time: In the RI-CLPM, this is represented by a factor corresponding to unit-mean variation in the observed variables, a "random-intercept" while in the LCM, this is captured through a factor corresponding to unit-level change over time, a "random slope."
+
+This documentation elaborates upon:
+
+* The theoretical background for the CLPM, RI-CLPM, and LCM, highlighting their similarities and differences.
+* An introduction to the `crossLagR` package, which includes various utilities to estimate and simulate effects from these models.
+* A Monte Carlo simulation procedure that examines the degree of bias in parameter estimates from the CLPM, RI-CLPM, and LCM under different data-generating processes.
+
+
+
+<!--chapter:end:index.Rmd-->
+
+
+# Panel Data Models
+
+Placeholder
+
+
+## The Cross-Lagged Panel Model 
+## The Change Score Regression
+## Example: CLPM and Change Score Regression
+## Types of Change
+## Unit Effects
+## The Random Intercept Cross Lagged Regression 
+## The Latent Growth Model
+## Measurement Error
+
+<!--chapter:end:01_Panel_Models.Rmd-->
+
 # Panel Data Analysis
 
 The package that accompanies this summary, `crossLagR`, includes functions to estimate several panel data models.
@@ -59,87 +116,6 @@ cat()
 
 ## Simulation
 
-As a simple motivating example, lets' simulate data from a CLPM and simply estimate two regression models, one with lags and one on the change scores. The regression models are just OLS models, one using change scores, the other using lags. Not surprisingly, they are interchangeable.
-
-```{r, echo = TRUE, message = FALSE, error = FALSE}
-# Simulate a five wave panel, with two variables, x y:
-simCLPM(waves = 5)$data |> 
-  reshape_long_sim_cr() -> wide_data
-
-data = wide_data |>
-  group_by(id) |>
-  mutate(
-    y_lag = lag(y),
-    x_lag = lag(x),
-    delta_y = y - lag(y)
-  ) |>
-  ungroup() -> data
-head(data)
-```
-
-Let's assume that we have data generated from a latent change model, with constant change, and we estimate two OLS models, one predicting change scores, the other predicting level scores.
-
-```{r, echo = FALSE, message = FALSE, error = FALSE}
-lm(delta_y ~ y_lag + x_lag, data = data) |> summary()
-lm(y ~ y_lag + x_lag, data = data) |> summary()
-```
-
-They're again interchangeable by $\beta_{CLPM} = \beta_{LChange} + 1$, but the parameter estimates are far from the true parameter estimates used to generate the data. Let's see how the CLPM, RICLPM, and Latent Change models perform on these data.
-
-
-```{r, echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE }
-library(lavaan)
-devtools::load_all()
-simLChange(
-  waves = 5,
-  variable_type = "bivariate",
-  beta_x = -0.3,
-  beta_y = -0.3,
-  omega_x = 0.5,
-  omega_y = 0.5,
-  estimate_constant_change = TRUE,
-           # Covariance between change scores
-  sample.nobs = 10000
-)$data -> wide_data
-
-data = wide_data |> 
-  reshape_long_sim_cr() |> 
-  group_by(id) |>
-  mutate(
-    y_lag = lag(y),
-    x_lag = lag(x),
-    delta_y = y - lag(y)
-  ) |>
-  ungroup() -> data
-
-lm(delta_y ~ y_lag + x_lag, data = data) |> summary()
-lm(y ~ y_lag + x_lag, data = data) |> summary()
-```
-
-The Latent Change Model (unsurprisingly) almost perfectly retrieves the parameter estimates.
-
-```{r}
-model = lavaan::lavaan(
-  model = estimateLChange(waves = 5,
-                variable_type = "bivariate",
-                constrain_omega = TRUE,
-                constrain_beta =  TRUE,
-                estimate_constant_change = TRUE),
-  data = wide_data) 
-summary(model)
-```
-
-
-```{r}
-model = lavaan::lavaan(
-  model = estimateRICLPM(waves = 5,
-                constrain_omega = TRUE,
-                constrain_beta =  TRUE),
-  data = wide_data) 
-summary(model)
-```
-
-
 Each estimation function comes with a simulate data function, allowing users to generate data under the assumptions of each model. These functions are
 
 * `simCLPM()` simulates data from a standard cross-lagged panel model.
@@ -149,87 +125,55 @@ Each estimation function comes with a simulate data function, allowing users to 
 
 Documentation is included for each of the functions and can be accessed with the `help()` function. For example, let's simulated data using a bivariate latent change score model, and then estimate CLPM, RICLPM, Latent Change, and Latent Growth models, on this data set.
 
-### What Happens with Constant Change
-
-Constant change is a "unit effect" so let's examine how this affects the CLPM, RICLPM and LCHANGE model.
+### Specifications
 
 * $\beta = -0.3$ (autoregressive/proportional change)
 * $\omega=  0.3$ (cross lag/cross proportinal change)
 * waves = 5
 * n = 5000
+* No Constant Change
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE }
 library(lavaan)
-devtools::load_all()
-simLChange(
+single_change_data <- simLChange(
   waves = 5,
   variable_type = "bivariate",
   beta_x = -0.3,
   beta_y = -0.3,
-  omega_x = 0.5,
-  omega_y = 0.5,
-  estimate_constant_change = TRUE,
-           # Covariance between change scores
-  sample.nobs = 10000
-)$data |> 
-  reshape_long_sim_cr() |> 
-  group_by(id) |>
-  mutate(
-    y_lag = lag(y),
-    x_lag = lag(x),
-    delta_y = y - lag(y)
-  ) |>
-  ungroup() -> data
-
-lm(delta_y ~ y_lag + x_lag, data = data) |> summary()
-lm(y ~ y_lag + x_lag, data = data) |> summary()
-```
+  omega_x = 0.3,
+  omega_y = 0.3,
+  latent_variance_x = 0.1,
+  latent_variance_y = 0.1,
+  sample.nobs = 5000,
+  estimate_constant_change = FALSE
+)$data -> dat
 ```
 
-```{r}
-# Simulate a five wave panel, with two variables, x y:
-single_change_data <- simLChange(
-  waves = 3,
-  variable_type = "bivariate",
-  beta_x = -0.3,
-  beta_y = -0.3,
-  omega_x = 0.5,
-  omega_y = 0.5,
-  estimate_constant_change = FALSE,
-           # Covariance between change scores
-  sample.nobs = 10000
-)$data 
-```
 
 First examining the results of the latent change score model, it is clear that the model retrieves the correct parameter estimates.
 
 ```{r, echo = FALSE, message = FALSE, warning = FALSE, cache = TRUE }
 model = lavaan::lavaan(
-  model = estimateLChange(waves = 3,
+  model = estimateLChange(waves = 5,
                 variable_type = "bivariate",
                 constrain_omega = TRUE,
                 constrain_beta =  TRUE,
                 estimate_constant_change = FALSE),
-  data = single_change_data) 
+  data = dat) 
 summary(model)
 ```
 The estimate of $beta = -0.3$ and $\omega = 0.3$ are correct.
 
 We can similarly estimate a five wave CLPM. Here, we would expect roughly the same $\omega$ estimates, but the $\beta$ parameters are $\omega_{Latent change} + 1 = \omega_{CLPM}$
-This also appears to be the case, though the CLPM is still off by a bit.
+This also appears to be the case.
 
 
 ```{r}
 library(lavaan)
 library(tidyverse)
 fit = lavaan(
-  model = estimateCLPM(waves = 3, 
-                       estimate_means = TRUE,
-                       constrain_beta = TRUE, 
-                       constrain_omega = TRUE,
-                       constrain_residual_variances = TRUE, 
-                       constrain_residual_covariances = TRUE),
-  data = single_change_data) 
+  model = estimateCLPM(waves = 5, estimate_means = FALSE),
+  data = dat) 
 summary(fit)
 ```
 But, according to the data generating process, the auto-regressive parameter should be approximately 0.7. The RICLPM gets this correct.
@@ -440,3 +384,6 @@ model = estimateCTSEM(data = ct_sem_data)
 summary(model[[1]])$parmatrices
 print(model[[2]] %>% t())
 ```
+
+<!--chapter:end:02_CLPM_Estimation.Rmd-->
+

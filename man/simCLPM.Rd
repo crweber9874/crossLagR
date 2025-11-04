@@ -5,48 +5,97 @@
 \title{simCLPM}
 \usage{
 simCLPM(
-  waves = 10,
-  stability_p = 0.2,
-  stability_q = 0.2,
-  cross_p = 0.1,
-  cross_q = 0.1,
-  variance_p = 1,
-  variance_q = 1,
-  cov_pq = 0.1,
-  means_p = NULL,
-  means_q = NULL,
+  waves = 5,
+  beta_y = 0.4,
+  beta_x = 0.4,
+  omega_xy = 0.2,
+  omega_yx = 0.2,
+  var_y = 1,
+  var_x = 1,
+  cov_xy = 0.3,
+  var_y1 = NULL,
+  var_x1 = NULL,
+  cov_xy1 = NULL,
+  mean_y1 = 0,
+  mean_x1 = 0,
+  sample_size = 1000,
+  seed = NULL,
   ...
 )
 }
 \arguments{
 \item{waves}{The number of waves (time points) in the model.}
 
-\item{stability_p}{The stability parameter for the x variable (autoregressive effect).}
+\item{beta_y}{The autoregressive effect for the y variable (stability parameter).}
 
-\item{stability_q}{The stability parameter for the y variable (autoregressive effect).}
+\item{beta_x}{The autoregressive effect for the x variable (stability parameter).}
 
-\item{cross_p}{The cross-lagged effect of y on x at the next time point.}
+\item{omega_xy}{The cross-lagged effect of x on y at the next time point.}
 
-\item{cross_q}{The cross-lagged effect of x on y at the next time point.}
+\item{omega_yx}{The cross-lagged effect of y on x at the next time point.}
 
-\item{variance_p}{The variance parameter for the x variable.}
+\item{var_y}{The residual variance for the y latent variables.}
 
-\item{variance_q}{The variance parameter for the y variable.}
+\item{var_x}{The residual variance for the x latent variables.}
 
-\item{cov_pq}{The covariance between x and y within the same time point.}
+\item{cov_xy}{The covariance between x and y within the same time point.}
 
-\item{means_p}{Vector of means for p across waves. If NULL, defaults to 0 for all waves.}
+\item{var_y1}{The variance for the first wave y variable. If NULL, uses var_y.}
 
-\item{means_q}{Vector of means for q across waves. If NULL, defaults to 0 for all waves.}
+\item{var_x1}{The variance for the first wave x variable. If NULL, uses var_x.}
+
+\item{cov_xy1}{The covariance for the first wave between x and y. If NULL, uses cov_xy.}
+
+\item{mean_y1}{The mean for the first wave y variable. Default is 0.}
+
+\item{mean_x1}{The mean for the first wave x variable. Default is 0.}
+
+\item{sample_size}{The number of observations to simulate. Default is 1000.}
+
+\item{seed}{Random seed for reproducibility. Default is NULL.}
 
 \item{...}{Additional arguments to pass to the `lavaan::simulateData` function.}
 }
 \value{
 A list containing two elements:
    * `model`: The Lavaan model syntax used for data simulation.
-   * `data`:  The simulated data in a data frame format.
+   * `data`: The simulated data in a data frame format.
 }
 \description{
-Simulate data from a cross-lagged panel model (CLPM)
-In particular, this creates a synthetic dataset of a cross-lagged model with a specified number of waves and structural parameters.
+Simulate data from a Cross-Lagged Panel Model (CLPM) with options for parameter constraints and starting values.
+}
+\details{
+This function simulates data from a Cross-Lagged Panel Model (CLPM) where:
+- p variables represent latent y constructs
+- q variables represent latent x constructs
+- beta parameters represent autoregressive (stability) effects
+- omega parameters represent cross-lagged (reciprocal) effects
+
+The CLPM assumes all relationships are due to within-person processes
+and does not separate stable between-person differences from dynamic effects
+(unlike the RI-CLPM).
+
+Parameter interpretation:
+- beta_y: How much y at time t predicts y at time t+1
+- beta_x: How much x at time t predicts x at time t+1
+- omega_xy: How much x at time t predicts y at time t+1
+- omega_yx: How much y at time t predicts x at time t+1
+}
+\examples{
+# Basic CLPM simulation
+sim_result <- simCLPM(
+  waves = 5,
+  beta_y = 0.4,
+  beta_x = 0.3,
+  omega_xy = 0.2,
+  omega_yx = 0.1,
+  sample_size = 500
+)
+
+# View the generated model
+cat(sim_result$model)
+
+# View the data
+head(sim_result$data)
+
 }

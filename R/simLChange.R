@@ -25,11 +25,15 @@
 #' @param phi_y Change autoregression - effect of prior Y change on current Y change.
 #' @param indicator_variance_x Measurement error variance for X indicators.
 #' @param indicator_variance_y Measurement error variance for Y indicators.
+#' @param var_ld_x Variance of latent change scores for X (when estimate_constant_change = FALSE).
+#' @param var_ld_y Variance of latent change scores for Y (when estimate_constant_change = FALSE).
+#' @param cov_ld Covariance between latent change scores (when estimate_constant_change = FALSE).
 #' @param cov_initial_xy Covariance between initial X and Y true scores.
 #' @param cov_constant_change_xy Covariance between constant change factors for X and Y.
 #' @param cov_initial_x_constant_y Covariance between initial X and constant change Y.
 #' @param cov_initial_y_constant_x Covariance between initial Y and constant change X.
 #' @param estimate_change_to_change Logical. Whether to include change-to-change effects.
+#' @param estimate_constant_change Logical. Whether to include constant change factors. Default is TRUE.
 #' @param ... Additional arguments to pass to the `lavaan::simulateData` function.
 #'
 #' @return A list containing two elements:
@@ -43,10 +47,16 @@
 #' For the dual change model (variable_type = "bivariate"), the model includes:
 #' - Latent true scores (cf_x, cf_y) at each wave
 #' - Latent change scores (ld_x, ld_y) from wave 2 onwards
-#' - Constant change factors (general_x, general_y)
+#' - Constant change factors (general_x, general_y) if estimate_constant_change = TRUE
 #' - Proportional effects (levels affecting own changes)
 #' - Coupling effects (levels affecting other variable's changes)
 #' - Change-to-change effects (lagged changes affecting current changes) if enabled
+#'
+#' When estimate_constant_change = FALSE:
+#' - No constant change factors are included
+#' - Latent change scores have their own variances (var_ld_x, var_ld_y)
+#' - Useful for avoiding positive definiteness issues when constant change variances are small
+#' - Only proportional and coupling effects drive systematic change
 #'
 #' @examples
 #' # Single variable latent change model
@@ -71,6 +81,21 @@
 #'   sample.nobs = 1000
 #' )
 #'
+#' # Bivariate model without constant change factors
+#' no_constant_data <- simLChange(
+#'   waves = 5,
+#'   variable_type = "bivariate",
+#'   beta_x = -0.3,
+#'   beta_y = -0.3,
+#'   omega_x = 0.3,
+#'   omega_y = 0.3,
+#'   estimate_constant_change = FALSE,
+#'   var_ld_x = 0.5,
+#'   var_ld_y = 0.5,
+#'   cov_ld = 0.2,
+#'   sample.nobs = 5000
+#' )
+#'
 #' @export
 simLChange <- function(waves = 10,
                        variable_type = c("univariate", "bivariate"),
@@ -92,11 +117,15 @@ simLChange <- function(waves = 10,
                        phi_y = 0.1,
                        indicator_variance_x = 0.5,
                        indicator_variance_y = 0.5,
+                       var_ld_x = 0.5,
+                       var_ld_y = 0.5,
+                       cov_ld = 0.2,
                        cov_initial_xy = 0.3,
                        cov_constant_change_xy = 0.3,
                        cov_initial_x_constant_y = 0.2,
                        cov_initial_y_constant_x = 0.2,
                        estimate_change_to_change = FALSE,
+                       estimate_constant_change = TRUE,
                        ...) {
 
   # Validate inputs
@@ -161,23 +190,30 @@ simLChange <- function(waves = 10,
       model_string <- paste0(model_string, "    ld", w, " ~ 0*1\n")
     }
 
-    # Latent change score variances (constrained to 0)
-    for (w in 2:waves) {
-      model_string <- paste0(model_string, "    ld", w, " ~~ 0*ld", w, "\n")
+    if (estimate_constant_change) {
+      # Latent change score variances (constrained to 0)
+      for (w in 2:waves) {
+        model_string <- paste0(model_string, "    ld", w, " ~~ 0*ld", w, "\n")
+      }
+
+      # Constant change factor (loadings = 1)
+      model_string <- paste0(model_string, "    general =~ 1*ld2\n")
+      for (w in 3:waves) {
+        model_string <- paste0(model_string, "          + 1*ld", w, "\n")
+      }
+
+      # Constant change factor mean and variance
+      model_string <- paste0(model_string, "    general ~ ", constant_mean_x, "*1\n")
+      model_string <- paste0(model_string, "    general ~~ ", latent_variance_x, "*general\n")
+
+      # Constant change factor covariance with the initial true score
+      model_string <- paste0(model_string, "    general ~~ cf1\n")
+    } else {
+      # Free latent change score variances
+      for (w in 2:waves) {
+        model_string <- paste0(model_string, "    ld", w, " ~~ ", var_ld_x, "*ld", w, "\n")
+      }
     }
-
-    # Constant change factor (loadings = 1)
-    model_string <- paste0(model_string, "    general =~ 1*ld2\n")
-    for (w in 3:waves) {
-      model_string <- paste0(model_string, "          + 1*ld", w, "\n")
-    }
-
-    # Constant change factor mean and variance
-    model_string <- paste0(model_string, "    general ~ ", constant_mean_x, "*1\n")
-    model_string <- paste0(model_string, "    general ~~ ", latent_variance_x, "*general\n")
-
-    # Constant change factor covariance with the initial true score
-    model_string <- paste0(model_string, "    general ~~ cf1\n")
 
     # Proportional effects
     for (w in 2:waves) {
@@ -231,23 +267,30 @@ simLChange <- function(waves = 10,
       model_string <- paste0(model_string, "    ld_x", w, " ~ 0*1\n")
     }
 
-    # Latent change score variances (constrained to 0)
-    for (w in 2:waves) {
-      model_string <- paste0(model_string, "    ld_x", w, " ~~ 0*ld_x", w, "\n")
+    if (estimate_constant_change) {
+      # Latent change score variances (constrained to 0)
+      for (w in 2:waves) {
+        model_string <- paste0(model_string, "    ld_x", w, " ~~ 0*ld_x", w, "\n")
+      }
+
+      # Constant change factor (loadings = 1)
+      model_string <- paste0(model_string, "    general_x =~ 1*ld_x2\n")
+      for (w in 3:waves) {
+        model_string <- paste0(model_string, "          + 1*ld_x", w, "\n")
+      }
+
+      # Constant change factor mean and variance
+      model_string <- paste0(model_string, "    general_x ~ ", constant_mean_x, "*1\n")
+      model_string <- paste0(model_string, "    general_x ~~ ", latent_variance_x, "*general_x\n")
+
+      # Constant change factor covariance with the initial true score
+      model_string <- paste0(model_string, "    general_x ~~ cf_x1\n")
+    } else {
+      # Free latent change score variances
+      for (w in 2:waves) {
+        model_string <- paste0(model_string, "    ld_x", w, " ~~ ", var_ld_x, "*ld_x", w, "\n")
+      }
     }
-
-    # Constant change factor (loadings = 1)
-    model_string <- paste0(model_string, "    general_x =~ 1*ld_x2\n")
-    for (w in 3:waves) {
-      model_string <- paste0(model_string, "          + 1*ld_x", w, "\n")
-    }
-
-    # Constant change factor mean and variance
-    model_string <- paste0(model_string, "    general_x ~ ", constant_mean_x, "*1\n")
-    model_string <- paste0(model_string, "    general_x ~~ ", latent_variance_x, "*general_x\n")
-
-    # Constant change factor covariance with the initial true score
-    model_string <- paste0(model_string, "    general_x ~~ cf_x1\n")
 
     # Proportional effects for X
     for (w in 2:waves) {
@@ -298,23 +341,30 @@ simLChange <- function(waves = 10,
       model_string <- paste0(model_string, "    ld_y", w, " ~ 0*1\n")
     }
 
-    # Latent change score variances (constrained to 0)
-    for (w in 2:waves) {
-      model_string <- paste0(model_string, "    ld_y", w, " ~~ 0*ld_y", w, "\n")
+    if (estimate_constant_change) {
+      # Latent change score variances (constrained to 0)
+      for (w in 2:waves) {
+        model_string <- paste0(model_string, "    ld_y", w, " ~~ 0*ld_y", w, "\n")
+      }
+
+      # Constant change factor (loadings = 1)
+      model_string <- paste0(model_string, "    general_y =~ 1*ld_y2\n")
+      for (w in 3:waves) {
+        model_string <- paste0(model_string, "          + 1*ld_y", w, "\n")
+      }
+
+      # Constant change factor mean and variance
+      model_string <- paste0(model_string, "    general_y ~ ", constant_mean_y, "*1\n")
+      model_string <- paste0(model_string, "    general_y ~~ ", latent_variance_y, "*general_y\n")
+
+      # Constant change factor covariance with the initial true score
+      model_string <- paste0(model_string, "    general_y ~~ cf_y1\n")
+    } else {
+      # Free latent change score variances
+      for (w in 2:waves) {
+        model_string <- paste0(model_string, "    ld_y", w, " ~~ ", var_ld_y, "*ld_y", w, "\n")
+      }
     }
-
-    # Constant change factor (loadings = 1)
-    model_string <- paste0(model_string, "    general_y =~ 1*ld_y2\n")
-    for (w in 3:waves) {
-      model_string <- paste0(model_string, "          + 1*ld_y", w, "\n")
-    }
-
-    # Constant change factor mean and variance
-    model_string <- paste0(model_string, "    general_y ~ ", constant_mean_y, "*1\n")
-    model_string <- paste0(model_string, "    general_y ~~ ", latent_variance_y, "*general_y\n")
-
-    # Constant change factor covariance with the initial true score
-    model_string <- paste0(model_string, "    general_y ~~ cf_y1\n")
 
     # Proportional effects for Y
     for (w in 2:waves) {
@@ -324,8 +374,8 @@ simLChange <- function(waves = 10,
     # -------------------- COUPLING PARAMETERS --------------------
     # Cross-lagged effects on latent change
     for (w in 2:waves) {
-      model_string <- paste0(model_string, "    ld_x", w, " ~ ", omega_y, "*cf_y", w - 1, "\n")
-      model_string <- paste0(model_string, "    ld_y", w, " ~ ", omega_x, "*cf_x", w - 1, "\n")
+      model_string <- paste0(model_string, "    ld_x", w, " ~ ", omega_x, "*cf_y", w - 1, "\n")
+      model_string <- paste0(model_string, "    ld_y", w, " ~ ", omega_y, "*cf_x", w - 1, "\n")
     }
 
     # -------------------- CHANGE-TO-CHANGE PARAMETERS --------------------
@@ -344,15 +394,25 @@ simLChange <- function(waves = 10,
     }
 
     # -------------------- COVARIANCES --------------------
-    # Covariance between constant change factors
-    model_string <- paste0(model_string, "    general_x ~~ ", cov_constant_change_xy, "*general_y\n")
+    if (estimate_constant_change) {
+      # Covariance between constant change factors
+      model_string <- paste0(model_string, "    general_x ~~ ", cov_constant_change_xy, "*general_y\n")
 
-    # Covariance between initial true scores
-    model_string <- paste0(model_string, "    cf_x1 ~~ ", cov_initial_xy, "*cf_y1\n")
+      # Covariance between initial true scores
+      model_string <- paste0(model_string, "    cf_x1 ~~ ", cov_initial_xy, "*cf_y1\n")
 
-    # Covariance between wave 1 scores and constant change scores
-    model_string <- paste0(model_string, "    cf_x1 ~~ ", cov_initial_x_constant_y, "*general_y\n")
-    model_string <- paste0(model_string, "    cf_y1 ~~ ", cov_initial_y_constant_x, "*general_x\n")
+      # Covariance between wave 1 scores and constant change scores
+      model_string <- paste0(model_string, "    cf_x1 ~~ ", cov_initial_x_constant_y, "*general_y\n")
+      model_string <- paste0(model_string, "    cf_y1 ~~ ", cov_initial_y_constant_x, "*general_x\n")
+    } else {
+      # Covariance between initial true scores
+      model_string <- paste0(model_string, "    cf_x1 ~~ ", cov_initial_xy, "*cf_y1\n")
+
+      # Covariances between latent change scores
+      for (w in 2:waves) {
+        model_string <- paste0(model_string, "    ld_x", w, " ~~ ", cov_ld, "*ld_y", w, "\n")
+      }
+    }
   }
 
   # Generate data using lavaan

@@ -92,7 +92,7 @@ estimateCLPM <- function(waves = 5,
   # Fix observed variable intercepts to 0
   for (w in 1:waves) {
     model_string <- paste0( model_string, "    y", w, " ~ 0*1\n")
-    model_string <- paste0(model_string, "    x", w, " ~0*1\n")
+    model_string <- paste0(model_string, "    x", w, "  ~0*1\n")
   }
 
   # Autoregressive and cross-lagged effects
