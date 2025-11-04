@@ -61,7 +61,8 @@ Key parameters estimated:
 - var_S_x, var_S_y: Slope variances (individual differences in rate of change)
 - var_Q_x, var_Q_y: Quadratic variances (if included)
 - cov_IS_x, cov_IS_y: Intercept-slope covariances
-- sigma2_x, sigma2_y: Residual variances
+- var_p, var_q: Latent variable unique variances
+- cov_pq: Latent variable covariances (bivariate only)
 
 Time scoring options:
 - Default: 0, 1, 2, ..., waves-1 (intercept = initial level)
@@ -70,4 +71,24 @@ Time scoring options:
 
 The model assumes linear change over time, with optional quadratic component.
 Individual differences in both initial levels and rates of change are estimated.
+}
+\examples{
+# Basic univariate LGM with 5 waves
+model_syntax <- estimateLGM(waves = 5)
+cat(model_syntax)
+
+# Bivariate LGM with custom time scores
+model_syntax <- estimateLGM(
+  waves = 4,
+  variable_type = "bivariate",
+  time_scores = c(0, 1, 3, 5)
+)
+
+# LGM with quadratic growth
+model_syntax <- estimateLGM(
+  waves = 6,
+  estimate_quadratic = TRUE,
+  center_time = TRUE
+)
+
 }

@@ -12,7 +12,8 @@ estimateLChange(
   constrain_omega = TRUE,
   estimate_change_to_change = FALSE,
   change_to_change = FALSE,
-  constrain_change_cross_lag = FALSE
+  constrain_change_cross_lag = FALSE,
+  estimate_constant_change = TRUE
 )
 }
 \arguments{
@@ -27,6 +28,8 @@ estimateLChange(
 \item{constrain_omega}{Logical. If TRUE, constrains cross-lagged (coupling) effects to equality. Default is FALSE for bivariate.}
 
 \item{estimate_change_to_change}{Logical. Extension to the Latent Change Model. Estimate lagged difference effects -- autoregressive and cross lagged. Requires 4 or more waves of data. Default is FALSE for bivariate.}
+
+\item{estimate_constant_change}{Logical. If TRUE, estimates constant change factors (intercept and slope components). If FALSE, omits constant change factors (pure proportional and coupling effects only). Default is TRUE.}
 
 \item{constrain_change_to_change}{Logical. Extension to the Latent Change Model. Constrain change to change (AR) parameters to equality. Default is FALSE for bivariate.}
 }
@@ -45,7 +48,7 @@ number of waves.
 For single variable models (variable_type = "univariate"):
 - Latent true scores at each wave
 - Latent change scores from wave 2 onwards
-- A constant change factor
+- A constant change factor (if estimate_constant_change = TRUE)
 - Proportional effects (level affecting own change)
 
 For dual change models (variable_type = "bivariate"):
@@ -59,13 +62,18 @@ For bivariate dual change models (variable_type = "bivariate", constrain_change_
 - Cross-lagged (coupling) effects (X level affecting Y change and vice versa)
 - Change-to-change effects (autoregressive and cross-lagged).
 
+When estimate_constant_change = FALSE:
+- No constant change factors are estimated
+- Only proportional and coupling effects drive change
+- Useful when constant change variances are near zero or causing estimation problems
+
 Key parameters estimated:
 - beta_x, beta_y: Proportional effects (level -> own change)
 - omega_x, omega_y: Cross-lagged effects (other level -> change)
 - phi_x, phi_y: Change-to-change effects
 - cross_change_x, cross_change_y: Change-to-change cross-lagged effects
-- constant_mean_x, constant_mean_y: Means of constant change factors
-- latent_variance_x, latent_variance_y: Variances of constant change factors
+- constant_mean_x, constant_mean_y: Means of constant change factors (if estimated)
+- latent_variance_x, latent_variance_y: Variances of constant change factors (if estimated)
 - indicator_variance_x, indicator_variance_y: Measurement error variances
 }
 \examples{
@@ -76,5 +84,13 @@ cat(model_syntax_single)
 # Dual change model
 model_syntax_dual <- estimateLChange(waves = 5, variable_type = "bivariate")
 cat(model_syntax_dual)
+
+# Bivariate model without constant change factors
+model_syntax_no_constant <- estimateLChange(
+  waves = 5,
+  variable_type = "bivariate",
+  estimate_constant_change = FALSE
+)
+cat(model_syntax_no_constant)
 
 }

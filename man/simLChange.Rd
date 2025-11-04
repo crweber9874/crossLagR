@@ -25,11 +25,15 @@ simLChange(
   phi_y = 0.1,
   indicator_variance_x = 0.5,
   indicator_variance_y = 0.5,
+  var_ld_x = 0.5,
+  var_ld_y = 0.5,
+  cov_ld = 0.2,
   cov_initial_xy = 0.3,
   cov_constant_change_xy = 0.3,
   cov_initial_x_constant_y = 0.2,
   cov_initial_y_constant_x = 0.2,
   estimate_change_to_change = FALSE,
+  estimate_constant_change = TRUE,
   ...
 )
 }
@@ -74,6 +78,12 @@ simLChange(
 
 \item{indicator_variance_y}{Measurement error variance for Y indicators.}
 
+\item{var_ld_x}{Variance of latent change scores for X (when estimate_constant_change = FALSE).}
+
+\item{var_ld_y}{Variance of latent change scores for Y (when estimate_constant_change = FALSE).}
+
+\item{cov_ld}{Covariance between latent change scores (when estimate_constant_change = FALSE).}
+
 \item{cov_initial_xy}{Covariance between initial X and Y true scores.}
 
 \item{cov_constant_change_xy}{Covariance between constant change factors for X and Y.}
@@ -83,6 +93,8 @@ simLChange(
 \item{cov_initial_y_constant_x}{Covariance between initial Y and constant change X.}
 
 \item{estimate_change_to_change}{Logical. Whether to include change-to-change effects.}
+
+\item{estimate_constant_change}{Logical. Whether to include constant change factors. Default is TRUE.}
 
 \item{...}{Additional arguments to pass to the `lavaan::simulateData` function.}
 }
@@ -105,10 +117,16 @@ only X-related parameters are used.
 For the dual change model (variable_type = "bivariate"), the model includes:
 - Latent true scores (cf_x, cf_y) at each wave
 - Latent change scores (ld_x, ld_y) from wave 2 onwards
-- Constant change factors (general_x, general_y)
+- Constant change factors (general_x, general_y) if estimate_constant_change = TRUE
 - Proportional effects (levels affecting own changes)
 - Coupling effects (levels affecting other variable's changes)
 - Change-to-change effects (lagged changes affecting current changes) if enabled
+
+When estimate_constant_change = FALSE:
+- No constant change factors are included
+- Latent change scores have their own variances (var_ld_x, var_ld_y)
+- Useful for avoiding positive definiteness issues when constant change variances are small
+- Only proportional and coupling effects drive systematic change
 }
 \examples{
 # Single variable latent change model
@@ -131,6 +149,21 @@ dual_change_data <- simLChange(
   cross_change_x = 0.1,
   cross_change_y = 0.1,
   sample.nobs = 1000
+)
+
+# Bivariate model without constant change factors
+no_constant_data <- simLChange(
+  waves = 5,
+  variable_type = "bivariate",
+  beta_x = -0.3,
+  beta_y = -0.3,
+  omega_x = 0.3,
+  omega_y = 0.3,
+  estimate_constant_change = FALSE,
+  var_ld_x = 0.5,
+  var_ld_y = 0.5,
+  cov_ld = 0.2,
+  sample.nobs = 5000
 )
 
 }

@@ -8,16 +8,16 @@ simLGM(
   waves = 5,
   variable_type = c("univariate", "bivariate"),
   time_scores = NULL,
-  mean_I_x = 1,
+  mean_I_x = 10,
   mean_S_x = 0.5,
   mean_Q_x = 0,
-  mean_I_y = 1,
+  mean_I_y = 10,
   mean_S_y = 0.5,
   mean_Q_y = 0,
-  var_I_x = 0.5,
-  var_S_x = 0.5,
+  var_I_x = 4,
+  var_S_x = 1,
   var_Q_x = 0.01,
-  var_I_y = 1,
+  var_I_y = 4,
   var_S_y = 1,
   var_Q_y = 0.01,
   cov_IS_x = 0,
@@ -106,11 +106,11 @@ simLGM(
 
 \item{cov_SQ_yx}{Covariance between Y slope and X quadratic factors (bivariate only).}
 
-\item{sigma2_x}{Residual variance for X indicators.}
+\item{sigma2_x}{Unique variance for X latent variables (p factors).}
 
-\item{sigma2_y}{Residual variance for Y indicators (bivariate only).}
+\item{sigma2_y}{Unique variance for Y latent variables (q factors, bivariate only).}
 
-\item{cov_res}{Residual covariance between X and Y at each time point (bivariate only).}
+\item{cov_res}{Covariance between X and Y latent variables at each time point (bivariate only).}
 
 \item{estimate_quadratic}{Logical. If TRUE, includes quadratic growth factors in simulation.}
 
@@ -155,10 +155,52 @@ Parameter interpretation:
 - var_S: Individual differences in rates of change
 - var_Q: Individual differences in acceleration
 - cov_IS: Relationship between initial level and rate of change
-- sigma2: Measurement error variance
+- sigma2: Unique variance for latent variables (measurement precision)
+- cov_res: Covariance between latent variables (bivariate models)
 
 Time scoring options:
 - Default: 0, 1, 2, ..., waves-1 (intercept = initial observation)
 - Custom: User-specified time points for unequal spacing
 - Centered: Time scores centered around their mean
+}
+\examples{
+# Basic univariate LGM
+lgm_data <- simLGM(
+  waves = 5,
+  variable_type = "univariate",
+  mean_I_x = 10,
+  mean_S_x = 0.5,
+  var_I_x = 4,
+  var_S_x = 1,
+  cov_IS_x = -0.5,
+  sigma2_x = 2,
+  sample_size = 500
+)
+
+# Bivariate LGM with correlation between variables
+bivar_lgm <- simLGM(
+  waves = 4,
+  variable_type = "bivariate",
+  mean_I_x = 10, mean_I_y = 15,
+  mean_S_x = 0.3, mean_S_y = -0.2,
+  var_I_x = 2, var_I_y = 3,
+  var_S_x = 0.5, var_S_y = 0.8,
+  cov_I_xy = 1.2,
+  cov_S_xy = 0.3,
+  sample_size = 800
+)
+
+# Quadratic growth model
+quad_lgm <- simLGM(
+  waves = 6,
+  estimate_quadratic = TRUE,
+  mean_I_x = 20,
+  mean_S_x = 2,
+  mean_Q_x = -0.1,
+  var_I_x = 9,
+  var_S_x = 1,
+  var_Q_x = 0.01,
+  sample_size = 1200
+)
+
 }
