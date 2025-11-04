@@ -13,9 +13,19 @@ library(crossLagR)
 * `estimateRICLPM()` generates the syntax for random-intercept cross-lagged panel models. Use `help(estimateRICLPM)` to modify constraints and number of waves.
 * `estimateLChange()` generates the syntax for latent change score model. Use `help(estimateLChange)` to modify constraints and number of waves.
 
+Nearly all the functions in the package start with a core lavaan model -- such as the RICLPM [@hamaker2015]. From there, build in rules to implement constraints, extend the number of waves, and modify parameters. You could just print the model code and modify manually. For instance, the `lavaan` code to estimate the CLPM is,
 
+```{r, echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE }
+estimateCLPM(waves = 2,
+                         constrain_beta = TRUE,
+                         constrain_omega = TRUE,
+                         constrain_residual_variances = TRUE,
+                         constrain_residual_covariances = TRUE,
+                         estimate_means = FALSE) |>
+cat()
+```  
 
-
+The `lavaan` code to estimate the Bivariate Latent Change Model is,
 
 ```{r, echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE }
 rm(list = ls())
@@ -26,7 +36,18 @@ estimateLChange(waves = 3,
                 constrain_beta =  TRUE) |>
   cat()
 ```
+And the RICLPM model is 
 
+```{r, echo = TRUE, message = FALSE, warning = FALSE, cache = TRUE }
+rm(list = ls())
+devtools::load_all()
+estimateRICLPM(waves = 3,
+                constrain_omega = TRUE,
+                constrain_beta =  TRUE) |>
+  cat()
+```
+                       
+And finally, the LGM model.
 
 
 
