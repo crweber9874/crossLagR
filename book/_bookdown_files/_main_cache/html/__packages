@@ -11,3 +11,8 @@ dplyr
 stringr
 forcats
 lubridate
+Rcpp
+brms
+StanHeaders
+rstan
+DiagrammeR

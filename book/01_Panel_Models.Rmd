@@ -370,38 +370,6 @@ $$
 
 The change regression and CLPM are interchangeable, and the lagged and cross-lagged effects simply become **proportional** and **cross-proportional** effects on change scores. . 
 
-## Example: CLPM and Change Score Regression
-
-```{r, echo = FALSE, message = FALSE, error = FALSE}
-library(dplyr)
-devtools::load_all()
-```
-
-```{r, echo = TRUE, message = FALSE, error = FALSE}
-# Simulate a five wave panel, with two variables, x y:
-simCLPM(waves = 5)$data |> 
-# In crossLagR there is a helper function to transform wide to long
-  reshape_long_sim_cr() |> 
-# Id identifies the subject, so use this to construct lags
-  group_by(id) |>
-  mutate(
-    y_lag = lag(y),
-    x_lag = lag(x),
-  # Change Score
-    delta_y = y - lag(y)
-  ) |>
-  ungroup() -> data
-
-head(data)
-```
-
-```{r, echo = FALSE, message = FALSE, error = FALSE}
-lm(delta_y ~ y_lag + x_lag, data = data) |> summary()
-lm(y ~ y_lag + x_lag, data = data) |> summary()
-```
-
-The cross-lagged parameters are equal, the AR parameters by $1-\beta$. In the latent change score model (an extension of the change score regression), one can explicitly model change as a latent variable, and decompose change into constituent processes, "proportional change," "constant change," and "dual change" [@grimmetal2012].
-
 ## Types of Change
 
 The univariate change score regression model allows us to decompose change into three components: constant, proportional, and dual change processes [@grimmetal2012]. 
@@ -433,7 +401,7 @@ $$
 \end{matrix}
 $$ 
 
-```{r, echo = FALSE, message = FALSE, error = FALSE}
+```{r lcm, echo = FALSE, message = FALSE, error = FALSE, fig.cap="Latent Change Model with Constant Effects."}
 library(DiagrammeR)
 # RI-CLPM with proper residuals as curved self-loops and correlated errors - 5 WAVE
 lcm <- grViz("
