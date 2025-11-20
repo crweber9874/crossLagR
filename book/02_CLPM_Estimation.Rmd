@@ -3,7 +3,7 @@
 The package that accompanies this summary, `crossLagR`, includes functions to estimate several panel data models. They're structured such that functions that begin with `estimate` are simple functions to write latent variable panel models. The (working) package can be accessed on `github`:  `devtools::install_github("crweber9874/crossLagR")`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
-devtools::install_github("crweber9874/crossLagR")
+# devtools::install_github("crweber9874/crossLagR")
 library(crossLagR)
 library(brms)
 library(dplyr)
@@ -756,6 +756,11 @@ This example simulates data from a four wave panel. Notice that the parameter es
 #| echo: true
 #| message: false
 #| warning: false
+library(crossLagR)
+library(dplyr)
+library(purrr)
+library(tidyr)
+
 # Long data
 baseRICLPM_sim(n = 1000,
                ar_x = 0.5,
@@ -773,10 +778,17 @@ lm(within.y ~  xlagw + ylagw, data = dat) |>
 With more waves $t = 30$, the model recovers the true parameters.
 
 ```{r}
+
 #| echo: true
 #| message: false
 #| warning: false
 # Long data
+library(crossLagR)
+library(dplyr)
+library(purrr)
+library(tidyr)
+
+
 baseRICLPM_sim(n = 1000,
                ar_x = 0.5,
                ar_y = 0.5,
@@ -792,16 +804,21 @@ lm(within.y ~  xlagw + ylagw, data = dat) |>
 
 ## The RICLPM
 
-The RICLPM doesn't exhibit the same problem, with minimal bias (that decreases) with more waves.
+The RICLPM doesn't exhibit the same problem, with minimal bias (that decreases) with more waves. The code below runs a simple
+Monte Carlo analysis varying the number of panel waves, and the following fixed paramters ($n = 2000; \beta_x = 0.4; \beta_y = 0.7; \omega_{x \rightarrow y} = 0.2; \omega_{y \rightarrow x} = 0.3$). 
 
 ```{r}
 #| echo: true
 #| message: false
 #| warning: false
-
+library(crossLagR)
 library(dplyr)
 library(purrr)
 library(tidyr)
+
+fit = lavaan::lavaan(estimateRICLPM(waves = .y),
+                     data = dat, 
+                     warn = FALSE, verbose = FALSE)
 
 true_params <- list(beta_x = 0.4, beta_y = 0.7, 
                     omega_xy = 0.2, omega_yx = 0.3)
@@ -809,18 +826,21 @@ true_params <- list(beta_x = 0.4, beta_y = 0.7,
 # Simple Function to extract parameters from fitted model
 extract_params <- function(fit) {
   pe <- lavaan::parameterEstimates(fit)
+  factor_scores <- lavaan::lavPredict(fit, method = "EBM")
+  factor_scores_df <- as_tibble(factor_scores) %>%
+      select(starts_with("general_y") | starts_with("general_x"))
   tibble(
     beta_x = pe$est[pe$label ==   "beta_x"][1],
     beta_y = pe$est[pe$label ==   "beta_y"][1],
     omega_xy = pe$est[pe$label == "omega_xy"][1],
-    omega_yx = pe$est[pe$label == "omega_yx"][1]
+    omega_yx = pe$est[pe$label == "omega_yx"][1],
   )
 }
 
 
 # Test across different wave counts
 results <- expand_grid(
-  waves = c(3, 5, 7, 10, 30, 50),
+  waves = c(3, 5, 7, 10, 30),
   rep = 1:100
 ) |>
   mutate(
@@ -834,6 +854,7 @@ results <- expand_grid(
       ) |>
         select(-contains("trait"))
     }),
+    # This iterates over the data, x and waves y
     fit = map2(data, waves, ~{
       lavaan::lavaan(estimateRICLPM(waves = .y,
                    label_autoregressive = c("beta_x", "beta_y")), data = .x, 
@@ -843,7 +864,80 @@ results <- expand_grid(
   ) |>
   unnest(params)
 
-# Calculate bias by wave count
+```
+
+```{r}
+library(ggridges)
+library(dplyr)
+library(tidyr)
+library(ggplot2)
+
+# Prepare data with simpler labels for parsing
+results_long <- results |>
+  select(waves, rep, beta_x, beta_y, omega_xy, omega_yx) |>
+  pivot_longer(cols = c(beta_x, beta_y, omega_xy, omega_yx),
+               names_to = "parameter", 
+               values_to = "estimate") |>
+  mutate(
+    parameter_label = case_when(
+      parameter == "beta_x" ~ "Autoregressive[x]",
+      parameter == "beta_y" ~ "Autoregressive[y]",
+      parameter == "omega_xy" ~ "CrossLag~X%->%Y~(omega[xy])",
+      parameter == "omega_yx" ~ "CrossLag~Y%->%X~(omega[yx])"
+    ),
+    true_value = case_when(
+      parameter == "beta_x" ~ 0.4,
+      parameter == "beta_y" ~ 0.7,
+      parameter == "omega_xy" ~ 0.2,
+      parameter == "omega_yx" ~ 0.3
+    ),
+    waves_factor = factor(waves, levels = c(30, 10, 7, 5, 3))
+  )
+
+# Calculate medians for each wave/parameter combination
+medians <- results_long |>
+  group_by(waves_factor, parameter_label, true_value) |>
+  summarise(median_est = median(estimate), .groups = "drop")
+
+# Create plot with median lines
+ggplot(results_long, aes(x = estimate, y = waves_factor)) +
+  geom_density_ridges(
+    aes(fill = waves_factor),
+    scale = 2, 
+    rel_min_height = 0.01,
+    alpha = 0.7
+  ) +
+  # Add true value lines
+  geom_vline(aes(xintercept = true_value), 
+             linetype = "dashed", color = "black", size = 0.8, alpha = 0.5) +
+  # Add median lines for each distribution
+  geom_segment(data = medians,
+               aes(x = median_est, xend = median_est,
+                   y = as.numeric(waves_factor) - 0.3, 
+                   yend = as.numeric(waves_factor) + 0.3),
+               color = "green", size = 1) +
+  facet_wrap(~parameter_label, scales = "free_x", 
+             labeller = label_parsed, nrow = 2) +
+  scale_fill_viridis_d(option = "viridis", begin = 0.2, end = 0.9) +
+  labs(
+    title = "Monte Carlo Sample Distribution Varying Waves, RI-CLPM",
+    subtitle = "Green dashed line = true value | Black line = median estimate",
+    x = "Parameter Estimate",
+    y = "Number of Waves"
+  ) +
+  theme_minimal(base_size = 12) +
+  theme(
+    legend.position = "none",
+    strip.text = element_text(size = 11, face = "bold"),
+    panel.grid.minor = element_blank()
+  )
+```
+
+Here is a summary table,
+
+```{r}
+library(gt)
+# # Calculate bias by wave count
 bias_summary <- results |>
   group_by(waves) |>
   summarise(
@@ -860,34 +954,151 @@ bias_summary <- results |>
          contains("bias")) |>
   mutate(across(where(is.numeric), ~round(., 3)))
 
-# bias_summary |>
-#   gt() |>
-#   tab_header(
-#     title = md("**Monte Carlo Bias Analysis**"),
-#     subtitle = "CLPM Simulation: Varying the DGP"
-#   ) |>
-#   cols_label(
-#     parameter = "Parameter",
-#     clpmu =  "CLPM, Confounder",
-#     clpm  =  "CLPM, No Confounder",
-#     riclpm = "RICLPM",
-# ) |>
-#     fmt_number(
-#     columns = c(clpm, clpmu, riclpm),  # All numeric columns
-#     decimals = 3  # Change this number to control decimals
-#   ) |>
-#   tab_source_note(
-#     source_note = md("*Note*: The results reported here are from 100 simulations.")
-#    ) |>
-#    tab_footnote(
-#      footnote = "Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100",
-#      locations = cells_column_labels(columns = starts_with("Y_"))
-#    )
+bias_summary |>
+  gt() |>
+  tab_header(
+    title = md("**Monte Carlo Bias Analysis**"),
+    subtitle = "RICLPM Estimation: Varying the Number of Waves"
+  ) |>
+  cols_label(
+    waves = "Waves",
+    beta_x_bias =  "Bias, AR(X)",
+    beta_y_bias =  "Bias, AR(Y)",
+    beta_x_relative_bias  =  "Relative Bias AR(X) %",
+    beta_y_relative_bias  =  "Relative Bias AR(Y) %",
+    omega_xy_bias  =  "Bias, CL(X→Y)",
+    omega_yx_bias  =  "Bias, CL(Y→X)",
+    omega_xy_relative_bias  =  "Relative Bias, CL(X→Y) %",
+    omega_yx_relative_bias  =  "Relative Bias, CL(Y→X) %"
+)|>
+   tab_source_note(
+     source_note = md("*Note*: The results reported here are from 100 simulations, varying the number of waves.")
+    ) |>
+    tab_footnote(
+      footnote = "Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100")
+```
+## Change
 
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+library(crossLagR)
+library(dplyr)
+library(purrr)
+library(tidyr)
+
+baseRICLPM_sim(n = 1000,
+               ar_x = 0.5,
+               ar_y = 0.5,
+               cl_xy = 0.3,
+               cl_yx = 0.2, 
+               waves = 10) |>
+  select(-contains("trait")) -> dat
+
+fit = lavaan::lavaan(estimateLChange(waves = 10,
+                                  variable_type =    "bivariate"), 
+                                 data = dat, 
+                     warn = FALSE, verbose = FALSE)
+
+
+true_params <- list(beta_x = -0.6 , beta_y = -0.3, 
+                    omega_x = 0.2, omega_y = 0.3)
+
+# Simple Function to extract parameters from fitted model
+extract_params <- function(fit) {
+  pe <- lavaan::parameterEstimates(fit)
+  tibble(
+    beta_x = pe$est[pe$label ==   "beta_x"][1],
+    beta_y = pe$est[pe$label ==   "beta_y"][1],
+    omega_x = pe$est[pe$label == "omega_x"][1],
+    omega_y = pe$est[pe$label == "omega_y"][1]
+  )
+}
+
+
+# Test across different wave counts
+results <- expand_grid(
+  waves = c(3, 5, 7, 10, 30),
+  rep = 1:100
+) |>
+  mutate(
+    data = map(waves, ~{
+      baseRICLPM_sim(
+        n = 2000,
+        innov_var = 0.5,
+        ar_x = 0.4,  ar_y = 0.7,
+        cl_xy = 0.3, cl_yx = 0.2,
+        waves = .x
+      ) |>
+        select(-contains("trait"))
+    }),
+    # This iterates over the data, x and waves y
+    fit = map2(data, waves, ~{
+      lavaan::lavaan(estimateLChange(waves = .y,
+                                     variable_type = "bivariate",
+                                     estimate_constant_change = FALSE), 
+                                 data = .x, 
+                     warn = FALSE, verbose = FALSE)
+    }),
+    params = map(fit, extract_params)
+  ) |>
+  unnest(params)
 ```
 
-## The Latent Change Model
 
+## Change
+
+```{r}
+library(gt)
+# # Calculate bias by wave count
+bias_summary <- results |>
+  mutate(
+    beta_y = beta_y - 1,
+    beta_x = beta_x - 1 ) |>
+  group_by(waves) |>
+  summarise(
+    across(c(beta_x, beta_y, omega_y, omega_x),
+           list(
+             mean = mean,
+             bias = ~mean(.) - true_params[[cur_column()]],
+             relative_bias = ~ (mean(.) - true_params[[cur_column()]]) / true_params[[cur_column()]]*100,
+             se = ~sd(.)
+           ),
+           .names = "{.col}_{.fn}")
+  ) |>
+  select(waves,
+         contains("bias")) |>
+  mutate(across(where(is.numeric), ~round(., 3)))
+
+bias_summary |>
+  gt() |>
+  tab_header(
+    title = md("**Monte Carlo Bias Analysis**"),
+    subtitle = "RICLPM Estimation: Varying the Number of Waves"
+  ) |>
+  cols_label(
+    waves = "Waves",
+    beta_x_bias =  "Bias, AR(X)",
+    beta_y_bias =  "Bias, AR(Y)",
+    beta_x_relative_bias  =  "Relative Bias AR(X) %",
+    beta_y_relative_bias  =  "Relative Bias AR(Y) %",
+    omega_xy_bias  =  "Bias, CL(X→Y)",
+    omega_yx_bias  =  "Bias, CL(Y→X)",
+    omega_xy_relative_bias  =  "Relative Bias, CL(X→Y) %",
+    omega_yx_relative_bias  =  "Relative Bias, CL(Y→X) %"
+)|>
+   tab_source_note(
+     source_note = md("*Note*: The results reported here are from 100 simulations, varying the number of waves.")
+    ) |>
+    tab_footnote(
+      footnote = "Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100")
+```
+There are inherent benefits to change score specification, 
+
+* Absent unit effects, interchangeable with CLPM. The minimum number of waves is two
+* Effectively deals with unit effects $\alpha_i$ by differencing them out. The minimum number of waves is two.
+* If there are unit effects, the minimum number of waves required is three to identify the model
 
 
 
@@ -896,127 +1107,6 @@ bias_summary <- results |>
 
 
 The model is biased with fewer waves.
-
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-set.seed(123)
-n <- 500
-waves <- 4
-ar_x <- 0.5  
-ar_y <- 0.5  
-cl_xy <- 0.3  
-cl_yx <- 0.2
-## Correlation between latent traits
-cor_traits <- 0.5
-trait_mean <- c(0, 0)
-trait_cov <- matrix(c(1, cor_traits,
-                         cor_traits, 1), 
-                    nrow = 2, byrow = TRUE)
-
-traits <- MASS::mvrnorm(n = n, 
-                  mu = trait_mean, 
-                  Sigma = trait_cov)
-trait_x <- traits[, 1]
-trait_y <- traits[, 2]
-wave_var <- 0.5
-X <- matrix(NA, nrow = n, ncol = waves)
-Y <- matrix(NA, nrow = n, ncol = waves)
-X[, 1] <- trait_x + rnorm(n, mean = 0, sd = sqrt(innov_var))
-Y[, 1] <- trait_y + rnorm(n, mean = 0, sd = sqrt(innov_var))
-## Wave 1 correlations
-innov_cov <- matrix(c(innov_var, cor_xy * innov_var,
-                      cor_xy * innov_var, innov_var), 2, 2)
-wave1_innov <- mvrnorm(n, mu = c(0, 0), Sigma = innov_cov)
-
-X[, 1] <- trait_x + wave1_innov[, 1]
-Y[, 1] <- trait_y + wave1_innov[, 2]
-     
-## Draw subsequent waves, based on correlated within time innovations                     
-for (t in 2:waves) {
-  innovations <- MASS::mvrnorm(n, c(0,0), 
-                         matrix(c(innov_var, cor_xy*innov_var,
-                                  cor_xy*innov_var, innov_var), 2, 2))
-  # Within-person deviations from trait
-  X[, t] <- trait_x + ar_x * (X[, t-1] - trait_x) + 
-                      cl_yx * (Y[, t-1] - trait_y) + innovations[, 1]
-  Y[, t] <- trait_y + ar_y * (Y[, t-1] - trait_y) + 
-                      cl_xy * (X[, t-1] - trait_x) + innovations[, 2]
-}
-
-library(dplyr)
-library(tidyr)
-library(stringr)
-data <- tibble(
-  id = rep(1:n, each = waves),
-  wave = rep(1:waves, times = n)
-) |>
-  mutate(
-    x = c(t(X)),
-    y = c(t(Y)),
-    trait_x = rep(trait_x, each = waves),
-    trait_y = rep(trait_y, each = waves)
-  ) |>
-  # pivot to wide
-  pivot_wider(names_from = wave, 
-              values_from = c(x, y),
-              names_prefix = "") |>
-  rename_with(~ str_replace_all(.x, "_", ""), everything())
-
-
-
-summary(lavaan(estimateRICLPM(waves = 4), data = sim_data))
-```
-
-```{r}
-library(lavaan)
-#| echo: false
-#| message: false
-#| warning: false
-#| 
-data = simLChange(
-  waves = 4,
-  variable_type = "bivariate",
-  beta_x = -0.4,    
-  beta_y = -0.6,   
-  indicator_variance_y = 0.5,
-  indicator_variance_x = 0.5, 
-  constant_mean_x = 0,
-  constant_mean_y = 0 ,
-  omega_x = 0.1,   
-  omega_y = 0.1,
-  estimate_constant_change = TRUE,  
-  sample.nobs = 1000
-)$data
-
-summary(lavaan(estimateRICLPM(waves = 4), data = data))
-```
-
-
-
-```{r}
-#| echo: false
-#| message: false
-#| warning: false
-#| 
-data = simLChange(
-  waves = 5,
-  variable_type = "bivariate",
-  beta_x = -0.2,    
-  beta_y = -0.3,   
-  indicator_variance_y = 1,
-  indicator_variance_x = 1, 
-  constant_mean_x = 0,
-  constant_mean_y = 0 ,
-  omega_x = 0.4,   
-  omega_y = 0.4,
-  estimate_constant_change = TRUE,  
-  sample.nobs = 1000
-)$data
-
-summary(lavaan(estimateRICLPM(waves = 5), data = data))
-```
 
 
 

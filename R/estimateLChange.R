@@ -1,8 +1,53 @@
-# CORRECTED estimateLChange function - fixes the change-to-change cross-lagged bug
 
+#' Generate Lavaan Model Syntax for Latent Change Score Models
+#'
+#' @description
+#' Creates lavaan model syntax for univariate or bivariate Latent Change Score Models (LCSM).
+#' The function implements various forms of LCSM including basic proportional change models,
+#' constant change models, and models with change-to-change effects. The generated syntax
+#' follows McArdle's (2009) latent change score framework.
+#'
+#' @param waves Integer. Number of measurement waves (minimum = 3). Higher wave counts
+#'   provide better estimation of change parameters and model fit.
+#'
+#' @param variable_type Character string. Either "univariate" for single variable models
+#'   or "bivariate" for coupled change models with two variables. Default is "univariate".
+#'
+#' @param constrain_indicator_variances Logical. If TRUE (default), constrains measurement
+#'   error variances to equality across waves, assuming measurement invariance. This
+#'   improves model identification and parameter recovery.
+#'
+#' @param constrain_beta Logical. If TRUE (default), constrains proportional change
+#'   parameters (β) to equality across waves. These parameters represent the effect of
+#'   the current level on subsequent change.
+#'
+#' @param constrain_omega Logical. If TRUE (default), constrains coupling parameters (ω)
+#'   to equality across waves in bivariate models. These represent cross-variable effects
+#'   where one variable's level influences the other's change. Only used when
+#'   variable_type = "bivariate".
+#'
+#' @param estimate_change_to_change Logical. If FALSE (default), does not include
+#'   change-to-change effects. If TRUE, adds autoregressive and cross-lagged effects
+#'   between latent change scores. Requires at least 4 waves. Only used when
+#'   variable_type = "bivariate".
+#'
+#' @param constrain_change_to_change Logical. If FALSE (default), allows change-to-change
+#'   effects to vary across waves. If TRUE, constrains them to equality. Only relevant
+#'   when estimate_change_to_change = TRUE.
+#'
+#' @param constrain_change_cross_lag Logical. If FALSE (default), estimates unconstrained
+#'   cross-lagged change-to-change effects. If TRUE, constrains cross-lagged
+#'   change-to-change parameters to equality. Only relevant when
+#'   estimate_change_to_change = TRUE.
+#'
+#' @param estimate_constant_change Logical. If TRUE (default), estimates a second-order
+#'   constant change factor representing linear growth/decline. This factor captures
+#'   systematic change that is constant acros
+#'   waves. If FALSE, latent change score variances are freely estimated.
+#'   @export
 estimateLChange <- function(waves = 10,
                                   variable_type = c('univariate', 'bivariate'),
-                                  constrain_indicator_variances = TRUE,
+                                  constrain_inicator_variances = TRUE,
                                   constrain_beta = TRUE,
                                   constrain_omega = TRUE,
                                   estimate_change_to_change = FALSE,
