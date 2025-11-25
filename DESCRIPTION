@@ -23,7 +23,6 @@ Imports:
   gganimate,
   tidyr,
   stringr,
-  ctsem,
   lme4
 Suggests:
     knitr,

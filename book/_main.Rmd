@@ -4,19 +4,7 @@ author: "Christopher Weber"
 date: "`r Sys.Date()`"
 site: bookdown::bookdown_site
 documentclass: book
-bibliography: [book.bib, packages.bib]  # ← First one
-description: |
-  Cross Lagged Regression
-link-citations: yes
-github-repo: crweber9874/advancedRegression
----
---- 
-title: "Cross Lagged Regression"
-author: "Christopher Weber"
-date: "`r Sys.Date()`"
-site: bookdown::bookdown_site
-documentclass: book
-bibliography: [book.bib, packages.bib]  # ← First one
+bibliography: [book.bib, packages.bib]  
 description: |
   Cross Lagged Regression
 link-citations: yes

@@ -1,0 +1,12 @@
+name: 02_clpm_estimation
+title: 02_CLPM_Estimation
+username: chrisweber
+account: chrisweber
+server: viz.datascience.arizona.edu
+hostUrl: https://viz.datascience.arizona.edu/__api__
+appId: 1334
+bundleId: 8152
+url: https://viz.datascience.arizona.edu:443/content/79b998a1-8e6c-47c4-a7bf-be1a2cf8c118/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE
