@@ -3,7 +3,7 @@
 The package that accompanies this summary, `crossLagR`, includes functions to estimate several panel data models. They're structured such that functions that begin with `estimate` are simple functions to write latent variable panel models. The (working) package can be accessed on `github`:  `devtools::install_github("crweber9874/crossLagR")`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
-# devtools::install_github("crweber9874/crossLagR")
+devtools::install_github("crweber9874/crossLagR")
 library(crossLagR)
 library(brms)
 library(dplyr)
@@ -1137,6 +1137,8 @@ C. Moderate *t* panel, less stable constructs. 2012-2020. "Institute for the Stu
 D. Long t panel
 
 IV. Discussion/Conclusion
+
 - Summary of findings
+
 - Recommendations for applied researchers...models and data constraints -- e.g., RICLPM is effective with marginally stable constructs and moderate to longer *t* panels. LCM models change processes explicitly. The CLPM almost always will get it wrong.
 
