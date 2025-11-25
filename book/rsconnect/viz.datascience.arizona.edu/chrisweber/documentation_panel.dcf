@@ -1,0 +1,12 @@
+name: documentation_panel
+title: Documentation_Panel
+username: chrisweber
+account: chrisweber
+server: viz.datascience.arizona.edu
+hostUrl: https://viz.datascience.arizona.edu/__api__
+appId: 1325
+bundleId: 8150
+url: https://viz.datascience.arizona.edu:443/content/59e85130-bbf9-43db-b3ed-be1d535aa9d3/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

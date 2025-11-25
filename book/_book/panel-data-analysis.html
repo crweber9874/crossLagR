@@ -1,0 +1,1590 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 2 Panel Data Analysis | Cross Lagged Regression</title>
+  <meta name="description" content="Chapter 2 Panel Data Analysis | Cross Lagged Regression" />
+  <meta name="generator" content="bookdown 0.45 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 2 Panel Data Analysis | Cross Lagged Regression" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Chapter 2 Panel Data Analysis | Cross Lagged Regression" />
+  <meta name="github-repo" content="crweber9874/advancedRegression" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 2 Panel Data Analysis | Cross Lagged Regression" />
+  
+  <meta name="twitter:description" content="Chapter 2 Panel Data Analysis | Cross Lagged Regression" />
+  
+
+<meta name="author" content="Christopher Weber" />
+
+
+<meta name="date" content="2025-11-04" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="panel-data-models.html"/>
+
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">CrossLagR</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="panel-data-models.html"><a href="panel-data-models.html"><i class="fa fa-check"></i><b>1</b> Panel Data Models</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="panel-data-models.html"><a href="panel-data-models.html#the-cross-lagged-panel-model"><i class="fa fa-check"></i><b>1.1</b> The Cross-Lagged Panel Model</a></li>
+<li class="chapter" data-level="1.2" data-path="panel-data-models.html"><a href="panel-data-models.html#the-change-score-regression"><i class="fa fa-check"></i><b>1.2</b> The Change Score Regression</a></li>
+<li class="chapter" data-level="1.3" data-path="panel-data-models.html"><a href="panel-data-models.html#example-clpm-and-change-score-regression"><i class="fa fa-check"></i><b>1.3</b> Example: CLPM and Change Score Regression</a></li>
+<li class="chapter" data-level="1.4" data-path="panel-data-models.html"><a href="panel-data-models.html#types-of-change"><i class="fa fa-check"></i><b>1.4</b> Types of Change</a></li>
+<li class="chapter" data-level="1.5" data-path="panel-data-models.html"><a href="panel-data-models.html#unit-effects"><i class="fa fa-check"></i><b>1.5</b> Unit Effects</a></li>
+<li class="chapter" data-level="1.6" data-path="panel-data-models.html"><a href="panel-data-models.html#the-random-intercept-cross-lagged-regression"><i class="fa fa-check"></i><b>1.6</b> The Random Intercept Cross Lagged Regression</a></li>
+<li class="chapter" data-level="1.7" data-path="panel-data-models.html"><a href="panel-data-models.html#the-latent-growth-model"><i class="fa fa-check"></i><b>1.7</b> The Latent Growth Model</a></li>
+<li class="chapter" data-level="1.8" data-path="panel-data-models.html"><a href="panel-data-models.html#measurement-error"><i class="fa fa-check"></i><b>1.8</b> Measurement Error</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="panel-data-analysis.html"><a href="panel-data-analysis.html"><i class="fa fa-check"></i><b>2</b> Panel Data Analysis</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="panel-data-analysis.html"><a href="panel-data-analysis.html#simulation"><i class="fa fa-check"></i><b>2.1</b> Simulation</a></li>
+<li class="chapter" data-level="2.2" data-path="panel-data-analysis.html"><a href="panel-data-analysis.html#a-simple-example"><i class="fa fa-check"></i><b>2.2</b> A Simple Example</a></li>
+<li class="chapter" data-level="2.3" data-path="panel-data-analysis.html"><a href="panel-data-analysis.html#summary"><i class="fa fa-check"></i><b>2.3</b> Summary</a></li>
+<li class="chapter" data-level="2.4" data-path="panel-data-analysis.html"><a href="panel-data-analysis.html#unit-effects-1"><i class="fa fa-check"></i><b>2.4</b> Unit Effects</a>
+<ul>
+<li class="chapter" data-level="2.4.1" data-path="panel-data-analysis.html"><a href="panel-data-analysis.html#dgp-latent-change-with-constant-effects-estimator-clpm"><i class="fa fa-check"></i><b>2.4.1</b> DGP: Latent Change with Constant Effects, Estimator: CLPM</a></li>
+</ul></li>
+<li class="chapter" data-level="2.5" data-path="panel-data-analysis.html"><a href="panel-data-analysis.html#summary-1"><i class="fa fa-check"></i><b>2.5</b> Summary</a></li>
+</ul></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Cross Lagged Regression</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="panel-data-analysis" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Chapter 2</span> Panel Data Analysis<a href="panel-data-analysis.html#panel-data-analysis" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The package that accompanies this summary, <code>crossLagR</code>, includes functions to estimate several panel data models.</p>
+<p><strong>Install and Load</strong></p>
+<ul>
+<li><code>estimateCLPM()</code> generates the syntax for cross-lagged panel models. Use <code>help(estimateRICLPM)</code> to modify constraints and number of waves.</li>
+<li><code>estimateRICLPM()</code> generates the syntax for random-intercept cross-lagged panel models. Use <code>help(estimateRICLPM)</code> to modify constraints and number of waves.</li>
+<li><code>estimateLChange()</code> generates the syntax for latent change score model. Use <code>help(estimateLChange)</code> to modify constraints and number of waves.</li>
+<li><code>estimateLGM()</code> generates the syntax for latent growth models. Use <code>help(estimateLGM)</code> to modify constraints and number of waves.</li>
+</ul>
+<p>Nearly all the functions in the package start with a core lavaan model – such as the RICLPM <span class="citation">(<a href="#ref-hamaker2015"><strong>hamaker2015?</strong></a>)</span>. From there, build in rules to implement constraints, extend the number of waves, and modify parameters. You could just print the model code and modify manually. For instance, the <code>lavaan</code> code to estimate the CLPM is,</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="panel-data-analysis.html#cb1-1" tabindex="-1"></a><span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">2</span>,</span>
+<span id="cb1-2"><a href="panel-data-analysis.html#cb1-2" tabindex="-1"></a>                         <span class="at">constrain_beta =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-3"><a href="panel-data-analysis.html#cb1-3" tabindex="-1"></a>                         <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-4"><a href="panel-data-analysis.html#cb1-4" tabindex="-1"></a>                         <span class="at">constrain_residual_variances =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-5"><a href="panel-data-analysis.html#cb1-5" tabindex="-1"></a>                         <span class="at">constrain_residual_covariances =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-6"><a href="panel-data-analysis.html#cb1-6" tabindex="-1"></a>                         <span class="at">estimate_means =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-7"><a href="panel-data-analysis.html#cb1-7" tabindex="-1"></a><span class="fu">cat</span>()</span></code></pre></div>
+<pre><code>##     p1 =~ 1*y1
+##     q1 =~ 1*x1
+##     p2 =~ 1*y2
+##     q2 =~ 1*x2
+##     p1 ~ 0*1
+##     q1 ~ 0*1
+##     p2 ~ 0*1
+##     q2 ~ 0*1
+##     y1 ~ 0*1
+##     x1  ~0*1
+##     y2 ~ 0*1
+##     x2  ~0*1
+##     p2 ~ beta_y*p1 + omega_xy*q1
+##     q2 ~ beta_x*q1 + omega_yx*p1
+##     p1 ~~ var_y1*p1
+##     q1 ~~ var_x1*q1
+##     p2 ~~ var_y*p2
+##     q2 ~~ var_x*q2
+##     p1 ~~ cov_xy1*q1
+##     p2 ~~ cov_xy*q2
+##     y1 ~~ 0*y1
+##     x1 ~~ 0*x1
+##     y2 ~~ 0*y2
+##     x2 ~~ 0*x2</code></pre>
+<p>The <code>lavaan</code> code to estimate the Bivariate Latent Change Model is,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="panel-data-analysis.html#cb3-1" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
+<span id="cb3-2"><a href="panel-data-analysis.html#cb3-2" tabindex="-1"></a>                <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb3-3"><a href="panel-data-analysis.html#cb3-3" tabindex="-1"></a>                <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-4"><a href="panel-data-analysis.html#cb3-4" tabindex="-1"></a>                <span class="at">constrain_beta =</span>  <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="panel-data-analysis.html#cb3-5" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div>
+<pre><code>##     cf_x1 =~ 1*x1
+##     cf_x2 =~ 1*x2
+##     cf_x3 =~ 1*x3
+##     cf_x1 ~ indicator_mean_x*1
+##     cf_x2 ~ 0*1
+##     cf_x3 ~ 0*1
+##     cf_x1 ~~ start(15)*latent_indicator_mean_x*cf_x1
+##     cf_x2 ~~ 0*cf_x2
+##     cf_x3 ~~ 0*cf_x3
+##     x1 ~ 0*1
+##     x2 ~ 0*1
+##     x3 ~ 0*1
+##     x1 ~~ indicator_variance_x*x1
+##     x2 ~~ indicator_variance_x*x2
+##     x3 ~~ indicator_variance_x*x3
+##     cf_x2 ~ 1*cf_x1
+##     cf_x3 ~ 1*cf_x2
+##     ld_x2 =~ 1*cf_x2
+##     ld_x3 =~ 1*cf_x3
+##     ld_x2 ~ 0*1
+##     ld_x3 ~ 0*1
+##     ld_x2 ~~ 0*ld_x2
+##     ld_x3 ~~ 0*ld_x3
+##     general_x =~ 1*ld_x2
+##     + 1*ld_x3
+##     general_x ~ constant_mean_x*1
+##     general_x ~~ latent_variance_x*general_x
+##     general_x ~~ cf_x1
+##     ld_x2 ~ start(-0.15)*beta_x*cf_x1
+##     ld_x3 ~ start(-0.15)*beta_x*cf_x2
+##     cf_y1 =~ 1*y1
+##     cf_y2 =~ 1*y2
+##     cf_y3 =~ 1*y3
+##     cf_y1 ~ indicator_mean_y*1
+##     cf_y2 ~ 0*1
+##     cf_y3 ~ 0*1
+##     cf_y1 ~~ start(15)*latent_variance_y*cf_y1
+##     cf_y2 ~~ 0*cf_y2
+##     cf_y3 ~~ 0*cf_y3
+##     y1 ~ 0*1
+##     y2 ~ 0*1
+##     y3 ~ 0*1
+##     y1 ~~ indicator_variance_y*y1
+##     y2 ~~ indicator_variance_y*y2
+##     y3 ~~ indicator_variance_y*y3
+##     cf_y2 ~ 1*cf_y1
+##     cf_y3 ~ 1*cf_y2
+##     ld_y2 =~ 1*cf_y2
+##     ld_y3 =~ 1*cf_y3
+##     ld_y2 ~ 0*1
+##     ld_y3 ~ 0*1
+##     ld_y2 ~~ 0*ld_y2
+##     ld_y3 ~~ 0*ld_y3
+##     general_y =~ 1*ld_y2
+##           + 1*ld_y3
+##     general_y ~ constant_mean_y*1
+##     general_y ~~ latent_variance_y*general_y
+##     general_y ~~ cf_y1
+##     ld_y2 ~ beta_y*cf_y1
+##     ld_y3 ~ beta_y*cf_y2
+##     ld_x2 ~ start(-0.2)*omega_x*cf_y1
+##     ld_y2 ~ start(-0.2)*omega_y*cf_x1
+##     ld_x3 ~ start(-0.2)*omega_x*cf_y2
+##     ld_y3 ~ start(-0.2)*omega_y*cf_x2
+##     general_x ~~ general_y
+##     cf_x1 ~~ cf_y1
+##     cf_x1 ~~ general_y
+##     cf_y1 ~~ general_x</code></pre>
+<p>And the RICLPM model is,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="panel-data-analysis.html#cb5-1" tabindex="-1"></a><span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
+<span id="cb5-2"><a href="panel-data-analysis.html#cb5-2" tabindex="-1"></a>                <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-3"><a href="panel-data-analysis.html#cb5-3" tabindex="-1"></a>                <span class="at">constrain_beta =</span>  <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="panel-data-analysis.html#cb5-4" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div>
+<pre><code>## 
+## # Random Intercepts
+## BX =~ 1*x1 + 1*x2 + 1*x3
+## BY =~ 1*y1 + 1*y2 + 1*y3
+## 
+## # Within-Person Latent Variables
+## p1 =~ 1*x1
+## q1 =~ 1*y1
+## p2 =~ 1*x2
+## q2 =~ 1*y2
+## p3 =~ 1*x3
+## q3 =~ 1*y3
+## 
+## # Latent Variable Means (Fixed to 0)
+## p1 ~ 0*1
+## q1 ~ 0*1
+## 
+## p2 ~ 0*1
+## q2 ~ 0*1
+## 
+## p3 ~ 0*1
+## q3 ~ 0*1
+## 
+## # Autoregressive and Cross-lagged Effects
+## p2 ~ beta_y*p1 + omega_xy*q1
+## q2 ~ beta_x*q1 + omega_yx*p1
+## p3 ~ beta_y*p2 + omega_xy*q2
+## q3 ~ beta_x*q2 + omega_yx*p2
+## 
+## # Residual Variances
+## p1 ~~ var_p*p1
+## q1 ~~ var_q*q1
+## p2 ~~ var_p*p2
+## q2 ~~ var_q*q2
+## p3 ~~ var_p*p3
+## q3 ~~ var_q*q3
+## 
+## # Residual Covariances
+## p1 ~~ cov_pq*q1
+## p2 ~~ cov_pq*q2
+## p3 ~~ cov_pq*q3
+## 
+## # Random Intercept Variances and Covariances
+## BX ~~ BX
+## BY ~~ BY
+## BX ~~ BY
+## 
+## # Fix Observed Variable Residuals to Zero
+## x1 ~~ 0*x1
+## y1 ~~ 0*y1
+## x2 ~~ 0*x2
+## y2 ~~ 0*y2
+## x3 ~~ 0*x3
+## y3 ~~ 0*y3</code></pre>
+<p>And finally, the Bivariate Latent (Linear) Growth Model,</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="panel-data-analysis.html#cb7-1" tabindex="-1"></a><span class="fu">estimateLGM</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
+<span id="cb7-2"><a href="panel-data-analysis.html#cb7-2" tabindex="-1"></a>            <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span></span>
+<span id="cb7-3"><a href="panel-data-analysis.html#cb7-3" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="panel-data-analysis.html#cb7-4" tabindex="-1"></a><span class="fu">cat</span>()</span></code></pre></div>
+<pre><code>## # Latent Variables
+## p1 =~ 1*x1
+## q1 =~ 1*y1
+## p2 =~ 1*x2
+## q2 =~ 1*y2
+## p3 =~ 1*x3
+## q3 =~ 1*y3
+## 
+## # Latent Growth Factors for X
+## I_x =~ 1*p1 + 1*p2 + 1*p3
+## S_x =~ 0*p1 + 1*p2 + 2*p3
+## 
+## # Latent Growth Factors for Y
+## I_y =~ 1*q1 + 1*q2 + 1*q3
+## S_y =~ 0*q1 + 1*q2 + 2*q3
+## 
+## # Growth Factor Means
+## I_x ~ mean_I_x*1
+## S_x ~ mean_S_x*1
+## I_y ~ mean_I_y*1
+## S_y ~ mean_S_y*1
+## 
+## # Growth Factor Variances
+## I_x ~~ var_I_x*I_x
+## S_x ~~ var_S_x*S_x
+## I_y ~~ var_I_y*I_y
+## S_y ~~ var_S_y*S_y
+## 
+## # Within-Variable Growth Factor Covariances
+## I_x ~~ cov_IS_x*S_x
+## I_y ~~ cov_IS_y*S_y
+## 
+## # Between-Variable Growth Factor Covariances
+## I_x ~~ cov_I_xy*I_y
+## S_x ~~ cov_S_xy*S_y
+## I_x ~~ cov_IS_xy*S_y
+## I_y ~~ cov_IS_yx*S_x
+## 
+## # Latent Variable Means (Fixed to 0)
+## p1 ~ 0*1
+## q1 ~ 0*1
+## p2 ~ 0*1
+## q2 ~ 0*1
+## p3 ~ 0*1
+## q3 ~ 0*1
+## 
+## # Observed Variable Intercepts (Fixed to 0)
+## x1 ~ 0*1
+## y1 ~ 0*1
+## x2 ~ 0*1
+## y2 ~ 0*1
+## x3 ~ 0*1
+## y3 ~ 0*1
+## 
+## # Latent Variable Variances
+## p1 ~~ var_p*p1
+## q1 ~~ var_q*q1
+## p2 ~~ var_p*p2
+## q2 ~~ var_q*q2
+## p3 ~~ var_p*p3
+## q3 ~~ var_q*q3
+## 
+## # Latent Variable Covariances
+## p1 ~~ cov_pq*q1
+## p2 ~~ cov_pq*q2
+## p3 ~~ cov_pq*q3
+## 
+## # Fix Observed Variable Residuals to Zero
+## x1 ~~ 0*x1
+## y1 ~~ 0*y1
+## x2 ~~ 0*x2
+## y2 ~~ 0*y2
+## x3 ~~ 0*x3
+## y3 ~~ 0*y3</code></pre>
+<div id="simulation" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Simulation<a href="panel-data-analysis.html#simulation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Each estimation function comes with a simulate data function, allowing users to generate data under the assumptions of each model. These functions are</p>
+<ul>
+<li><code>simCLPM()</code> simulates data from a standard cross-lagged panel model.</li>
+<li><code>simRICLPM()</code> simulates data from a random-intercept cross-lagged panel model.</li>
+<li><code>simLChange()</code> simulates data from a latent change score model.</li>
+<li><code>simLGM()</code> simulates data from a latent growth model.</li>
+</ul>
+<p>Documentation is included for each of the functions and can be accessed with the <code>help()</code> function. For example, let’s simulated data using a bivariate latent change score model, and then estimate CLPM, RICLPM, Latent Change, and Latent Growth models, on this data set.</p>
+</div>
+<div id="a-simple-example" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> A Simple Example<a href="panel-data-analysis.html#a-simple-example" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>As a simple motivating example, simulate data from a CLPM and simply estimate two regression models, one with AR and CL parameters and one on the change scores. The regression models are just OLS models, one using change scores, the other using lags. Not surprisingly, they are interchangeable.</p>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="panel-data-analysis.html#cb9-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb9-2"><a href="panel-data-analysis.html#cb9-2" tabindex="-1"></a><span class="co"># Simulate a five wave panel, with two variables, x y:</span></span>
+<span id="cb9-3"><a href="panel-data-analysis.html#cb9-3" tabindex="-1"></a><span class="fu">simCLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>)<span class="sc">$</span>data <span class="sc">|&gt;</span> </span>
+<span id="cb9-4"><a href="panel-data-analysis.html#cb9-4" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="ot">-&gt;</span> wide_data</span>
+<span id="cb9-5"><a href="panel-data-analysis.html#cb9-5" tabindex="-1"></a></span>
+<span id="cb9-6"><a href="panel-data-analysis.html#cb9-6" tabindex="-1"></a>data <span class="ot">=</span> wide_data <span class="sc">|&gt;</span></span>
+<span id="cb9-7"><a href="panel-data-analysis.html#cb9-7" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span></span>
+<span id="cb9-8"><a href="panel-data-analysis.html#cb9-8" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb9-9"><a href="panel-data-analysis.html#cb9-9" tabindex="-1"></a>    <span class="at">y_lag =</span> <span class="fu">lag</span>(y),</span>
+<span id="cb9-10"><a href="panel-data-analysis.html#cb9-10" tabindex="-1"></a>    <span class="at">x_lag =</span> <span class="fu">lag</span>(x),</span>
+<span id="cb9-11"><a href="panel-data-analysis.html#cb9-11" tabindex="-1"></a>    <span class="at">delta_y =</span> y <span class="sc">-</span> <span class="fu">lag</span>(y)</span>
+<span id="cb9-12"><a href="panel-data-analysis.html#cb9-12" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb9-13"><a href="panel-data-analysis.html#cb9-13" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span> data</span></code></pre></div>
+<p>Let’s assume that we have data generated from a latent change model, with constant change, and we estimate two OLS models, one predicting change scores, the other predicting level scores.</p>
+<pre><code>## 
+## Call:
+## lm(formula = delta_y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.7191 -0.6599 -0.0120  0.6545  3.3016 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.01194    0.01567  -0.762    0.446    
+## y_lag       -0.61043    0.01577 -38.703   &lt;2e-16 ***
+## x_lag        0.21928    0.01545  14.194   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.9905 on 3997 degrees of freedom
+##   (1000 observations deleted due to missingness)
+## Multiple R-squared:  0.2734, Adjusted R-squared:  0.273 
+## F-statistic: 751.9 on 2 and 3997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.7191 -0.6599 -0.0120  0.6545  3.3016 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.01194    0.01567  -0.762    0.446    
+## y_lag        0.38957    0.01577  24.700   &lt;2e-16 ***
+## x_lag        0.21928    0.01545  14.194   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.9905 on 3997 degrees of freedom
+##   (1000 observations deleted due to missingness)
+## Multiple R-squared:  0.2526, Adjusted R-squared:  0.2522 
+## F-statistic: 675.3 on 2 and 3997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>If we simulate data under a latent change model, with no constant change, the CLPM and difference parameters should align (they do).</p>
+<div class="sourceCode" id="cb12"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb12-1"><a href="panel-data-analysis.html#cb12-1" tabindex="-1"></a><span class="fu">simLChange</span>(</span>
+<span id="cb12-2"><a href="panel-data-analysis.html#cb12-2" tabindex="-1"></a>  <span class="at">waves =</span> <span class="dv">5</span>,</span>
+<span id="cb12-3"><a href="panel-data-analysis.html#cb12-3" tabindex="-1"></a>  <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb12-4"><a href="panel-data-analysis.html#cb12-4" tabindex="-1"></a>  <span class="at">beta_x =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb12-5"><a href="panel-data-analysis.html#cb12-5" tabindex="-1"></a>  <span class="at">beta_y =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb12-6"><a href="panel-data-analysis.html#cb12-6" tabindex="-1"></a>  <span class="at">omega_x =</span> <span class="fl">0.5</span>,    <span class="co"># Cross-lagged coupling effects</span></span>
+<span id="cb12-7"><a href="panel-data-analysis.html#cb12-7" tabindex="-1"></a>  <span class="at">omega_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb12-8"><a href="panel-data-analysis.html#cb12-8" tabindex="-1"></a>  <span class="at">estimate_constant_change =</span> <span class="cn">FALSE</span>,  <span class="co"># Important: no constant change</span></span>
+<span id="cb12-9"><a href="panel-data-analysis.html#cb12-9" tabindex="-1"></a>  <span class="at">sample.nobs =</span> <span class="dv">10000</span></span>
+<span id="cb12-10"><a href="panel-data-analysis.html#cb12-10" tabindex="-1"></a>)<span class="sc">$</span>data <span class="sc">|&gt;</span></span>
+<span id="cb12-11"><a href="panel-data-analysis.html#cb12-11" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="sc">|&gt;</span></span>
+<span id="cb12-12"><a href="panel-data-analysis.html#cb12-12" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span></span>
+<span id="cb12-13"><a href="panel-data-analysis.html#cb12-13" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
+<span id="cb12-14"><a href="panel-data-analysis.html#cb12-14" tabindex="-1"></a>      <span class="at">y_lag =</span> <span class="fu">lag</span>(y),</span>
+<span id="cb12-15"><a href="panel-data-analysis.html#cb12-15" tabindex="-1"></a>      <span class="at">x_lag =</span> <span class="fu">lag</span>(x),</span>
+<span id="cb12-16"><a href="panel-data-analysis.html#cb12-16" tabindex="-1"></a>      <span class="at">delta_y =</span> y <span class="sc">-</span> <span class="fu">lag</span>(y)</span>
+<span id="cb12-17"><a href="panel-data-analysis.html#cb12-17" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb12-18"><a href="panel-data-analysis.html#cb12-18" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span> data</span>
+<span id="cb12-19"><a href="panel-data-analysis.html#cb12-19" tabindex="-1"></a></span>
+<span id="cb12-20"><a href="panel-data-analysis.html#cb12-20" tabindex="-1"></a><span class="fu">lm</span>(delta_y <span class="sc">~</span> y_lag <span class="sc">+</span> x_lag, <span class="at">data =</span> data) <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = delta_y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.1464 -0.7157  0.0006  0.7248  4.3188 
+## 
+## Coefficients:
+##               Estimate Std. Error  t value Pr(&gt;|t|)    
+## (Intercept)  5.866e-05  5.317e-03    0.011    0.991    
+## y_lag       -7.367e-01  4.720e-03 -156.086   &lt;2e-16 ***
+## x_lag        3.423e-01  4.734e-03   72.304   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.063 on 39997 degrees of freedom
+##   (10000 observations deleted due to missingness)
+## Multiple R-squared:  0.3799, Adjusted R-squared:  0.3799 
+## F-statistic: 1.225e+04 on 2 and 39997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<div class="sourceCode" id="cb14"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb14-1"><a href="panel-data-analysis.html#cb14-1" tabindex="-1"></a><span class="fu">lm</span>(y <span class="sc">~</span> y_lag <span class="sc">+</span> x_lag, <span class="at">data =</span> data) <span class="sc">|&gt;</span> <span class="fu">summary</span>()</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.1464 -0.7157  0.0006  0.7248  4.3188 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 5.866e-05  5.317e-03   0.011    0.991    
+## y_lag       2.633e-01  4.720e-03  55.782   &lt;2e-16 ***
+## x_lag       3.423e-01  4.734e-03  72.304   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.063 on 39997 degrees of freedom
+##   (10000 observations deleted due to missingness)
+## Multiple R-squared:  0.254,  Adjusted R-squared:  0.2539 
+## F-statistic:  6808 on 2 and 39997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>They’re again interchangeable by <span class="math inline">\(\beta_{CLPM} = \beta_{LChange} + 1\)</span>. Let’s simulate data from a latent change model, with no constant change. If we estimate a latent variable CLPM model, assuming the DGP is a latent change model with no constant change, the CLPM will accurately estimate the autoregressive parameters.</p>
+<div class="sourceCode" id="cb16"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb16-1"><a href="panel-data-analysis.html#cb16-1" tabindex="-1"></a>lcsm_data <span class="ot">&lt;-</span> <span class="fu">simLChange</span>(</span>
+<span id="cb16-2"><a href="panel-data-analysis.html#cb16-2" tabindex="-1"></a>  <span class="at">waves =</span> <span class="dv">5</span>,</span>
+<span id="cb16-3"><a href="panel-data-analysis.html#cb16-3" tabindex="-1"></a>  <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb16-4"><a href="panel-data-analysis.html#cb16-4" tabindex="-1"></a>  <span class="at">beta_x =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb16-5"><a href="panel-data-analysis.html#cb16-5" tabindex="-1"></a>  <span class="at">beta_y =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb16-6"><a href="panel-data-analysis.html#cb16-6" tabindex="-1"></a>  <span class="at">omega_x =</span> <span class="fl">0.5</span>,    <span class="co"># Cross-lagged coupling effects</span></span>
+<span id="cb16-7"><a href="panel-data-analysis.html#cb16-7" tabindex="-1"></a>  <span class="at">omega_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb16-8"><a href="panel-data-analysis.html#cb16-8" tabindex="-1"></a>  <span class="at">estimate_constant_change =</span> <span class="cn">FALSE</span>,  <span class="co"># Important: no constant change</span></span>
+<span id="cb16-9"><a href="panel-data-analysis.html#cb16-9" tabindex="-1"></a>  <span class="at">sample.nobs =</span> <span class="dv">10000</span></span>
+<span id="cb16-10"><a href="panel-data-analysis.html#cb16-10" tabindex="-1"></a>)</span>
+<span id="cb16-11"><a href="panel-data-analysis.html#cb16-11" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>), <span class="at">data =</span> lcsm_data<span class="sc">$</span>data))</span></code></pre></div>
+<pre><code>## lavaan 0.6-20 ended normally after 42 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        33
+##   Number of equality constraints                    21
+## 
+##   Number of observations                         10000
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                               924.639
+##   Degrees of freedom                                53
+##   P-value (Chi-square)                           0.000
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 =~                                               
+##     y1                1.000                           
+##   q1 =~                                               
+##     x1                1.000                           
+##   p2 =~                                               
+##     y2                1.000                           
+##   q2 =~                                               
+##     x2                1.000                           
+##   p3 =~                                               
+##     y3                1.000                           
+##   q3 =~                                               
+##     x3                1.000                           
+##   p4 =~                                               
+##     y4                1.000                           
+##   q4 =~                                               
+##     x4                1.000                           
+##   p5 =~                                               
+##     y5                1.000                           
+##   q5 =~                                               
+##     x5                1.000                           
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p2 ~                                                
+##     p1      (bt_y)    0.251    0.005   53.538    0.000
+##     q1     (omg_x)    0.349    0.005   74.394    0.000
+##   q2 ~                                                
+##     q1      (bt_x)    0.262    0.005   55.750    0.000
+##     p1     (omg_y)    0.346    0.005   73.875    0.000
+##   p3 ~                                                
+##     p2      (bt_y)    0.251    0.005   53.538    0.000
+##     q2     (omg_x)    0.349    0.005   74.394    0.000
+##   q3 ~                                                
+##     q2      (bt_x)    0.262    0.005   55.750    0.000
+##     p2     (omg_y)    0.346    0.005   73.875    0.000
+##   p4 ~                                                
+##     p3      (bt_y)    0.251    0.005   53.538    0.000
+##     q3     (omg_x)    0.349    0.005   74.394    0.000
+##   q4 ~                                                
+##     q3      (bt_x)    0.262    0.005   55.750    0.000
+##     p3     (omg_y)    0.346    0.005   73.875    0.000
+##   p5 ~                                                
+##     p4      (bt_y)    0.251    0.005   53.538    0.000
+##     q4     (omg_x)    0.349    0.005   74.394    0.000
+##   q5 ~                                                
+##     q4      (bt_x)    0.262    0.005   55.750    0.000
+##     p4     (omg_y)    0.346    0.005   73.875    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 ~~                                               
+##     q1      (cv_1)    0.293    0.015   18.961    0.000
+##  .p2 ~~                                               
+##    .q2      (cv_x)    0.314    0.006   53.869    0.000
+##  .p3 ~~                                               
+##    .q3      (cv_x)    0.314    0.006   53.869    0.000
+##  .p4 ~~                                               
+##    .q4      (cv_x)    0.314    0.006   53.869    0.000
+##  .p5 ~~                                               
+##    .q5      (cv_x)    0.314    0.006   53.869    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1               -0.002    0.012   -0.174    0.862
+##     q1               -0.013    0.012   -1.104    0.270
+##    .p2                0.000                           
+##    .q2                0.000                           
+##    .p3                0.000                           
+##    .q3                0.000                           
+##    .p4                0.000                           
+##    .q4                0.000                           
+##    .p5                0.000                           
+##    .q5                0.000                           
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1     (vr_y1)    1.545    0.022   70.711    0.000
+##     q1     (vr_x1)    1.491    0.021   70.711    0.000
+##    .p2      (vr_y)    1.123    0.008  141.421    0.000
+##    .q2      (vr_x)    1.123    0.008  141.421    0.000
+##    .p3      (vr_y)    1.123    0.008  141.421    0.000
+##    .q3      (vr_x)    1.123    0.008  141.421    0.000
+##    .p4      (vr_y)    1.123    0.008  141.421    0.000
+##    .q4      (vr_x)    1.123    0.008  141.421    0.000
+##    .p5      (vr_y)    1.123    0.008  141.421    0.000
+##    .q5      (vr_x)    1.123    0.008  141.421    0.000
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000</code></pre>
+</div>
+<div id="summary" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> Summary<a href="panel-data-analysis.html#summary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>With no “unit effects” the change score and level score models are equivalent, and the CLPM will correctly retrieve parameter estimates if the data are generated by a latent change model with no constant effects. Now, let’s simulate data with constant change, and see what happens when we estimate CLPM, RICLPM, and Latent Change models.</p>
+</div>
+<div id="unit-effects-1" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> Unit Effects<a href="panel-data-analysis.html#unit-effects-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div id="dgp-latent-change-with-constant-effects-estimator-clpm" class="section level3 hasAnchor" number="2.4.1">
+<h3><span class="header-section-number">2.4.1</span> DGP: Latent Change with Constant Effects, Estimator: CLPM<a href="panel-data-analysis.html#dgp-latent-change-with-constant-effects-estimator-clpm" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="panel-data-analysis.html#cb18-1" tabindex="-1"></a>lcsm_data <span class="ot">&lt;-</span> <span class="fu">simLChange</span>(</span>
+<span id="cb18-2"><a href="panel-data-analysis.html#cb18-2" tabindex="-1"></a>  <span class="at">waves =</span> <span class="dv">5</span>,</span>
+<span id="cb18-3"><a href="panel-data-analysis.html#cb18-3" tabindex="-1"></a>  <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb18-4"><a href="panel-data-analysis.html#cb18-4" tabindex="-1"></a>  <span class="at">beta_x =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb18-5"><a href="panel-data-analysis.html#cb18-5" tabindex="-1"></a>  <span class="at">beta_y =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb18-6"><a href="panel-data-analysis.html#cb18-6" tabindex="-1"></a>  <span class="at">omega_x =</span> <span class="fl">0.5</span>,    <span class="co"># Cross-lagged coupling effects</span></span>
+<span id="cb18-7"><a href="panel-data-analysis.html#cb18-7" tabindex="-1"></a>  <span class="at">omega_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb18-8"><a href="panel-data-analysis.html#cb18-8" tabindex="-1"></a>  <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb18-9"><a href="panel-data-analysis.html#cb18-9" tabindex="-1"></a>  <span class="at">latent_variance_x =</span> <span class="fl">0.5</span>,</span>
+<span id="cb18-10"><a href="panel-data-analysis.html#cb18-10" tabindex="-1"></a>  <span class="at">latent_variance_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb18-11"><a href="panel-data-analysis.html#cb18-11" tabindex="-1"></a>  <span class="at">sample.nobs =</span> <span class="dv">10000</span></span>
+<span id="cb18-12"><a href="panel-data-analysis.html#cb18-12" tabindex="-1"></a>)</span>
+<span id="cb18-13"><a href="panel-data-analysis.html#cb18-13" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>), <span class="at">data =</span> lcsm_data<span class="sc">$</span>data))</span></code></pre></div>
+<pre><code>## lavaan 0.6-20 ended normally after 39 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        33
+##   Number of equality constraints                    21
+## 
+##   Number of observations                         10000
+## 
+## Model Test User Model:
+##                                                        
+##   Test statistic                              15779.946
+##   Degrees of freedom                                 53
+##   P-value (Chi-square)                            0.000
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 =~                                               
+##     y1                1.000                           
+##   q1 =~                                               
+##     x1                1.000                           
+##   p2 =~                                               
+##     y2                1.000                           
+##   q2 =~                                               
+##     x2                1.000                           
+##   p3 =~                                               
+##     y3                1.000                           
+##   q3 =~                                               
+##     x3                1.000                           
+##   p4 =~                                               
+##     y4                1.000                           
+##   q4 =~                                               
+##     x4                1.000                           
+##   p5 =~                                               
+##     y5                1.000                           
+##   q5 =~                                               
+##     x5                1.000                           
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p2 ~                                                
+##     p1      (bt_y)    0.563    0.005  122.555    0.000
+##     q1     (omg_x)    0.535    0.005  116.303    0.000
+##   q2 ~                                                
+##     q1      (bt_x)    0.560    0.005  122.088    0.000
+##     p1     (omg_y)    0.536    0.005  116.889    0.000
+##   p3 ~                                                
+##     p2      (bt_y)    0.563    0.005  122.555    0.000
+##     q2     (omg_x)    0.535    0.005  116.303    0.000
+##   q3 ~                                                
+##     q2      (bt_x)    0.560    0.005  122.088    0.000
+##     p2     (omg_y)    0.536    0.005  116.889    0.000
+##   p4 ~                                                
+##     p3      (bt_y)    0.563    0.005  122.555    0.000
+##     q3     (omg_x)    0.535    0.005  116.303    0.000
+##   q4 ~                                                
+##     q3      (bt_x)    0.560    0.005  122.088    0.000
+##     p3     (omg_y)    0.536    0.005  116.889    0.000
+##   p5 ~                                                
+##     p4      (bt_y)    0.563    0.005  122.555    0.000
+##     q4     (omg_x)    0.535    0.005  116.303    0.000
+##   q5 ~                                                
+##     q4      (bt_x)    0.560    0.005  122.088    0.000
+##     p4     (omg_y)    0.536    0.005  116.889    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 ~~                                               
+##     q1      (cv_1)    0.295    0.015   19.295    0.000
+##  .p2 ~~                                               
+##    .q2      (cv_x)    0.507    0.006   79.342    0.000
+##  .p3 ~~                                               
+##    .q3      (cv_x)    0.507    0.006   79.342    0.000
+##  .p4 ~~                                               
+##    .q4      (cv_x)    0.507    0.006   79.342    0.000
+##  .p5 ~~                                               
+##    .q5      (cv_x)    0.507    0.006   79.342    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1               -0.023    0.012   -1.871    0.061
+##     q1               -0.009    0.012   -0.729    0.466
+##    .p2                0.000                           
+##    .q2                0.000                           
+##    .p3                0.000                           
+##    .q3                0.000                           
+##    .p4                0.000                           
+##    .q4                0.000                           
+##    .p5                0.000                           
+##    .q5                0.000                           
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1     (vr_y1)    1.477    0.021   70.711    0.000
+##     q1     (vr_x1)    1.521    0.022   70.711    0.000
+##    .p2      (vr_y)    1.176    0.008  141.421    0.000
+##    .q2      (vr_x)    1.171    0.008  141.421    0.000
+##    .p3      (vr_y)    1.176    0.008  141.421    0.000
+##    .q3      (vr_x)    1.171    0.008  141.421    0.000
+##    .p4      (vr_y)    1.176    0.008  141.421    0.000
+##    .q4      (vr_x)    1.171    0.008  141.421    0.000
+##    .p5      (vr_y)    1.176    0.008  141.421    0.000
+##    .q5      (vr_x)    1.171    0.008  141.421    0.000
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000</code></pre>
+<p>The CLPM drastically over-estimates the autoregressive parameters, as expected. The value should 0.3, but is closer to 0.6. What about the RI-CLPM? Here, we estimate a “unit effect” though the parameterization is a bit different than the change score approach.</p>
+<div class="sourceCode" id="cb20"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb20-1"><a href="panel-data-analysis.html#cb20-1" tabindex="-1"></a>lcsm_data <span class="ot">&lt;-</span> <span class="fu">simLChange</span>(</span>
+<span id="cb20-2"><a href="panel-data-analysis.html#cb20-2" tabindex="-1"></a>  <span class="at">waves =</span> <span class="dv">5</span>,</span>
+<span id="cb20-3"><a href="panel-data-analysis.html#cb20-3" tabindex="-1"></a>  <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb20-4"><a href="panel-data-analysis.html#cb20-4" tabindex="-1"></a>  <span class="at">beta_x =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb20-5"><a href="panel-data-analysis.html#cb20-5" tabindex="-1"></a>  <span class="at">beta_y =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb20-6"><a href="panel-data-analysis.html#cb20-6" tabindex="-1"></a>  <span class="at">omega_x =</span> <span class="fl">0.5</span>,    <span class="co"># Cross-lagged coupling effects</span></span>
+<span id="cb20-7"><a href="panel-data-analysis.html#cb20-7" tabindex="-1"></a>  <span class="at">omega_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb20-8"><a href="panel-data-analysis.html#cb20-8" tabindex="-1"></a>  <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb20-9"><a href="panel-data-analysis.html#cb20-9" tabindex="-1"></a>  <span class="at">latent_variance_x =</span> <span class="fl">0.5</span>,</span>
+<span id="cb20-10"><a href="panel-data-analysis.html#cb20-10" tabindex="-1"></a>  <span class="at">latent_variance_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb20-11"><a href="panel-data-analysis.html#cb20-11" tabindex="-1"></a>  <span class="at">sample.nobs =</span> <span class="dv">10000</span></span>
+<span id="cb20-12"><a href="panel-data-analysis.html#cb20-12" tabindex="-1"></a>)</span>
+<span id="cb20-13"><a href="panel-data-analysis.html#cb20-13" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>), <span class="at">data =</span> lcsm_data<span class="sc">$</span>data))</span></code></pre></div>
+<pre><code>## lavaan 0.6-20 ended normally after 34 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        34
+##   Number of equality constraints                    24
+## 
+##   Number of observations                         10000
+## 
+## Model Test User Model:
+##                                                        
+##   Test statistic                              17332.898
+##   Degrees of freedom                                 55
+##   P-value (Chi-square)                            0.000
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   BX =~                                               
+##     x1                1.000                           
+##     x2                1.000                           
+##     x3                1.000                           
+##     x4                1.000                           
+##     x5                1.000                           
+##   BY =~                                               
+##     y1                1.000                           
+##     y2                1.000                           
+##     y3                1.000                           
+##     y4                1.000                           
+##     y5                1.000                           
+##   p1 =~                                               
+##     x1                1.000                           
+##   q1 =~                                               
+##     y1                1.000                           
+##   p2 =~                                               
+##     x2                1.000                           
+##   q2 =~                                               
+##     y2                1.000                           
+##   p3 =~                                               
+##     x3                1.000                           
+##   q3 =~                                               
+##     y3                1.000                           
+##   p4 =~                                               
+##     x4                1.000                           
+##   q4 =~                                               
+##     y4                1.000                           
+##   p5 =~                                               
+##     x5                1.000                           
+##   q5 =~                                               
+##     y5                1.000                           
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p2 ~                                                
+##     p1      (bt_y)    0.581    0.005  112.374    0.000
+##     q1     (omg_x)    0.538    0.005  102.130    0.000
+##   q2 ~                                                
+##     q1      (bt_x)    0.573    0.005  110.180    0.000
+##     p1     (omg_y)    0.538    0.005  101.820    0.000
+##   p3 ~                                                
+##     p2      (bt_y)    0.581    0.005  112.374    0.000
+##     q2     (omg_x)    0.538    0.005  102.130    0.000
+##   q3 ~                                                
+##     q2      (bt_x)    0.573    0.005  110.180    0.000
+##     p2     (omg_y)    0.538    0.005  101.820    0.000
+##   p4 ~                                                
+##     p3      (bt_y)    0.581    0.005  112.374    0.000
+##     q3     (omg_x)    0.538    0.005  102.130    0.000
+##   q4 ~                                                
+##     q3      (bt_x)    0.573    0.005  110.180    0.000
+##     p3     (omg_y)    0.538    0.005  101.820    0.000
+##   p5 ~                                                
+##     p4      (bt_y)    0.581    0.005  112.374    0.000
+##     q4     (omg_x)    0.538    0.005  102.130    0.000
+##   q5 ~                                                
+##     q4      (bt_x)    0.573    0.005  110.180    0.000
+##     p4     (omg_y)    0.538    0.005  101.820    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 ~~                                               
+##     q1      (cv_p)    0.417    0.006   65.053    0.000
+##  .p2 ~~                                               
+##    .q2      (cv_p)    0.417    0.006   65.053    0.000
+##  .p3 ~~                                               
+##    .q3      (cv_p)    0.417    0.006   65.053    0.000
+##  .p4 ~~                                               
+##    .q4      (cv_p)    0.417    0.006   65.053    0.000
+##  .p5 ~~                                               
+##    .q5      (cv_p)    0.417    0.006   65.053    0.000
+##   BX ~~                                               
+##     BY                0.229    0.015   14.921    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1                0.000                           
+##     q1                0.000                           
+##    .p2                0.000                           
+##    .q2                0.000                           
+##    .p3                0.000                           
+##    .q3                0.000                           
+##    .p4                0.000                           
+##    .q4                0.000                           
+##    .p5                0.000                           
+##    .q5                0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1      (vr_p)    1.186    0.008  144.711    0.000
+##     q1      (vr_q)    1.196    0.008  144.920    0.000
+##    .p2      (vr_p)    1.186    0.008  144.711    0.000
+##    .q2      (vr_q)    1.196    0.008  144.920    0.000
+##    .p3      (vr_p)    1.186    0.008  144.711    0.000
+##    .q3      (vr_q)    1.196    0.008  144.920    0.000
+##    .p4      (vr_p)    1.186    0.008  144.711    0.000
+##    .q4      (vr_q)    1.196    0.008  144.920    0.000
+##    .p5      (vr_p)    1.186    0.008  144.711    0.000
+##    .q5      (vr_q)    1.196    0.008  144.920    0.000
+##     BX                0.240    0.017   14.244    0.000
+##     BY                0.223    0.016   13.521    0.000
+##    .x1                0.000                           
+##    .y1                0.000                           
+##    .x2                0.000                           
+##    .y2                0.000                           
+##    .x3                0.000                           
+##    .y3                0.000                           
+##    .x4                0.000                           
+##    .y4                0.000                           
+##    .x5                0.000                           
+##    .y5                0.000</code></pre>
+<p>The model does a poor job retrieving the correct parameter estimates. Not surprisingly, the parameters are correct for the latent change model.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="panel-data-analysis.html#cb22-1" tabindex="-1"></a>lcsm_data <span class="ot">&lt;-</span> <span class="fu">simLChange</span>(</span>
+<span id="cb22-2"><a href="panel-data-analysis.html#cb22-2" tabindex="-1"></a>  <span class="at">waves =</span> <span class="dv">5</span>,</span>
+<span id="cb22-3"><a href="panel-data-analysis.html#cb22-3" tabindex="-1"></a>  <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb22-4"><a href="panel-data-analysis.html#cb22-4" tabindex="-1"></a>  <span class="at">beta_x =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb22-5"><a href="panel-data-analysis.html#cb22-5" tabindex="-1"></a>  <span class="at">beta_y =</span> <span class="sc">-</span><span class="fl">0.7</span>,    <span class="co"># This should give CLPM beta ≈ 0.3</span></span>
+<span id="cb22-6"><a href="panel-data-analysis.html#cb22-6" tabindex="-1"></a>  <span class="at">omega_x =</span> <span class="fl">0.5</span>,    <span class="co"># Cross-lagged coupling effects</span></span>
+<span id="cb22-7"><a href="panel-data-analysis.html#cb22-7" tabindex="-1"></a>  <span class="at">omega_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb22-8"><a href="panel-data-analysis.html#cb22-8" tabindex="-1"></a>  <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>, </span>
+<span id="cb22-9"><a href="panel-data-analysis.html#cb22-9" tabindex="-1"></a>  <span class="at">latent_variance_x =</span> <span class="fl">0.5</span>,</span>
+<span id="cb22-10"><a href="panel-data-analysis.html#cb22-10" tabindex="-1"></a>  <span class="at">latent_variance_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb22-11"><a href="panel-data-analysis.html#cb22-11" tabindex="-1"></a>  <span class="at">sample.nobs =</span> <span class="dv">10000</span></span>
+<span id="cb22-12"><a href="panel-data-analysis.html#cb22-12" tabindex="-1"></a>)</span>
+<span id="cb22-13"><a href="panel-data-analysis.html#cb22-13" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">5</span>,</span>
+<span id="cb22-14"><a href="panel-data-analysis.html#cb22-14" tabindex="-1"></a>                               <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb22-15"><a href="panel-data-analysis.html#cb22-15" tabindex="-1"></a>                               <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>), <span class="at">data =</span> lcsm_data<span class="sc">$</span>data))</span></code></pre></div>
+<pre><code>## lavaan 0.6-20 ended normally after 40 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        40
+##   Number of equality constraints                    21
+## 
+##   Number of observations                         10000
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                               551.856
+##   Degrees of freedom                                46
+##   P-value (Chi-square)                           0.000
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   cf_x1 =~                                            
+##     x1                1.000                           
+##   cf_x2 =~                                            
+##     x2                1.000                           
+##   cf_x3 =~                                            
+##     x3                1.000                           
+##   cf_x4 =~                                            
+##     x4                1.000                           
+##   cf_x5 =~                                            
+##     x5                1.000                           
+##   ld_x2 =~                                            
+##     cf_x2             1.000                           
+##   ld_x3 =~                                            
+##     cf_x3             1.000                           
+##   ld_x4 =~                                            
+##     cf_x4             1.000                           
+##   ld_x5 =~                                            
+##     cf_x5             1.000                           
+##   general_x =~                                        
+##     ld_x2             1.000                           
+##     ld_x3             1.000                           
+##     ld_x4             1.000                           
+##     ld_x5             1.000                           
+##   cf_y1 =~                                            
+##     y1                1.000                           
+##   cf_y2 =~                                            
+##     y2                1.000                           
+##   cf_y3 =~                                            
+##     y3                1.000                           
+##   cf_y4 =~                                            
+##     y4                1.000                           
+##   cf_y5 =~                                            
+##     y5                1.000                           
+##   ld_y2 =~                                            
+##     cf_y2             1.000                           
+##   ld_y3 =~                                            
+##     cf_y3             1.000                           
+##   ld_y4 =~                                            
+##     cf_y4             1.000                           
+##   ld_y5 =~                                            
+##     cf_y5             1.000                           
+##   general_y =~                                        
+##     ld_y2             1.000                           
+##     ld_y3             1.000                           
+##     ld_y4             1.000                           
+##     ld_y5             1.000                           
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   cf_x2 ~                                             
+##     cf_x1             1.000                           
+##   cf_x3 ~                                             
+##     cf_x2             1.000                           
+##   cf_x4 ~                                             
+##     cf_x3             1.000                           
+##   cf_x5 ~                                             
+##     cf_x4             1.000                           
+##   ld_x2 ~                                             
+##     cf_x1   (bt_x)   -0.730    0.008  -91.873    0.000
+##   ld_x3 ~                                             
+##     cf_x2   (bt_x)   -0.730    0.008  -91.873    0.000
+##   ld_x4 ~                                             
+##     cf_x3   (bt_x)   -0.730    0.008  -91.873    0.000
+##   ld_x5 ~                                             
+##     cf_x4   (bt_x)   -0.730    0.008  -91.873    0.000
+##   cf_y2 ~                                             
+##     cf_y1             1.000                           
+##   cf_y3 ~                                             
+##     cf_y2             1.000                           
+##   cf_y4 ~                                             
+##     cf_y3             1.000                           
+##   cf_y5 ~                                             
+##     cf_y4             1.000                           
+##   ld_y2 ~                                             
+##     cf_y1   (bt_y)   -0.718    0.008  -92.387    0.000
+##   ld_y3 ~                                             
+##     cf_y2   (bt_y)   -0.718    0.008  -92.387    0.000
+##   ld_y4 ~                                             
+##     cf_y3   (bt_y)   -0.718    0.008  -92.387    0.000
+##   ld_y5 ~                                             
+##     cf_y4   (bt_y)   -0.718    0.008  -92.387    0.000
+##   ld_x2 ~                                             
+##     cf_y1  (omg_x)    0.525    0.008   65.813    0.000
+##   ld_y2 ~                                             
+##     cf_x1  (omg_y)    0.468    0.008   59.679    0.000
+##   ld_x3 ~                                             
+##     cf_y2  (omg_x)    0.525    0.008   65.813    0.000
+##   ld_y3 ~                                             
+##     cf_x2  (omg_y)    0.468    0.008   59.679    0.000
+##   ld_x4 ~                                             
+##     cf_y3  (omg_x)    0.525    0.008   65.813    0.000
+##   ld_y4 ~                                             
+##     cf_x3  (omg_y)    0.468    0.008   59.679    0.000
+##   ld_x5 ~                                             
+##     cf_y4  (omg_x)    0.525    0.008   65.813    0.000
+##   ld_y5 ~                                             
+##     cf_x4  (omg_y)    0.468    0.008   59.679    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   cf_x1 ~~                                            
+##     general_x         0.016    0.010    1.581    0.114
+##   cf_y1 ~~                                            
+##     general_y         0.029    0.010    2.937    0.003
+##   general_x ~~                                        
+##     general_y         0.405    0.009   44.637    0.000
+##   cf_x1 ~~                                            
+##     cf_y1             0.268    0.013   20.910    0.000
+##     general_y         0.258    0.011   23.570    0.000
+##   general_x ~~                                        
+##     cf_y1             0.183    0.009   20.857    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##      (indctr_mn_x)   -0.016    0.012   -1.367    0.172
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##      (cnstnt_mn_x)    0.495    0.009   56.171    0.000
+##      (indctr_mn_y)   -0.017    0.011   -1.596    0.110
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##      (cnstnt_mn_y)    0.532    0.010   55.969    0.000
+## 
+## Variances:
+##                        Estimate  Std.Err  z-value  P(&gt;|z|)
+##                 (l___)    1.006    0.021   47.897    0.000
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .   (indctr_vrnc_x)    0.498    0.004  117.183    0.000
+##    .   (indctr_vrnc_x)    0.498    0.004  117.183    0.000
+##    .   (indctr_vrnc_x)    0.498    0.004  117.183    0.000
+##    .   (indctr_vrnc_x)    0.498    0.004  117.183    0.000
+##    .   (indctr_vrnc_x)    0.498    0.004  117.183    0.000
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##          (ltnt_vrnc_x)    0.552    0.012   46.738    0.000
+##          (ltnt_vrnc_y)    0.705    0.011   64.092    0.000
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .   (indctr_vrnc_y)    0.523    0.004  120.113    0.000
+##    .   (indctr_vrnc_y)    0.523    0.004  120.113    0.000
+##    .   (indctr_vrnc_y)    0.523    0.004  120.113    0.000
+##    .   (indctr_vrnc_y)    0.523    0.004  120.113    0.000
+##    .   (indctr_vrnc_y)    0.523    0.004  120.113    0.000
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##          (ltnt_vrnc_y)    0.705    0.011   64.092    0.000</code></pre>
+<p>But, what if we simulate data under an RICLPM and fit a latent change model</p>
+<div class="sourceCode" id="cb24"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb24-1"><a href="panel-data-analysis.html#cb24-1" tabindex="-1"></a><span class="co"># Corrected version of your code</span></span>
+<span id="cb24-2"><a href="panel-data-analysis.html#cb24-2" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">load_all</span>()</span></code></pre></div>
+<pre><code>## ℹ Loading crossLagR</code></pre>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="panel-data-analysis.html#cb26-1" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb26-2"><a href="panel-data-analysis.html#cb26-2" tabindex="-1"></a>riclpm_data <span class="ot">&lt;-</span> <span class="fu">simRICLPM</span>(</span>
+<span id="cb26-3"><a href="panel-data-analysis.html#cb26-3" tabindex="-1"></a>  <span class="at">waves =</span> <span class="dv">5</span>,</span>
+<span id="cb26-4"><a href="panel-data-analysis.html#cb26-4" tabindex="-1"></a>  <span class="at">beta_x =</span> <span class="fl">0.3</span>,     <span class="co"># Direct RICLPM parameter (not LCSM conversion)</span></span>
+<span id="cb26-5"><a href="panel-data-analysis.html#cb26-5" tabindex="-1"></a>  <span class="at">beta_y =</span> <span class="fl">0.3</span>,     <span class="co"># Direct RICLPM parameter</span></span>
+<span id="cb26-6"><a href="panel-data-analysis.html#cb26-6" tabindex="-1"></a>  <span class="at">omega_xy =</span> <span class="fl">0.3</span>,   <span class="co"># Y -&gt; X cross-lagged effect</span></span>
+<span id="cb26-7"><a href="panel-data-analysis.html#cb26-7" tabindex="-1"></a>  <span class="at">omega_yx =</span> <span class="fl">0.3</span>,   <span class="co"># X -&gt; Y cross-lagged effect</span></span>
+<span id="cb26-8"><a href="panel-data-analysis.html#cb26-8" tabindex="-1"></a>  <span class="at">var_p =</span> <span class="fl">0.5</span>,      <span class="co"># Within-person variance for X</span></span>
+<span id="cb26-9"><a href="panel-data-analysis.html#cb26-9" tabindex="-1"></a>  <span class="at">var_q =</span> <span class="fl">0.5</span>,      <span class="co"># Within-person variance for Y</span></span>
+<span id="cb26-10"><a href="panel-data-analysis.html#cb26-10" tabindex="-1"></a>  <span class="at">var_BX =</span> <span class="dv">1</span>,     <span class="co"># Random intercept variance for X  </span></span>
+<span id="cb26-11"><a href="panel-data-analysis.html#cb26-11" tabindex="-1"></a>  <span class="at">var_BY =</span> <span class="dv">1</span>,     <span class="co"># Random intercept variance for Y</span></span>
+<span id="cb26-12"><a href="panel-data-analysis.html#cb26-12" tabindex="-1"></a>  <span class="at">sample.nobs =</span> <span class="dv">10000</span></span>
+<span id="cb26-13"><a href="panel-data-analysis.html#cb26-13" tabindex="-1"></a>)</span></code></pre></div>
+<pre><code>## ✅ Successfully simulated RICLPM data with 5 waves and 10000 observations.</code></pre>
+<div class="sourceCode" id="cb28"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb28-1"><a href="panel-data-analysis.html#cb28-1" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">5</span>, <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb28-2"><a href="panel-data-analysis.html#cb28-2" tabindex="-1"></a>                               <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb28-3"><a href="panel-data-analysis.html#cb28-3" tabindex="-1"></a>                               <span class="at">constrain_beta  =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb28-4"><a href="panel-data-analysis.html#cb28-4" tabindex="-1"></a>                               <span class="at">estimate_constant_change =</span> <span class="cn">FALSE</span>), </span>
+<span id="cb28-5"><a href="panel-data-analysis.html#cb28-5" tabindex="-1"></a>               <span class="at">data =</span> riclpm_data<span class="sc">$</span>data))</span></code></pre></div>
+<pre><code>## lavaan 0.6-20 ended normally after 67 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        43
+##   Number of equality constraints                    29
+## 
+##   Number of observations                         10000
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                              1807.890
+##   Degrees of freedom                                51
+##   P-value (Chi-square)                           0.000
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   cf_x1 =~                                            
+##     x1                1.000                           
+##   cf_x2 =~                                            
+##     x2                1.000                           
+##   cf_x3 =~                                            
+##     x3                1.000                           
+##   cf_x4 =~                                            
+##     x4                1.000                           
+##   cf_x5 =~                                            
+##     x5                1.000                           
+##   ld_x2 =~                                            
+##     cf_x2             1.000                           
+##   ld_x3 =~                                            
+##     cf_x3             1.000                           
+##   ld_x4 =~                                            
+##     cf_x4             1.000                           
+##   ld_x5 =~                                            
+##     cf_x5             1.000                           
+##   cf_y1 =~                                            
+##     y1                1.000                           
+##   cf_y2 =~                                            
+##     y2                1.000                           
+##   cf_y3 =~                                            
+##     y3                1.000                           
+##   cf_y4 =~                                            
+##     y4                1.000                           
+##   cf_y5 =~                                            
+##     y5                1.000                           
+##   ld_y2 =~                                            
+##     cf_y2             1.000                           
+##   ld_y3 =~                                            
+##     cf_y3             1.000                           
+##   ld_y4 =~                                            
+##     cf_y4             1.000                           
+##   ld_y5 =~                                            
+##     cf_y5             1.000                           
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   cf_x2 ~                                             
+##     cf_x1             1.000                           
+##   cf_x3 ~                                             
+##     cf_x2             1.000                           
+##   cf_x4 ~                                             
+##     cf_x3             1.000                           
+##   cf_x5 ~                                             
+##     cf_x4             1.000                           
+##   ld_x2 ~                                             
+##     cf_x1   (bt_x)   -0.040    0.004  -10.675    0.000
+##   ld_x3 ~                                             
+##     cf_x2   (bt_x)   -0.040    0.004  -10.675    0.000
+##   ld_x4 ~                                             
+##     cf_x3   (bt_x)   -0.040    0.004  -10.675    0.000
+##   ld_x5 ~                                             
+##     cf_x4   (bt_x)   -0.040    0.004  -10.675    0.000
+##   cf_y2 ~                                             
+##     cf_y1             1.000                           
+##   cf_y3 ~                                             
+##     cf_y2             1.000                           
+##   cf_y4 ~                                             
+##     cf_y3             1.000                           
+##   cf_y5 ~                                             
+##     cf_y4             1.000                           
+##   ld_y2 ~                                             
+##     cf_y1   (bt_y)   -0.038    0.004   -9.765    0.000
+##   ld_y3 ~                                             
+##     cf_y2   (bt_y)   -0.038    0.004   -9.765    0.000
+##   ld_y4 ~                                             
+##     cf_y3   (bt_y)   -0.038    0.004   -9.765    0.000
+##   ld_y5 ~                                             
+##     cf_y4   (bt_y)   -0.038    0.004   -9.765    0.000
+##   ld_x2 ~                                             
+##     cf_y1  (omg_x)    0.004    0.003    1.063    0.288
+##   ld_y2 ~                                             
+##     cf_x1  (omg_y)   -0.005    0.003   -1.427    0.154
+##   ld_x3 ~                                             
+##     cf_y2  (omg_x)    0.004    0.003    1.063    0.288
+##   ld_y3 ~                                             
+##     cf_x2  (omg_y)   -0.005    0.003   -1.427    0.154
+##   ld_x4 ~                                             
+##     cf_y3  (omg_x)    0.004    0.003    1.063    0.288
+##   ld_y4 ~                                             
+##     cf_x3  (omg_y)   -0.005    0.003   -1.427    0.154
+##   ld_x5 ~                                             
+##     cf_y4  (omg_x)    0.004    0.003    1.063    0.288
+##   ld_y5 ~                                             
+##     cf_x4  (omg_y)   -0.005    0.003   -1.427    0.154
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   cf_x1 ~~                                            
+##     cf_y1             0.676    0.016   42.677    0.000
+##  .ld_x2 ~~                                            
+##    .ld_y2   (cv_l)    0.088    0.002   36.436    0.000
+##  .ld_x3 ~~                                            
+##    .ld_y3   (cv_l)    0.088    0.002   36.436    0.000
+##  .ld_x4 ~~                                            
+##    .ld_y4   (cv_l)    0.088    0.002   36.436    0.000
+##  .ld_x5 ~~                                            
+##    .ld_y5   (cv_l)    0.088    0.002   36.436    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##      (indctr_mn_x)    0.010    0.012    0.884    0.377
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##      (indctr_mn_y)    0.001    0.012    0.097    0.923
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+##    .                  0.000                           
+## 
+## Variances:
+##                        Estimate  Std.Err  z-value  P(&gt;|z|)
+##                 (l___)    1.230    0.021   59.210    0.000
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .   (indctr_vrnc_x)    0.328    0.004   77.438    0.000
+##    .   (indctr_vrnc_x)    0.328    0.004   77.438    0.000
+##    .   (indctr_vrnc_x)    0.328    0.004   77.438    0.000
+##    .   (indctr_vrnc_x)    0.328    0.004   77.438    0.000
+##    .   (indctr_vrnc_x)    0.328    0.004   77.438    0.000
+##    .         (vr_ld_x)    0.129    0.005   28.233    0.000
+##    .         (vr_ld_x)    0.129    0.005   28.233    0.000
+##    .         (vr_ld_x)    0.129    0.005   28.233    0.000
+##    .         (vr_ld_x)    0.129    0.005   28.233    0.000
+##                 (lt__)    1.179    0.020   58.681    0.000
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .                      0.000                           
+##    .   (indctr_vrnc_y)    0.331    0.004   77.309    0.000
+##    .   (indctr_vrnc_y)    0.331    0.004   77.309    0.000
+##    .   (indctr_vrnc_y)    0.331    0.004   77.309    0.000
+##    .   (indctr_vrnc_y)    0.331    0.004   77.309    0.000
+##    .   (indctr_vrnc_y)    0.331    0.004   77.309    0.000
+##    .         (vr_ld_y)    0.129    0.005   27.849    0.000
+##    .         (vr_ld_y)    0.129    0.005   27.849    0.000
+##    .         (vr_ld_y)    0.129    0.005   27.849    0.000
+##    .         (vr_ld_y)    0.129    0.005   27.849    0.000</code></pre>
+</div>
+</div>
+<div id="summary-1" class="section level2 hasAnchor" number="2.5">
+<h2><span class="header-section-number">2.5</span> Summary<a href="panel-data-analysis.html#summary-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The change (LCM) and level score (CLPM; RICLPM) analysis are equivalent in the absense of unit effects. This suggests a close relationship between these models. However, when unit effects are present, the CLPM retrieves the incorrect parameter estimates. “Unit Effects” themselves are also not always comparable, with unit average change score forming the LCMs unit effects, and unit average level score forming the RICLPMs unit effects.</p>
+<!-- ## Trajectories -->
+<!-- ```{r} -->
+<!-- library(dplyr) -->
+<!-- library(ggplot2) -->
+<!-- dat_long |>  -->
+<!--   ggplot(aes(x = wave, y = y, group = id)) + -->
+<!--   geom_line(alpha = 0.1, color = "black", position = position_jitter(width = 0.1, height = 0.2)) + -->
+<!--   # geom_point(alpha = 0.3, size = 0.5, position = position_jitter(width = 0.1, height = 0.2)) + -->
+<!--   stat_summary(aes(group = 1), fun = mean, geom = "line",  -->
+<!--                color = "lightblue", size = 1, alpha = 0.8) + -->
+<!--   stat_summary(aes(group = 1), fun = mean, geom = "point",  -->
+<!--                color = "lightblue", size = 1) + -->
+<!--   labs( -->
+<!--     title = "Individual Trajectories: Simulated Data", -->
+<!--     subtitle = "Linear Trend", -->
+<!--     x = "Survey Wave", -->
+<!--     y = "Response" -->
+<!--   ) + -->
+<!--   theme_minimal() + -->
+<!--   scale_y_continuous(limits = c(-5, 6) ) + -->
+<!--   theme(strip.text = element_text(color = "black")) -> plot -->
+<!-- print(plot) -->
+<!-- ``` -->
+<!-- ```{r} -->
+<!-- dat_long <- dat_long |> -->
+<!--   mutate( -->
+<!--     # xlag = if_else(is.na(xlag), mean(x, na.rm = TRUE), xlag), -->
+<!--     # ylag = if_else(is.na(ylag), mean(y, na.rm = TRUE), ylag), -->
+<!--     predicted = predict(lm(y ~ ylag + xlag, data = dat_long), newdata = dat_long) -->
+<!--   ) -->
+<!-- dat_long |>  -->
+<!--   ggplot(aes(x = wave, y = y, group = id)) + -->
+<!--   geom_line(alpha = 0.1, color = "black", position = position_jitter(width = 0.1, height = 0.2)) + -->
+<!--   # Observed mean trend -->
+<!--   stat_summary(aes(group = 1), fun = mean, geom = "line",  -->
+<!--                color = "lightblue", size = 1, alpha = 0.8) + -->
+<!--   stat_summary(aes(group = 1), fun = mean, geom = "point",  -->
+<!--                color = "lightblue", size = 1) + -->
+<!--   # Model predictions mean trend -->
+<!--   stat_summary(aes(y = predicted, group = 1), fun = mean, geom = "line",  -->
+<!--                color = "red", size = 1, alpha = 0.8, na.rm = TRUE) + -->
+<!--   stat_summary(aes(y = predicted, group = 1), fun = mean, geom = "point",  -->
+<!--                color = "red", size = 1, na.rm = TRUE) + -->
+<!--   labs( -->
+<!--     title = "Individual Trajectories: Simulated Data", -->
+<!--     subtitle = "Observed (blue) vs CLPM Predicted (red) trends", -->
+<!--     x = "Survey Wave", -->
+<!--     y = "Response" -->
+<!--   ) + -->
+<!--   theme_minimal() + -->
+<!--   scale_y_continuous(limits = c(-5, 6)) + -->
+<!--   theme(strip.text = element_text(color = "black")) -->
+<!-- ``` -->
+<!-- ### Cross-Lagged Panel Model -->
+<!-- Let's fit several models under a random intercept cross lagged panel data generating process. -->
+<!-- ```{r} -->
+<!-- data = simCLPM(waves = 5, -->
+<!--              variance_p = 0.5,      # underscore -->
+<!--              variance_q = 0.5,      # underscore -->
+<!--              stability_p = 0.9,      # underscore -->
+<!--              stability_q = 0.9,      # underscore -->
+<!--              cross_q = 0, -->
+<!--              cross_p = 0, -->
+<!--              cov_pq = 0.00, -->
+<!--              # means_p = c(1,1.1,1.2,1.3,1.4), -->
+<!--              sample.nobs = 1000)$data -->
+<!-- lavaan::lavaan(estimateLChange(waves = 3, -->
+<!--                                constrain_omega = TRUE, -->
+<!--                                constrain_beta =  TRUE), -->
+<!--               data = data, -->
+<!--               int.ov.free = TRUE, # Fix intercepts to zero -->
+<!--               estimator="ml") |> -->
+<!--   lavaan::summary() -->
+<!-- ``` -->
+
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="panel-data-models.html" class="navigation navigation-prev navigation-unique" aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/USERNAME/REPO/edit/BRANCH/02_CLPM_Estimation.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>

@@ -1,0 +1,1174 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Chapter 3 Short t bias. | Dynamic Regression Models: Cross-Lagged Panel Models and Alternatives</title>
+  <meta name="description" content="Cross Lagged Regression" />
+  <meta name="generator" content="bookdown 0.45 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Chapter 3 Short t bias. | Dynamic Regression Models: Cross-Lagged Panel Models and Alternatives" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Cross Lagged Regression" />
+  <meta name="github-repo" content="crweber9874/advancedRegression" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Chapter 3 Short t bias. | Dynamic Regression Models: Cross-Lagged Panel Models and Alternatives" />
+  
+  <meta name="twitter:description" content="Cross Lagged Regression" />
+  
+
+<meta name="author" content="Christopher Weber" />
+
+
+<meta name="date" content="2025-11-25" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="simple-motivating-examples.html"/>
+<link rel="next" href="outline.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
+<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding-1.0.11/grViz.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">CrossLagR</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="panel-data-models-using-sem.html"><a href="panel-data-models-using-sem.html"><i class="fa fa-check"></i><b>1</b> Panel Data Models using SEM</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="panel-data-models-using-sem.html"><a href="panel-data-models-using-sem.html#the-cross-lagged-panel-model"><i class="fa fa-check"></i><b>1.1</b> The Cross-Lagged Panel Model</a></li>
+<li class="chapter" data-level="1.2" data-path="panel-data-models-using-sem.html"><a href="panel-data-models-using-sem.html#the-change-score-regression"><i class="fa fa-check"></i><b>1.2</b> The Change Score Regression</a></li>
+<li class="chapter" data-level="1.3" data-path="panel-data-models-using-sem.html"><a href="panel-data-models-using-sem.html#types-of-change"><i class="fa fa-check"></i><b>1.3</b> Types of Change</a></li>
+<li class="chapter" data-level="1.4" data-path="panel-data-models-using-sem.html"><a href="panel-data-models-using-sem.html#unit-effects"><i class="fa fa-check"></i><b>1.4</b> Unit Effects</a></li>
+<li class="chapter" data-level="1.5" data-path="panel-data-models-using-sem.html"><a href="panel-data-models-using-sem.html#the-random-intercept-cross-lagged-regression"><i class="fa fa-check"></i><b>1.5</b> The Random Intercept Cross Lagged Regression</a></li>
+<li class="chapter" data-level="1.6" data-path="panel-data-models-using-sem.html"><a href="panel-data-models-using-sem.html#the-latent-growth-model"><i class="fa fa-check"></i><b>1.6</b> The Latent Growth Model</a></li>
+<li class="chapter" data-level="1.7" data-path="panel-data-models-using-sem.html"><a href="panel-data-models-using-sem.html#measurement-error"><i class="fa fa-check"></i><b>1.7</b> Measurement Error</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html"><i class="fa fa-check"></i><b>2</b> Simple Motivating Examples</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#simulation"><i class="fa fa-check"></i><b>2.1</b> Simulation</a></li>
+<li class="chapter" data-level="2.2" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#a-simple-example"><i class="fa fa-check"></i><b>2.2</b> A Simple Example</a></li>
+<li class="chapter" data-level="2.3" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#summary-change-versus-level-scores"><i class="fa fa-check"></i><b>2.3</b> Summary: Change versus Level Scores</a></li>
+<li class="chapter" data-level="2.4" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#unobserved-heterogeneity"><i class="fa fa-check"></i><b>2.4</b> Unobserved Heterogeneity</a></li>
+<li class="chapter" data-level="2.5" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#model-validation"><i class="fa fa-check"></i><b>2.5</b> Model Validation</a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#hierarchical-brms-estimation"><i class="fa fa-check"></i><b>2.5.1</b> Hierarchical <code>brms</code> Estimation</a></li>
+</ul></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="short-t-bias..html"><a href="short-t-bias..html"><i class="fa fa-check"></i><b>3</b> Short <em>t</em> bias.</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="short-t-bias..html"><a href="short-t-bias..html#the-fixed-effect-dynamic-panel-estimator"><i class="fa fa-check"></i><b>3.1</b> The Fixed Effect (Dynamic Panel) Estimator</a></li>
+<li class="chapter" data-level="3.2" data-path="short-t-bias..html"><a href="short-t-bias..html#the-riclpm"><i class="fa fa-check"></i><b>3.2</b> The RICLPM</a></li>
+<li class="chapter" data-level="3.3" data-path="short-t-bias..html"><a href="short-t-bias..html#change"><i class="fa fa-check"></i><b>3.3</b> Change</a></li>
+<li class="chapter" data-level="3.4" data-path="short-t-bias..html"><a href="short-t-bias..html#change-1"><i class="fa fa-check"></i><b>3.4</b> Change</a></li>
+<li class="chapter" data-level="3.5" data-path="short-t-bias..html"><a href="short-t-bias..html#summary"><i class="fa fa-check"></i><b>3.5</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="outline.html"><a href="outline.html"><i class="fa fa-check"></i><b>4</b> Outline</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Dynamic Regression Models: Cross-Lagged Panel Models and Alternatives</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="short-t-bias." class="section level1 hasAnchor" number="3">
+<h1><span class="header-section-number">Chapter 3</span> Short <em>t</em> bias.<a href="short-t-bias..html#short-t-bias." class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>It is well established that estimating a dynamic fixed effects model with short <em>t</em> – relatively few waves – can lead to biased estimates. This is shown in <span class="citation">Hsiao (<a href="#ref-hsiao2022">2022</a>)</span>. To see this, here is a dynamic panel data simulation where the DGP is an RI-CLPM with known parameters.</p>
+<div id="the-fixed-effect-dynamic-panel-estimator" class="section level2 hasAnchor" number="3.1">
+<h2><span class="header-section-number">3.1</span> The Fixed Effect (Dynamic Panel) Estimator<a href="short-t-bias..html#the-fixed-effect-dynamic-panel-estimator" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example simulates data from a four wave panel. Notice that the parameter estimates are far from their true values.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="short-t-bias..html#cb25-1" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
+<span id="cb25-2"><a href="short-t-bias..html#cb25-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb25-3"><a href="short-t-bias..html#cb25-3" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb25-4"><a href="short-t-bias..html#cb25-4" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb25-5"><a href="short-t-bias..html#cb25-5" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="short-t-bias..html#cb25-6" tabindex="-1"></a><span class="co"># Long data</span></span>
+<span id="cb25-7"><a href="short-t-bias..html#cb25-7" tabindex="-1"></a><span class="fu">baseRICLPM_sim</span>(<span class="at">n =</span> <span class="dv">1000</span>,</span>
+<span id="cb25-8"><a href="short-t-bias..html#cb25-8" tabindex="-1"></a>               <span class="at">ar_x =</span> <span class="fl">0.5</span>,</span>
+<span id="cb25-9"><a href="short-t-bias..html#cb25-9" tabindex="-1"></a>               <span class="at">ar_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb25-10"><a href="short-t-bias..html#cb25-10" tabindex="-1"></a>               <span class="at">cl_xy =</span> <span class="fl">0.3</span>,</span>
+<span id="cb25-11"><a href="short-t-bias..html#cb25-11" tabindex="-1"></a>               <span class="at">cl_yx =</span> <span class="fl">0.2</span>, </span>
+<span id="cb25-12"><a href="short-t-bias..html#cb25-12" tabindex="-1"></a>               <span class="at">waves =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-13"><a href="short-t-bias..html#cb25-13" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">contains</span>(<span class="st">&quot;trait&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb25-14"><a href="short-t-bias..html#cb25-14" tabindex="-1"></a>  <span class="co"># reshape to long</span></span>
+<span id="cb25-15"><a href="short-t-bias..html#cb25-15" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="ot">-&gt;</span> dat</span>
+<span id="cb25-16"><a href="short-t-bias..html#cb25-16" tabindex="-1"></a><span class="fu">lm</span>(within.y <span class="sc">~</span>  xlagw <span class="sc">+</span> ylagw, <span class="at">data =</span> dat) <span class="sc">|&gt;</span> </span>
+<span id="cb25-17"><a href="short-t-bias..html#cb25-17" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = within.y ~ xlagw + ylagw, data = dat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.84701 -0.36315  0.00182  0.36254  2.49156 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.002764   0.009604  -0.288    0.774    
+## xlagw        0.174539   0.018460   9.455   &lt;2e-16 ***
+## ylagw       -0.163348   0.018381  -8.887   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.526 on 2997 degrees of freedom
+##   (1000 observations deleted due to missingness)
+## Multiple R-squared:  0.04559,    Adjusted R-squared:  0.04495 
+## F-statistic: 71.57 on 2 and 2997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>With more waves <span class="math inline">\(t = 30\)</span>, the model recovers the true parameters.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="short-t-bias..html#cb27-1" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb27-2"><a href="short-t-bias..html#cb27-2" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb27-3"><a href="short-t-bias..html#cb27-3" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb27-4"><a href="short-t-bias..html#cb27-4" tabindex="-1"></a><span class="co"># Long data</span></span>
+<span id="cb27-5"><a href="short-t-bias..html#cb27-5" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
+<span id="cb27-6"><a href="short-t-bias..html#cb27-6" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb27-7"><a href="short-t-bias..html#cb27-7" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb27-8"><a href="short-t-bias..html#cb27-8" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb27-9"><a href="short-t-bias..html#cb27-9" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="short-t-bias..html#cb27-10" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="short-t-bias..html#cb27-11" tabindex="-1"></a><span class="fu">baseRICLPM_sim</span>(<span class="at">n =</span> <span class="dv">1000</span>,</span>
+<span id="cb27-12"><a href="short-t-bias..html#cb27-12" tabindex="-1"></a>               <span class="at">ar_x =</span> <span class="fl">0.5</span>,</span>
+<span id="cb27-13"><a href="short-t-bias..html#cb27-13" tabindex="-1"></a>               <span class="at">ar_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb27-14"><a href="short-t-bias..html#cb27-14" tabindex="-1"></a>               <span class="at">cl_xy =</span> <span class="fl">0.3</span>,</span>
+<span id="cb27-15"><a href="short-t-bias..html#cb27-15" tabindex="-1"></a>               <span class="at">cl_yx =</span> <span class="fl">0.2</span>, </span>
+<span id="cb27-16"><a href="short-t-bias..html#cb27-16" tabindex="-1"></a>               <span class="at">waves =</span> <span class="dv">30</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-17"><a href="short-t-bias..html#cb27-17" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">contains</span>(<span class="st">&quot;trait&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb27-18"><a href="short-t-bias..html#cb27-18" tabindex="-1"></a>  <span class="co"># reshape to long</span></span>
+<span id="cb27-19"><a href="short-t-bias..html#cb27-19" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="ot">-&gt;</span> dat</span>
+<span id="cb27-20"><a href="short-t-bias..html#cb27-20" tabindex="-1"></a><span class="fu">lm</span>(within.y <span class="sc">~</span>  xlagw <span class="sc">+</span> ylagw, <span class="at">data =</span> dat) <span class="sc">|&gt;</span> </span>
+<span id="cb27-21"><a href="short-t-bias..html#cb27-21" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = within.y ~ xlagw + ylagw, data = dat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.81152 -0.47215 -0.00156  0.47284  2.58771 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.001252   0.004083  -0.307    0.759    
+## xlagw        0.299270   0.005733  52.200   &lt;2e-16 ***
+## ylagw        0.441164   0.005381  81.979   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.6953 on 28997 degrees of freedom
+##   (1000 observations deleted due to missingness)
+## Multiple R-squared:  0.3973, Adjusted R-squared:  0.3973 
+## F-statistic:  9559 on 2 and 28997 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="the-riclpm" class="section level2 hasAnchor" number="3.2">
+<h2><span class="header-section-number">3.2</span> The RICLPM<a href="short-t-bias..html#the-riclpm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The RICLPM doesn’t exhibit the same problem, with minimal bias (that decreases) with more waves. The code below runs a simple
+Monte Carlo analysis varying the number of panel waves, and the following fixed parameters (<span class="math inline">\(n = 2000; \beta_x = 0.4; \beta_y = 0.7; \omega_{x \rightarrow y} = 0.2; \omega_{y \rightarrow x} = 0.3\)</span>).</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="short-t-bias..html#cb29-1" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
+<span id="cb29-2"><a href="short-t-bias..html#cb29-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb29-3"><a href="short-t-bias..html#cb29-3" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb29-4"><a href="short-t-bias..html#cb29-4" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb29-5"><a href="short-t-bias..html#cb29-5" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb29-6"><a href="short-t-bias..html#cb29-6" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="short-t-bias..html#cb29-7" tabindex="-1"></a>true_params <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">beta_x =</span> <span class="fl">0.4</span>, <span class="at">beta_y =</span> <span class="fl">0.7</span>, </span>
+<span id="cb29-8"><a href="short-t-bias..html#cb29-8" tabindex="-1"></a>                    <span class="at">omega_xy =</span> <span class="fl">0.2</span>, <span class="at">omega_yx =</span> <span class="fl">0.3</span>)</span>
+<span id="cb29-9"><a href="short-t-bias..html#cb29-9" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="short-t-bias..html#cb29-10" tabindex="-1"></a>extract_params <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) {</span>
+<span id="cb29-11"><a href="short-t-bias..html#cb29-11" tabindex="-1"></a>  pe <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">parameterEstimates</span>(fit)</span>
+<span id="cb29-12"><a href="short-t-bias..html#cb29-12" tabindex="-1"></a>  factor_scores <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">lavPredict</span>(fit, <span class="at">method =</span> <span class="st">&quot;EBM&quot;</span>)</span>
+<span id="cb29-13"><a href="short-t-bias..html#cb29-13" tabindex="-1"></a>  factor_scores_df <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(factor_scores) <span class="sc">%&gt;%</span></span>
+<span id="cb29-14"><a href="short-t-bias..html#cb29-14" tabindex="-1"></a>      <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;general_y&quot;</span>) <span class="sc">|</span> <span class="fu">starts_with</span>(<span class="st">&quot;general_x&quot;</span>))</span>
+<span id="cb29-15"><a href="short-t-bias..html#cb29-15" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb29-16"><a href="short-t-bias..html#cb29-16" tabindex="-1"></a>    <span class="at">beta_x =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span>   <span class="st">&quot;beta_x&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb29-17"><a href="short-t-bias..html#cb29-17" tabindex="-1"></a>    <span class="at">beta_y =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span>   <span class="st">&quot;beta_y&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb29-18"><a href="short-t-bias..html#cb29-18" tabindex="-1"></a>    <span class="at">omega_xy =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span> <span class="st">&quot;omega_xy&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb29-19"><a href="short-t-bias..html#cb29-19" tabindex="-1"></a>    <span class="at">omega_yx =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span> <span class="st">&quot;omega_yx&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb29-20"><a href="short-t-bias..html#cb29-20" tabindex="-1"></a>  )</span>
+<span id="cb29-21"><a href="short-t-bias..html#cb29-21" tabindex="-1"></a>}</span>
+<span id="cb29-22"><a href="short-t-bias..html#cb29-22" tabindex="-1"></a></span>
+<span id="cb29-23"><a href="short-t-bias..html#cb29-23" tabindex="-1"></a></span>
+<span id="cb29-24"><a href="short-t-bias..html#cb29-24" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
+<span id="cb29-25"><a href="short-t-bias..html#cb29-25" tabindex="-1"></a>  <span class="at">waves =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">30</span>),</span>
+<span id="cb29-26"><a href="short-t-bias..html#cb29-26" tabindex="-1"></a>  <span class="at">rep =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span></span>
+<span id="cb29-27"><a href="short-t-bias..html#cb29-27" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb29-28"><a href="short-t-bias..html#cb29-28" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb29-29"><a href="short-t-bias..html#cb29-29" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">map</span>(waves, <span class="sc">~</span>{</span>
+<span id="cb29-30"><a href="short-t-bias..html#cb29-30" tabindex="-1"></a>      <span class="fu">baseRICLPM_sim</span>(</span>
+<span id="cb29-31"><a href="short-t-bias..html#cb29-31" tabindex="-1"></a>        <span class="at">n =</span> <span class="dv">2000</span>,</span>
+<span id="cb29-32"><a href="short-t-bias..html#cb29-32" tabindex="-1"></a>        <span class="at">innov_var =</span> <span class="fl">0.45</span>,</span>
+<span id="cb29-33"><a href="short-t-bias..html#cb29-33" tabindex="-1"></a>        <span class="at">ar_x =</span> <span class="fl">0.4</span>,  <span class="at">ar_y =</span> <span class="fl">0.7</span>,</span>
+<span id="cb29-34"><a href="short-t-bias..html#cb29-34" tabindex="-1"></a>        <span class="at">cl_xy =</span> <span class="fl">0.3</span>, <span class="at">cl_yx =</span> <span class="fl">0.2</span>,</span>
+<span id="cb29-35"><a href="short-t-bias..html#cb29-35" tabindex="-1"></a>        <span class="at">waves =</span> .x</span>
+<span id="cb29-36"><a href="short-t-bias..html#cb29-36" tabindex="-1"></a>      ) <span class="sc">|&gt;</span></span>
+<span id="cb29-37"><a href="short-t-bias..html#cb29-37" tabindex="-1"></a>        <span class="fu">select</span>(<span class="sc">-</span><span class="fu">contains</span>(<span class="st">&quot;trait&quot;</span>))</span>
+<span id="cb29-38"><a href="short-t-bias..html#cb29-38" tabindex="-1"></a>    }),</span>
+<span id="cb29-39"><a href="short-t-bias..html#cb29-39" tabindex="-1"></a>    <span class="co"># This iterates over the data, x and waves y</span></span>
+<span id="cb29-40"><a href="short-t-bias..html#cb29-40" tabindex="-1"></a>    <span class="at">fit =</span> <span class="fu">map2</span>(data, waves, <span class="sc">~</span>{</span>
+<span id="cb29-41"><a href="short-t-bias..html#cb29-41" tabindex="-1"></a>      lavaan<span class="sc">::</span><span class="fu">lavaan</span>(<span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> ..<span class="dv">2</span>,</span>
+<span id="cb29-42"><a href="short-t-bias..html#cb29-42" tabindex="-1"></a>                   <span class="at">label_autoregressive =</span> <span class="fu">c</span>(<span class="st">&quot;beta_x&quot;</span>, <span class="st">&quot;beta_y&quot;</span>)), <span class="at">data =</span> ..<span class="dv">1</span>, </span>
+<span id="cb29-43"><a href="short-t-bias..html#cb29-43" tabindex="-1"></a>                     <span class="at">warn =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb29-44"><a href="short-t-bias..html#cb29-44" tabindex="-1"></a>    }),</span>
+<span id="cb29-45"><a href="short-t-bias..html#cb29-45" tabindex="-1"></a>    <span class="at">params =</span> <span class="fu">map</span>(fit, extract_params)</span>
+<span id="cb29-46"><a href="short-t-bias..html#cb29-46" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb29-47"><a href="short-t-bias..html#cb29-47" tabindex="-1"></a>  <span class="fu">unnest</span>(params)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="short-t-bias..html#cb30-1" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
+<span id="cb30-2"><a href="short-t-bias..html#cb30-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb30-3"><a href="short-t-bias..html#cb30-3" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb30-4"><a href="short-t-bias..html#cb30-4" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb30-5"><a href="short-t-bias..html#cb30-5" tabindex="-1"></a><span class="fu">library</span>(ggridges)  <span class="co"># ADD THIS - geom_density_ridges requires it</span></span>
+<span id="cb30-6"><a href="short-t-bias..html#cb30-6" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="short-t-bias..html#cb30-7" tabindex="-1"></a><span class="co"># Prepare data with simpler labels for parsing</span></span>
+<span id="cb30-8"><a href="short-t-bias..html#cb30-8" tabindex="-1"></a>results_long <span class="ot">&lt;-</span> results <span class="sc">|&gt;</span></span>
+<span id="cb30-9"><a href="short-t-bias..html#cb30-9" tabindex="-1"></a>  <span class="fu">select</span>(waves, rep, beta_x, beta_y, omega_xy, omega_yx) <span class="sc">|&gt;</span></span>
+<span id="cb30-10"><a href="short-t-bias..html#cb30-10" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(beta_x, beta_y, omega_xy, omega_yx),</span>
+<span id="cb30-11"><a href="short-t-bias..html#cb30-11" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;parameter&quot;</span>, </span>
+<span id="cb30-12"><a href="short-t-bias..html#cb30-12" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;estimate&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb30-13"><a href="short-t-bias..html#cb30-13" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb30-14"><a href="short-t-bias..html#cb30-14" tabindex="-1"></a>    <span class="at">parameter_label =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-15"><a href="short-t-bias..html#cb30-15" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;beta_x&quot;</span> <span class="sc">~</span> <span class="st">&quot;Autoregressive[x]&quot;</span>,</span>
+<span id="cb30-16"><a href="short-t-bias..html#cb30-16" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;beta_y&quot;</span> <span class="sc">~</span> <span class="st">&quot;Autoregressive[y]&quot;</span>,</span>
+<span id="cb30-17"><a href="short-t-bias..html#cb30-17" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;omega_xy&quot;</span> <span class="sc">~</span> <span class="st">&quot;CrossLag~X%-&gt;%Y~(omega[xy])&quot;</span>,</span>
+<span id="cb30-18"><a href="short-t-bias..html#cb30-18" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;omega_yx&quot;</span> <span class="sc">~</span> <span class="st">&quot;CrossLag~Y%-&gt;%X~(omega[yx])&quot;</span></span>
+<span id="cb30-19"><a href="short-t-bias..html#cb30-19" tabindex="-1"></a>    ),</span>
+<span id="cb30-20"><a href="short-t-bias..html#cb30-20" tabindex="-1"></a>    <span class="at">true_value =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-21"><a href="short-t-bias..html#cb30-21" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;beta_x&quot;</span> <span class="sc">~</span> <span class="fl">0.4</span>,</span>
+<span id="cb30-22"><a href="short-t-bias..html#cb30-22" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;beta_y&quot;</span> <span class="sc">~</span> <span class="fl">0.7</span>,</span>
+<span id="cb30-23"><a href="short-t-bias..html#cb30-23" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;omega_xy&quot;</span> <span class="sc">~</span> <span class="fl">0.2</span>,</span>
+<span id="cb30-24"><a href="short-t-bias..html#cb30-24" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;omega_yx&quot;</span> <span class="sc">~</span> <span class="fl">0.3</span></span>
+<span id="cb30-25"><a href="short-t-bias..html#cb30-25" tabindex="-1"></a>    ),</span>
+<span id="cb30-26"><a href="short-t-bias..html#cb30-26" tabindex="-1"></a>    <span class="at">waves_factor =</span> <span class="fu">factor</span>(waves, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">10</span>, <span class="dv">7</span>, <span class="dv">5</span>, <span class="dv">3</span>))</span>
+<span id="cb30-27"><a href="short-t-bias..html#cb30-27" tabindex="-1"></a>  )</span>
+<span id="cb30-28"><a href="short-t-bias..html#cb30-28" tabindex="-1"></a></span>
+<span id="cb30-29"><a href="short-t-bias..html#cb30-29" tabindex="-1"></a><span class="co"># Calculate medians for each wave/parameter combination</span></span>
+<span id="cb30-30"><a href="short-t-bias..html#cb30-30" tabindex="-1"></a>medians <span class="ot">&lt;-</span> results_long <span class="sc">|&gt;</span></span>
+<span id="cb30-31"><a href="short-t-bias..html#cb30-31" tabindex="-1"></a>  <span class="fu">group_by</span>(waves_factor, parameter_label, true_value) <span class="sc">|&gt;</span></span>
+<span id="cb30-32"><a href="short-t-bias..html#cb30-32" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">median_est =</span> <span class="fu">median</span>(estimate), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>)</span>
+<span id="cb30-33"><a href="short-t-bias..html#cb30-33" tabindex="-1"></a></span>
+<span id="cb30-34"><a href="short-t-bias..html#cb30-34" tabindex="-1"></a><span class="co"># Create plot with median lines</span></span>
+<span id="cb30-35"><a href="short-t-bias..html#cb30-35" tabindex="-1"></a><span class="fu">ggplot</span>(results_long, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> waves_factor)) <span class="sc">+</span></span>
+<span id="cb30-36"><a href="short-t-bias..html#cb30-36" tabindex="-1"></a>  <span class="fu">geom_density_ridges</span>(</span>
+<span id="cb30-37"><a href="short-t-bias..html#cb30-37" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">fill =</span> waves_factor),</span>
+<span id="cb30-38"><a href="short-t-bias..html#cb30-38" tabindex="-1"></a>    <span class="at">scale =</span> <span class="dv">2</span>, </span>
+<span id="cb30-39"><a href="short-t-bias..html#cb30-39" tabindex="-1"></a>    <span class="at">rel_min_height =</span> <span class="fl">0.01</span>,</span>
+<span id="cb30-40"><a href="short-t-bias..html#cb30-40" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.7</span></span>
+<span id="cb30-41"><a href="short-t-bias..html#cb30-41" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb30-42"><a href="short-t-bias..html#cb30-42" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept =</span> true_value), </span>
+<span id="cb30-43"><a href="short-t-bias..html#cb30-43" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">size =</span> <span class="fl">0.8</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb30-44"><a href="short-t-bias..html#cb30-44" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="at">data =</span> medians,</span>
+<span id="cb30-45"><a href="short-t-bias..html#cb30-45" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> median_est, <span class="at">xend =</span> median_est,</span>
+<span id="cb30-46"><a href="short-t-bias..html#cb30-46" tabindex="-1"></a>                   <span class="at">y =</span> <span class="fu">as.numeric</span>(waves_factor) <span class="sc">-</span> <span class="fl">0.3</span>, </span>
+<span id="cb30-47"><a href="short-t-bias..html#cb30-47" tabindex="-1"></a>                   <span class="at">yend =</span> <span class="fu">as.numeric</span>(waves_factor) <span class="sc">+</span> <span class="fl">0.3</span>),</span>
+<span id="cb30-48"><a href="short-t-bias..html#cb30-48" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">&quot;green&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb30-49"><a href="short-t-bias..html#cb30-49" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>parameter_label, <span class="at">scales =</span> <span class="st">&quot;free_x&quot;</span>, </span>
+<span id="cb30-50"><a href="short-t-bias..html#cb30-50" tabindex="-1"></a>             <span class="at">labeller =</span> label_parsed, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb30-51"><a href="short-t-bias..html#cb30-51" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>(<span class="at">option =</span> <span class="st">&quot;viridis&quot;</span>, <span class="at">begin =</span> <span class="fl">0.2</span>, <span class="at">end =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb30-52"><a href="short-t-bias..html#cb30-52" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb30-53"><a href="short-t-bias..html#cb30-53" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Monte Carlo Sample Distribution Varying Waves, RI-CLPM&quot;</span>,</span>
+<span id="cb30-54"><a href="short-t-bias..html#cb30-54" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Green line = median estimate | Dashed line = true value&quot;</span>,</span>
+<span id="cb30-55"><a href="short-t-bias..html#cb30-55" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Parameter Estimate&quot;</span>,</span>
+<span id="cb30-56"><a href="short-t-bias..html#cb30-56" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Number of Waves&quot;</span></span>
+<span id="cb30-57"><a href="short-t-bias..html#cb30-57" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb30-58"><a href="short-t-bias..html#cb30-58" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb30-59"><a href="short-t-bias..html#cb30-59" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb30-60"><a href="short-t-bias..html#cb30-60" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb30-61"><a href="short-t-bias..html#cb30-61" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">&quot;bold&quot;</span>),</span>
+<span id="cb30-62"><a href="short-t-bias..html#cb30-62" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb30-63"><a href="short-t-bias..html#cb30-63" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## Picking joint bandwidth of 0.00578</code></pre>
+<pre><code>## Picking joint bandwidth of 0.00426</code></pre>
+<pre><code>## Picking joint bandwidth of 0.00413</code></pre>
+<pre><code>## Picking joint bandwidth of 0.00474</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>Here is a summary table,</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="short-t-bias..html#cb35-1" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb35-2"><a href="short-t-bias..html#cb35-2" tabindex="-1"></a>bias_summary <span class="ot">&lt;-</span> results <span class="sc">|&gt;</span></span>
+<span id="cb35-3"><a href="short-t-bias..html#cb35-3" tabindex="-1"></a>  <span class="fu">group_by</span>(waves) <span class="sc">|&gt;</span></span>
+<span id="cb35-4"><a href="short-t-bias..html#cb35-4" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb35-5"><a href="short-t-bias..html#cb35-5" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(beta_x, beta_y, omega_xy, omega_yx),</span>
+<span id="cb35-6"><a href="short-t-bias..html#cb35-6" tabindex="-1"></a>           <span class="fu">list</span>(</span>
+<span id="cb35-7"><a href="short-t-bias..html#cb35-7" tabindex="-1"></a>             <span class="at">mean =</span> mean,</span>
+<span id="cb35-8"><a href="short-t-bias..html#cb35-8" tabindex="-1"></a>             <span class="at">bias =</span> <span class="sc">~</span><span class="fu">mean</span>(.) <span class="sc">-</span> true_params[[<span class="fu">cur_column</span>()]],</span>
+<span id="cb35-9"><a href="short-t-bias..html#cb35-9" tabindex="-1"></a>             <span class="at">relative_bias =</span> <span class="sc">~</span> (<span class="fu">mean</span>(.) <span class="sc">-</span> true_params[[<span class="fu">cur_column</span>()]]) <span class="sc">/</span> true_params[[<span class="fu">cur_column</span>()]]<span class="sc">*</span><span class="dv">100</span>,</span>
+<span id="cb35-10"><a href="short-t-bias..html#cb35-10" tabindex="-1"></a>             <span class="at">se =</span> <span class="sc">~</span><span class="fu">sd</span>(.)</span>
+<span id="cb35-11"><a href="short-t-bias..html#cb35-11" tabindex="-1"></a>           ),</span>
+<span id="cb35-12"><a href="short-t-bias..html#cb35-12" tabindex="-1"></a>           <span class="at">.names =</span> <span class="st">&quot;{.col}_{.fn}&quot;</span>)</span>
+<span id="cb35-13"><a href="short-t-bias..html#cb35-13" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb35-14"><a href="short-t-bias..html#cb35-14" tabindex="-1"></a>  <span class="fu">select</span>(waves,</span>
+<span id="cb35-15"><a href="short-t-bias..html#cb35-15" tabindex="-1"></a>         <span class="fu">contains</span>(<span class="st">&quot;bias&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb35-16"><a href="short-t-bias..html#cb35-16" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span>
+<span id="cb35-17"><a href="short-t-bias..html#cb35-17" tabindex="-1"></a></span>
+<span id="cb35-18"><a href="short-t-bias..html#cb35-18" tabindex="-1"></a>bias_summary <span class="sc">|&gt;</span></span>
+<span id="cb35-19"><a href="short-t-bias..html#cb35-19" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb35-20"><a href="short-t-bias..html#cb35-20" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb35-21"><a href="short-t-bias..html#cb35-21" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">md</span>(<span class="st">&quot;**Monte Carlo Bias Analysis**&quot;</span>),</span>
+<span id="cb35-22"><a href="short-t-bias..html#cb35-22" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;RICLPM Estimation: Varying the Number of Waves&quot;</span></span>
+<span id="cb35-23"><a href="short-t-bias..html#cb35-23" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb35-24"><a href="short-t-bias..html#cb35-24" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb35-25"><a href="short-t-bias..html#cb35-25" tabindex="-1"></a>    <span class="at">waves =</span> <span class="st">&quot;Waves&quot;</span>,</span>
+<span id="cb35-26"><a href="short-t-bias..html#cb35-26" tabindex="-1"></a>    <span class="at">beta_x_bias =</span>  <span class="st">&quot;Bias, AR(X)&quot;</span>,</span>
+<span id="cb35-27"><a href="short-t-bias..html#cb35-27" tabindex="-1"></a>    <span class="at">beta_y_bias =</span>  <span class="st">&quot;Bias, AR(Y)&quot;</span>,</span>
+<span id="cb35-28"><a href="short-t-bias..html#cb35-28" tabindex="-1"></a>    <span class="at">beta_x_relative_bias  =</span>  <span class="st">&quot;Relative Bias AR(X) %&quot;</span>,</span>
+<span id="cb35-29"><a href="short-t-bias..html#cb35-29" tabindex="-1"></a>    <span class="at">beta_y_relative_bias  =</span>  <span class="st">&quot;Relative Bias AR(Y) %&quot;</span>,</span>
+<span id="cb35-30"><a href="short-t-bias..html#cb35-30" tabindex="-1"></a>    <span class="at">omega_xy_bias  =</span>  <span class="st">&quot;Bias, CL(X→Y)&quot;</span>,</span>
+<span id="cb35-31"><a href="short-t-bias..html#cb35-31" tabindex="-1"></a>    <span class="at">omega_yx_bias  =</span>  <span class="st">&quot;Bias, CL(Y→X)&quot;</span>,</span>
+<span id="cb35-32"><a href="short-t-bias..html#cb35-32" tabindex="-1"></a>    <span class="at">omega_xy_relative_bias  =</span>  <span class="st">&quot;Relative Bias, CL(X→Y) %&quot;</span>,</span>
+<span id="cb35-33"><a href="short-t-bias..html#cb35-33" tabindex="-1"></a>    <span class="at">omega_yx_relative_bias  =</span>  <span class="st">&quot;Relative Bias, CL(Y→X) %&quot;</span></span>
+<span id="cb35-34"><a href="short-t-bias..html#cb35-34" tabindex="-1"></a>)<span class="sc">|&gt;</span></span>
+<span id="cb35-35"><a href="short-t-bias..html#cb35-35" tabindex="-1"></a>   <span class="fu">tab_source_note</span>(</span>
+<span id="cb35-36"><a href="short-t-bias..html#cb35-36" tabindex="-1"></a>     <span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">&quot;*Note*: The results reported here are from 100 simulations, varying the number of waves.&quot;</span>)</span>
+<span id="cb35-37"><a href="short-t-bias..html#cb35-37" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb35-38"><a href="short-t-bias..html#cb35-38" tabindex="-1"></a>    <span class="fu">tab_footnote</span>(</span>
+<span id="cb35-39"><a href="short-t-bias..html#cb35-39" tabindex="-1"></a>      <span class="at">footnote =</span> <span class="st">&quot;Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100&quot;</span>)</span></code></pre></div>
+<div id="cpitnkohmh" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#cpitnkohmh table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#cpitnkohmh thead, #cpitnkohmh tbody, #cpitnkohmh tfoot, #cpitnkohmh tr, #cpitnkohmh td, #cpitnkohmh th {
+  border-style: none;
+}
+
+#cpitnkohmh p {
+  margin: 0;
+  padding: 0;
+}
+
+#cpitnkohmh .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#cpitnkohmh .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#cpitnkohmh .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#cpitnkohmh .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#cpitnkohmh .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#cpitnkohmh .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#cpitnkohmh .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#cpitnkohmh .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#cpitnkohmh .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#cpitnkohmh .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#cpitnkohmh .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#cpitnkohmh .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#cpitnkohmh .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#cpitnkohmh .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#cpitnkohmh .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cpitnkohmh .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#cpitnkohmh .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#cpitnkohmh .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#cpitnkohmh .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cpitnkohmh .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#cpitnkohmh .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cpitnkohmh .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#cpitnkohmh .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cpitnkohmh .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#cpitnkohmh .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#cpitnkohmh .gt_left {
+  text-align: left;
+}
+
+#cpitnkohmh .gt_center {
+  text-align: center;
+}
+
+#cpitnkohmh .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#cpitnkohmh .gt_font_normal {
+  font-weight: normal;
+}
+
+#cpitnkohmh .gt_font_bold {
+  font-weight: bold;
+}
+
+#cpitnkohmh .gt_font_italic {
+  font-style: italic;
+}
+
+#cpitnkohmh .gt_super {
+  font-size: 65%;
+}
+
+#cpitnkohmh .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#cpitnkohmh .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#cpitnkohmh .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#cpitnkohmh .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#cpitnkohmh .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#cpitnkohmh .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#cpitnkohmh .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#cpitnkohmh .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#cpitnkohmh div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="9" class="gt_heading gt_title gt_font_normal" style><span class='gt_from_md'><strong>Monte Carlo Bias Analysis</strong></span></td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="9" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>RICLPM Estimation: Varying the Number of Waves</td>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="waves">Waves</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="beta_x_bias">Bias, AR(X)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="beta_x_relative_bias">Relative Bias AR(X) %</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="beta_y_bias">Bias, AR(Y)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="beta_y_relative_bias">Relative Bias AR(Y) %</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="omega_xy_bias">Bias, CL(X→Y)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="omega_xy_relative_bias">Relative Bias, CL(X→Y) %</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="omega_yx_bias">Bias, CL(Y→X)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="omega_yx_relative_bias">Relative Bias, CL(Y→X) %</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="waves" class="gt_row gt_right">3</td>
+<td headers="beta_x_bias" class="gt_row gt_right">0.000</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">0.124</td>
+<td headers="beta_y_bias" class="gt_row gt_right">0.004</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">0.571</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">0.000</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">0.191</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">-0.005</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">-1.812</td></tr>
+    <tr><td headers="waves" class="gt_row gt_right">5</td>
+<td headers="beta_x_bias" class="gt_row gt_right">0.001</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">0.300</td>
+<td headers="beta_y_bias" class="gt_row gt_right">-0.001</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">-0.189</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">-0.001</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">-0.252</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">0.001</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">0.191</td></tr>
+    <tr><td headers="waves" class="gt_row gt_right">7</td>
+<td headers="beta_x_bias" class="gt_row gt_right">0.000</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">0.055</td>
+<td headers="beta_y_bias" class="gt_row gt_right">0.000</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">0.022</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">-0.001</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">-0.330</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">-0.001</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">-0.367</td></tr>
+    <tr><td headers="waves" class="gt_row gt_right">10</td>
+<td headers="beta_x_bias" class="gt_row gt_right">0.001</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">0.259</td>
+<td headers="beta_y_bias" class="gt_row gt_right">-0.001</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">-0.088</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">0.000</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">0.004</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">0.002</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">0.772</td></tr>
+    <tr><td headers="waves" class="gt_row gt_right">30</td>
+<td headers="beta_x_bias" class="gt_row gt_right">0.001</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">0.176</td>
+<td headers="beta_y_bias" class="gt_row gt_right">0.000</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">-0.059</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">0.000</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">0.006</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">0.000</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">0.148</td></tr>
+  </tbody>
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td class="gt_footnote" colspan="9"> Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100</td>
+    </tr>
+    <tr class="gt_sourcenotes">
+      <td class="gt_sourcenote" colspan="9"><span class='gt_from_md'><em>Note</em>: The results reported here are from 100 simulations, varying the number of waves.</span></td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+<div id="change" class="section level2 hasAnchor" number="3.3">
+<h2><span class="header-section-number">3.3</span> Change<a href="short-t-bias..html#change" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Below I attempt to do the same analysis but with the latent change score model with constant effects. In these simulations, I vary the degree of “between-unit” and “within-wave” variation. I didn’t have much luck here….strange results.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="short-t-bias..html#cb36-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb36-2"><a href="short-t-bias..html#cb36-2" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb36-3"><a href="short-t-bias..html#cb36-3" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb36-4"><a href="short-t-bias..html#cb36-4" tabindex="-1"></a></span>
+<span id="cb36-5"><a href="short-t-bias..html#cb36-5" tabindex="-1"></a><span class="fu">baseRICLPM_sim</span>(<span class="at">n =</span> <span class="dv">1000</span>,</span>
+<span id="cb36-6"><a href="short-t-bias..html#cb36-6" tabindex="-1"></a>               <span class="at">ar_x =</span> <span class="fl">0.4</span>,</span>
+<span id="cb36-7"><a href="short-t-bias..html#cb36-7" tabindex="-1"></a>               <span class="at">ar_y =</span> <span class="fl">0.7</span>,</span>
+<span id="cb36-8"><a href="short-t-bias..html#cb36-8" tabindex="-1"></a>               <span class="at">cl_xy =</span> <span class="fl">0.3</span>,</span>
+<span id="cb36-9"><a href="short-t-bias..html#cb36-9" tabindex="-1"></a>               <span class="at">cl_yx =</span> <span class="fl">0.2</span>, </span>
+<span id="cb36-10"><a href="short-t-bias..html#cb36-10" tabindex="-1"></a>               <span class="at">waves =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-11"><a href="short-t-bias..html#cb36-11" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">contains</span>(<span class="st">&quot;trait&quot;</span>)) <span class="ot">-&gt;</span> dat</span>
+<span id="cb36-12"><a href="short-t-bias..html#cb36-12" tabindex="-1"></a></span>
+<span id="cb36-13"><a href="short-t-bias..html#cb36-13" tabindex="-1"></a>fit <span class="ot">=</span> lavaan<span class="sc">::</span><span class="fu">lavaan</span>(<span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">10</span>,</span>
+<span id="cb36-14"><a href="short-t-bias..html#cb36-14" tabindex="-1"></a>                                  <span class="at">variable_type =</span>    <span class="st">&quot;bivariate&quot;</span>), </span>
+<span id="cb36-15"><a href="short-t-bias..html#cb36-15" tabindex="-1"></a>                                 <span class="at">data =</span> dat, </span>
+<span id="cb36-16"><a href="short-t-bias..html#cb36-16" tabindex="-1"></a>                     <span class="at">warn =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb36-17"><a href="short-t-bias..html#cb36-17" tabindex="-1"></a></span>
+<span id="cb36-18"><a href="short-t-bias..html#cb36-18" tabindex="-1"></a></span>
+<span id="cb36-19"><a href="short-t-bias..html#cb36-19" tabindex="-1"></a>true_params <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">beta_x =</span> <span class="sc">-</span><span class="fl">0.6</span> , <span class="at">beta_y =</span> <span class="sc">-</span><span class="fl">0.3</span>, </span>
+<span id="cb36-20"><a href="short-t-bias..html#cb36-20" tabindex="-1"></a>                    <span class="at">omega_x =</span> <span class="fl">0.2</span>, <span class="at">omega_y =</span> <span class="fl">0.3</span>)</span>
+<span id="cb36-21"><a href="short-t-bias..html#cb36-21" tabindex="-1"></a></span>
+<span id="cb36-22"><a href="short-t-bias..html#cb36-22" tabindex="-1"></a>extract_params <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) {</span>
+<span id="cb36-23"><a href="short-t-bias..html#cb36-23" tabindex="-1"></a>  pe <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">parameterEstimates</span>(fit)</span>
+<span id="cb36-24"><a href="short-t-bias..html#cb36-24" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb36-25"><a href="short-t-bias..html#cb36-25" tabindex="-1"></a>    <span class="at">beta_x =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span>   <span class="st">&quot;beta_x&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb36-26"><a href="short-t-bias..html#cb36-26" tabindex="-1"></a>    <span class="at">beta_y =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span>   <span class="st">&quot;beta_y&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb36-27"><a href="short-t-bias..html#cb36-27" tabindex="-1"></a>    <span class="at">omega_x =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span> <span class="st">&quot;omega_x&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb36-28"><a href="short-t-bias..html#cb36-28" tabindex="-1"></a>    <span class="at">omega_y =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span> <span class="st">&quot;omega_y&quot;</span>][<span class="dv">1</span>]</span>
+<span id="cb36-29"><a href="short-t-bias..html#cb36-29" tabindex="-1"></a>  )</span>
+<span id="cb36-30"><a href="short-t-bias..html#cb36-30" tabindex="-1"></a>}</span>
+<span id="cb36-31"><a href="short-t-bias..html#cb36-31" tabindex="-1"></a></span>
+<span id="cb36-32"><a href="short-t-bias..html#cb36-32" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
+<span id="cb36-33"><a href="short-t-bias..html#cb36-33" tabindex="-1"></a>  <span class="at">waves =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">30</span>),</span>
+<span id="cb36-34"><a href="short-t-bias..html#cb36-34" tabindex="-1"></a>  <span class="at">innov_var =</span> <span class="fu">seq</span>(<span class="fl">0.25</span>, <span class="fl">1.25</span>, <span class="at">by =</span> <span class="dv">1</span>),</span>
+<span id="cb36-35"><a href="short-t-bias..html#cb36-35" tabindex="-1"></a>  <span class="at">rep =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">100</span></span>
+<span id="cb36-36"><a href="short-t-bias..html#cb36-36" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb36-37"><a href="short-t-bias..html#cb36-37" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-38"><a href="short-t-bias..html#cb36-38" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">pmap</span>(<span class="fu">list</span>(<span class="at">waves =</span> waves, <span class="at">innov_var =</span> innov_var), <span class="sc">~</span>{</span>
+<span id="cb36-39"><a href="short-t-bias..html#cb36-39" tabindex="-1"></a>  <span class="fu">baseRICLPM_sim</span>(</span>
+<span id="cb36-40"><a href="short-t-bias..html#cb36-40" tabindex="-1"></a>    <span class="at">n =</span> <span class="dv">2000</span>,</span>
+<span id="cb36-41"><a href="short-t-bias..html#cb36-41" tabindex="-1"></a>    <span class="at">innov_var =</span> ..<span class="dv">2</span>,  <span class="co"># second arg pmap</span></span>
+<span id="cb36-42"><a href="short-t-bias..html#cb36-42" tabindex="-1"></a>    <span class="at">ar_x =</span> <span class="fl">0.4</span>, <span class="at">ar_y =</span> <span class="fl">0.7</span>,</span>
+<span id="cb36-43"><a href="short-t-bias..html#cb36-43" tabindex="-1"></a>    <span class="at">cl_xy =</span> <span class="fl">0.3</span>, <span class="at">cl_yx =</span> <span class="fl">0.2</span>,</span>
+<span id="cb36-44"><a href="short-t-bias..html#cb36-44" tabindex="-1"></a>    <span class="at">waves =</span> ..<span class="dv">1</span> <span class="co"># first arg in pmap</span></span>
+<span id="cb36-45"><a href="short-t-bias..html#cb36-45" tabindex="-1"></a>  )</span>
+<span id="cb36-46"><a href="short-t-bias..html#cb36-46" tabindex="-1"></a>}),</span>
+<span id="cb36-47"><a href="short-t-bias..html#cb36-47" tabindex="-1"></a>    <span class="co"># This iterates over the data, x and waves y</span></span>
+<span id="cb36-48"><a href="short-t-bias..html#cb36-48" tabindex="-1"></a>    <span class="at">fit =</span> <span class="fu">map2</span>(data, waves, <span class="sc">~</span>{</span>
+<span id="cb36-49"><a href="short-t-bias..html#cb36-49" tabindex="-1"></a>      lavaan<span class="sc">::</span><span class="fu">lavaan</span>(<span class="fu">estimateLChange</span>(<span class="at">waves =</span> ..<span class="dv">2</span>,</span>
+<span id="cb36-50"><a href="short-t-bias..html#cb36-50" tabindex="-1"></a>                                     <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb36-51"><a href="short-t-bias..html#cb36-51" tabindex="-1"></a>                                     <span class="at">estimate_constant_change =</span> <span class="cn">FALSE</span>), </span>
+<span id="cb36-52"><a href="short-t-bias..html#cb36-52" tabindex="-1"></a>                                 <span class="at">data =</span> ..<span class="dv">1</span>, </span>
+<span id="cb36-53"><a href="short-t-bias..html#cb36-53" tabindex="-1"></a>                     <span class="at">warn =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb36-54"><a href="short-t-bias..html#cb36-54" tabindex="-1"></a>    }),</span>
+<span id="cb36-55"><a href="short-t-bias..html#cb36-55" tabindex="-1"></a>    <span class="at">params =</span> <span class="fu">map</span>(fit, extract_params)</span>
+<span id="cb36-56"><a href="short-t-bias..html#cb36-56" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb36-57"><a href="short-t-bias..html#cb36-57" tabindex="-1"></a>  <span class="fu">unnest</span>(params)</span>
+<span id="cb36-58"><a href="short-t-bias..html#cb36-58" tabindex="-1"></a></span>
+<span id="cb36-59"><a href="short-t-bias..html#cb36-59" tabindex="-1"></a>results <span class="sc">|&gt;</span></span>
+<span id="cb36-60"><a href="short-t-bias..html#cb36-60" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-61"><a href="short-t-bias..html#cb36-61" tabindex="-1"></a>    <span class="at">beta_y =</span> beta_y ,</span>
+<span id="cb36-62"><a href="short-t-bias..html#cb36-62" tabindex="-1"></a>    <span class="at">beta_x =</span> beta_x ) <span class="sc">|&gt;</span></span>
+<span id="cb36-63"><a href="short-t-bias..html#cb36-63" tabindex="-1"></a>  <span class="fu">group_by</span>(waves, innov_var) <span class="sc">|&gt;</span></span>
+<span id="cb36-64"><a href="short-t-bias..html#cb36-64" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb36-65"><a href="short-t-bias..html#cb36-65" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(beta_x, beta_y, omega_y, omega_x),</span>
+<span id="cb36-66"><a href="short-t-bias..html#cb36-66" tabindex="-1"></a>           <span class="fu">list</span>(</span>
+<span id="cb36-67"><a href="short-t-bias..html#cb36-67" tabindex="-1"></a>             <span class="at">mean =</span> mean,</span>
+<span id="cb36-68"><a href="short-t-bias..html#cb36-68" tabindex="-1"></a>             <span class="at">bias =</span> <span class="sc">~</span><span class="fu">mean</span>(.) <span class="sc">-</span> true_params[[<span class="fu">cur_column</span>()]],</span>
+<span id="cb36-69"><a href="short-t-bias..html#cb36-69" tabindex="-1"></a>             <span class="at">relative_bias =</span> <span class="sc">~</span> (<span class="fu">mean</span>(.) <span class="sc">-</span> true_params[[<span class="fu">cur_column</span>()]]) <span class="sc">/</span> true_params[[<span class="fu">cur_column</span>()]]<span class="sc">*</span><span class="dv">100</span>,</span>
+<span id="cb36-70"><a href="short-t-bias..html#cb36-70" tabindex="-1"></a>             <span class="at">se =</span> <span class="sc">~</span><span class="fu">sd</span>(.)</span>
+<span id="cb36-71"><a href="short-t-bias..html#cb36-71" tabindex="-1"></a>           ),</span>
+<span id="cb36-72"><a href="short-t-bias..html#cb36-72" tabindex="-1"></a>           <span class="at">.names =</span> <span class="st">&quot;{.col}_{.fn}&quot;</span>)) <span class="ot">-&gt;</span> bias_summary</span></code></pre></div>
+</div>
+<div id="change-1" class="section level2 hasAnchor" number="3.4">
+<h2><span class="header-section-number">3.4</span> Change<a href="short-t-bias..html#change-1" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="short-t-bias..html#cb37-1" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb37-2"><a href="short-t-bias..html#cb37-2" tabindex="-1"></a>bias_summary <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="short-t-bias..html#cb37-3" tabindex="-1"></a>  <span class="fu">select</span>(waves,</span>
+<span id="cb37-4"><a href="short-t-bias..html#cb37-4" tabindex="-1"></a>         <span class="fu">contains</span>(<span class="fu">c</span>(<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;waves&quot;</span>, <span class="st">&quot;innov_var&quot;</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb37-5"><a href="short-t-bias..html#cb37-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>))) </span></code></pre></div>
+<pre><code>## # A tibble: 8 × 6
+## # Groups:   waves [4]
+##   waves beta_x_mean beta_y_mean omega_y_mean omega_x_mean innov_var
+##   &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;
+## 1     3      -0.037      -0.046        0.057        0.014      0.25
+## 2     3      -0.174      -0.172        0.209        0.066      1.25
+## 3     5      -0.023      -0.05         0.045       -0.001      0.25
+## 4     5      -0.14       -0.185        0.199        0.034      1.25
+## 5    10      -0.008      -0.058        0.033       -0.016      0.25
+## 6    10      -0.102      -0.195        0.188        0.004      1.25
+## 7    30       0.001      -0.059        0.017       -0.025      0.25
+## 8    30      -0.053      -0.182        0.154       -0.025      1.25</code></pre>
+</div>
+<div id="summary" class="section level2 hasAnchor" number="3.5">
+<h2><span class="header-section-number">3.5</span> Summary<a href="short-t-bias..html#summary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The change (LCM) and level score (CLPM; RICLPM) analysis are equivalent in the absence of unit effects. This suggests a close relationship between these models. However, when unit effects are present, the models diverge. When the DGP includes unit effects, the same interchangeable relationships disappear.</p>
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-hsiao2022" class="csl-entry">
+Hsiao, Cheng. 2022. <em>Analysis of Panel Data</em>. 64. Cambridge university press.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="simple-motivating-examples.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="outline.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/USERNAME/REPO/edit/BRANCH/02_CLPM_Estimation.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
