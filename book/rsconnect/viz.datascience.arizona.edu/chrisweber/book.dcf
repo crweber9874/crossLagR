@@ -1,0 +1,12 @@
+name: book
+title: book
+username: chrisweber
+account: chrisweber
+server: viz.datascience.arizona.edu
+hostUrl: https://viz.datascience.arizona.edu/__api__
+appId: 1337
+bundleId:
+url: https://viz.datascience.arizona.edu:443/content/76c7c5da-4c4b-4104-b15c-27da279ca6ce/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

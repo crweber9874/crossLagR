@@ -1,0 +1,12 @@
+name: panel_data2
+title: Panel Data
+username: chrisweber
+account: chrisweber
+server: viz.datascience.arizona.edu
+hostUrl: https://viz.datascience.arizona.edu/__api__
+appId: 1336
+bundleId: 8157
+url: https://viz.datascience.arizona.edu:443/content/b4c5e0f6-f752-4f79-bf42-ba0b6c895d35/
+version: 1
+asMultiple: FALSE
+asStatic: FALSE

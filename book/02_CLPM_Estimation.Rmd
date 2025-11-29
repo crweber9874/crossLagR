@@ -1,9 +1,14 @@
+---
+output:
+  pdf_document: default
+  html_document: default
+---
 # Simple Motivating Examples
 
 The package that accompanies this summary, `crossLagR`, includes functions to estimate several panel data models. They're structured such that functions that begin with `estimate` are simple functions to write latent variable panel models. The (working) package can be accessed on `github`:  `devtools::install_github("crweber9874/crossLagR")`
 
 ```{r echo=FALSE, message=FALSE, warning=FALSE, cache=TRUE}
-devtools::install_github("crweber9874/crossLagR")
+# devtools::install_github("crweber9874/crossLagR")
 library(crossLagR)
 library(brms)
 library(dplyr)
@@ -835,7 +840,7 @@ extract_params <- function(fit) {
 
 results <- expand_grid(
   waves = c(3, 5, 7, 10, 30),
-  rep = 1:100
+  rep = 1:50
 ) |>
   mutate(
     data = map(waves, ~{
@@ -865,7 +870,7 @@ library(ggridges)
 library(dplyr)
 library(tidyr)
 library(ggplot2)
-library(ggridges)  # ADD THIS - geom_density_ridges requires it
+library(ggridges)  
 
 # Prepare data with simpler labels for parsing
 results_long <- results |>
@@ -1012,7 +1017,7 @@ extract_params <- function(fit) {
 results <- expand_grid(
   waves = c(3, 5, 10, 30),
   innov_var = seq(0.25, 1.25, by = 1),
-  rep = 1:100
+  rep = 1:50
 ) |>
   mutate(
   data = pmap(list(waves = waves, innov_var = innov_var), ~{

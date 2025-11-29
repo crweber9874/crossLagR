@@ -5,7 +5,7 @@ account: chrisweber
 server: viz.datascience.arizona.edu
 hostUrl: https://viz.datascience.arizona.edu/__api__
 appId: 1335
-bundleId: 8153
+bundleId:
 url: https://viz.datascience.arizona.edu:443/content/0b7da06e-36ef-45a9-a59d-fee9bc9a6976/
 version: 1
 asMultiple: FALSE
