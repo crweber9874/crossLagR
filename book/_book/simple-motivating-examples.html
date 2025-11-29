@@ -23,7 +23,7 @@
 <meta name="author" content="Christopher Weber" />
 
 
-<meta name="date" content="2025-11-26" />
+<meta name="date" content="2025-11-28" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -228,13 +228,13 @@ div.csl-indent {
 <li><code>estimateLGM()</code> generates the syntax for latent growth models. Use <code>help(estimateLGM)</code>.</li>
 </ul>
 <p>Nearly all the functions in the package start with a core lavaan model – such as the RICLPM <span class="citation">(<a href="#ref-hamaker_critique_2015">Hamaker, Kuiper, and Grasman 2015</a>)</span>. From there, build in rules to implement constraints, extend the number of waves, and modify parameters. You could just print the model code and modify manually. For instance, the <code>lavaan</code> code to estimate the CLPM is,</p>
-<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="simple-motivating-examples.html#cb1-1" tabindex="-1"></a><span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">2</span>,</span>
-<span id="cb1-2"><a href="simple-motivating-examples.html#cb1-2" tabindex="-1"></a>                         <span class="at">constrain_beta =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb1-3"><a href="simple-motivating-examples.html#cb1-3" tabindex="-1"></a>                         <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb1-4"><a href="simple-motivating-examples.html#cb1-4" tabindex="-1"></a>                         <span class="at">constrain_residual_variances =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb1-5"><a href="simple-motivating-examples.html#cb1-5" tabindex="-1"></a>                         <span class="at">constrain_residual_covariances =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb1-6"><a href="simple-motivating-examples.html#cb1-6" tabindex="-1"></a>                         <span class="at">estimate_means =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb1-7"><a href="simple-motivating-examples.html#cb1-7" tabindex="-1"></a><span class="fu">cat</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="simple-motivating-examples.html#cb5-1" tabindex="-1"></a><span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">2</span>,</span>
+<span id="cb5-2"><a href="simple-motivating-examples.html#cb5-2" tabindex="-1"></a>                         <span class="at">constrain_beta =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-3"><a href="simple-motivating-examples.html#cb5-3" tabindex="-1"></a>                         <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-4"><a href="simple-motivating-examples.html#cb5-4" tabindex="-1"></a>                         <span class="at">constrain_residual_variances =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-5"><a href="simple-motivating-examples.html#cb5-5" tabindex="-1"></a>                         <span class="at">constrain_residual_covariances =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-6"><a href="simple-motivating-examples.html#cb5-6" tabindex="-1"></a>                         <span class="at">estimate_means =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-7"><a href="simple-motivating-examples.html#cb5-7" tabindex="-1"></a><span class="fu">cat</span>()</span></code></pre></div>
 <pre><code>##     p1 =~ 1*y1
 ##     q1 =~ 1*x1
 ##     p2 =~ 1*y2
@@ -260,11 +260,11 @@ div.csl-indent {
 ##     y2 ~~ 0*y2
 ##     x2 ~~ 0*x2</code></pre>
 <p>By modifying <code>constrain_beta</code> and <code>constrain_omega</code>, this frees the AR (former) or CL (latter) parameters to vary across waves. The <code>lavaan</code> code to estimate the <strong>Bivariate Latent Change Model</strong> is,</p>
-<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="simple-motivating-examples.html#cb3-1" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
-<span id="cb3-2"><a href="simple-motivating-examples.html#cb3-2" tabindex="-1"></a>                <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
-<span id="cb3-3"><a href="simple-motivating-examples.html#cb3-3" tabindex="-1"></a>                <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb3-4"><a href="simple-motivating-examples.html#cb3-4" tabindex="-1"></a>                <span class="at">constrain_beta =</span>  <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb3-5"><a href="simple-motivating-examples.html#cb3-5" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="simple-motivating-examples.html#cb7-1" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
+<span id="cb7-2"><a href="simple-motivating-examples.html#cb7-2" tabindex="-1"></a>                <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb7-3"><a href="simple-motivating-examples.html#cb7-3" tabindex="-1"></a>                <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-4"><a href="simple-motivating-examples.html#cb7-4" tabindex="-1"></a>                <span class="at">constrain_beta =</span>  <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-5"><a href="simple-motivating-examples.html#cb7-5" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div>
 <pre><code>##     cf_x1 =~ 1*x1
 ##     cf_x2 =~ 1*x2
 ##     cf_x3 =~ 1*x3
@@ -334,10 +334,10 @@ div.csl-indent {
 ##     cf_x1 ~~ general_y
 ##     cf_y1 ~~ general_x</code></pre>
 <p>And the <strong>RICLPM</strong> model is,</p>
-<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="simple-motivating-examples.html#cb5-1" tabindex="-1"></a><span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
-<span id="cb5-2"><a href="simple-motivating-examples.html#cb5-2" tabindex="-1"></a>                <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb5-3"><a href="simple-motivating-examples.html#cb5-3" tabindex="-1"></a>                <span class="at">constrain_beta =</span>  <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb5-4"><a href="simple-motivating-examples.html#cb5-4" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb9"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb9-1"><a href="simple-motivating-examples.html#cb9-1" tabindex="-1"></a><span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
+<span id="cb9-2"><a href="simple-motivating-examples.html#cb9-2" tabindex="-1"></a>                <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb9-3"><a href="simple-motivating-examples.html#cb9-3" tabindex="-1"></a>                <span class="at">constrain_beta =</span>  <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb9-4"><a href="simple-motivating-examples.html#cb9-4" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div>
 <pre><code>## 
 ## # Random Intercepts
 ## BX =~ 1*x1 + 1*x2 + 1*x3
@@ -393,10 +393,10 @@ div.csl-indent {
 ## x3 ~~ 0*x3
 ## y3 ~~ 0*y3</code></pre>
 <p>And finally, the <strong>Bivariate Latent (Linear) Growth Model</strong>,</p>
-<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="simple-motivating-examples.html#cb7-1" tabindex="-1"></a><span class="fu">estimateLGM</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
-<span id="cb7-2"><a href="simple-motivating-examples.html#cb7-2" tabindex="-1"></a>            <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span></span>
-<span id="cb7-3"><a href="simple-motivating-examples.html#cb7-3" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
-<span id="cb7-4"><a href="simple-motivating-examples.html#cb7-4" tabindex="-1"></a><span class="fu">cat</span>()</span></code></pre></div>
+<div class="sourceCode" id="cb11"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb11-1"><a href="simple-motivating-examples.html#cb11-1" tabindex="-1"></a><span class="fu">estimateLGM</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
+<span id="cb11-2"><a href="simple-motivating-examples.html#cb11-2" tabindex="-1"></a>            <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span></span>
+<span id="cb11-3"><a href="simple-motivating-examples.html#cb11-3" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb11-4"><a href="simple-motivating-examples.html#cb11-4" tabindex="-1"></a><span class="fu">cat</span>()</span></code></pre></div>
 <pre><code>## # Latent Variables
 ## p1 =~ 1*x1
 ## q1 =~ 1*y1
@@ -486,8 +486,8 @@ div.csl-indent {
 <h2><span class="header-section-number">2.2</span> A Simple Example<a href="simple-motivating-examples.html#a-simple-example" class="anchor-section" aria-label="Anchor link to header"></a></h2>
 <p>As a motivating example, let’s simulate data from a CLPM and estimate two regression models, one with AR and CL parameters in “level form” and another regression model on the change scores, also with AR and CL parameters. This is similar to <span class="citation">Allison (<a href="#ref-allison1990">1990</a>)</span>’s discussion of difference scores versus level scores.The regression models are just OLS models, one using change scores, the other using lags. Not surprisingly, and consistent with the previous section, they are interchangeable. Figure <a href="simple-motivating-examples.html#fig:latent-clpm">2.1</a> shows the DGP and Figure <a href="simple-motivating-examples.html#fig:trajectories">2.2</a> shows simulated data.</p>
 <div class="figure"><span style="display:block;" id="fig:latent-clpm"></span>
-<div class="grViz html-widget html-fill-item" id="htmlwidget-6b20c6bd080e64fc3621" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-6b20c6bd080e64fc3621">{"x":{"diagram":"\ndigraph RICLPM {\n\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  node [shape = box, style = filled, fillcolor = white, fontsize = 10]\n\n  # X indicators (3 per time point) - closer to latents\n  x11 [pos = \"-3.2,1.8!\", label = \"x₁₁\", width = 0.4, height = 0.25]\n  x12 [pos = \"-2.8,1.8!\", label = \"x₁₂\", width = 0.4, height = 0.25] \n  x13 [pos = \"-2.4,1.8!\", label = \"x₁₃\", width = 0.4, height = 0.25]\n  \n  x21 [pos = \"-1.7,1.8!\", label = \"x₂₁\", width = 0.4, height = 0.25]\n  x22 [pos = \"-1.3,1.8!\", label = \"x₂₂\", width = 0.4, height = 0.25]\n  x23 [pos = \"-0.9,1.8!\", label = \"x₂₃\", width = 0.4, height = 0.25]\n  \n  x31 [pos = \"-0.2,1.8!\", label = \"x₃₁\", width = 0.4, height = 0.25]\n  x32 [pos = \"0.2,1.8!\", label = \"x₃₂\", width = 0.4, height = 0.25]\n  x33 [pos = \"0.6,1.8!\", label = \"x₃₃\", width = 0.4, height = 0.25]\n  \n  x41 [pos = \"1.3,1.8!\", label = \"x₄₁\", width = 0.4, height = 0.25]\n  x42 [pos = \"1.7,1.8!\", label = \"x₄₂\", width = 0.4, height = 0.25]\n  x43 [pos = \"2.1,1.8!\", label = \"x₄₃\", width = 0.4, height = 0.25]\n  \n  x51 [pos = \"2.8,1.8!\", label = \"x₅₁\", width = 0.4, height = 0.25]\n  x52 [pos = \"3.2,1.8!\", label = \"x₅₂\", width = 0.4, height = 0.25]\n  x53 [pos = \"3.6,1.8!\", label = \"x₅₃\", width = 0.4, height = 0.25]\n\n  # Within Person X latents\n  wX1 [pos = \"-2.8,1!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1.3,1!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0.2,1!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1.7,1!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"3.2,1!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  # Within-person Y latents\n  wY1 [pos = \"-2.8,-1!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1.3,-1!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0.2,-1!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1.7,-1!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"3.2,-1!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n  # Y indicators (3 per time point) - closer to latents\n  y11 [pos = \"-3.2,-1.8!\", label = \"y₁₁\", width = 0.4, height = 0.25]\n  y12 [pos = \"-2.8,-1.8!\", label = \"y₁₂\", width = 0.4, height = 0.25]\n  y13 [pos = \"-2.4,-1.8!\", label = \"y₁₃\", width = 0.4, height = 0.25]\n  \n  y21 [pos = \"-1.7,-1.8!\", label = \"y₂₁\", width = 0.4, height = 0.25]\n  y22 [pos = \"-1.3,-1.8!\", label = \"y₂₂\", width = 0.4, height = 0.25]\n  y23 [pos = \"-0.9,-1.8!\", label = \"y₂₃\", width = 0.4, height = 0.25]\n  \n  y31 [pos = \"-0.2,-1.8!\", label = \"y₃₁\", width = 0.4, height = 0.25]\n  y32 [pos = \"0.2,-1.8!\", label = \"y₃₂\", width = 0.4, height = 0.25]\n  y33 [pos = \"0.6,-1.8!\", label = \"y₃₃\", width = 0.4, height = 0.25]\n  \n  y41 [pos = \"1.3,-1.8!\", label = \"y₄₁\", width = 0.4, height = 0.25]\n  y42 [pos = \"1.7,-1.8!\", label = \"y₄₂\", width = 0.4, height = 0.25]\n  y43 [pos = \"2.1,-1.8!\", label = \"y₄₃\", width = 0.4, height = 0.25]\n  \n  y51 [pos = \"2.8,-1.8!\", label = \"y₅₁\", width = 0.4, height = 0.25]\n  y52 [pos = \"3.2,-1.8!\", label = \"y₅₂\", width = 0.4, height = 0.25]\n  y53 [pos = \"3.6,-1.8!\", label = \"y₅₃\", width = 0.4, height = 0.25]\n\n  # Measurement model for X with proper subscripts\n  wX1 -> x11 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX1 -> x12 [label = <λ<sub>12<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX1 -> x13 [label = <λ<sub>13<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX2 -> x21 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX2 -> x22 [label = <λ<sub>22<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX2 -> x23 [label = <λ<sub>23<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX3 -> x31 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX3 -> x32 [label = <λ<sub>32<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX3 -> x33 [label = <λ<sub>33<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX4 -> x41 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX4 -> x42 [label = <λ<sub>42<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX4 -> x43 [label = <λ<sub>43<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX5 -> x51 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX5 -> x52 [label = <λ<sub>52<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX5 -> x53 [label = <λ<sub>53<\/sub>>, arrowsize = 0.4, fontsize = 8]\n\n  # Measurement model for Y with proper subscripts\n  wY1 -> y11 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY1 -> y12 [label = <λ<sub>12<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY1 -> y13 [label = <λ<sub>13<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY2 -> y21 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY2 -> y22 [label = <λ<sub>22<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY2 -> y23 [label = <λ<sub>23<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY3 -> y31 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY3 -> y32 [label = <λ<sub>32<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY3 -> y33 [label = <λ<sub>33<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY4 -> y41 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY4 -> y42 [label = <λ<sub>42<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY4 -> y43 [label = <λ<sub>43<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY5 -> y51 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY5 -> y52 [label = <λ<sub>52<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY5 -> y53 [label = <λ<sub>53<\/sub>>, arrowsize = 0.4, fontsize = 8]\n\n  # Autoregressive paths (β parameters) - fontsize 11\n  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n\n# Cross-lagged paths (ω parameters) - fontsize 11\n  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  \n  \n  # Within-time correlations\n  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n\n  # ERROR VARIANCES ON X INDICATORS (north side) - no labels\n  x11 -> x11 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x12 -> x12 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x13 -> x13 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x21 -> x21 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x22 -> x22 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x23 -> x23 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x31 -> x31 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x32 -> x32 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x33 -> x33 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x41 -> x41 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x42 -> x42 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x43 -> x43 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x51 -> x51 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x52 -> x52 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x53 -> x53 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n\n  # ERROR VARIANCES ON Y INDICATORS (south side) - no labels\n  y11 -> y11 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y12 -> y12 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y13 -> y13 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y21 -> y21 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y22 -> y22 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y23 -> y23 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y31 -> y31 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y32 -> y32 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y33 -> y33 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y41 -> y41 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y42 -> y42 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y43 -> y43 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y51 -> y51 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y52 -> y52 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y53 -> y53 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n\n  # Self-loops to represent errors on latent factors\n  wX2 -> wX2 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX3 -> wX3 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX4 -> wX4 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX5 -> wX5 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wY2 -> wY2 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY3 -> wY3 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY4 -> wY4 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY5 -> wY5 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-9171ea4a2e23464ac46d" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-9171ea4a2e23464ac46d">{"x":{"diagram":"\ndigraph RICLPM {\n\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  node [shape = box, style = filled, fillcolor = white, fontsize = 10]\n\n  # X indicators (3 per time point) - closer to latents\n  x11 [pos = \"-3.2,1.8!\", label = \"x₁₁\", width = 0.4, height = 0.25]\n  x12 [pos = \"-2.8,1.8!\", label = \"x₁₂\", width = 0.4, height = 0.25] \n  x13 [pos = \"-2.4,1.8!\", label = \"x₁₃\", width = 0.4, height = 0.25]\n  \n  x21 [pos = \"-1.7,1.8!\", label = \"x₂₁\", width = 0.4, height = 0.25]\n  x22 [pos = \"-1.3,1.8!\", label = \"x₂₂\", width = 0.4, height = 0.25]\n  x23 [pos = \"-0.9,1.8!\", label = \"x₂₃\", width = 0.4, height = 0.25]\n  \n  x31 [pos = \"-0.2,1.8!\", label = \"x₃₁\", width = 0.4, height = 0.25]\n  x32 [pos = \"0.2,1.8!\", label = \"x₃₂\", width = 0.4, height = 0.25]\n  x33 [pos = \"0.6,1.8!\", label = \"x₃₃\", width = 0.4, height = 0.25]\n  \n  x41 [pos = \"1.3,1.8!\", label = \"x₄₁\", width = 0.4, height = 0.25]\n  x42 [pos = \"1.7,1.8!\", label = \"x₄₂\", width = 0.4, height = 0.25]\n  x43 [pos = \"2.1,1.8!\", label = \"x₄₃\", width = 0.4, height = 0.25]\n  \n  x51 [pos = \"2.8,1.8!\", label = \"x₅₁\", width = 0.4, height = 0.25]\n  x52 [pos = \"3.2,1.8!\", label = \"x₅₂\", width = 0.4, height = 0.25]\n  x53 [pos = \"3.6,1.8!\", label = \"x₅₃\", width = 0.4, height = 0.25]\n\n  # Within Person X latents\n  wX1 [pos = \"-2.8,1!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1.3,1!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0.2,1!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1.7,1!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"3.2,1!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  # Within-person Y latents\n  wY1 [pos = \"-2.8,-1!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1.3,-1!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0.2,-1!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1.7,-1!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"3.2,-1!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n  # Y indicators (3 per time point) - closer to latents\n  y11 [pos = \"-3.2,-1.8!\", label = \"y₁₁\", width = 0.4, height = 0.25]\n  y12 [pos = \"-2.8,-1.8!\", label = \"y₁₂\", width = 0.4, height = 0.25]\n  y13 [pos = \"-2.4,-1.8!\", label = \"y₁₃\", width = 0.4, height = 0.25]\n  \n  y21 [pos = \"-1.7,-1.8!\", label = \"y₂₁\", width = 0.4, height = 0.25]\n  y22 [pos = \"-1.3,-1.8!\", label = \"y₂₂\", width = 0.4, height = 0.25]\n  y23 [pos = \"-0.9,-1.8!\", label = \"y₂₃\", width = 0.4, height = 0.25]\n  \n  y31 [pos = \"-0.2,-1.8!\", label = \"y₃₁\", width = 0.4, height = 0.25]\n  y32 [pos = \"0.2,-1.8!\", label = \"y₃₂\", width = 0.4, height = 0.25]\n  y33 [pos = \"0.6,-1.8!\", label = \"y₃₃\", width = 0.4, height = 0.25]\n  \n  y41 [pos = \"1.3,-1.8!\", label = \"y₄₁\", width = 0.4, height = 0.25]\n  y42 [pos = \"1.7,-1.8!\", label = \"y₄₂\", width = 0.4, height = 0.25]\n  y43 [pos = \"2.1,-1.8!\", label = \"y₄₃\", width = 0.4, height = 0.25]\n  \n  y51 [pos = \"2.8,-1.8!\", label = \"y₅₁\", width = 0.4, height = 0.25]\n  y52 [pos = \"3.2,-1.8!\", label = \"y₅₂\", width = 0.4, height = 0.25]\n  y53 [pos = \"3.6,-1.8!\", label = \"y₅₃\", width = 0.4, height = 0.25]\n\n  # Measurement model for X with proper subscripts\n  wX1 -> x11 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX1 -> x12 [label = <λ<sub>12<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX1 -> x13 [label = <λ<sub>13<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX2 -> x21 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX2 -> x22 [label = <λ<sub>22<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX2 -> x23 [label = <λ<sub>23<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX3 -> x31 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX3 -> x32 [label = <λ<sub>32<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX3 -> x33 [label = <λ<sub>33<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX4 -> x41 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX4 -> x42 [label = <λ<sub>42<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX4 -> x43 [label = <λ<sub>43<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX5 -> x51 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX5 -> x52 [label = <λ<sub>52<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX5 -> x53 [label = <λ<sub>53<\/sub>>, arrowsize = 0.4, fontsize = 8]\n\n  # Measurement model for Y with proper subscripts\n  wY1 -> y11 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY1 -> y12 [label = <λ<sub>12<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY1 -> y13 [label = <λ<sub>13<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY2 -> y21 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY2 -> y22 [label = <λ<sub>22<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY2 -> y23 [label = <λ<sub>23<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY3 -> y31 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY3 -> y32 [label = <λ<sub>32<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY3 -> y33 [label = <λ<sub>33<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY4 -> y41 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY4 -> y42 [label = <λ<sub>42<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY4 -> y43 [label = <λ<sub>43<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY5 -> y51 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY5 -> y52 [label = <λ<sub>52<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY5 -> y53 [label = <λ<sub>53<\/sub>>, arrowsize = 0.4, fontsize = 8]\n\n  # Autoregressive paths (β parameters) - fontsize 11\n  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n\n# Cross-lagged paths (ω parameters) - fontsize 11\n  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  \n  \n  # Within-time correlations\n  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n\n  # ERROR VARIANCES ON X INDICATORS (north side) - no labels\n  x11 -> x11 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x12 -> x12 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x13 -> x13 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x21 -> x21 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x22 -> x22 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x23 -> x23 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x31 -> x31 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x32 -> x32 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x33 -> x33 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x41 -> x41 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x42 -> x42 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x43 -> x43 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x51 -> x51 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x52 -> x52 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x53 -> x53 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n\n  # ERROR VARIANCES ON Y INDICATORS (south side) - no labels\n  y11 -> y11 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y12 -> y12 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y13 -> y13 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y21 -> y21 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y22 -> y22 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y23 -> y23 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y31 -> y31 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y32 -> y32 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y33 -> y33 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y41 -> y41 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y42 -> y42 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y43 -> y43 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y51 -> y51 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y52 -> y52 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y53 -> y53 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n\n  # Self-loops to represent errors on latent factors\n  wX2 -> wX2 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX3 -> wX3 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX4 -> wX4 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX5 -> wX5 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wY2 -> wY2 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY3 -> wY3 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY4 -> wY4 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY5 -> wY5 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 Figure 2.1: The Cross-Lagged Panel Model with Multiple Indicators
 </p>
@@ -505,40 +505,40 @@ Figure 2.2: Data Generating Process: CLPM; Simulated trajectories shown
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -3.5260 -0.6719  0.0238  0.6757  3.8817 
+## -3.6832 -0.6593 -0.0105  0.6663  3.3551 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept)  0.002285   0.016302    0.14    0.889    
-## y_lag       -0.582819   0.015217  -38.30   &lt;2e-16 ***
-## x_lag        0.194183   0.015284   12.71   &lt;2e-16 ***
+## (Intercept)  0.009138   0.015956   0.573    0.567    
+## y_lag       -0.625505   0.015482 -40.402   &lt;2e-16 ***
+## x_lag        0.191603   0.014834  12.916   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 1.011 on 3997 degrees of freedom
+## Residual standard error: 0.9823 on 3997 degrees of freedom
 ##   (1000 observations deleted due to missingness)
-## Multiple R-squared:  0.2704, Adjusted R-squared:   0.27 
-## F-statistic: 740.7 on 2 and 3997 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Multiple R-squared:  0.2914, Adjusted R-squared:  0.2911 
+## F-statistic: 821.9 on 2 and 3997 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = y ~ y_lag + x_lag, data = data)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -3.5260 -0.6719  0.0238  0.6757  3.8817 
+## -3.6832 -0.6593 -0.0105  0.6663  3.3551 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 0.002285   0.016302    0.14    0.889    
-## y_lag       0.417181   0.015217   27.42   &lt;2e-16 ***
-## x_lag       0.194183   0.015284   12.71   &lt;2e-16 ***
+## (Intercept) 0.009138   0.015956   0.573    0.567    
+## y_lag       0.374495   0.015482  24.189   &lt;2e-16 ***
+## x_lag       0.191603   0.014834  12.916   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 1.011 on 3997 degrees of freedom
+## Residual standard error: 0.9823 on 3997 degrees of freedom
 ##   (1000 observations deleted due to missingness)
-## Multiple R-squared:  0.2686, Adjusted R-squared:  0.2683 
-## F-statistic: 734.1 on 2 and 3997 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Multiple R-squared:  0.2289, Adjusted R-squared:  0.2285 
+## F-statistic: 593.3 on 2 and 3997 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>If we simulate data under a latent change model, with no constant change, the CLPM and difference parameters should align (they do). Notice that the <span class="math inline">\(beta\)</span> parameter in the CLPM formulation is exactly the same as the difference score interpretation, as <span class="math inline">\(\hat\beta_{CLPM} - 1 = \hat{\beta_\Delta}\)</span>, where <span class="math inline">\(\hat\Delta\)</span> is the the difference score autoregressive parameter, and <span class="math inline">\(\hat\beta_{CLPM}\)</span> is the level form autoregressive parameter. Likewise, we could simulate data under a latent change score specification (with no constant effects), and again the models mirror the DGP parameters and are related.</p>
 <pre><code>## 
 ## Call:
@@ -546,42 +546,42 @@ Figure 2.2: Data Generating Process: CLPM; Simulated trajectories shown
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -4.3369 -0.7151 -0.0030  0.7167  4.5017 
+## -4.4905 -0.7104 -0.0013  0.7202  4.2900 
 ## 
 ## Coefficients:
 ##              Estimate Std. Error  t value Pr(&gt;|t|)    
-## (Intercept)  0.008172   0.005313    1.538    0.124    
-## y_lag       -0.737339   0.004722 -156.144   &lt;2e-16 ***
-## x_lag        0.347551   0.004702   73.917   &lt;2e-16 ***
+## (Intercept)  0.007258   0.005291    1.372     0.17    
+## y_lag       -0.737898   0.004695 -157.151   &lt;2e-16 ***
+## x_lag        0.350068   0.004694   74.582   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 1.063 on 39997 degrees of freedom
+## Residual standard error: 1.058 on 39997 degrees of freedom
 ##   (10000 observations deleted due to missingness)
-## Multiple R-squared:  0.3808, Adjusted R-squared:  0.3808 
-## F-statistic: 1.23e+04 on 2 and 39997 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Multiple R-squared:  0.3836, Adjusted R-squared:  0.3836 
+## F-statistic: 1.245e+04 on 2 and 39997 DF,  p-value: &lt; 2.2e-16</code></pre>
 <pre><code>## 
 ## Call:
 ## lm(formula = y ~ y_lag + x_lag, data = data)
 ## 
 ## Residuals:
 ##     Min      1Q  Median      3Q     Max 
-## -4.3369 -0.7151 -0.0030  0.7167  4.5017 
+## -4.4905 -0.7104 -0.0013  0.7202  4.2900 
 ## 
 ## Coefficients:
 ##             Estimate Std. Error t value Pr(&gt;|t|)    
-## (Intercept) 0.008172   0.005313   1.538    0.124    
-## y_lag       0.262661   0.004722  55.623   &lt;2e-16 ***
-## x_lag       0.347551   0.004702  73.917   &lt;2e-16 ***
+## (Intercept) 0.007258   0.005291   1.372     0.17    
+## y_lag       0.262102   0.004695  55.820   &lt;2e-16 ***
+## x_lag       0.350068   0.004694  74.582   &lt;2e-16 ***
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
 ## 
-## Residual standard error: 1.063 on 39997 degrees of freedom
+## Residual standard error: 1.058 on 39997 degrees of freedom
 ##   (10000 observations deleted due to missingness)
-## Multiple R-squared:  0.2563, Adjusted R-squared:  0.2563 
-## F-statistic:  6894 on 2 and 39997 DF,  p-value: &lt; 2.2e-16</code></pre>
+## Multiple R-squared:  0.2608, Adjusted R-squared:  0.2608 
+## F-statistic:  7057 on 2 and 39997 DF,  p-value: &lt; 2.2e-16</code></pre>
 <p>The <code>estimateCLPM()</code> function may be used to estimate a latent variable CLPM. Notice that if we simulate data under the latent change model (without constant change), the CLPM retrieves the correct estimates, <span class="math inline">\(\hat\beta_{CLPM} - 1 \approx - -0.7\)</span></p>
-<pre><code>## lavaan 0.6-20 ended normally after 43 iterations
+<pre><code>## lavaan 0.6-20 ended normally after 42 iterations
 ## 
 ##   Estimator                                         ML
 ##   Optimization method                           NLMINB
@@ -592,7 +592,7 @@ Figure 2.2: Data Generating Process: CLPM; Simulated trajectories shown
 ## 
 ## Model Test User Model:
 ##                                                       
-##   Test statistic                               913.151
+##   Test statistic                               915.247
 ##   Degrees of freedom                                53
 ##   P-value (Chi-square)                           0.000
 ## 
@@ -628,47 +628,47 @@ Figure 2.2: Data Generating Process: CLPM; Simulated trajectories shown
 ## Regressions:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
 ##   p2 ~                                                
-##     p1      (bt_y)    0.248    0.005   52.793    0.000
-##     q1     (omg_x)    0.352    0.005   75.018    0.000
+##     p1      (bt_y)    0.257    0.005   54.675    0.000
+##     q1     (omg_x)    0.353    0.005   74.922    0.000
 ##   q2 ~                                                
-##     q1      (bt_x)    0.260    0.005   55.555    0.000
-##     p1     (omg_y)    0.350    0.005   74.833    0.000
+##     q1      (bt_x)    0.254    0.005   53.951    0.000
+##     p1     (omg_y)    0.351    0.005   74.866    0.000
 ##   p3 ~                                                
-##     p2      (bt_y)    0.248    0.005   52.793    0.000
-##     q2     (omg_x)    0.352    0.005   75.018    0.000
+##     p2      (bt_y)    0.257    0.005   54.675    0.000
+##     q2     (omg_x)    0.353    0.005   74.922    0.000
 ##   q3 ~                                                
-##     q2      (bt_x)    0.260    0.005   55.555    0.000
-##     p2     (omg_y)    0.350    0.005   74.833    0.000
+##     q2      (bt_x)    0.254    0.005   53.951    0.000
+##     p2     (omg_y)    0.351    0.005   74.866    0.000
 ##   p4 ~                                                
-##     p3      (bt_y)    0.248    0.005   52.793    0.000
-##     q3     (omg_x)    0.352    0.005   75.018    0.000
+##     p3      (bt_y)    0.257    0.005   54.675    0.000
+##     q3     (omg_x)    0.353    0.005   74.922    0.000
 ##   q4 ~                                                
-##     q3      (bt_x)    0.260    0.005   55.555    0.000
-##     p3     (omg_y)    0.350    0.005   74.833    0.000
+##     q3      (bt_x)    0.254    0.005   53.951    0.000
+##     p3     (omg_y)    0.351    0.005   74.866    0.000
 ##   p5 ~                                                
-##     p4      (bt_y)    0.248    0.005   52.793    0.000
-##     q4     (omg_x)    0.352    0.005   75.018    0.000
+##     p4      (bt_y)    0.257    0.005   54.675    0.000
+##     q4     (omg_x)    0.353    0.005   74.922    0.000
 ##   q5 ~                                                
-##     q4      (bt_x)    0.260    0.005   55.555    0.000
-##     p4     (omg_y)    0.350    0.005   74.833    0.000
+##     q4      (bt_x)    0.254    0.005   53.951    0.000
+##     p4     (omg_y)    0.351    0.005   74.866    0.000
 ## 
 ## Covariances:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
 ##   p1 ~~                                               
-##     q1      (cv_1)    0.282    0.015   18.413    0.000
+##     q1      (cv_1)    0.308    0.015   19.965    0.000
 ##  .p2 ~~                                               
-##    .q2      (cv_x)    0.304    0.006   52.150    0.000
+##    .q2      (cv_x)    0.321    0.006   55.181    0.000
 ##  .p3 ~~                                               
-##    .q3      (cv_x)    0.304    0.006   52.150    0.000
+##    .q3      (cv_x)    0.321    0.006   55.181    0.000
 ##  .p4 ~~                                               
-##    .q4      (cv_x)    0.304    0.006   52.150    0.000
+##    .q4      (cv_x)    0.321    0.006   55.181    0.000
 ##  .p5 ~~                                               
-##    .q5      (cv_x)    0.304    0.006   52.150    0.000
+##    .q5      (cv_x)    0.321    0.006   55.181    0.000
 ## 
 ## Intercepts:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
-##     p1                0.003    0.012    0.265    0.791
-##     q1               -0.021    0.012   -1.751    0.080
+##     p1               -0.027    0.012   -2.234    0.025
+##     q1                0.010    0.012    0.795    0.427
 ##    .p2                0.000                           
 ##    .q2                0.000                           
 ##    .p3                0.000                           
@@ -690,16 +690,16 @@ Figure 2.2: Data Generating Process: CLPM; Simulated trajectories shown
 ## 
 ## Variances:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
-##     p1     (vr_y1)    1.501    0.021   70.711    0.000
-##     q1     (vr_x1)    1.505    0.021   70.711    0.000
-##    .p2      (vr_y)    1.130    0.008  141.421    0.000
-##    .q2      (vr_x)    1.120    0.008  141.421    0.000
-##    .p3      (vr_y)    1.130    0.008  141.421    0.000
-##    .q3      (vr_x)    1.120    0.008  141.421    0.000
-##    .p4      (vr_y)    1.130    0.008  141.421    0.000
-##    .q4      (vr_x)    1.120    0.008  141.421    0.000
-##    .p5      (vr_y)    1.130    0.008  141.421    0.000
-##    .q5      (vr_x)    1.120    0.008  141.421    0.000
+##     p1     (vr_y1)    1.510    0.021   70.711    0.000
+##     q1     (vr_x1)    1.512    0.021   70.711    0.000
+##    .p2      (vr_y)    1.120    0.008  141.421    0.000
+##    .q2      (vr_x)    1.115    0.008  141.421    0.000
+##    .p3      (vr_y)    1.120    0.008  141.421    0.000
+##    .q3      (vr_x)    1.115    0.008  141.421    0.000
+##    .p4      (vr_y)    1.120    0.008  141.421    0.000
+##    .q4      (vr_x)    1.115    0.008  141.421    0.000
+##    .p5      (vr_y)    1.120    0.008  141.421    0.000
+##    .q5      (vr_x)    1.115    0.008  141.421    0.000
 ##    .y1                0.000                           
 ##    .x1                0.000                           
 ##    .y2                0.000                           
@@ -722,8 +722,8 @@ Figure 2.2: Data Generating Process: CLPM; Simulated trajectories shown
 <p><strong>The DGP is a Latent Change Model with Constant Effects and the Estimator is the CLPM</strong></p>
 <p>Assume the DGP is a latent change model with constant effects. The data are generated following <a href="simple-motivating-examples.html#fig:lcm">2.3</a>. Next, we estimate an ordinary CLPM. The autoregressive parameter (<span class="math inline">\(\hat\beta \approx 0.3\)</span>) is biased and is <span class="math inline">\(\approx 0.7\)</span>. The cross lagged parameters (<span class="math inline">\(\hat \omega \approx 0.4\)</span>) where they should be closer to 0.5.</p>
 <div class="figure"><span style="display:block;" id="fig:lcm"></span>
-<div class="grViz html-widget html-fill-item" id="htmlwidget-04166b182f702d1d19a1" style="width:672px;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-04166b182f702d1d19a1">{"x":{"diagram":"\ndigraph RICLPM {\n\n  # Graph attributes\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  # Node attributes\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  A_X [pos = \"-2.5,1!\", shape = circle, fillcolor = white, label = <Δ<sub>x<\/sub>>,  width = 0.5, height = 0.5]\n  I [pos = \"-2.5,0!\", shape = triangle, fillcolor = white, label = \"I\",  width = 0.5, height = 0.5]\n  X1 [pos = \"-2,2.2!\", label = \"x1\", width = 0.6, height = 0.3]\n  X2 [pos = \"-1,2.2!\", label = \"x2\", width = 0.6, height = 0.3]\n  X3 [pos = \"0,2.2!\", label = \"x3\", width = 0.6, height = 0.3]\n  X4 [pos = \"1,2.2!\", label = \"x4\", width = 0.6, height = 0.3]\n  X5 [pos = \"2,2.2!\", label = \"x5\", width = 0.6, height = 0.3]\n\n  # Row 2: Within-person X latents (middle-upper)\n  wX1 [pos = \"-2,1.35!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1,1.35!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0,1.35!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1,1.35!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"2,1.35!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  # Row 3: Within-person Y latents (middle-lower)\n  wY1 [pos = \"-2,-1.35!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1,-1.35!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0,-1.35!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1,-1.35!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"2,-1.35!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n\n  dX2 [pos = \"-1,0.5!\", shape = circle, fillcolor = white, label = \"Δx2\"]\n  dX3 [pos = \"0,0.5!\", shape = circle, fillcolor = white, label = \"Δx3\"]\n  dX4 [pos = \"1,0.5!\", shape = circle, fillcolor = white, label = \"Δx4\"]\n  dX5 [pos = \"2,0.5!\", shape = circle, fillcolor = white, label = \"Δx5\"]\n\n  dY2 [pos = \"-1,-0.5!\", shape = circle, fillcolor = white, label = \"Δy2\"]\n  dY3 [pos = \"0,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy3\"]\n  dY4 [pos = \"1,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy4\"]\n  dY5 [pos = \"2,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy5\"]\n\n\n\n  # Row 4: observed Y variables and RI_Y (bottom)\n  Y1 [pos = \"-2,-2.2!\", label = \"y1\", width = 0.6, height = 0.3]\n  Y2 [pos = \"-1,-2.2!\", label = \"y2\", width = 0.6, height = 0.3]\n  Y3 [pos = \"0,-2.2!\", label = \"y3\", width = 0.6, height = 0.3]\n  Y4 [pos = \"1,-2.2!\", label = \"y4\", width = 0.6, height = 0.3]\n  Y5 [pos = \"2,-2.2!\", label = \"y5\", width = 0.6, height = 0.3]\n  A_Y [pos = \"-2.5,-1!\", shape = circle, fillcolor = white, label = <Δ<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n\n  # Measurement model paths (RI to observed)\n  A_X -> dX2 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX3 [label = \"\",  arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX4 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX5 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n\n  A_Y -> dY2 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY3 [label = \"\",  arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY4 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY5 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n\n  I -> A_X [label = \"\", arrowsize = 0.5, tailport = n, headport = s]\n  I -> A_Y [label = \"\", arrowsize = 0.5, tailport = s, headport = n]\n  I -> wX1 [label = \"\", arrowsize = 0.5, tailport = n, headport = s]\n  I -> wY1 [label = \"\", arrowsize = 0.5, tailport = s, headport = n]\n\n \n  # Measurement model paths (w to observed)\n  wX1 -> X1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> X2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> X3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> X4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX5 -> X5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> Y1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> Y2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> Y3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> Y4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY5 -> Y5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> dY2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dY3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dY4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dY5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dX2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dX3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dX4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dX5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dY2 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dY3 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dY4 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dY5 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n\n  wY1 -> dX2 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dX3 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dX4 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dX5 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n\n  # Autoregressive paths\n  wX1 -> wX2 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> wX3 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> wX4 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> wX5 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> wY2 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> wY3 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> wY4 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> wY5 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  # Cross-lagged paths with offset gamma labels and subscripts\n  dX2 -> dY3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX3 -> dY4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX4 -> dY5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY2 -> dX3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY3 -> dX4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY4 -> dX5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n\n  dX2 -> wX2 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX3 -> wX3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX4 -> wX4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX5 -> wX5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n\n  dY2 -> wY2 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY3 -> wY3 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY4 -> wY4 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY5 -> wY5 [color = black, penwidth = 1, arrowsize = 0.5]\n\n\n  # # Within-time correlations - ONLY these are slightly rounded\n  # wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # \n\n\n  # Self-loops connected to bottom of each node using ports\n  dX2 -> dX2 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s , arrowsize = 0.5]\n  dX3 -> dX3 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dX4 -> dX4 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dX5 -> dX5 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dY2 -> dY2 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY3 -> dY3 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY4 -> dY4 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY5 -> dY5 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n\n\n\n  # Self-loops connected to bottom of each node using ports\n  # X1 -> X1 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X2 -> X2 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X3 -> X3 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X4 -> X4 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X5 -> X5 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # \n  # Y1 -> Y1 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y2 -> Y2 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y3 -> Y3 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y4 -> Y4 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y5 -> Y5 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n\n  # Self-loops connected to bottom of each node using ports\n   wX1 -> wX1 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11, labelangle = 45, labeldistance = 2.5]\n   wY1 -> wY1 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n\n  # Residuals for random intercepts (epsilon)\n  A_X -> A_X [dir = both, color = black, style = dashed, label = \"\", labelangle = 135, labeldistance = 1.5, tailport = s, headport = s, arrowsize = 0.5, width = 0.6, height = 0.3]\n  A_Y -> A_Y [dir = both, color = black, style = dashed, label = \"\", labelangle = 135, labeldistance = 1.5, tailport = n, headport = n, arrowsize = 0.5, width = 0.6, height = 0.3]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-bc443357c0d4f0f11c8c" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-bc443357c0d4f0f11c8c">{"x":{"diagram":"\ndigraph RICLPM {\n\n  # Graph attributes\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  # Node attributes\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  A_X [pos = \"-2.5,1!\", shape = circle, fillcolor = white, label = <Δ<sub>x<\/sub>>,  width = 0.5, height = 0.5]\n  I [pos = \"-2.5,0!\", shape = triangle, fillcolor = white, label = \"I\",  width = 0.5, height = 0.5]\n  X1 [pos = \"-2,2.2!\", label = \"x1\", width = 0.6, height = 0.3]\n  X2 [pos = \"-1,2.2!\", label = \"x2\", width = 0.6, height = 0.3]\n  X3 [pos = \"0,2.2!\", label = \"x3\", width = 0.6, height = 0.3]\n  X4 [pos = \"1,2.2!\", label = \"x4\", width = 0.6, height = 0.3]\n  X5 [pos = \"2,2.2!\", label = \"x5\", width = 0.6, height = 0.3]\n\n  # Row 2: Within-person X latents (middle-upper)\n  wX1 [pos = \"-2,1.35!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1,1.35!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0,1.35!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1,1.35!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"2,1.35!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  # Row 3: Within-person Y latents (middle-lower)\n  wY1 [pos = \"-2,-1.35!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1,-1.35!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0,-1.35!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1,-1.35!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"2,-1.35!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n\n  dX2 [pos = \"-1,0.5!\", shape = circle, fillcolor = white, label = \"Δx2\"]\n  dX3 [pos = \"0,0.5!\", shape = circle, fillcolor = white, label = \"Δx3\"]\n  dX4 [pos = \"1,0.5!\", shape = circle, fillcolor = white, label = \"Δx4\"]\n  dX5 [pos = \"2,0.5!\", shape = circle, fillcolor = white, label = \"Δx5\"]\n\n  dY2 [pos = \"-1,-0.5!\", shape = circle, fillcolor = white, label = \"Δy2\"]\n  dY3 [pos = \"0,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy3\"]\n  dY4 [pos = \"1,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy4\"]\n  dY5 [pos = \"2,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy5\"]\n\n\n\n  # Row 4: observed Y variables and RI_Y (bottom)\n  Y1 [pos = \"-2,-2.2!\", label = \"y1\", width = 0.6, height = 0.3]\n  Y2 [pos = \"-1,-2.2!\", label = \"y2\", width = 0.6, height = 0.3]\n  Y3 [pos = \"0,-2.2!\", label = \"y3\", width = 0.6, height = 0.3]\n  Y4 [pos = \"1,-2.2!\", label = \"y4\", width = 0.6, height = 0.3]\n  Y5 [pos = \"2,-2.2!\", label = \"y5\", width = 0.6, height = 0.3]\n  A_Y [pos = \"-2.5,-1!\", shape = circle, fillcolor = white, label = <Δ<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n\n  # Measurement model paths (RI to observed)\n  A_X -> dX2 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX3 [label = \"\",  arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX4 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX5 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n\n  A_Y -> dY2 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY3 [label = \"\",  arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY4 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY5 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n\n  I -> A_X [label = \"\", arrowsize = 0.5, tailport = n, headport = s]\n  I -> A_Y [label = \"\", arrowsize = 0.5, tailport = s, headport = n]\n  I -> wX1 [label = \"\", arrowsize = 0.5, tailport = n, headport = s]\n  I -> wY1 [label = \"\", arrowsize = 0.5, tailport = s, headport = n]\n\n \n  # Measurement model paths (w to observed)\n  wX1 -> X1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> X2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> X3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> X4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX5 -> X5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> Y1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> Y2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> Y3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> Y4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY5 -> Y5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> dY2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dY3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dY4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dY5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dX2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dX3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dX4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dX5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dY2 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dY3 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dY4 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dY5 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n\n  wY1 -> dX2 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dX3 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dX4 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dX5 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n\n  # Autoregressive paths\n  wX1 -> wX2 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> wX3 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> wX4 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> wX5 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> wY2 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> wY3 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> wY4 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> wY5 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  # Cross-lagged paths with offset gamma labels and subscripts\n  dX2 -> dY3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX3 -> dY4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX4 -> dY5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY2 -> dX3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY3 -> dX4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY4 -> dX5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n\n  dX2 -> wX2 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX3 -> wX3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX4 -> wX4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX5 -> wX5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n\n  dY2 -> wY2 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY3 -> wY3 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY4 -> wY4 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY5 -> wY5 [color = black, penwidth = 1, arrowsize = 0.5]\n\n\n  # # Within-time correlations - ONLY these are slightly rounded\n  # wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # \n\n\n  # Self-loops connected to bottom of each node using ports\n  dX2 -> dX2 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s , arrowsize = 0.5]\n  dX3 -> dX3 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dX4 -> dX4 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dX5 -> dX5 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dY2 -> dY2 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY3 -> dY3 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY4 -> dY4 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY5 -> dY5 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n\n\n\n  # Self-loops connected to bottom of each node using ports\n  # X1 -> X1 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X2 -> X2 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X3 -> X3 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X4 -> X4 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X5 -> X5 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # \n  # Y1 -> Y1 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y2 -> Y2 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y3 -> Y3 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y4 -> Y4 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y5 -> Y5 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n\n  # Self-loops connected to bottom of each node using ports\n   wX1 -> wX1 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11, labelangle = 45, labeldistance = 2.5]\n   wY1 -> wY1 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n\n  # Residuals for random intercepts (epsilon)\n  A_X -> A_X [dir = both, color = black, style = dashed, label = \"\", labelangle = 135, labeldistance = 1.5, tailport = s, headport = s, arrowsize = 0.5, width = 0.6, height = 0.3]\n  A_Y -> A_Y [dir = both, color = black, style = dashed, label = \"\", labelangle = 135, labeldistance = 1.5, tailport = n, headport = n, arrowsize = 0.5, width = 0.6, height = 0.3]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 <p class="caption">
 Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
 </p>
@@ -732,7 +732,7 @@ Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
 ##  with constant effects. The estimator is a CLPM model,
 ##  which doesn&#39;t fully control for unit effects.
 ##  lavaan results are printed below</code></pre>
-<pre><code>## lavaan 0.6-20 ended normally after 42 iterations
+<pre><code>## lavaan 0.6-20 ended normally after 45 iterations
 ## 
 ##   Estimator                                         ML
 ##   Optimization method                           NLMINB
@@ -743,7 +743,7 @@ Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
 ## 
 ## Model Test User Model:
 ##                                                        
-##   Test statistic                              21320.205
+##   Test statistic                              22100.637
 ##   Degrees of freedom                                 53
 ##   P-value (Chi-square)                            0.000
 ## 
@@ -779,47 +779,47 @@ Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
 ## Regressions:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
 ##   p2 ~                                                
-##     p1      (bt_y)    0.699    0.004  158.989    0.000
-##     q1     (omg_x)    0.440    0.004  100.393    0.000
+##     p1      (bt_y)    0.708    0.004  160.670    0.000
+##     q1     (omg_x)    0.435    0.004   99.028    0.000
 ##   q2 ~                                                
-##     q1      (bt_x)    0.704    0.004  160.283    0.000
-##     p1     (omg_y)    0.436    0.004   98.938    0.000
+##     q1      (bt_x)    0.710    0.004  161.454    0.000
+##     p1     (omg_y)    0.436    0.004   98.890    0.000
 ##   p3 ~                                                
-##     p2      (bt_y)    0.699    0.004  158.989    0.000
-##     q2     (omg_x)    0.440    0.004  100.393    0.000
+##     p2      (bt_y)    0.708    0.004  160.670    0.000
+##     q2     (omg_x)    0.435    0.004   99.028    0.000
 ##   q3 ~                                                
-##     q2      (bt_x)    0.704    0.004  160.283    0.000
-##     p2     (omg_y)    0.436    0.004   98.938    0.000
+##     q2      (bt_x)    0.710    0.004  161.454    0.000
+##     p2     (omg_y)    0.436    0.004   98.890    0.000
 ##   p4 ~                                                
-##     p3      (bt_y)    0.699    0.004  158.989    0.000
-##     q3     (omg_x)    0.440    0.004  100.393    0.000
+##     p3      (bt_y)    0.708    0.004  160.670    0.000
+##     q3     (omg_x)    0.435    0.004   99.028    0.000
 ##   q4 ~                                                
-##     q3      (bt_x)    0.704    0.004  160.283    0.000
-##     p3     (omg_y)    0.436    0.004   98.938    0.000
+##     q3      (bt_x)    0.710    0.004  161.454    0.000
+##     p3     (omg_y)    0.436    0.004   98.890    0.000
 ##   p5 ~                                                
-##     p4      (bt_y)    0.699    0.004  158.989    0.000
-##     q4     (omg_x)    0.440    0.004  100.393    0.000
+##     p4      (bt_y)    0.708    0.004  160.670    0.000
+##     q4     (omg_x)    0.435    0.004   99.028    0.000
 ##   q5 ~                                                
-##     q4      (bt_x)    0.704    0.004  160.283    0.000
-##     p4     (omg_y)    0.436    0.004   98.938    0.000
+##     q4      (bt_x)    0.710    0.004  161.454    0.000
+##     p4     (omg_y)    0.436    0.004   98.890    0.000
 ## 
 ## Covariances:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
 ##   p1 ~~                                               
-##     q1      (cv_1)    0.278    0.015   18.327    0.000
+##     q1      (cv_1)    0.314    0.015   20.398    0.000
 ##  .p2 ~~                                               
-##    .q2      (cv_x)    0.461    0.008   61.331    0.000
+##    .q2      (cv_x)    0.469    0.008   61.681    0.000
 ##  .p3 ~~                                               
-##    .q3      (cv_x)    0.461    0.008   61.331    0.000
+##    .q3      (cv_x)    0.469    0.008   61.681    0.000
 ##  .p4 ~~                                               
-##    .q4      (cv_x)    0.461    0.008   61.331    0.000
+##    .q4      (cv_x)    0.469    0.008   61.681    0.000
 ##  .p5 ~~                                               
-##    .q5      (cv_x)    0.461    0.008   61.331    0.000
+##    .q5      (cv_x)    0.469    0.008   61.681    0.000
 ## 
 ## Intercepts:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
-##     p1               -0.004    0.012   -0.354    0.723
-##     q1                0.000    0.012    0.006    0.995
+##     p1               -0.006    0.012   -0.450    0.652
+##     q1               -0.000    0.012   -0.036    0.971
 ##    .p2                0.000                           
 ##    .q2                0.000                           
 ##    .p3                0.000                           
@@ -841,16 +841,16 @@ Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
 ## 
 ## Variances:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
-##     p1     (vr_y1)    1.479    0.021   70.711    0.000
-##     q1     (vr_x1)    1.503    0.021   70.711    0.000
-##    .p2      (vr_y)    1.428    0.010  141.421    0.000
-##    .q2      (vr_x)    1.435    0.010  141.421    0.000
-##    .p3      (vr_y)    1.428    0.010  141.421    0.000
-##    .q3      (vr_x)    1.435    0.010  141.421    0.000
-##    .p4      (vr_y)    1.428    0.010  141.421    0.000
-##    .q4      (vr_x)    1.435    0.010  141.421    0.000
-##    .p5      (vr_y)    1.428    0.010  141.421    0.000
-##    .q5      (vr_x)    1.435    0.010  141.421    0.000
+##     p1     (vr_y1)    1.507    0.021   70.711    0.000
+##     q1     (vr_x1)    1.512    0.021   70.711    0.000
+##    .p2      (vr_y)    1.446    0.010  141.421    0.000
+##    .q2      (vr_x)    1.450    0.010  141.421    0.000
+##    .p3      (vr_y)    1.446    0.010  141.421    0.000
+##    .q3      (vr_x)    1.450    0.010  141.421    0.000
+##    .p4      (vr_y)    1.446    0.010  141.421    0.000
+##    .q4      (vr_x)    1.450    0.010  141.421    0.000
+##    .p5      (vr_y)    1.446    0.010  141.421    0.000
+##    .q5      (vr_x)    1.450    0.010  141.421    0.000
 ##    .y1                0.000                           
 ##    .x1                0.000                           
 ##    .y2                0.000                           
@@ -866,7 +866,7 @@ Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
 ##  The estimator is a CLPM model,
 ##  which doesn&#39;t fully control for unit effects.
 ##  lavaan results are printed below</code></pre>
-<pre><code>## lavaan 0.6-20 ended normally after 47 iterations
+<pre><code>## lavaan 0.6-20 ended normally after 41 iterations
 ## 
 ##   Estimator                                         ML
 ##   Optimization method                           NLMINB
@@ -877,7 +877,7 @@ Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
 ## 
 ## Model Test User Model:
 ##                                                       
-##   Test statistic                               209.237
+##   Test statistic                               222.906
 ##   Degrees of freedom                                53
 ##   P-value (Chi-square)                           0.000
 ## 
@@ -913,47 +913,47 @@ Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
 ## Regressions:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
 ##   p2 ~                                                
-##     p1      (bt_y)    0.439    0.015   30.225    0.000
-##     q1     (omg_x)    0.219    0.014   15.227    0.000
+##     p1      (bt_y)    0.433    0.015   29.797    0.000
+##     q1     (omg_x)    0.204    0.015   13.991    0.000
 ##   q2 ~                                                
-##     q1      (bt_x)    0.426    0.014   29.438    0.000
-##     p1     (omg_y)    0.264    0.015   18.043    0.000
+##     q1      (bt_x)    0.410    0.015   27.897    0.000
+##     p1     (omg_y)    0.235    0.015   16.056    0.000
 ##   p3 ~                                                
-##     p2      (bt_y)    0.439    0.015   30.225    0.000
-##     q2     (omg_x)    0.219    0.014   15.227    0.000
+##     p2      (bt_y)    0.433    0.015   29.797    0.000
+##     q2     (omg_x)    0.204    0.015   13.991    0.000
 ##   q3 ~                                                
-##     q2      (bt_x)    0.426    0.014   29.438    0.000
-##     p2     (omg_y)    0.264    0.015   18.043    0.000
+##     q2      (bt_x)    0.410    0.015   27.897    0.000
+##     p2     (omg_y)    0.235    0.015   16.056    0.000
 ##   p4 ~                                                
-##     p3      (bt_y)    0.439    0.015   30.225    0.000
-##     q3     (omg_x)    0.219    0.014   15.227    0.000
+##     p3      (bt_y)    0.433    0.015   29.797    0.000
+##     q3     (omg_x)    0.204    0.015   13.991    0.000
 ##   q4 ~                                                
-##     q3      (bt_x)    0.426    0.014   29.438    0.000
-##     p3     (omg_y)    0.264    0.015   18.043    0.000
+##     q3      (bt_x)    0.410    0.015   27.897    0.000
+##     p3     (omg_y)    0.235    0.015   16.056    0.000
 ##   p5 ~                                                
-##     p4      (bt_y)    0.439    0.015   30.225    0.000
-##     q4     (omg_x)    0.219    0.014   15.227    0.000
+##     p4      (bt_y)    0.433    0.015   29.797    0.000
+##     q4     (omg_x)    0.204    0.015   13.991    0.000
 ##   q5 ~                                                
-##     q4      (bt_x)    0.426    0.014   29.438    0.000
-##     p4     (omg_y)    0.264    0.015   18.043    0.000
+##     q4      (bt_x)    0.410    0.015   27.897    0.000
+##     p4     (omg_y)    0.235    0.015   16.056    0.000
 ## 
 ## Covariances:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
 ##   p1 ~~                                               
-##     q1      (cv_1)    0.577    0.050   11.544    0.000
+##     q1      (cv_1)    0.651    0.051   12.695    0.000
 ##  .p2 ~~                                               
-##    .q2      (cv_x)    0.205    0.018   11.677    0.000
+##    .q2      (cv_x)    0.200    0.018   11.389    0.000
 ##  .p3 ~~                                               
-##    .q3      (cv_x)    0.205    0.018   11.677    0.000
+##    .q3      (cv_x)    0.200    0.018   11.389    0.000
 ##  .p4 ~~                                               
-##    .q4      (cv_x)    0.205    0.018   11.677    0.000
+##    .q4      (cv_x)    0.200    0.018   11.389    0.000
 ##  .p5 ~~                                               
-##    .q5      (cv_x)    0.205    0.018   11.677    0.000
+##    .q5      (cv_x)    0.200    0.018   11.389    0.000
 ## 
 ## Intercepts:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
-##     p1               -0.064    0.038   -1.651    0.099
-##     q1               -0.017    0.038   -0.441    0.659
+##     p1                0.038    0.039    0.973    0.330
+##     q1                0.073    0.038    1.922    0.055
 ##    .p2                0.000                           
 ##    .q2                0.000                           
 ##    .p3                0.000                           
@@ -975,16 +975,16 @@ Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
 ## 
 ## Variances:
 ##                    Estimate  Std.Err  z-value  P(&gt;|z|)
-##     p1     (vr_y1)    1.481    0.066   22.361    0.000
-##     q1     (vr_x1)    1.464    0.065   22.361    0.000
-##    .p2      (vr_y)    1.085    0.024   44.721    0.000
-##    .q2      (vr_x)    1.096    0.025   44.721    0.000
-##    .p3      (vr_y)    1.085    0.024   44.721    0.000
-##    .q3      (vr_x)    1.096    0.025   44.721    0.000
-##    .p4      (vr_y)    1.085    0.024   44.721    0.000
-##    .q4      (vr_x)    1.096    0.025   44.721    0.000
-##    .p5      (vr_y)    1.085    0.024   44.721    0.000
-##    .q5      (vr_x)    1.096    0.025   44.721    0.000
+##     p1     (vr_y1)    1.530    0.068   22.361    0.000
+##     q1     (vr_x1)    1.442    0.064   22.361    0.000
+##    .p2      (vr_y)    1.087    0.024   44.721    0.000
+##    .q2      (vr_x)    1.101    0.025   44.721    0.000
+##    .p3      (vr_y)    1.087    0.024   44.721    0.000
+##    .q3      (vr_x)    1.101    0.025   44.721    0.000
+##    .p4      (vr_y)    1.087    0.024   44.721    0.000
+##    .q4      (vr_x)    1.101    0.025   44.721    0.000
+##    .p5      (vr_y)    1.087    0.024   44.721    0.000
+##    .q5      (vr_x)    1.101    0.025   44.721    0.000
 ##    .y1                0.000                           
 ##    .x1                0.000                           
 ##    .y2                0.000                           
@@ -1004,52 +1004,52 @@ Figure 2.4: Individual trajectories under RICLPM
 </p>
 </div>
 <p>This can be compared to the same DGP but where the <strong>within</strong> variance is 4 times as large as the <strong>between</strong> variance.</p>
-<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="simple-motivating-examples.html#cb18-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
-<span id="cb18-2"><a href="simple-motivating-examples.html#cb18-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
-<span id="cb18-3"><a href="simple-motivating-examples.html#cb18-3" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
-<span id="cb18-4"><a href="simple-motivating-examples.html#cb18-4" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
-<span id="cb18-5"><a href="simple-motivating-examples.html#cb18-5" tabindex="-1"></a></span>
-<span id="cb18-6"><a href="simple-motivating-examples.html#cb18-6" tabindex="-1"></a>wide_data <span class="ot">=</span> <span class="fu">simRICLPM</span>(</span>
-<span id="cb18-7"><a href="simple-motivating-examples.html#cb18-7" tabindex="-1"></a>  <span class="at">waves =</span> <span class="dv">5</span>,</span>
-<span id="cb18-8"><a href="simple-motivating-examples.html#cb18-8" tabindex="-1"></a>  <span class="at">beta_x =</span> <span class="fl">0.3</span>,    </span>
-<span id="cb18-9"><a href="simple-motivating-examples.html#cb18-9" tabindex="-1"></a>  <span class="at">beta_y =</span> <span class="fl">0.8</span>,    </span>
-<span id="cb18-10"><a href="simple-motivating-examples.html#cb18-10" tabindex="-1"></a>  <span class="at">sample.nobs =</span> <span class="dv">1000</span>,</span>
-<span id="cb18-11"><a href="simple-motivating-examples.html#cb18-11" tabindex="-1"></a>  <span class="at">var_BX =</span> <span class="fl">0.25</span>,</span>
-<span id="cb18-12"><a href="simple-motivating-examples.html#cb18-12" tabindex="-1"></a>  <span class="at">var_BY =</span> <span class="fl">0.25</span>,</span>
-<span id="cb18-13"><a href="simple-motivating-examples.html#cb18-13" tabindex="-1"></a>  <span class="at">var_p =</span> <span class="dv">1</span>,</span>
-<span id="cb18-14"><a href="simple-motivating-examples.html#cb18-14" tabindex="-1"></a>  <span class="at">var_q =</span> <span class="dv">1</span>,</span>
-<span id="cb18-15"><a href="simple-motivating-examples.html#cb18-15" tabindex="-1"></a>  <span class="at">estimate_means =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>data </span></code></pre></div>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="simple-motivating-examples.html#cb22-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb22-2"><a href="simple-motivating-examples.html#cb22-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb22-3"><a href="simple-motivating-examples.html#cb22-3" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
+<span id="cb22-4"><a href="simple-motivating-examples.html#cb22-4" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb22-5"><a href="simple-motivating-examples.html#cb22-5" tabindex="-1"></a></span>
+<span id="cb22-6"><a href="simple-motivating-examples.html#cb22-6" tabindex="-1"></a>wide_data <span class="ot">=</span> <span class="fu">simRICLPM</span>(</span>
+<span id="cb22-7"><a href="simple-motivating-examples.html#cb22-7" tabindex="-1"></a>  <span class="at">waves =</span> <span class="dv">5</span>,</span>
+<span id="cb22-8"><a href="simple-motivating-examples.html#cb22-8" tabindex="-1"></a>  <span class="at">beta_x =</span> <span class="fl">0.3</span>,    </span>
+<span id="cb22-9"><a href="simple-motivating-examples.html#cb22-9" tabindex="-1"></a>  <span class="at">beta_y =</span> <span class="fl">0.8</span>,    </span>
+<span id="cb22-10"><a href="simple-motivating-examples.html#cb22-10" tabindex="-1"></a>  <span class="at">sample.nobs =</span> <span class="dv">1000</span>,</span>
+<span id="cb22-11"><a href="simple-motivating-examples.html#cb22-11" tabindex="-1"></a>  <span class="at">var_BX =</span> <span class="fl">0.25</span>,</span>
+<span id="cb22-12"><a href="simple-motivating-examples.html#cb22-12" tabindex="-1"></a>  <span class="at">var_BY =</span> <span class="fl">0.25</span>,</span>
+<span id="cb22-13"><a href="simple-motivating-examples.html#cb22-13" tabindex="-1"></a>  <span class="at">var_p =</span> <span class="dv">1</span>,</span>
+<span id="cb22-14"><a href="simple-motivating-examples.html#cb22-14" tabindex="-1"></a>  <span class="at">var_q =</span> <span class="dv">1</span>,</span>
+<span id="cb22-15"><a href="simple-motivating-examples.html#cb22-15" tabindex="-1"></a>  <span class="at">estimate_means =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>data </span></code></pre></div>
 <pre><code>## Warning: lavaan-&gt;lav_start_check_cov():  
 ##    starting values imply a correlation larger than 1; variables involved are: 
 ##    BX BY</code></pre>
 <pre><code>## ✅ Successfully simulated RICLPM data with 5 waves and 1000 observations.</code></pre>
-<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="simple-motivating-examples.html#cb21-1" tabindex="-1"></a>data <span class="ot">=</span> wide_data <span class="sc">|&gt;</span></span>
-<span id="cb21-2"><a href="simple-motivating-examples.html#cb21-2" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="sc">|&gt;</span></span>
-<span id="cb21-3"><a href="simple-motivating-examples.html#cb21-3" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span></span>
-<span id="cb21-4"><a href="simple-motivating-examples.html#cb21-4" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
-<span id="cb21-5"><a href="simple-motivating-examples.html#cb21-5" tabindex="-1"></a>    <span class="at">y_lag =</span> <span class="fu">lag</span>(y),</span>
-<span id="cb21-6"><a href="simple-motivating-examples.html#cb21-6" tabindex="-1"></a>    <span class="at">x_lag =</span> <span class="fu">lag</span>(x),</span>
-<span id="cb21-7"><a href="simple-motivating-examples.html#cb21-7" tabindex="-1"></a>    <span class="at">delta_y =</span> y <span class="sc">-</span> <span class="fu">lag</span>(y)</span>
-<span id="cb21-8"><a href="simple-motivating-examples.html#cb21-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
-<span id="cb21-9"><a href="simple-motivating-examples.html#cb21-9" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span> data</span>
-<span id="cb21-10"><a href="simple-motivating-examples.html#cb21-10" tabindex="-1"></a></span>
-<span id="cb21-11"><a href="simple-motivating-examples.html#cb21-11" tabindex="-1"></a>data <span class="sc">|&gt;</span>  </span>
-<span id="cb21-12"><a href="simple-motivating-examples.html#cb21-12" tabindex="-1"></a>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> wave, <span class="at">y =</span> y, <span class="at">group =</span> id)) <span class="sc">+</span> </span>
-<span id="cb21-13"><a href="simple-motivating-examples.html#cb21-13" tabindex="-1"></a>   <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="fl">0.1</span>, <span class="at">height =</span> <span class="fl">0.2</span>)) <span class="sc">+</span></span>
-<span id="cb21-14"><a href="simple-motivating-examples.html#cb21-14" tabindex="-1"></a>   <span class="fu">stat_summary</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">fun =</span> mean, <span class="at">geom =</span> <span class="st">&quot;line&quot;</span>,  </span>
-<span id="cb21-15"><a href="simple-motivating-examples.html#cb21-15" tabindex="-1"></a>                <span class="at">color =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span> </span>
-<span id="cb21-16"><a href="simple-motivating-examples.html#cb21-16" tabindex="-1"></a>   <span class="fu">stat_summary</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">fun =</span> mean, <span class="at">geom =</span> <span class="st">&quot;point&quot;</span>,  </span>
-<span id="cb21-17"><a href="simple-motivating-examples.html#cb21-17" tabindex="-1"></a>                <span class="at">color =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
-<span id="cb21-18"><a href="simple-motivating-examples.html#cb21-18" tabindex="-1"></a>   <span class="fu">labs</span>(</span>
-<span id="cb21-19"><a href="simple-motivating-examples.html#cb21-19" tabindex="-1"></a>     <span class="at">title =</span> <span class="st">&quot;Individual Trajectories: Simulated Data&quot;</span>, </span>
-<span id="cb21-20"><a href="simple-motivating-examples.html#cb21-20" tabindex="-1"></a>     <span class="at">subtitle =</span> <span class="st">&quot;Within Variance = 4x as large as Between&quot;</span>, </span>
-<span id="cb21-21"><a href="simple-motivating-examples.html#cb21-21" tabindex="-1"></a>     <span class="at">x =</span> <span class="st">&quot;Survey Wave&quot;</span>,</span>
-<span id="cb21-22"><a href="simple-motivating-examples.html#cb21-22" tabindex="-1"></a>     <span class="at">y =</span> <span class="st">&quot;Response&quot;</span> </span>
-<span id="cb21-23"><a href="simple-motivating-examples.html#cb21-23" tabindex="-1"></a>   ) <span class="sc">+</span></span>
-<span id="cb21-24"><a href="simple-motivating-examples.html#cb21-24" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
-<span id="cb21-25"><a href="simple-motivating-examples.html#cb21-25" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">6</span>) ) <span class="sc">+</span> </span>
-<span id="cb21-26"><a href="simple-motivating-examples.html#cb21-26" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">&quot;black&quot;</span>)) <span class="ot">-&gt;</span> plot </span>
-<span id="cb21-27"><a href="simple-motivating-examples.html#cb21-27" tabindex="-1"></a><span class="fu">print</span>(plot)</span></code></pre></div>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="simple-motivating-examples.html#cb25-1" tabindex="-1"></a>data <span class="ot">=</span> wide_data <span class="sc">|&gt;</span></span>
+<span id="cb25-2"><a href="simple-motivating-examples.html#cb25-2" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="sc">|&gt;</span></span>
+<span id="cb25-3"><a href="simple-motivating-examples.html#cb25-3" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span></span>
+<span id="cb25-4"><a href="simple-motivating-examples.html#cb25-4" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb25-5"><a href="simple-motivating-examples.html#cb25-5" tabindex="-1"></a>    <span class="at">y_lag =</span> <span class="fu">lag</span>(y),</span>
+<span id="cb25-6"><a href="simple-motivating-examples.html#cb25-6" tabindex="-1"></a>    <span class="at">x_lag =</span> <span class="fu">lag</span>(x),</span>
+<span id="cb25-7"><a href="simple-motivating-examples.html#cb25-7" tabindex="-1"></a>    <span class="at">delta_y =</span> y <span class="sc">-</span> <span class="fu">lag</span>(y)</span>
+<span id="cb25-8"><a href="simple-motivating-examples.html#cb25-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb25-9"><a href="simple-motivating-examples.html#cb25-9" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span> data</span>
+<span id="cb25-10"><a href="simple-motivating-examples.html#cb25-10" tabindex="-1"></a></span>
+<span id="cb25-11"><a href="simple-motivating-examples.html#cb25-11" tabindex="-1"></a>data <span class="sc">|&gt;</span>  </span>
+<span id="cb25-12"><a href="simple-motivating-examples.html#cb25-12" tabindex="-1"></a>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> wave, <span class="at">y =</span> y, <span class="at">group =</span> id)) <span class="sc">+</span> </span>
+<span id="cb25-13"><a href="simple-motivating-examples.html#cb25-13" tabindex="-1"></a>   <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="fl">0.1</span>, <span class="at">height =</span> <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb25-14"><a href="simple-motivating-examples.html#cb25-14" tabindex="-1"></a>   <span class="fu">stat_summary</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">fun =</span> mean, <span class="at">geom =</span> <span class="st">&quot;line&quot;</span>,  </span>
+<span id="cb25-15"><a href="simple-motivating-examples.html#cb25-15" tabindex="-1"></a>                <span class="at">color =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span> </span>
+<span id="cb25-16"><a href="simple-motivating-examples.html#cb25-16" tabindex="-1"></a>   <span class="fu">stat_summary</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">fun =</span> mean, <span class="at">geom =</span> <span class="st">&quot;point&quot;</span>,  </span>
+<span id="cb25-17"><a href="simple-motivating-examples.html#cb25-17" tabindex="-1"></a>                <span class="at">color =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
+<span id="cb25-18"><a href="simple-motivating-examples.html#cb25-18" tabindex="-1"></a>   <span class="fu">labs</span>(</span>
+<span id="cb25-19"><a href="simple-motivating-examples.html#cb25-19" tabindex="-1"></a>     <span class="at">title =</span> <span class="st">&quot;Individual Trajectories: Simulated Data&quot;</span>, </span>
+<span id="cb25-20"><a href="simple-motivating-examples.html#cb25-20" tabindex="-1"></a>     <span class="at">subtitle =</span> <span class="st">&quot;Within Variance = 4x as large as Between&quot;</span>, </span>
+<span id="cb25-21"><a href="simple-motivating-examples.html#cb25-21" tabindex="-1"></a>     <span class="at">x =</span> <span class="st">&quot;Survey Wave&quot;</span>,</span>
+<span id="cb25-22"><a href="simple-motivating-examples.html#cb25-22" tabindex="-1"></a>     <span class="at">y =</span> <span class="st">&quot;Response&quot;</span> </span>
+<span id="cb25-23"><a href="simple-motivating-examples.html#cb25-23" tabindex="-1"></a>   ) <span class="sc">+</span></span>
+<span id="cb25-24"><a href="simple-motivating-examples.html#cb25-24" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb25-25"><a href="simple-motivating-examples.html#cb25-25" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">6</span>) ) <span class="sc">+</span> </span>
+<span id="cb25-26"><a href="simple-motivating-examples.html#cb25-26" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">&quot;black&quot;</span>)) <span class="ot">-&gt;</span> plot </span>
+<span id="cb25-27"><a href="simple-motivating-examples.html#cb25-27" tabindex="-1"></a><span class="fu">print</span>(plot)</span></code></pre></div>
 <div class="figure"><span style="display:block;" id="fig:trajectories3"></span>
 <img src="_main_files/figure-html/trajectories3-1.png" alt="Individual trajectories under RICLPM" width="672" />
 <p class="caption">
@@ -1064,7 +1064,7 @@ Figure 2.5: Individual trajectories under RICLPM
 <div id="hierarchical-brms-estimation" class="section level3 hasAnchor" number="2.5.1">
 <h3><span class="header-section-number">2.5.1</span> Hierarchical <code>brms</code> Estimation<a href="simple-motivating-examples.html#hierarchical-brms-estimation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
 <p>This is the differenced variable regression with random intercepts.</p>
-<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="simple-motivating-examples.html#cb22-1" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div>
+<div class="sourceCode" id="cb26"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb26-1"><a href="simple-motivating-examples.html#cb26-1" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div>
 <pre><code>## Warning: Parts of the model have not converged (some Rhats are &gt; 1.05). Be
 ## careful when analysing the results! We recommend running more iterations and/or
 ## setting stronger priors.</code></pre>
@@ -1080,29 +1080,29 @@ Figure 2.5: Individual trajectories under RICLPM
 ## Multilevel Hyperparameters:
 ## ~id (Number of levels: 1000) 
 ##                      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-## sd(deltay_Intercept)     1.69      0.04     1.62     1.78 1.06       59
-## sd(deltax_Intercept)     1.71      0.05     1.63     1.81 1.10       24
+## sd(deltay_Intercept)     1.74      0.04     1.66     1.82 1.07       42
+## sd(deltax_Intercept)     1.73      0.04     1.65     1.82 1.07       43
 ##                      Tail_ESS
-## sd(deltay_Intercept)      202
-## sd(deltax_Intercept)       54
+## sd(deltay_Intercept)      145
+## sd(deltax_Intercept)       72
 ## 
 ## Regression Coefficients:
 ##              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## deltay_y_lag    -0.83      0.01    -0.84    -0.82 1.00     2942     1135
-## deltay_x_lag     0.20      0.01     0.18     0.21 1.00      934     1224
-## deltax_y_lag     0.19      0.01     0.18     0.20 1.00      779      888
-## deltax_x_lag    -0.83      0.01    -0.84    -0.82 1.00     2726      947
+## deltay_y_lag    -0.84      0.01    -0.85    -0.83 1.00     2356     1150
+## deltay_x_lag     0.20      0.01     0.19     0.21 1.00      911     1029
+## deltax_y_lag     0.18      0.01     0.17     0.19 1.00      970     1182
+## deltax_x_lag    -0.84      0.01    -0.85    -0.83 1.01     3186     1226
 ## 
 ## Further Distributional Parameters:
 ##              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
-## sigma_deltay     1.06      0.00     1.05     1.07 1.00     2495     1213
-## sigma_deltax     1.06      0.00     1.05     1.07 1.00     2309      931
+## sigma_deltay     1.07      0.00     1.06     1.08 1.00     2884     1118
+## sigma_deltax     1.05      0.00     1.04     1.06 1.00     3465     1316
 ## 
 ## Residual Correlations: 
 ##                       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
-## rescor(deltay,deltax)     0.11      0.01     0.10     0.12 1.01     3792
+## rescor(deltay,deltax)     0.11      0.01     0.10     0.12 1.01     3702
 ##                       Tail_ESS
-## rescor(deltay,deltax)      726
+## rescor(deltay,deltax)      871
 ## 
 ## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
 ## and Tail_ESS are effective sample size measures, and Rhat is the potential

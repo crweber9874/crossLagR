@@ -1,3 +1,7 @@
+fig:clpm-diagram
+fig:error-clpm-diagram
+fig:riclpm-diagram
+fig:lgm-diagram
 fig:latent-clpm
 fig:trajectories
 fig:lcm
