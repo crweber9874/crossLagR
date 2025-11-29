@@ -1,3 +1,3 @@
 [build]
-  command = "Rscript -e 'bookdown::render_book(\"index.Rmd\", output_format = \"bookdown::gitbook\")'"
-  publish = "_book"
+  command = "echo 'Using pre-built _book directory'"
+  publish = "book/_book"
