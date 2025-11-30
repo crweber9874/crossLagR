@@ -1,3 +1,5 @@
 [build]
   command = "echo 'Using pre-built _book directory'"
   publish = "book/_book"
+  publish = "book/_book"
+  command = "true"
