@@ -12,3 +12,97 @@ These data are downloaded from data verse [@upenn_iscap_2022]. The data include 
   b. "At present I feel very critical of our political system"
   c. "The system does a good job representing the interests of people like me"
   d. "Feel critical of our political system"
+
+## Data
+
+
+```{r}
+#devtools::install_github("crweber9874/crossLagR")
+library(crossLagR)
+library(dplyr)
+library(tidyr)
+data(upenn)
+head(upenn)
+```
+## Legitimacy Scale 
+
+```{r}
+library(psych)
+alpha(upenn |>
+  select(
+    live_our_government_2012,
+    critical_of_system_2012,
+    system_needs_changes_2012,
+    system_represents_interests_2012
+  ))
+upenn |>
+  mutate(political_legitimacy = rowMeans(
+    c(
+      live_our_government_2012,
+      critical_of_system_2012,
+      system_needs_changes_2012,
+      system_represents_interests_2012
+  ), na.rm = TRUE
+         ))
+```
+
+The data are structured in `wide` format with variables followed with wave numbers (e.g., `_2012`). This isn't ideal for panel analysis. The `dplyr` package includes `pivot_longer()` function to reshape the data from wide to long format.
+
+```{r}
+cat("The number of rows in the wide format data is:", nrow(upenn), "\n")
+cat("The complete data has ", sum(complete.cases(upenn)), "complete cases.\n")
+cat("There are ", sum(!complete.cases(upenn)), "rows with missing data.\n")
+```
+
+```{r}
+
+upenn_long <- upenn %>%
+  pivot_longer(
+    cols = -c(identifier),
+    names_to = c(".value", "wave"),
+    names_pattern = "(.+)_(\\d+)$"  # Regex to extract _2012, etc part
+  ) %>%
+  arrange(identifier, wave)
+```
+
+```{r}
+library(naniar)
+legitimacy_data = upenn_long |>
+  select(identifier, wave,
+         live_our_government,
+         critical_of_system,
+         system_needs_changes,
+         system_represents_interests)
+
+miss_var_summary(legitimacy_data)
+```
+
+Below I display the missing data patterns across all variables and respondents in the dataset. Dark cells indicate missing values.
+
+
+## Missing Data by Wave
+
+```{r}
+legitimacy_data %>%
+  group_by(wave) %>%
+  miss_var_summary()
+```
+
+## Missingness Pattern
+
+```{r fig.height=6, fig.width=8}
+gg_miss_var(legitimacy_data |> select(-c(identifier)), facet = wave)
+```
+```{r}
+upenn_long %>%
+  group_by(identifier) %>%
+  summarise(
+    n_missing = sum(is.na(system_represents_interests) + 
+                      is.na(system_needs_changes) +
+                      is.na(critical_of_system) +
+                      is.na(live_our_government)),
+    .groups = 'drop'
+  ) %>%
+  group_by(n_missing) %>%
+  count(name = "n_respondents")
+```
