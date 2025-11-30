@@ -7,4 +7,5 @@ rmd_files: [
   "index.Rmd",
   "01_Panel_Models.Rmd",
   "02_CLPM_Estimation.Rmd",
+  "03_upenn.Rmd",
 ]
