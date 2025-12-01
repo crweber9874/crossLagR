@@ -1059,7 +1059,6 @@ results |>
 ```
 
 
-## Change
 
 ```{r}
 library(gt)

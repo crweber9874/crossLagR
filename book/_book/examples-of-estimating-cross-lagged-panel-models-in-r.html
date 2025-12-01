@@ -1,0 +1,2089 @@
+<!DOCTYPE html>
+<html lang="" xml:lang="">
+<head>
+
+  <meta charset="utf-8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
+  <title>Section 2 Examples of Estimating Cross-Lagged Panel Models in R | Dynamic Panels and the Cross Lagged Panel Model</title>
+  <meta name="description" content="Cross Lagged Regression" />
+  <meta name="generator" content="bookdown 0.45 and GitBook 2.6.7" />
+
+  <meta property="og:title" content="Section 2 Examples of Estimating Cross-Lagged Panel Models in R | Dynamic Panels and the Cross Lagged Panel Model" />
+  <meta property="og:type" content="book" />
+  
+  <meta property="og:description" content="Cross Lagged Regression" />
+  <meta name="github-repo" content="crweber9874/advancedRegression" />
+
+  <meta name="twitter:card" content="summary" />
+  <meta name="twitter:title" content="Section 2 Examples of Estimating Cross-Lagged Panel Models in R | Dynamic Panels and the Cross Lagged Panel Model" />
+  
+  <meta name="twitter:description" content="Cross Lagged Regression" />
+  
+
+<meta name="author" content="Christopher Weber, Stanley Feldman, Adam Panish, and Bang Zheng" />
+
+
+<meta name="date" content="2025-12-01" />
+
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+  
+  
+<link rel="prev" href="the-cross-lagged-panel-model-and-innovations.html"/>
+<link rel="next" href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"/>
+<script src="libs/jquery-3.6.0/jquery-3.6.0.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/fuse.js@6.4.6/dist/fuse.min.js"></script>
+<link href="libs/gitbook-2.6.7/css/style.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-table.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-bookdown.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-highlight.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-search.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-fontsettings.css" rel="stylesheet" />
+<link href="libs/gitbook-2.6.7/css/plugin-clipboard.css" rel="stylesheet" />
+
+
+
+
+
+
+
+
+<link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
+<link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
+<script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
+<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
+<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="libs/viz-1.8.2/viz.js"></script>
+<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
+<script src="libs/grViz-binding-1.0.11/grViz.js"></script>
+
+
+<style type="text/css">
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+    color: #aaaaaa;
+  }
+pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+code span.al { color: #ff0000; font-weight: bold; } /* Alert */
+code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
+code span.at { color: #7d9029; } /* Attribute */
+code span.bn { color: #40a070; } /* BaseN */
+code span.bu { color: #008000; } /* BuiltIn */
+code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
+code span.ch { color: #4070a0; } /* Char */
+code span.cn { color: #880000; } /* Constant */
+code span.co { color: #60a0b0; font-style: italic; } /* Comment */
+code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
+code span.do { color: #ba2121; font-style: italic; } /* Documentation */
+code span.dt { color: #902000; } /* DataType */
+code span.dv { color: #40a070; } /* DecVal */
+code span.er { color: #ff0000; font-weight: bold; } /* Error */
+code span.ex { } /* Extension */
+code span.fl { color: #40a070; } /* Float */
+code span.fu { color: #06287e; } /* Function */
+code span.im { color: #008000; font-weight: bold; } /* Import */
+code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
+code span.kw { color: #007020; font-weight: bold; } /* Keyword */
+code span.op { color: #666666; } /* Operator */
+code span.ot { color: #007020; } /* Other */
+code span.pp { color: #bc7a00; } /* Preprocessor */
+code span.sc { color: #4070a0; } /* SpecialChar */
+code span.ss { color: #bb6688; } /* SpecialString */
+code span.st { color: #4070a0; } /* String */
+code span.va { color: #19177c; } /* Variable */
+code span.vs { color: #4070a0; } /* VerbatimString */
+code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
+</style>
+
+<style type="text/css">
+  
+  div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+</style>
+<style type="text/css">
+/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}
+</style>
+
+<link rel="stylesheet" href="style.css" type="text/css" />
+</head>
+
+<body>
+
+
+
+  <div class="book without-animation with-summary font-size-2 font-family-1" data-basepath=".">
+
+    <div class="book-summary">
+      <nav role="navigation">
+
+<ul class="summary">
+<li><a href="./">CrossLagR</a></li>
+
+<li class="divider"></li>
+<li class="chapter" data-level="" data-path="index.html"><a href="index.html"><i class="fa fa-check"></i>Preface</a></li>
+<li class="chapter" data-level="1" data-path="the-cross-lagged-panel-model-and-innovations.html"><a href="the-cross-lagged-panel-model-and-innovations.html"><i class="fa fa-check"></i><b>1</b> The Cross-Lagged Panel Model and Innovations</a>
+<ul>
+<li class="chapter" data-level="1.1" data-path="the-cross-lagged-panel-model-and-innovations.html"><a href="the-cross-lagged-panel-model-and-innovations.html#the-cross-lagged-panel-model"><i class="fa fa-check"></i><b>1.1</b> The Cross-Lagged Panel Model</a></li>
+<li class="chapter" data-level="1.2" data-path="the-cross-lagged-panel-model-and-innovations.html"><a href="the-cross-lagged-panel-model-and-innovations.html#the-change-score-regression"><i class="fa fa-check"></i><b>1.2</b> The Change Score Regression</a>
+<ul>
+<li class="chapter" data-level="1.2.1" data-path="the-cross-lagged-panel-model-and-innovations.html"><a href="the-cross-lagged-panel-model-and-innovations.html#a-simple-demonstration-clpm-and-change-score-regression"><i class="fa fa-check"></i><b>1.2.1</b> A Simple Demonstration: CLPM and Change Score Regression</a></li>
+<li class="chapter" data-level="1.2.2" data-path="the-cross-lagged-panel-model-and-innovations.html"><a href="the-cross-lagged-panel-model-and-innovations.html#types-of-change"><i class="fa fa-check"></i><b>1.2.2</b> Types of Change</a></li>
+</ul></li>
+<li class="chapter" data-level="1.3" data-path="the-cross-lagged-panel-model-and-innovations.html"><a href="the-cross-lagged-panel-model-and-innovations.html#unit-effects"><i class="fa fa-check"></i><b>1.3</b> Unit Effects</a></li>
+<li class="chapter" data-level="1.4" data-path="the-cross-lagged-panel-model-and-innovations.html"><a href="the-cross-lagged-panel-model-and-innovations.html#the-random-intercept-cross-lagged-regression"><i class="fa fa-check"></i><b>1.4</b> The Random Intercept Cross Lagged Regression</a></li>
+<li class="chapter" data-level="1.5" data-path="the-cross-lagged-panel-model-and-innovations.html"><a href="the-cross-lagged-panel-model-and-innovations.html#the-latent-growth-model"><i class="fa fa-check"></i><b>1.5</b> The Latent Growth Model</a></li>
+<li class="chapter" data-level="1.6" data-path="the-cross-lagged-panel-model-and-innovations.html"><a href="the-cross-lagged-panel-model-and-innovations.html#measurement-error"><i class="fa fa-check"></i><b>1.6</b> Measurement Error</a></li>
+</ul></li>
+<li class="chapter" data-level="2" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html"><i class="fa fa-check"></i><b>2</b> Examples of Estimating Cross-Lagged Panel Models in R</a>
+<ul>
+<li class="chapter" data-level="2.1" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#simulation"><i class="fa fa-check"></i><b>2.1</b> Simulation</a></li>
+<li class="chapter" data-level="2.2" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#a-simple-example"><i class="fa fa-check"></i><b>2.2</b> A Simple Example</a></li>
+<li class="chapter" data-level="2.3" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#summary-change-versus-level-scores"><i class="fa fa-check"></i><b>2.3</b> Summary: Change versus Level Scores</a></li>
+<li class="chapter" data-level="2.4" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#unobserved-heterogeneity"><i class="fa fa-check"></i><b>2.4</b> Unobserved Heterogeneity</a></li>
+<li class="chapter" data-level="2.5" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#model-validation"><i class="fa fa-check"></i><b>2.5</b> Model Validation</a>
+<ul>
+<li class="chapter" data-level="2.5.1" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#hierarchical-brms-estimation"><i class="fa fa-check"></i><b>2.5.1</b> Hierarchical <code>brms</code> Estimation</a></li>
+</ul></li>
+<li class="chapter" data-level="2.6" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#short-t-bias."><i class="fa fa-check"></i><b>2.6</b> Short <em>t</em> bias.</a></li>
+<li class="chapter" data-level="2.7" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#the-fixed-effect-dynamic-panel-estimator"><i class="fa fa-check"></i><b>2.7</b> The Fixed Effect (Dynamic Panel) Estimator</a></li>
+<li class="chapter" data-level="2.8" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#the-riclpm"><i class="fa fa-check"></i><b>2.8</b> The RICLPM</a></li>
+<li class="chapter" data-level="2.9" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#change"><i class="fa fa-check"></i><b>2.9</b> Change</a></li>
+<li class="chapter" data-level="2.10" data-path="examples-of-estimating-cross-lagged-panel-models-in-r.html"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#summary"><i class="fa fa-check"></i><b>2.10</b> Summary</a></li>
+</ul></li>
+<li class="chapter" data-level="3" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><i class="fa fa-check"></i><b>3</b> The Institute for the Study of Citizens and Politics (ISCAP) Panel</a>
+<ul>
+<li class="chapter" data-level="3.1" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#data"><i class="fa fa-check"></i><b>3.1</b> Data</a></li>
+<li class="chapter" data-level="3.2" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#legitimacy-scale"><i class="fa fa-check"></i><b>3.2</b> Legitimacy Scale</a></li>
+<li class="chapter" data-level="3.3" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#missing-data-by-wave"><i class="fa fa-check"></i><b>3.3</b> Missing Data by Wave</a></li>
+<li class="chapter" data-level="3.4" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#autocorrelation"><i class="fa fa-check"></i><b>3.4</b> Autocorrelation</a></li>
+<li class="chapter" data-level="3.5" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#unit-fixed-effects"><i class="fa fa-check"></i><b>3.5</b> Unit Fixed Effects</a></li>
+<li class="chapter" data-level="3.6" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#fitting-the-two-way-fixed-effects"><i class="fa fa-check"></i><b>3.6</b> Fitting the Two Way Fixed Effects</a></li>
+<li class="chapter" data-level="3.7" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#fitting-the-random-intercept-model"><i class="fa fa-check"></i><b>3.7</b> Fitting the Random Intercept Model</a>
+<ul>
+<li class="chapter" data-level="3.7.1" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#expertise-partisanship-and-political-legitimacy"><i class="fa fa-check"></i><b>3.7.1</b> Expertise, Partisanship, and Political Legitimacy</a></li>
+</ul></li>
+<li class="chapter" data-level="3.8" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#change-to-change-and-cross-lagged-effects"><i class="fa fa-check"></i><b>3.8</b> Change-to-Change and Cross-Lagged Effects</a>
+<ul>
+<li class="chapter" data-level="3.8.1" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#removing-change-to-change"><i class="fa fa-check"></i><b>3.8.1</b> Removing Change-to-Change</a></li>
+</ul></li>
+<li class="chapter" data-level="3.9" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#constant-change"><i class="fa fa-check"></i><b>3.9</b> Constant Change</a></li>
+</ul></li>
+<li class="chapter" data-level="4" data-path="outline.html"><a href="outline.html"><i class="fa fa-check"></i><b>4</b> Outline</a></li>
+</ul>
+
+      </nav>
+    </div>
+
+    <div class="book-body">
+      <div class="body-inner">
+        <div class="book-header" role="navigation">
+          <h1>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Dynamic Panels and the Cross Lagged Panel Model</a>
+          </h1>
+        </div>
+
+        <div class="page-wrapper" tabindex="-1" role="main">
+          <div class="page-inner">
+
+            <section class="normal" id="section-">
+<div id="examples-of-estimating-cross-lagged-panel-models-in-r" class="section level1 hasAnchor" number="2">
+<h1><span class="header-section-number">Section 2</span> Examples of Estimating Cross-Lagged Panel Models in R<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#examples-of-estimating-cross-lagged-panel-models-in-r" class="anchor-section" aria-label="Anchor link to header"></a></h1>
+<p>The package that accompanies this summary, <code>crossLagR</code>, includes functions to estimate several panel data models. They’re structured such that functions that begin with <code>estimate</code> are simple functions to write latent variable panel models. The (working) package can be accessed on <code>github</code>: <code>devtools::install_github("crweber9874/crossLagR")</code></p>
+<p>Below I use four functions, with simulated data, which is expanded to real panel data in the next section.</p>
+<ul>
+<li><code>estimateCLPM()</code> generates the syntax for cross-lagged panel models. Use <code>help(estimateRICLPM)</code> to modify constraints and number of waves.</li>
+<li><code>estimateRICLPM()</code> generates the syntax for random-intercept cross-lagged panel models. Use <code>help(estimateRICLPM)</code>.</li>
+<li><code>estimateLChange()</code> generates the syntax for latent change score model. Use <code>help(estimateLChange)</code>.</li>
+<li><code>estimateLGM()</code> generates the syntax for latent growth models. Use <code>help(estimateLGM)</code>.</li>
+</ul>
+<p>Nearly all the functions in the package start with a core lavaan model – such as the RICLPM <span class="citation">(<a href="#ref-hamaker_critique_2015">Hamaker, Kuiper, and Grasman 2015</a>)</span>. From there, build in rules to implement constraints, extend the number of waves, and modify parameters. You could just print the model code and modify manually. For instance, the <code>lavaan</code> code to estimate the CLPM is,</p>
+<div class="sourceCode" id="cb1"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb1-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb1-1" tabindex="-1"></a><span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">2</span>,</span>
+<span id="cb1-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb1-2" tabindex="-1"></a>                         <span class="at">constrain_beta =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb1-3" tabindex="-1"></a>                         <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb1-4" tabindex="-1"></a>                         <span class="at">constrain_residual_variances =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb1-5" tabindex="-1"></a>                         <span class="at">constrain_residual_covariances =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb1-6"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb1-6" tabindex="-1"></a>                         <span class="at">estimate_means =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-7"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb1-7" tabindex="-1"></a><span class="fu">cat</span>()</span></code></pre></div>
+<pre><code>##     p1 =~ 1*y1
+##     q1 =~ 1*x1
+##     p2 =~ 1*y2
+##     q2 =~ 1*x2
+##     p1 ~ 0*1
+##     q1 ~ 0*1
+##     p2 ~ 0*1
+##     q2 ~ 0*1
+##     y1 ~ 0*1
+##     x1  ~0*1
+##     y2 ~ 0*1
+##     x2  ~0*1
+##     p2 ~ beta_y*p1 + omega_xy*q1
+##     q2 ~ beta_x*q1 + omega_yx*p1
+##     p1 ~~ var_y1*p1
+##     q1 ~~ var_x1*q1
+##     p2 ~~ var_y*p2
+##     q2 ~~ var_x*q2
+##     p1 ~~ cov_xy1*q1
+##     p2 ~~ cov_xy*q2
+##     y1 ~~ 0*y1
+##     x1 ~~ 0*x1
+##     y2 ~~ 0*y2
+##     x2 ~~ 0*x2</code></pre>
+<p>By modifying <code>constrain_beta</code> and <code>constrain_omega</code>, this frees the AR (former) or CL (latter) parameters to vary across waves. The <code>lavaan</code> code to estimate the <strong>Bivariate Latent Change Model</strong> is,</p>
+<div class="sourceCode" id="cb3"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb3-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb3-1" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
+<span id="cb3-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb3-2" tabindex="-1"></a>                <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb3-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb3-3" tabindex="-1"></a>                <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb3-4" tabindex="-1"></a>                <span class="at">constrain_beta =</span>  <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb3-5" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div>
+<pre><code>##     cf_x1 =~ 1*x1
+##     cf_x2 =~ 1*x2
+##     cf_x3 =~ 1*x3
+##     cf_x1 ~ indicator_mean_x*1
+##     cf_x2 ~ 0*1
+##     cf_x3 ~ 0*1
+##     cf_x1 ~~ start(15)*latent_indicator_mean_x*cf_x1
+##     cf_x2 ~~ 0*cf_x2
+##     cf_x3 ~~ 0*cf_x3
+##     x1 ~ 0*1
+##     x2 ~ 0*1
+##     x3 ~ 0*1
+##     x1 ~~ indicator_variance_x*x1
+##     x2 ~~ indicator_variance_x*x2
+##     x3 ~~ indicator_variance_x*x3
+##     cf_x2 ~ 1*cf_x1
+##     cf_x3 ~ 1*cf_x2
+##     ld_x2 =~ 1*cf_x2
+##     ld_x3 =~ 1*cf_x3
+##     ld_x2 ~ 0*1
+##     ld_x3 ~ 0*1
+##     ld_x2 ~~ 0*ld_x2
+##     ld_x3 ~~ 0*ld_x3
+##     general_x =~ 1*ld_x2
+##     + 1*ld_x3
+##     general_x ~ constant_mean_x*1
+##     general_x ~~ latent_variance_x*general_x
+##     general_x ~~ cf_x1
+##     ld_x2 ~ start(-0.15)*beta_x*cf_x1
+##     ld_x3 ~ start(-0.15)*beta_x*cf_x2
+##     cf_y1 =~ 1*y1
+##     cf_y2 =~ 1*y2
+##     cf_y3 =~ 1*y3
+##     cf_y1 ~ indicator_mean_y*1
+##     cf_y2 ~ 0*1
+##     cf_y3 ~ 0*1
+##     cf_y1 ~~ start(15)*latent_variance_y*cf_y1
+##     cf_y2 ~~ 0*cf_y2
+##     cf_y3 ~~ 0*cf_y3
+##     y1 ~ 0*1
+##     y2 ~ 0*1
+##     y3 ~ 0*1
+##     y1 ~~ indicator_variance_y*y1
+##     y2 ~~ indicator_variance_y*y2
+##     y3 ~~ indicator_variance_y*y3
+##     cf_y2 ~ 1*cf_y1
+##     cf_y3 ~ 1*cf_y2
+##     ld_y2 =~ 1*cf_y2
+##     ld_y3 =~ 1*cf_y3
+##     ld_y2 ~ 0*1
+##     ld_y3 ~ 0*1
+##     ld_y2 ~~ 0*ld_y2
+##     ld_y3 ~~ 0*ld_y3
+##     general_y =~ 1*ld_y2
+##           + 1*ld_y3
+##     general_y ~ constant_mean_y*1
+##     general_y ~~ latent_variance_y*general_y
+##     general_y ~~ cf_y1
+##     ld_y2 ~ beta_y*cf_y1
+##     ld_y3 ~ beta_y*cf_y2
+##     ld_x2 ~ start(-0.2)*omega_x*cf_y1
+##     ld_y2 ~ start(-0.2)*omega_y*cf_x1
+##     ld_x3 ~ start(-0.2)*omega_x*cf_y2
+##     ld_y3 ~ start(-0.2)*omega_y*cf_x2
+##     general_x ~~ general_y
+##     cf_x1 ~~ cf_y1
+##     cf_x1 ~~ general_y
+##     cf_y1 ~~ general_x</code></pre>
+<p>And the <strong>RICLPM</strong> model is,</p>
+<div class="sourceCode" id="cb5"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb5-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb5-1" tabindex="-1"></a><span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
+<span id="cb5-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb5-2" tabindex="-1"></a>                <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb5-3" tabindex="-1"></a>                <span class="at">constrain_beta =</span>  <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb5-4" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div>
+<pre><code>## 
+## # Random Intercepts
+## BX =~ 1*x1 + 1*x2 + 1*x3
+## BY =~ 1*y1 + 1*y2 + 1*y3
+## 
+## # Within-Person Latent Variables
+## p1 =~ 1*x1
+## q1 =~ 1*y1
+## p2 =~ 1*x2
+## q2 =~ 1*y2
+## p3 =~ 1*x3
+## q3 =~ 1*y3
+## 
+## # Latent Variable Means (Fixed to 0)
+## p1 ~ 0*1
+## q1 ~ 0*1
+## 
+## p2 ~ 0*1
+## q2 ~ 0*1
+## 
+## p3 ~ 0*1
+## q3 ~ 0*1
+## 
+## # Autoregressive and Cross-lagged Effects
+## p2 ~ beta_y*p1 + omega_xy*q1
+## q2 ~ beta_x*q1 + omega_yx*p1
+## p3 ~ beta_y*p2 + omega_xy*q2
+## q3 ~ beta_x*q2 + omega_yx*p2
+## 
+## # Residual Variances
+## p1 ~~ var_p*p1
+## q1 ~~ var_q*q1
+## p2 ~~ var_p*p2
+## q2 ~~ var_q*q2
+## p3 ~~ var_p*p3
+## q3 ~~ var_q*q3
+## 
+## # Residual Covariances
+## p1 ~~ cov_pq*q1
+## p2 ~~ cov_pq*q2
+## p3 ~~ cov_pq*q3
+## 
+## # Random Intercept Variances and Covariances
+## BX ~~ BX
+## BY ~~ BY
+## BX ~~ BY
+## 
+## # Fix Observed Variable Residuals to Zero
+## x1 ~~ 0*x1
+## y1 ~~ 0*y1
+## x2 ~~ 0*x2
+## y2 ~~ 0*y2
+## x3 ~~ 0*x3
+## y3 ~~ 0*y3</code></pre>
+<p>And finally, the <strong>Bivariate Latent (Linear) Growth Model</strong>,</p>
+<div class="sourceCode" id="cb7"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb7-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb7-1" tabindex="-1"></a><span class="fu">estimateLGM</span>(<span class="at">waves =</span> <span class="dv">3</span>,</span>
+<span id="cb7-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb7-2" tabindex="-1"></a>            <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span></span>
+<span id="cb7-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb7-3" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb7-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb7-4" tabindex="-1"></a><span class="fu">cat</span>()</span></code></pre></div>
+<pre><code>## # Latent Variables
+## p1 =~ 1*x1
+## q1 =~ 1*y1
+## p2 =~ 1*x2
+## q2 =~ 1*y2
+## p3 =~ 1*x3
+## q3 =~ 1*y3
+## 
+## # Latent Growth Factors for X
+## I_x =~ 1*p1 + 1*p2 + 1*p3
+## S_x =~ 0*p1 + 1*p2 + 2*p3
+## 
+## # Latent Growth Factors for Y
+## I_y =~ 1*q1 + 1*q2 + 1*q3
+## S_y =~ 0*q1 + 1*q2 + 2*q3
+## 
+## # Growth Factor Means
+## I_x ~ mean_I_x*1
+## S_x ~ mean_S_x*1
+## I_y ~ mean_I_y*1
+## S_y ~ mean_S_y*1
+## 
+## # Growth Factor Variances
+## I_x ~~ var_I_x*I_x
+## S_x ~~ var_S_x*S_x
+## I_y ~~ var_I_y*I_y
+## S_y ~~ var_S_y*S_y
+## 
+## # Within-Variable Growth Factor Covariances
+## I_x ~~ cov_IS_x*S_x
+## I_y ~~ cov_IS_y*S_y
+## 
+## # Between-Variable Growth Factor Covariances
+## I_x ~~ cov_I_xy*I_y
+## S_x ~~ cov_S_xy*S_y
+## I_x ~~ cov_IS_xy*S_y
+## I_y ~~ cov_IS_yx*S_x
+## 
+## # Latent Variable Means (Fixed to 0)
+## p1 ~ 0*1
+## q1 ~ 0*1
+## p2 ~ 0*1
+## q2 ~ 0*1
+## p3 ~ 0*1
+## q3 ~ 0*1
+## 
+## # Observed Variable Intercepts (Fixed to 0)
+## x1 ~ 0*1
+## y1 ~ 0*1
+## x2 ~ 0*1
+## y2 ~ 0*1
+## x3 ~ 0*1
+## y3 ~ 0*1
+## 
+## # Latent Variable Variances
+## p1 ~~ var_p*p1
+## q1 ~~ var_q*q1
+## p2 ~~ var_p*p2
+## q2 ~~ var_q*q2
+## p3 ~~ var_p*p3
+## q3 ~~ var_q*q3
+## 
+## # Latent Variable Covariances
+## p1 ~~ cov_pq*q1
+## p2 ~~ cov_pq*q2
+## p3 ~~ cov_pq*q3
+## 
+## # Fix Observed Variable Residuals to Zero
+## x1 ~~ 0*x1
+## y1 ~~ 0*y1
+## x2 ~~ 0*x2
+## y2 ~~ 0*y2
+## x3 ~~ 0*x3
+## y3 ~~ 0*y3</code></pre>
+<div id="simulation" class="section level2 hasAnchor" number="2.1">
+<h2><span class="header-section-number">2.1</span> Simulation<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#simulation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Each estimation function comes with an associated data simulation function. The functions simulate data according to the model specified. These are later used to build Monte Carlo functions.</p>
+<ul>
+<li><code>simCLPM()</code> simulates data from a standard cross-lagged panel model.</li>
+<li><code>simRICLPM()</code> simulates data from a random-intercept cross-lagged panel model.</li>
+<li><code>simLChange()</code> simulates data from a latent change score model.</li>
+<li><code>simLGM()</code> simulates data from a latent growth model.</li>
+</ul>
+<p>Documentation is included for each of the functions and can be accessed with the <code>help()</code> or <code>?</code> function.</p>
+</div>
+<div id="a-simple-example" class="section level2 hasAnchor" number="2.2">
+<h2><span class="header-section-number">2.2</span> A Simple Example<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#a-simple-example" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>As a motivating example, let’s simulate data from a CLPM and estimate two regression models, one with AR and CL parameters in “level form” and another regression model on the change scores, also with AR and CL parameters. This is similar to <span class="citation">Allison (<a href="#ref-allison1990">1990</a>)</span>’s discussion of difference scores versus level scores.The regression models are just OLS models, one using change scores, the other using lags. Not surprisingly, and consistent with the previous section, they are interchangeable. Figure <a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#fig:latent-clpm">2.1</a> shows the DGP and Figure <a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#fig:trajectories">2.2</a> shows simulated data.</p>
+<div class="figure"><span style="display:block;" id="fig:latent-clpm"></span>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-b0a495b267e740df3d2d" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-b0a495b267e740df3d2d">{"x":{"diagram":"\ndigraph RICLPM {\n\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  node [shape = box, style = filled, fillcolor = white, fontsize = 10]\n\n  # X indicators (3 per time point) - closer to latents\n  x11 [pos = \"-3.2,1.8!\", label = \"x₁₁\", width = 0.4, height = 0.25]\n  x12 [pos = \"-2.8,1.8!\", label = \"x₁₂\", width = 0.4, height = 0.25] \n  x13 [pos = \"-2.4,1.8!\", label = \"x₁₃\", width = 0.4, height = 0.25]\n  \n  x21 [pos = \"-1.7,1.8!\", label = \"x₂₁\", width = 0.4, height = 0.25]\n  x22 [pos = \"-1.3,1.8!\", label = \"x₂₂\", width = 0.4, height = 0.25]\n  x23 [pos = \"-0.9,1.8!\", label = \"x₂₃\", width = 0.4, height = 0.25]\n  \n  x31 [pos = \"-0.2,1.8!\", label = \"x₃₁\", width = 0.4, height = 0.25]\n  x32 [pos = \"0.2,1.8!\", label = \"x₃₂\", width = 0.4, height = 0.25]\n  x33 [pos = \"0.6,1.8!\", label = \"x₃₃\", width = 0.4, height = 0.25]\n  \n  x41 [pos = \"1.3,1.8!\", label = \"x₄₁\", width = 0.4, height = 0.25]\n  x42 [pos = \"1.7,1.8!\", label = \"x₄₂\", width = 0.4, height = 0.25]\n  x43 [pos = \"2.1,1.8!\", label = \"x₄₃\", width = 0.4, height = 0.25]\n  \n  x51 [pos = \"2.8,1.8!\", label = \"x₅₁\", width = 0.4, height = 0.25]\n  x52 [pos = \"3.2,1.8!\", label = \"x₅₂\", width = 0.4, height = 0.25]\n  x53 [pos = \"3.6,1.8!\", label = \"x₅₃\", width = 0.4, height = 0.25]\n\n  # Within Person X latents\n  wX1 [pos = \"-2.8,1!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1.3,1!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0.2,1!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1.7,1!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"3.2,1!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  # Within-person Y latents\n  wY1 [pos = \"-2.8,-1!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1.3,-1!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0.2,-1!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1.7,-1!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"3.2,-1!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n  # Y indicators (3 per time point) - closer to latents\n  y11 [pos = \"-3.2,-1.8!\", label = \"y₁₁\", width = 0.4, height = 0.25]\n  y12 [pos = \"-2.8,-1.8!\", label = \"y₁₂\", width = 0.4, height = 0.25]\n  y13 [pos = \"-2.4,-1.8!\", label = \"y₁₃\", width = 0.4, height = 0.25]\n  \n  y21 [pos = \"-1.7,-1.8!\", label = \"y₂₁\", width = 0.4, height = 0.25]\n  y22 [pos = \"-1.3,-1.8!\", label = \"y₂₂\", width = 0.4, height = 0.25]\n  y23 [pos = \"-0.9,-1.8!\", label = \"y₂₃\", width = 0.4, height = 0.25]\n  \n  y31 [pos = \"-0.2,-1.8!\", label = \"y₃₁\", width = 0.4, height = 0.25]\n  y32 [pos = \"0.2,-1.8!\", label = \"y₃₂\", width = 0.4, height = 0.25]\n  y33 [pos = \"0.6,-1.8!\", label = \"y₃₃\", width = 0.4, height = 0.25]\n  \n  y41 [pos = \"1.3,-1.8!\", label = \"y₄₁\", width = 0.4, height = 0.25]\n  y42 [pos = \"1.7,-1.8!\", label = \"y₄₂\", width = 0.4, height = 0.25]\n  y43 [pos = \"2.1,-1.8!\", label = \"y₄₃\", width = 0.4, height = 0.25]\n  \n  y51 [pos = \"2.8,-1.8!\", label = \"y₅₁\", width = 0.4, height = 0.25]\n  y52 [pos = \"3.2,-1.8!\", label = \"y₅₂\", width = 0.4, height = 0.25]\n  y53 [pos = \"3.6,-1.8!\", label = \"y₅₃\", width = 0.4, height = 0.25]\n\n  # Measurement model for X with proper subscripts\n  wX1 -> x11 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX1 -> x12 [label = <λ<sub>12<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX1 -> x13 [label = <λ<sub>13<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX2 -> x21 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX2 -> x22 [label = <λ<sub>22<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX2 -> x23 [label = <λ<sub>23<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX3 -> x31 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX3 -> x32 [label = <λ<sub>32<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX3 -> x33 [label = <λ<sub>33<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX4 -> x41 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX4 -> x42 [label = <λ<sub>42<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX4 -> x43 [label = <λ<sub>43<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wX5 -> x51 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wX5 -> x52 [label = <λ<sub>52<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wX5 -> x53 [label = <λ<sub>53<\/sub>>, arrowsize = 0.4, fontsize = 8]\n\n  # Measurement model for Y with proper subscripts\n  wY1 -> y11 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY1 -> y12 [label = <λ<sub>12<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY1 -> y13 [label = <λ<sub>13<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY2 -> y21 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY2 -> y22 [label = <λ<sub>22<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY2 -> y23 [label = <λ<sub>23<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY3 -> y31 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY3 -> y32 [label = <λ<sub>32<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY3 -> y33 [label = <λ<sub>33<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY4 -> y41 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY4 -> y42 [label = <λ<sub>42<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY4 -> y43 [label = <λ<sub>43<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  \n  wY5 -> y51 [label = \"1\", arrowsize = 0.4, fontsize = 8]\n  wY5 -> y52 [label = <λ<sub>52<\/sub>>, arrowsize = 0.4, fontsize = 8]\n  wY5 -> y53 [label = <λ<sub>53<\/sub>>, arrowsize = 0.4, fontsize = 8]\n\n  # Autoregressive paths (β parameters) - fontsize 11\n  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"β\", fontsize = 11]\n\n# Cross-lagged paths (ω parameters) - fontsize 11\n  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5, label = \"ω\", fontsize = 11]\n  \n  \n  # Within-time correlations\n  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]\n\n  # ERROR VARIANCES ON X INDICATORS (north side) - no labels\n  x11 -> x11 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x12 -> x12 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x13 -> x13 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x21 -> x21 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x22 -> x22 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x23 -> x23 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x31 -> x31 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x32 -> x32 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x33 -> x33 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x41 -> x41 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x42 -> x42 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x43 -> x43 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x51 -> x51 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x52 -> x52 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n  x53 -> x53 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n, arrowsize = 0.4]\n\n  # ERROR VARIANCES ON Y INDICATORS (south side) - no labels\n  y11 -> y11 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y12 -> y12 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y13 -> y13 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y21 -> y21 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y22 -> y22 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y23 -> y23 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y31 -> y31 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y32 -> y32 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y33 -> y33 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y41 -> y41 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y42 -> y42 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y43 -> y43 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y51 -> y51 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y52 -> y52 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n  y53 -> y53 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.4]\n\n  # Self-loops to represent errors on latent factors\n  wX2 -> wX2 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX3 -> wX3 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX4 -> wX4 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wX5 -> wX5 [dir = both, color = black, style = dashed, label = \"\", tailport = sw, headport = s, arrowsize = 0.5]\n  wY2 -> wY2 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY3 -> wY3 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY4 -> wY4 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n  wY5 -> wY5 [dir = both, color = black, style = dashed, label = \"\", tailport = nw, headport = n, arrowsize = 0.5]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+Figure 2.1: The Cross-Lagged Panel Model with Multiple Indicators
+</p>
+</div>
+<div class="figure"><span style="display:block;" id="fig:trajectories"></span>
+<img src="_main_files/figure-html/trajectories-1.png" alt="Data Generating Process: CLPM; Simulated trajectories shown " width="672" />
+<p class="caption">
+Figure 2.2: Data Generating Process: CLPM; Simulated trajectories shown
+</p>
+</div>
+<p>Using these data, let’s estimate a change score regression, alongside a level score regression (estimating the CLPM with least squares). These are not latent variable models, but rather simple OLS regressions on observed data.</p>
+<pre><code>## 
+## Call:
+## lm(formula = delta_y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.4868 -0.6711 -0.0025  0.6651  4.1120 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.02526    0.01612   1.567    0.117    
+## y_lag       -0.60491    0.01529 -39.552   &lt;2e-16 ***
+## x_lag        0.21590    0.01487  14.516   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.9967 on 3997 degrees of freedom
+##   (1000 observations deleted due to missingness)
+## Multiple R-squared:  0.2813, Adjusted R-squared:  0.2809 
+## F-statistic: 782.2 on 2 and 3997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -3.4868 -0.6711 -0.0025  0.6651  4.1120 
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  0.02526    0.01612   1.567    0.117    
+## y_lag        0.39509    0.01529  25.833   &lt;2e-16 ***
+## x_lag        0.21590    0.01487  14.516   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.9967 on 3997 degrees of freedom
+##   (1000 observations deleted due to missingness)
+## Multiple R-squared:  0.2516, Adjusted R-squared:  0.2512 
+## F-statistic: 671.7 on 2 and 3997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>If we simulate data under a latent change model, with no constant change, the CLPM and difference parameters should align (they do). Notice that the <span class="math inline">\(beta\)</span> parameter in the CLPM formulation is exactly the same as the difference score interpretation, as <span class="math inline">\(\hat\beta_{CLPM} - 1 = \hat{\beta_\Delta}\)</span>, where <span class="math inline">\(\hat\Delta\)</span> is the the difference score autoregressive parameter, and <span class="math inline">\(\hat\beta_{CLPM}\)</span> is the level form autoregressive parameter. Likewise, we could simulate data under a latent change score specification (with no constant effects), and again the models mirror the DGP parameters and are related.</p>
+<pre><code>## 
+## Call:
+## lm(formula = delta_y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.2570 -0.7089  0.0016  0.7104  4.4047 
+## 
+## Coefficients:
+##              Estimate Std. Error  t value Pr(&gt;|t|)    
+## (Intercept) -0.005187   0.005280   -0.982    0.326    
+## y_lag       -0.746183   0.004708 -158.481   &lt;2e-16 ***
+## x_lag        0.351695   0.004703   74.785   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.056 on 39997 degrees of freedom
+##   (10000 observations deleted due to missingness)
+## Multiple R-squared:  0.388,  Adjusted R-squared:  0.388 
+## F-statistic: 1.268e+04 on 2 and 39997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = y ~ y_lag + x_lag, data = data)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -4.2570 -0.7089  0.0016  0.7104  4.4047 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.005187   0.005280  -0.982    0.326    
+## y_lag        0.253817   0.004708  53.908   &lt;2e-16 ***
+## x_lag        0.351695   0.004703  74.785   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 1.056 on 39997 degrees of freedom
+##   (10000 observations deleted due to missingness)
+## Multiple R-squared:  0.2527, Adjusted R-squared:  0.2527 
+## F-statistic:  6764 on 2 and 39997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>The <code>estimateCLPM()</code> function may be used to estimate a latent variable CLPM. Notice that if we simulate data under the latent change model (without constant change), the CLPM retrieves the correct estimates, <span class="math inline">\(\hat\beta_{CLPM} - 1 \approx -0.7\)</span></p>
+<pre><code>## lavaan 0.6-20 ended normally after 42 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        33
+##   Number of equality constraints                    21
+## 
+##   Number of observations                         10000
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                               894.277
+##   Degrees of freedom                                53
+##   P-value (Chi-square)                           0.000
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 =~                                               
+##     y1                1.000                           
+##   q1 =~                                               
+##     x1                1.000                           
+##   p2 =~                                               
+##     y2                1.000                           
+##   q2 =~                                               
+##     x2                1.000                           
+##   p3 =~                                               
+##     y3                1.000                           
+##   q3 =~                                               
+##     x3                1.000                           
+##   p4 =~                                               
+##     y4                1.000                           
+##   q4 =~                                               
+##     x4                1.000                           
+##   p5 =~                                               
+##     y5                1.000                           
+##   q5 =~                                               
+##     x5                1.000                           
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p2 ~                                                
+##     p1      (bt_y)    0.254    0.005   53.847    0.000
+##     q1     (omg_x)    0.351    0.005   74.512    0.000
+##   q2 ~                                                
+##     q1      (bt_x)    0.259    0.005   54.757    0.000
+##     p1     (omg_y)    0.344    0.005   72.900    0.000
+##   p3 ~                                                
+##     p2      (bt_y)    0.254    0.005   53.847    0.000
+##     q2     (omg_x)    0.351    0.005   74.512    0.000
+##   q3 ~                                                
+##     q2      (bt_x)    0.259    0.005   54.757    0.000
+##     p2     (omg_y)    0.344    0.005   72.900    0.000
+##   p4 ~                                                
+##     p3      (bt_y)    0.254    0.005   53.847    0.000
+##     q3     (omg_x)    0.351    0.005   74.512    0.000
+##   q4 ~                                                
+##     q3      (bt_x)    0.259    0.005   54.757    0.000
+##     p3     (omg_y)    0.344    0.005   72.900    0.000
+##   p5 ~                                                
+##     p4      (bt_y)    0.254    0.005   53.847    0.000
+##     q4     (omg_x)    0.351    0.005   74.512    0.000
+##   q5 ~                                                
+##     q4      (bt_x)    0.259    0.005   54.757    0.000
+##     p4     (omg_y)    0.344    0.005   72.900    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 ~~                                               
+##     q1      (cv_1)    0.309    0.015   20.258    0.000
+##  .p2 ~~                                               
+##    .q2      (cv_x)    0.322    0.006   55.368    0.000
+##  .p3 ~~                                               
+##    .q3      (cv_x)    0.322    0.006   55.368    0.000
+##  .p4 ~~                                               
+##    .q4      (cv_x)    0.322    0.006   55.368    0.000
+##  .p5 ~~                                               
+##    .q5      (cv_x)    0.322    0.006   55.368    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1                0.008    0.012    0.636    0.525
+##     q1                0.004    0.012    0.336    0.737
+##    .p2                0.000                           
+##    .q2                0.000                           
+##    .p3                0.000                           
+##    .q3                0.000                           
+##    .p4                0.000                           
+##    .q4                0.000                           
+##    .p5                0.000                           
+##    .q5                0.000                           
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1     (vr_y1)    1.503    0.021   70.711    0.000
+##     q1     (vr_x1)    1.487    0.021   70.711    0.000
+##    .p2      (vr_y)    1.115    0.008  141.421    0.000
+##    .q2      (vr_x)    1.121    0.008  141.421    0.000
+##    .p3      (vr_y)    1.115    0.008  141.421    0.000
+##    .q3      (vr_x)    1.121    0.008  141.421    0.000
+##    .p4      (vr_y)    1.115    0.008  141.421    0.000
+##    .q4      (vr_x)    1.121    0.008  141.421    0.000
+##    .p5      (vr_y)    1.115    0.008  141.421    0.000
+##    .q5      (vr_x)    1.121    0.008  141.421    0.000
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000</code></pre>
+</div>
+<div id="summary-change-versus-level-scores" class="section level2 hasAnchor" number="2.3">
+<h2><span class="header-section-number">2.3</span> Summary: Change versus Level Scores<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#summary-change-versus-level-scores" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Consistent with <span class="citation">Allison (<a href="#ref-allison1990">1990</a>)</span>, there is a similarity between these two approaches – modeling dynamic processes in change and level form. However, the simulated examples thus far ignore an important dynamic, <em>unobserved heterogeneity</em> or <em>unit effects</em>. <span class="citation">Hsiao (<a href="#ref-hsiao2022">2022</a>)</span> shows that when autoregressive parameters are specified, and unit effects are ignored, the CLPM specification will yield biased parameter estimates, overestimating the autoregressive parameter and under-estimating the cross-lagged parameter. In the next section, we more fully consider the empirical consequences of unobserved heterogeneity and how latent variable models may be specified to estimated these <em>random effects.</em></p>
+</div>
+<div id="unobserved-heterogeneity" class="section level2 hasAnchor" number="2.4">
+<h2><span class="header-section-number">2.4</span> Unobserved Heterogeneity<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#unobserved-heterogeneity" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The CLPM and Change Score models estimated will produce biased parameter estimates, as unit effects are not considered. Both the RI-CLPM and the Latent Change Score model (LCM) address these concerns, by decomposing the variance in <span class="math inline">\(y\)</span> to <strong>between</strong> (i.e., unit) and <strong>within</strong> (i.e., variation around the unit’s mean) in the case of the RI-CLPM versus a model that models <strong>constant</strong> change (i.e., unit change) and <strong>proportional</strong> change in the case of the LCM.</p>
+<p>Let’s begin by considering how the CLPM does not correctly retrieve parameter estimates assuming a LCM DGP with constant effects.</p>
+<p><strong>The DGP is a Latent Change Model with Constant Effects and the Estimator is the CLPM</strong></p>
+<p>Assume the DGP is a latent change model with constant effects. The data are generated following <a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#fig:lcm">2.3</a>. Next, we estimate an ordinary CLPM. The autoregressive parameter (<span class="math inline">\(\hat\beta \approx 0.3\)</span>) is biased and is <span class="math inline">\(\approx 0.7\)</span>. The cross lagged parameters (<span class="math inline">\(\hat \omega \approx 0.4\)</span>) where they should be closer to 0.5.</p>
+<div class="figure"><span style="display:block;" id="fig:lcm"></span>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-71357f24b8eb6dfe8360" style="width:672px;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-71357f24b8eb6dfe8360">{"x":{"diagram":"\ndigraph RICLPM {\n\n  # Graph attributes\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n\n  # Node attributes\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  A_X [pos = \"-2.5,1!\", shape = circle, fillcolor = white, label = <Δ<sub>x<\/sub>>,  width = 0.5, height = 0.5]\n  I [pos = \"-2.5,0!\", shape = triangle, fillcolor = white, label = \"I\",  width = 0.5, height = 0.5]\n  X1 [pos = \"-2,2.2!\", label = \"x1\", width = 0.6, height = 0.3]\n  X2 [pos = \"-1,2.2!\", label = \"x2\", width = 0.6, height = 0.3]\n  X3 [pos = \"0,2.2!\", label = \"x3\", width = 0.6, height = 0.3]\n  X4 [pos = \"1,2.2!\", label = \"x4\", width = 0.6, height = 0.3]\n  X5 [pos = \"2,2.2!\", label = \"x5\", width = 0.6, height = 0.3]\n\n  # Row 2: Within-person X latents (middle-upper)\n  wX1 [pos = \"-2,1.35!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1,1.35!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0,1.35!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1,1.35!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"2,1.35!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  # Row 3: Within-person Y latents (middle-lower)\n  wY1 [pos = \"-2,-1.35!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1,-1.35!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0,-1.35!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1,-1.35!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"2,-1.35!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n\n  dX2 [pos = \"-1,0.5!\", shape = circle, fillcolor = white, label = \"Δx2\"]\n  dX3 [pos = \"0,0.5!\", shape = circle, fillcolor = white, label = \"Δx3\"]\n  dX4 [pos = \"1,0.5!\", shape = circle, fillcolor = white, label = \"Δx4\"]\n  dX5 [pos = \"2,0.5!\", shape = circle, fillcolor = white, label = \"Δx5\"]\n\n  dY2 [pos = \"-1,-0.5!\", shape = circle, fillcolor = white, label = \"Δy2\"]\n  dY3 [pos = \"0,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy3\"]\n  dY4 [pos = \"1,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy4\"]\n  dY5 [pos = \"2,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy5\"]\n\n\n\n  # Row 4: observed Y variables and RI_Y (bottom)\n  Y1 [pos = \"-2,-2.2!\", label = \"y1\", width = 0.6, height = 0.3]\n  Y2 [pos = \"-1,-2.2!\", label = \"y2\", width = 0.6, height = 0.3]\n  Y3 [pos = \"0,-2.2!\", label = \"y3\", width = 0.6, height = 0.3]\n  Y4 [pos = \"1,-2.2!\", label = \"y4\", width = 0.6, height = 0.3]\n  Y5 [pos = \"2,-2.2!\", label = \"y5\", width = 0.6, height = 0.3]\n  A_Y [pos = \"-2.5,-1!\", shape = circle, fillcolor = white, label = <Δ<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n\n  # Measurement model paths (RI to observed)\n  A_X -> dX2 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX3 [label = \"\",  arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX4 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX5 [label = \"\", arrowsize = 0.5, tailport = e, headport = n]\n\n  A_Y -> dY2 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY3 [label = \"\",  arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY4 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY5 [label = \"\", arrowsize = 0.5, tailport = e, headport = s]\n\n  I -> A_X [label = \"\", arrowsize = 0.5, tailport = n, headport = s]\n  I -> A_Y [label = \"\", arrowsize = 0.5, tailport = s, headport = n]\n  I -> wX1 [label = \"\", arrowsize = 0.5, tailport = n, headport = s]\n  I -> wY1 [label = \"\", arrowsize = 0.5, tailport = s, headport = n]\n\n \n  # Measurement model paths (w to observed)\n  wX1 -> X1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> X2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> X3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> X4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX5 -> X5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> Y1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> Y2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> Y3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> Y4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY5 -> Y5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> dY2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dY3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dY4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dY5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dX2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dX3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dX4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dX5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dY2 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dY3 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dY4 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dY5 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n\n  wY1 -> dX2 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dX3 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dX4 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dX5 [label = \"θ\", arrowsize = 0.5, fontsize = 10]\n\n  # Autoregressive paths\n  wX1 -> wX2 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> wX3 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> wX4 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> wX5 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> wY2 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> wY3 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> wY4 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> wY5 [color = black, penwidth = 1, label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  # Cross-lagged paths with offset gamma labels and subscripts\n  dX2 -> dY3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX3 -> dY4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX4 -> dY5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY2 -> dX3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY3 -> dX4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dY4 -> dX5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n\n  dX2 -> wX2 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX3 -> wX3 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX4 -> wX4 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n  dX5 -> wX5 [color = black, penwidth = 1, arrowsize = 0.5, label = \"\", fontsize = 11]\n\n  dY2 -> wY2 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY3 -> wY3 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY4 -> wY4 [color = black, penwidth = 1, arrowsize = 0.5]\n  dY5 -> wY5 [color = black, penwidth = 1, arrowsize = 0.5]\n\n\n  # # Within-time correlations - ONLY these are slightly rounded\n  # wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]\n  # \n\n\n  # Self-loops connected to bottom of each node using ports\n  dX2 -> dX2 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s , arrowsize = 0.5]\n  dX3 -> dX3 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dX4 -> dX4 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dX5 -> dX5 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s, arrowsize = 0.5]\n  dY2 -> dY2 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY3 -> dY3 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY4 -> dY4 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n  dY5 -> dY5 [dir = both, color = black, style = dashed, label = \"\", tailport = ne, headport = ne, arrowsize = 0.5]\n\n\n\n  # Self-loops connected to bottom of each node using ports\n  # X1 -> X1 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X2 -> X2 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X3 -> X3 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X4 -> X4 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # X5 -> X5 [dir = both, color = black, style = dashed, label = \"0\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n  # \n  # Y1 -> Y1 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y2 -> Y2 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y3 -> Y3 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y4 -> Y4 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n  # Y5 -> Y5 [dir = both, color = black, style = dashed, label = \"0\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11]\n\n  # Self-loops connected to bottom of each node using ports\n   wX1 -> wX1 [dir = both, color = black, style = dashed, label = \"\", tailport = s, headport = s , arrowsize = 0.5, fontsize = 11, labelangle = 45, labeldistance = 2.5]\n   wY1 -> wY1 [dir = both, color = black, style = dashed, label = \"\", tailport = n, headport = n , arrowsize = 0.5, fontsize = 11]\n\n  # Residuals for random intercepts (epsilon)\n  A_X -> A_X [dir = both, color = black, style = dashed, label = \"\", labelangle = 135, labeldistance = 1.5, tailport = s, headport = s, arrowsize = 0.5, width = 0.6, height = 0.3]\n  A_Y -> A_Y [dir = both, color = black, style = dashed, label = \"\", labelangle = 135, labeldistance = 1.5, tailport = n, headport = n, arrowsize = 0.5, width = 0.6, height = 0.3]\n\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<p class="caption">
+Figure 2.3: DGP: Latent Change with Unit Effects; Estimator: CLPM.
+</p>
+</div>
+<pre><code>## In this example, the DGP is a latent change model
+##  with constant effects. The estimator is a CLPM model,
+##  which doesn&#39;t fully control for unit effects.
+##  lavaan results are printed below</code></pre>
+<pre><code>## lavaan 0.6-20 ended normally after 44 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        33
+##   Number of equality constraints                    21
+## 
+##   Number of observations                         10000
+## 
+## Model Test User Model:
+##                                                        
+##   Test statistic                              21439.095
+##   Degrees of freedom                                 53
+##   P-value (Chi-square)                            0.000
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 =~                                               
+##     y1                1.000                           
+##   q1 =~                                               
+##     x1                1.000                           
+##   p2 =~                                               
+##     y2                1.000                           
+##   q2 =~                                               
+##     x2                1.000                           
+##   p3 =~                                               
+##     y3                1.000                           
+##   q3 =~                                               
+##     x3                1.000                           
+##   p4 =~                                               
+##     y4                1.000                           
+##   q4 =~                                               
+##     x4                1.000                           
+##   p5 =~                                               
+##     y5                1.000                           
+##   q5 =~                                               
+##     x5                1.000                           
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p2 ~                                                
+##     p1      (bt_y)    0.710    0.004  161.170    0.000
+##     q1     (omg_x)    0.434    0.004   98.300    0.000
+##   q2 ~                                                
+##     q1      (bt_x)    0.708    0.004  160.614    0.000
+##     p1     (omg_y)    0.435    0.004   98.793    0.000
+##   p3 ~                                                
+##     p2      (bt_y)    0.710    0.004  161.170    0.000
+##     q2     (omg_x)    0.434    0.004   98.300    0.000
+##   q3 ~                                                
+##     q2      (bt_x)    0.708    0.004  160.614    0.000
+##     p2     (omg_y)    0.435    0.004   98.793    0.000
+##   p4 ~                                                
+##     p3      (bt_y)    0.710    0.004  161.170    0.000
+##     q3     (omg_x)    0.434    0.004   98.300    0.000
+##   q4 ~                                                
+##     q3      (bt_x)    0.708    0.004  160.614    0.000
+##     p3     (omg_y)    0.435    0.004   98.793    0.000
+##   p5 ~                                                
+##     p4      (bt_y)    0.710    0.004  161.170    0.000
+##     q4     (omg_x)    0.434    0.004   98.300    0.000
+##   q5 ~                                                
+##     q4      (bt_x)    0.708    0.004  160.614    0.000
+##     p4     (omg_y)    0.435    0.004   98.793    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 ~~                                               
+##     q1      (cv_1)    0.295    0.015   19.500    0.000
+##  .p2 ~~                                               
+##    .q2      (cv_x)    0.470    0.008   62.280    0.000
+##  .p3 ~~                                               
+##    .q3      (cv_x)    0.470    0.008   62.280    0.000
+##  .p4 ~~                                               
+##    .q4      (cv_x)    0.470    0.008   62.280    0.000
+##  .p5 ~~                                               
+##    .q5      (cv_x)    0.470    0.008   62.280    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1               -0.010    0.012   -0.819    0.413
+##     q1               -0.011    0.012   -0.906    0.365
+##    .p2                0.000                           
+##    .q2                0.000                           
+##    .p3                0.000                           
+##    .q3                0.000                           
+##    .p4                0.000                           
+##    .q4                0.000                           
+##    .p5                0.000                           
+##    .q5                0.000                           
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1     (vr_y1)    1.483    0.021   70.711    0.000
+##     q1     (vr_x1)    1.486    0.021   70.711    0.000
+##    .p2      (vr_y)    1.438    0.010  141.421    0.000
+##    .q2      (vr_x)    1.433    0.010  141.421    0.000
+##    .p3      (vr_y)    1.438    0.010  141.421    0.000
+##    .q3      (vr_x)    1.433    0.010  141.421    0.000
+##    .p4      (vr_y)    1.438    0.010  141.421    0.000
+##    .q4      (vr_x)    1.433    0.010  141.421    0.000
+##    .p5      (vr_y)    1.438    0.010  141.421    0.000
+##    .q5      (vr_x)    1.433    0.010  141.421    0.000
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000</code></pre>
+<p>What about the RI-CLPM? If we simulate data under the RI-CLPM DGP, does the CLPM retrieve the correct parameters?</p>
+<pre><code>## In this example, the DGP is the RICLPM
+##  The estimator is a CLPM model,
+##  which doesn&#39;t fully control for unit effects.
+##  lavaan results are printed below</code></pre>
+<pre><code>## lavaan 0.6-20 ended normally after 44 iterations
+## 
+##   Estimator                                         ML
+##   Optimization method                           NLMINB
+##   Number of model parameters                        33
+##   Number of equality constraints                    21
+## 
+##   Number of observations                          1000
+## 
+## Model Test User Model:
+##                                                       
+##   Test statistic                               198.728
+##   Degrees of freedom                                53
+##   P-value (Chi-square)                           0.000
+## 
+## Parameter Estimates:
+## 
+##   Standard errors                             Standard
+##   Information                                 Expected
+##   Information saturated (h1) model          Structured
+## 
+## Latent Variables:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 =~                                               
+##     y1                1.000                           
+##   q1 =~                                               
+##     x1                1.000                           
+##   p2 =~                                               
+##     y2                1.000                           
+##   q2 =~                                               
+##     x2                1.000                           
+##   p3 =~                                               
+##     y3                1.000                           
+##   q3 =~                                               
+##     x3                1.000                           
+##   p4 =~                                               
+##     y4                1.000                           
+##   q4 =~                                               
+##     x4                1.000                           
+##   p5 =~                                               
+##     y5                1.000                           
+##   q5 =~                                               
+##     x5                1.000                           
+## 
+## Regressions:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p2 ~                                                
+##     p1      (bt_y)    0.435    0.014   30.165    0.000
+##     q1     (omg_x)    0.239    0.014   16.651    0.000
+##   q2 ~                                                
+##     q1      (bt_x)    0.436    0.015   30.053    0.000
+##     p1     (omg_y)    0.251    0.015   17.221    0.000
+##   p3 ~                                                
+##     p2      (bt_y)    0.435    0.014   30.165    0.000
+##     q2     (omg_x)    0.239    0.014   16.651    0.000
+##   q3 ~                                                
+##     q2      (bt_x)    0.436    0.015   30.053    0.000
+##     p2     (omg_y)    0.251    0.015   17.221    0.000
+##   p4 ~                                                
+##     p3      (bt_y)    0.435    0.014   30.165    0.000
+##     q3     (omg_x)    0.239    0.014   16.651    0.000
+##   q4 ~                                                
+##     q3      (bt_x)    0.436    0.015   30.053    0.000
+##     p3     (omg_y)    0.251    0.015   17.221    0.000
+##   p5 ~                                                
+##     p4      (bt_y)    0.435    0.014   30.165    0.000
+##     q4     (omg_x)    0.239    0.014   16.651    0.000
+##   q5 ~                                                
+##     q4      (bt_x)    0.436    0.015   30.053    0.000
+##     p4     (omg_y)    0.251    0.015   17.221    0.000
+## 
+## Covariances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##   p1 ~~                                               
+##     q1      (cv_1)    0.608    0.050   12.102    0.000
+##  .p2 ~~                                               
+##    .q2      (cv_x)    0.185    0.017   10.625    0.000
+##  .p3 ~~                                               
+##    .q3      (cv_x)    0.185    0.017   10.625    0.000
+##  .p4 ~~                                               
+##    .q4      (cv_x)    0.185    0.017   10.625    0.000
+##  .p5 ~~                                               
+##    .q5      (cv_x)    0.185    0.017   10.625    0.000
+## 
+## Intercepts:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1               -0.010    0.039   -0.253    0.800
+##     q1                0.014    0.038    0.374    0.708
+##    .p2                0.000                           
+##    .q2                0.000                           
+##    .p3                0.000                           
+##    .q3                0.000                           
+##    .p4                0.000                           
+##    .q4                0.000                           
+##    .p5                0.000                           
+##    .q5                0.000                           
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000                           
+## 
+## Variances:
+##                    Estimate  Std.Err  z-value  P(&gt;|z|)
+##     p1     (vr_y1)    1.505    0.067   22.361    0.000
+##     q1     (vr_x1)    1.433    0.064   22.361    0.000
+##    .p2      (vr_y)    1.078    0.024   44.721    0.000
+##    .q2      (vr_x)    1.099    0.025   44.721    0.000
+##    .p3      (vr_y)    1.078    0.024   44.721    0.000
+##    .q3      (vr_x)    1.099    0.025   44.721    0.000
+##    .p4      (vr_y)    1.078    0.024   44.721    0.000
+##    .q4      (vr_x)    1.099    0.025   44.721    0.000
+##    .p5      (vr_y)    1.078    0.024   44.721    0.000
+##    .q5      (vr_x)    1.099    0.025   44.721    0.000
+##    .y1                0.000                           
+##    .x1                0.000                           
+##    .y2                0.000                           
+##    .x2                0.000                           
+##    .y3                0.000                           
+##    .x3                0.000                           
+##    .y4                0.000                           
+##    .x4                0.000                           
+##    .y5                0.000                           
+##    .x5                0.000</code></pre>
+<p>Notice, the same problem exists. The model does a poor job retrieving the correct parameter estimates.</p>
+<p>Why does the CLPM get it wrong? It only does as the proportion of the variance in <span class="math inline">\(y\)</span> (or <span class="math inline">\(x\)</span>) increases due to unit effect – unobserved heterogeneity. The CLPM assumes that all variance is wave-specific, and thus misattributes stable variance in <span class="math inline">\(y\)</span> to the autoregression parameters. This can be seen in examining the simulated trajectories of data generated varying the variance parameters for the random intercepts. First, let’s consider a situation in which the <strong>between</strong> variance is 4 times as large as the within variance.</p>
+<div class="figure"><span style="display:block;" id="fig:trajectories2"></span>
+<img src="_main_files/figure-html/trajectories2-1.png" alt="Individual trajectories under RICLPM" width="672" />
+<p class="caption">
+Figure 2.4: Individual trajectories under RICLPM
+</p>
+</div>
+<p>This can be compared to the same DGP but where the <strong>within</strong> variance is 4 times as large as the <strong>between</strong> variance.</p>
+<div class="sourceCode" id="cb18"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb18-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb18-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-2" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb18-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-3" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
+<span id="cb18-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-4" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
+<span id="cb18-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-5" tabindex="-1"></a></span>
+<span id="cb18-6"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-6" tabindex="-1"></a>wide_data <span class="ot">=</span> <span class="fu">simRICLPM</span>(</span>
+<span id="cb18-7"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-7" tabindex="-1"></a>  <span class="at">waves =</span> <span class="dv">5</span>,</span>
+<span id="cb18-8"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-8" tabindex="-1"></a>  <span class="at">beta_x =</span> <span class="fl">0.3</span>,    </span>
+<span id="cb18-9"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-9" tabindex="-1"></a>  <span class="at">beta_y =</span> <span class="fl">0.8</span>,    </span>
+<span id="cb18-10"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-10" tabindex="-1"></a>  <span class="at">sample.nobs =</span> <span class="dv">1000</span>,</span>
+<span id="cb18-11"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-11" tabindex="-1"></a>  <span class="at">var_BX =</span> <span class="fl">0.25</span>,</span>
+<span id="cb18-12"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-12" tabindex="-1"></a>  <span class="at">var_BY =</span> <span class="fl">0.25</span>,</span>
+<span id="cb18-13"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-13" tabindex="-1"></a>  <span class="at">var_p =</span> <span class="dv">1</span>,</span>
+<span id="cb18-14"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-14" tabindex="-1"></a>  <span class="at">var_q =</span> <span class="dv">1</span>,</span>
+<span id="cb18-15"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb18-15" tabindex="-1"></a>  <span class="at">estimate_means =</span> <span class="cn">TRUE</span>)<span class="sc">$</span>data </span></code></pre></div>
+<pre><code>## Warning: lavaan-&gt;lav_start_check_cov():  
+##    starting values imply a correlation larger than 1; variables involved are: 
+##    BX BY</code></pre>
+<pre><code>## ✅ Successfully simulated RICLPM data with 5 waves and 1000 observations.</code></pre>
+<div class="sourceCode" id="cb21"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb21-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-1" tabindex="-1"></a>data <span class="ot">=</span> wide_data <span class="sc">|&gt;</span></span>
+<span id="cb21-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-2" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="sc">|&gt;</span></span>
+<span id="cb21-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-3" tabindex="-1"></a>  <span class="fu">group_by</span>(id) <span class="sc">|&gt;</span></span>
+<span id="cb21-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-4" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb21-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-5" tabindex="-1"></a>    <span class="at">y_lag =</span> <span class="fu">lag</span>(y),</span>
+<span id="cb21-6"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-6" tabindex="-1"></a>    <span class="at">x_lag =</span> <span class="fu">lag</span>(x),</span>
+<span id="cb21-7"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-7" tabindex="-1"></a>    <span class="at">delta_y =</span> y <span class="sc">-</span> <span class="fu">lag</span>(y)</span>
+<span id="cb21-8"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-8" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb21-9"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-9" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="ot">-&gt;</span> data</span>
+<span id="cb21-10"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-10" tabindex="-1"></a></span>
+<span id="cb21-11"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-11" tabindex="-1"></a>data <span class="sc">|&gt;</span>  </span>
+<span id="cb21-12"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-12" tabindex="-1"></a>   <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> wave, <span class="at">y =</span> y, <span class="at">group =</span> id)) <span class="sc">+</span> </span>
+<span id="cb21-13"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-13" tabindex="-1"></a>   <span class="fu">geom_line</span>(<span class="at">alpha =</span> <span class="fl">0.1</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">position =</span> <span class="fu">position_jitter</span>(<span class="at">width =</span> <span class="fl">0.1</span>, <span class="at">height =</span> <span class="fl">0.2</span>)) <span class="sc">+</span></span>
+<span id="cb21-14"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-14" tabindex="-1"></a>   <span class="fu">stat_summary</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">fun =</span> mean, <span class="at">geom =</span> <span class="st">&quot;line&quot;</span>,  </span>
+<span id="cb21-15"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-15" tabindex="-1"></a>                <span class="at">color =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>, <span class="at">alpha =</span> <span class="fl">0.4</span>) <span class="sc">+</span> </span>
+<span id="cb21-16"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-16" tabindex="-1"></a>   <span class="fu">stat_summary</span>(<span class="fu">aes</span>(<span class="at">group =</span> <span class="dv">1</span>), <span class="at">fun =</span> mean, <span class="at">geom =</span> <span class="st">&quot;point&quot;</span>,  </span>
+<span id="cb21-17"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-17" tabindex="-1"></a>                <span class="at">color =</span> <span class="st">&quot;lightblue&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span> </span>
+<span id="cb21-18"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-18" tabindex="-1"></a>   <span class="fu">labs</span>(</span>
+<span id="cb21-19"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-19" tabindex="-1"></a>     <span class="at">title =</span> <span class="st">&quot;Individual Trajectories: Simulated Data&quot;</span>, </span>
+<span id="cb21-20"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-20" tabindex="-1"></a>     <span class="at">subtitle =</span> <span class="st">&quot;Within Variance = 4x as large as Between&quot;</span>, </span>
+<span id="cb21-21"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-21" tabindex="-1"></a>     <span class="at">x =</span> <span class="st">&quot;Survey Wave&quot;</span>,</span>
+<span id="cb21-22"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-22" tabindex="-1"></a>     <span class="at">y =</span> <span class="st">&quot;Response&quot;</span> </span>
+<span id="cb21-23"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-23" tabindex="-1"></a>   ) <span class="sc">+</span></span>
+<span id="cb21-24"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-24" tabindex="-1"></a>  <span class="fu">theme_minimal</span>() <span class="sc">+</span> </span>
+<span id="cb21-25"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-25" tabindex="-1"></a>  <span class="fu">scale_y_continuous</span>(<span class="at">limits =</span> <span class="fu">c</span>(<span class="sc">-</span><span class="dv">5</span>, <span class="dv">6</span>) ) <span class="sc">+</span> </span>
+<span id="cb21-26"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-26" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">color =</span> <span class="st">&quot;black&quot;</span>)) <span class="ot">-&gt;</span> plot </span>
+<span id="cb21-27"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb21-27" tabindex="-1"></a><span class="fu">print</span>(plot)</span></code></pre></div>
+<div class="figure"><span style="display:block;" id="fig:trajectories3"></span>
+<img src="_main_files/figure-html/trajectories3-1.png" alt="Individual trajectories under RICLPM" width="672" />
+<p class="caption">
+Figure 2.5: Individual trajectories under RICLPM
+</p>
+</div>
+<p>Figure <a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#fig:trajectories2">2.4</a> shows real differences between units – they’re spread out; whereas Figure <a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#fig:trajectories3">2.5</a> shows much less difference between units – they’re more tightly compact. The fundamental relationship between the points over time does not change, all that changes is the spread of the trajectories.</p>
+</div>
+<div id="model-validation" class="section level2 hasAnchor" number="2.5">
+<h2><span class="header-section-number">2.5</span> Model Validation<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#model-validation" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>It may be useful to show these models can be estimated using techniques more familiar to a political science audience. Below, I estimate both the latent change model with constant effects and the RI-CLPM using <code>brms</code>.</p>
+<div id="hierarchical-brms-estimation" class="section level3 hasAnchor" number="2.5.1">
+<h3><span class="header-section-number">2.5.1</span> Hierarchical <code>brms</code> Estimation<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#hierarchical-brms-estimation" class="anchor-section" aria-label="Anchor link to header"></a></h3>
+<p>This is the differenced variable regression with random intercepts.</p>
+<div class="sourceCode" id="cb22"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb22-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb22-1" tabindex="-1"></a><span class="fu">summary</span>(model)</span></code></pre></div>
+<pre><code>## Warning: Parts of the model have not converged (some Rhats are &gt; 1.05). Be
+## careful when analysing the results! We recommend running more iterations and/or
+## setting stronger priors.</code></pre>
+<pre><code>##  Family: MV(gaussian, gaussian) 
+##   Links: mu = identity
+##          mu = identity 
+## Formula: delta_y ~ -1 + y_lag + x_lag + (1 | id) 
+##          delta_x ~ -1 + y_lag + x_lag + (1 | id) 
+##    Data: data (Number of observations: 29000) 
+##   Draws: 3 chains, each with iter = 1000; warmup = 500; thin = 1;
+##          total post-warmup draws = 1500
+## 
+## Multilevel Hyperparameters:
+## ~id (Number of levels: 1000) 
+##                      Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+## sd(deltay_Intercept)     1.69      0.04     1.62     1.78 1.06       59
+## sd(deltax_Intercept)     1.71      0.05     1.63     1.81 1.10       24
+##                      Tail_ESS
+## sd(deltay_Intercept)      202
+## sd(deltax_Intercept)       54
+## 
+## Regression Coefficients:
+##              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## deltay_y_lag    -0.83      0.01    -0.84    -0.82 1.00     2942     1135
+## deltay_x_lag     0.20      0.01     0.18     0.21 1.00      934     1224
+## deltax_y_lag     0.19      0.01     0.18     0.20 1.00      779      888
+## deltax_x_lag    -0.83      0.01    -0.84    -0.82 1.00     2726      947
+## 
+## Further Distributional Parameters:
+##              Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS Tail_ESS
+## sigma_deltay     1.06      0.00     1.05     1.07 1.00     2495     1213
+## sigma_deltax     1.06      0.00     1.05     1.07 1.00     2309      931
+## 
+## Residual Correlations: 
+##                       Estimate Est.Error l-95% CI u-95% CI Rhat Bulk_ESS
+## rescor(deltay,deltax)     0.11      0.01     0.10     0.12 1.01     3792
+##                       Tail_ESS
+## rescor(deltay,deltax)      726
+## 
+## Draws were sampled using sampling(NUTS). For each parameter, Bulk_ESS
+## and Tail_ESS are effective sample size measures, and Rhat is the potential
+## scale reduction factor on split chains (at convergence, Rhat = 1).</code></pre>
+</div>
+</div>
+<div id="short-t-bias." class="section level2 hasAnchor" number="2.6">
+<h2><span class="header-section-number">2.6</span> Short <em>t</em> bias.<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#short-t-bias." class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>It is well established that estimating a dynamic fixed effects model with short <em>t</em> – relatively few waves – can lead to biased estimates. This is shown in <span class="citation">Hsiao (<a href="#ref-hsiao2022">2022</a>)</span>. To see this, here is a dynamic panel data simulation where the DGP is an RI-CLPM with known parameters.</p>
+</div>
+<div id="the-fixed-effect-dynamic-panel-estimator" class="section level2 hasAnchor" number="2.7">
+<h2><span class="header-section-number">2.7</span> The Fixed Effect (Dynamic Panel) Estimator<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#the-fixed-effect-dynamic-panel-estimator" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>This example simulates data from a four wave panel. Notice that the parameter estimates are far from their true values.</p>
+<div class="sourceCode" id="cb25"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb25-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-1" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
+<span id="cb25-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb25-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-3" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb25-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-4" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb25-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-5" tabindex="-1"></a></span>
+<span id="cb25-6"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-6" tabindex="-1"></a><span class="co"># Long data</span></span>
+<span id="cb25-7"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-7" tabindex="-1"></a><span class="fu">baseRICLPM_sim</span>(<span class="at">n =</span> <span class="dv">1000</span>,</span>
+<span id="cb25-8"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-8" tabindex="-1"></a>               <span class="at">ar_x =</span> <span class="fl">0.5</span>,</span>
+<span id="cb25-9"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-9" tabindex="-1"></a>               <span class="at">ar_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb25-10"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-10" tabindex="-1"></a>               <span class="at">cl_xy =</span> <span class="fl">0.3</span>,</span>
+<span id="cb25-11"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-11" tabindex="-1"></a>               <span class="at">cl_yx =</span> <span class="fl">0.2</span>, </span>
+<span id="cb25-12"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-12" tabindex="-1"></a>               <span class="at">waves =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span></span>
+<span id="cb25-13"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-13" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">contains</span>(<span class="st">&quot;trait&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb25-14"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-14" tabindex="-1"></a>  <span class="co"># reshape to long</span></span>
+<span id="cb25-15"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-15" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="ot">-&gt;</span> dat</span>
+<span id="cb25-16"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-16" tabindex="-1"></a><span class="fu">lm</span>(within.y <span class="sc">~</span>  xlagw <span class="sc">+</span> ylagw, <span class="at">data =</span> dat) <span class="sc">|&gt;</span> </span>
+<span id="cb25-17"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb25-17" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = within.y ~ xlagw + ylagw, data = dat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -1.84701 -0.36315  0.00182  0.36254  2.49156 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.002764   0.009604  -0.288    0.774    
+## xlagw        0.174539   0.018460   9.455   &lt;2e-16 ***
+## ylagw       -0.163348   0.018381  -8.887   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.526 on 2997 degrees of freedom
+##   (1000 observations deleted due to missingness)
+## Multiple R-squared:  0.04559,    Adjusted R-squared:  0.04495 
+## F-statistic: 71.57 on 2 and 2997 DF,  p-value: &lt; 2.2e-16</code></pre>
+<p>With more waves <span class="math inline">\(t = 30\)</span>, the model recovers the true parameters.</p>
+<div class="sourceCode" id="cb27"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb27-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-1" tabindex="-1"></a><span class="co">#| echo: true</span></span>
+<span id="cb27-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-2" tabindex="-1"></a><span class="co">#| message: false</span></span>
+<span id="cb27-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-3" tabindex="-1"></a><span class="co">#| warning: false</span></span>
+<span id="cb27-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-4" tabindex="-1"></a><span class="co"># Long data</span></span>
+<span id="cb27-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-5" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
+<span id="cb27-6"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-6" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb27-7"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-7" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb27-8"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-8" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb27-9"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-9" tabindex="-1"></a></span>
+<span id="cb27-10"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-10" tabindex="-1"></a></span>
+<span id="cb27-11"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-11" tabindex="-1"></a><span class="fu">baseRICLPM_sim</span>(<span class="at">n =</span> <span class="dv">1000</span>,</span>
+<span id="cb27-12"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-12" tabindex="-1"></a>               <span class="at">ar_x =</span> <span class="fl">0.5</span>,</span>
+<span id="cb27-13"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-13" tabindex="-1"></a>               <span class="at">ar_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb27-14"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-14" tabindex="-1"></a>               <span class="at">cl_xy =</span> <span class="fl">0.3</span>,</span>
+<span id="cb27-15"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-15" tabindex="-1"></a>               <span class="at">cl_yx =</span> <span class="fl">0.2</span>, </span>
+<span id="cb27-16"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-16" tabindex="-1"></a>               <span class="at">waves =</span> <span class="dv">30</span>) <span class="sc">|&gt;</span></span>
+<span id="cb27-17"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-17" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">contains</span>(<span class="st">&quot;trait&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb27-18"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-18" tabindex="-1"></a>  <span class="co"># reshape to long</span></span>
+<span id="cb27-19"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-19" tabindex="-1"></a>  <span class="fu">reshape_long_sim_cr</span>() <span class="ot">-&gt;</span> dat</span>
+<span id="cb27-20"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-20" tabindex="-1"></a><span class="fu">lm</span>(within.y <span class="sc">~</span>  xlagw <span class="sc">+</span> ylagw, <span class="at">data =</span> dat) <span class="sc">|&gt;</span> </span>
+<span id="cb27-21"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb27-21" tabindex="-1"></a>  <span class="fu">summary</span>()</span></code></pre></div>
+<pre><code>## 
+## Call:
+## lm(formula = within.y ~ xlagw + ylagw, data = dat)
+## 
+## Residuals:
+##      Min       1Q   Median       3Q      Max 
+## -2.81152 -0.47215 -0.00156  0.47284  2.58771 
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -0.001252   0.004083  -0.307    0.759    
+## xlagw        0.299270   0.005733  52.200   &lt;2e-16 ***
+## ylagw        0.441164   0.005381  81.979   &lt;2e-16 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 0.6953 on 28997 degrees of freedom
+##   (1000 observations deleted due to missingness)
+## Multiple R-squared:  0.3973, Adjusted R-squared:  0.3973 
+## F-statistic:  9559 on 2 and 28997 DF,  p-value: &lt; 2.2e-16</code></pre>
+</div>
+<div id="the-riclpm" class="section level2 hasAnchor" number="2.8">
+<h2><span class="header-section-number">2.8</span> The RICLPM<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#the-riclpm" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The RICLPM doesn’t exhibit the same problem, with minimal bias (that decreases) with more waves. The code below runs a simple
+Monte Carlo analysis varying the number of panel waves, and the following fixed parameters (<span class="math inline">\(n = 2000; \beta_x = 0.4; \beta_y = 0.7; \omega_{x \rightarrow y} = 0.2; \omega_{y \rightarrow x} = 0.3\)</span>).</p>
+<div class="sourceCode" id="cb29"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb29-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-1" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
+<span id="cb29-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb29-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-3" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb29-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-4" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb29-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-5" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb29-6"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-6" tabindex="-1"></a></span>
+<span id="cb29-7"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-7" tabindex="-1"></a>true_params <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">beta_x =</span> <span class="fl">0.4</span>, <span class="at">beta_y =</span> <span class="fl">0.7</span>, </span>
+<span id="cb29-8"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-8" tabindex="-1"></a>                    <span class="at">omega_xy =</span> <span class="fl">0.2</span>, <span class="at">omega_yx =</span> <span class="fl">0.3</span>)</span>
+<span id="cb29-9"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-9" tabindex="-1"></a></span>
+<span id="cb29-10"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-10" tabindex="-1"></a>extract_params <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) {</span>
+<span id="cb29-11"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-11" tabindex="-1"></a>  pe <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">parameterEstimates</span>(fit)</span>
+<span id="cb29-12"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-12" tabindex="-1"></a>  factor_scores <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">lavPredict</span>(fit, <span class="at">method =</span> <span class="st">&quot;EBM&quot;</span>)</span>
+<span id="cb29-13"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-13" tabindex="-1"></a>  factor_scores_df <span class="ot">&lt;-</span> <span class="fu">as_tibble</span>(factor_scores) <span class="sc">%&gt;%</span></span>
+<span id="cb29-14"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-14" tabindex="-1"></a>      <span class="fu">select</span>(<span class="fu">starts_with</span>(<span class="st">&quot;general_y&quot;</span>) <span class="sc">|</span> <span class="fu">starts_with</span>(<span class="st">&quot;general_x&quot;</span>))</span>
+<span id="cb29-15"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-15" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb29-16"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-16" tabindex="-1"></a>    <span class="at">beta_x =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span>   <span class="st">&quot;beta_x&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb29-17"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-17" tabindex="-1"></a>    <span class="at">beta_y =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span>   <span class="st">&quot;beta_y&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb29-18"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-18" tabindex="-1"></a>    <span class="at">omega_xy =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span> <span class="st">&quot;omega_xy&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb29-19"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-19" tabindex="-1"></a>    <span class="at">omega_yx =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span> <span class="st">&quot;omega_yx&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb29-20"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-20" tabindex="-1"></a>  )</span>
+<span id="cb29-21"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-21" tabindex="-1"></a>}</span>
+<span id="cb29-22"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-22" tabindex="-1"></a></span>
+<span id="cb29-23"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-23" tabindex="-1"></a></span>
+<span id="cb29-24"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-24" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
+<span id="cb29-25"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-25" tabindex="-1"></a>  <span class="at">waves =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">7</span>, <span class="dv">10</span>, <span class="dv">30</span>),</span>
+<span id="cb29-26"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-26" tabindex="-1"></a>  <span class="at">rep =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span></span>
+<span id="cb29-27"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-27" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb29-28"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-28" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb29-29"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-29" tabindex="-1"></a>    <span class="at">data =</span> <span class="fu">map</span>(waves, <span class="sc">~</span>{</span>
+<span id="cb29-30"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-30" tabindex="-1"></a>      <span class="fu">baseRICLPM_sim</span>(</span>
+<span id="cb29-31"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-31" tabindex="-1"></a>        <span class="at">n =</span> <span class="dv">2000</span>,</span>
+<span id="cb29-32"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-32" tabindex="-1"></a>        <span class="at">innov_var =</span> <span class="fl">0.45</span>,</span>
+<span id="cb29-33"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-33" tabindex="-1"></a>        <span class="at">ar_x =</span> <span class="fl">0.4</span>,  <span class="at">ar_y =</span> <span class="fl">0.7</span>,</span>
+<span id="cb29-34"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-34" tabindex="-1"></a>        <span class="at">cl_xy =</span> <span class="fl">0.3</span>, <span class="at">cl_yx =</span> <span class="fl">0.2</span>,</span>
+<span id="cb29-35"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-35" tabindex="-1"></a>        <span class="at">waves =</span> .x</span>
+<span id="cb29-36"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-36" tabindex="-1"></a>      ) <span class="sc">|&gt;</span></span>
+<span id="cb29-37"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-37" tabindex="-1"></a>        <span class="fu">select</span>(<span class="sc">-</span><span class="fu">contains</span>(<span class="st">&quot;trait&quot;</span>))</span>
+<span id="cb29-38"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-38" tabindex="-1"></a>    }),</span>
+<span id="cb29-39"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-39" tabindex="-1"></a>    <span class="co"># This iterates over the data, x and waves y</span></span>
+<span id="cb29-40"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-40" tabindex="-1"></a>    <span class="at">fit =</span> <span class="fu">map2</span>(data, waves, <span class="sc">~</span>{</span>
+<span id="cb29-41"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-41" tabindex="-1"></a>      lavaan<span class="sc">::</span><span class="fu">lavaan</span>(<span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> ..<span class="dv">2</span>,</span>
+<span id="cb29-42"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-42" tabindex="-1"></a>                   <span class="at">label_autoregressive =</span> <span class="fu">c</span>(<span class="st">&quot;beta_x&quot;</span>, <span class="st">&quot;beta_y&quot;</span>)), <span class="at">data =</span> ..<span class="dv">1</span>, </span>
+<span id="cb29-43"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-43" tabindex="-1"></a>                     <span class="at">warn =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb29-44"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-44" tabindex="-1"></a>    }),</span>
+<span id="cb29-45"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-45" tabindex="-1"></a>    <span class="at">params =</span> <span class="fu">map</span>(fit, extract_params)</span>
+<span id="cb29-46"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-46" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb29-47"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb29-47" tabindex="-1"></a>  <span class="fu">unnest</span>(params)</span></code></pre></div>
+<div class="sourceCode" id="cb30"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb30-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-1" tabindex="-1"></a><span class="fu">library</span>(ggridges)</span>
+<span id="cb30-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-2" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb30-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-3" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb30-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-4" tabindex="-1"></a><span class="fu">library</span>(ggplot2)</span>
+<span id="cb30-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-5" tabindex="-1"></a><span class="fu">library</span>(ggridges)  </span>
+<span id="cb30-6"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-6" tabindex="-1"></a></span>
+<span id="cb30-7"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-7" tabindex="-1"></a><span class="co"># Prepare data with simpler labels for parsing</span></span>
+<span id="cb30-8"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-8" tabindex="-1"></a>results_long <span class="ot">&lt;-</span> results <span class="sc">|&gt;</span></span>
+<span id="cb30-9"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-9" tabindex="-1"></a>  <span class="fu">select</span>(waves, rep, beta_x, beta_y, omega_xy, omega_yx) <span class="sc">|&gt;</span></span>
+<span id="cb30-10"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-10" tabindex="-1"></a>  <span class="fu">pivot_longer</span>(<span class="at">cols =</span> <span class="fu">c</span>(beta_x, beta_y, omega_xy, omega_yx),</span>
+<span id="cb30-11"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-11" tabindex="-1"></a>               <span class="at">names_to =</span> <span class="st">&quot;parameter&quot;</span>, </span>
+<span id="cb30-12"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-12" tabindex="-1"></a>               <span class="at">values_to =</span> <span class="st">&quot;estimate&quot;</span>) <span class="sc">|&gt;</span></span>
+<span id="cb30-13"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-13" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb30-14"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-14" tabindex="-1"></a>    <span class="at">parameter_label =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-15"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-15" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;beta_x&quot;</span> <span class="sc">~</span> <span class="st">&quot;Autoregressive[x]&quot;</span>,</span>
+<span id="cb30-16"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-16" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;beta_y&quot;</span> <span class="sc">~</span> <span class="st">&quot;Autoregressive[y]&quot;</span>,</span>
+<span id="cb30-17"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-17" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;omega_xy&quot;</span> <span class="sc">~</span> <span class="st">&quot;CrossLag~X%-&gt;%Y~(omega[xy])&quot;</span>,</span>
+<span id="cb30-18"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-18" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;omega_yx&quot;</span> <span class="sc">~</span> <span class="st">&quot;CrossLag~Y%-&gt;%X~(omega[yx])&quot;</span></span>
+<span id="cb30-19"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-19" tabindex="-1"></a>    ),</span>
+<span id="cb30-20"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-20" tabindex="-1"></a>    <span class="at">true_value =</span> <span class="fu">case_when</span>(</span>
+<span id="cb30-21"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-21" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;beta_x&quot;</span> <span class="sc">~</span> <span class="fl">0.4</span>,</span>
+<span id="cb30-22"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-22" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;beta_y&quot;</span> <span class="sc">~</span> <span class="fl">0.7</span>,</span>
+<span id="cb30-23"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-23" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;omega_xy&quot;</span> <span class="sc">~</span> <span class="fl">0.2</span>,</span>
+<span id="cb30-24"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-24" tabindex="-1"></a>      parameter <span class="sc">==</span> <span class="st">&quot;omega_yx&quot;</span> <span class="sc">~</span> <span class="fl">0.3</span></span>
+<span id="cb30-25"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-25" tabindex="-1"></a>    ),</span>
+<span id="cb30-26"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-26" tabindex="-1"></a>    <span class="at">waves_factor =</span> <span class="fu">factor</span>(waves, <span class="at">levels =</span> <span class="fu">c</span>(<span class="dv">30</span>, <span class="dv">10</span>, <span class="dv">7</span>, <span class="dv">5</span>, <span class="dv">3</span>))</span>
+<span id="cb30-27"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-27" tabindex="-1"></a>  )</span>
+<span id="cb30-28"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-28" tabindex="-1"></a></span>
+<span id="cb30-29"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-29" tabindex="-1"></a><span class="co"># Calculate medians for each wave/parameter combination</span></span>
+<span id="cb30-30"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-30" tabindex="-1"></a>medians <span class="ot">&lt;-</span> results_long <span class="sc">|&gt;</span></span>
+<span id="cb30-31"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-31" tabindex="-1"></a>  <span class="fu">group_by</span>(waves_factor, parameter_label, true_value) <span class="sc">|&gt;</span></span>
+<span id="cb30-32"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-32" tabindex="-1"></a>  <span class="fu">summarise</span>(<span class="at">median_est =</span> <span class="fu">median</span>(estimate), <span class="at">.groups =</span> <span class="st">&quot;drop&quot;</span>)</span>
+<span id="cb30-33"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-33" tabindex="-1"></a></span>
+<span id="cb30-34"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-34" tabindex="-1"></a><span class="co"># Create plot with median lines</span></span>
+<span id="cb30-35"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-35" tabindex="-1"></a><span class="fu">ggplot</span>(results_long, <span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> waves_factor)) <span class="sc">+</span></span>
+<span id="cb30-36"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-36" tabindex="-1"></a>  <span class="fu">geom_density_ridges</span>(</span>
+<span id="cb30-37"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-37" tabindex="-1"></a>    <span class="fu">aes</span>(<span class="at">fill =</span> waves_factor),</span>
+<span id="cb30-38"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-38" tabindex="-1"></a>    <span class="at">scale =</span> <span class="dv">2</span>, </span>
+<span id="cb30-39"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-39" tabindex="-1"></a>    <span class="at">rel_min_height =</span> <span class="fl">0.01</span>,</span>
+<span id="cb30-40"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-40" tabindex="-1"></a>    <span class="at">alpha =</span> <span class="fl">0.7</span></span>
+<span id="cb30-41"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-41" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb30-42"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-42" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="fu">aes</span>(<span class="at">xintercept =</span> true_value), </span>
+<span id="cb30-43"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-43" tabindex="-1"></a>             <span class="at">linetype =</span> <span class="st">&quot;dashed&quot;</span>, <span class="at">color =</span> <span class="st">&quot;black&quot;</span>, <span class="at">size =</span> <span class="fl">0.8</span>, <span class="at">alpha =</span> <span class="fl">0.5</span>) <span class="sc">+</span></span>
+<span id="cb30-44"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-44" tabindex="-1"></a>  <span class="fu">geom_segment</span>(<span class="at">data =</span> medians,</span>
+<span id="cb30-45"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-45" tabindex="-1"></a>               <span class="fu">aes</span>(<span class="at">x =</span> median_est, <span class="at">xend =</span> median_est,</span>
+<span id="cb30-46"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-46" tabindex="-1"></a>                   <span class="at">y =</span> <span class="fu">as.numeric</span>(waves_factor) <span class="sc">-</span> <span class="fl">0.3</span>, </span>
+<span id="cb30-47"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-47" tabindex="-1"></a>                   <span class="at">yend =</span> <span class="fu">as.numeric</span>(waves_factor) <span class="sc">+</span> <span class="fl">0.3</span>),</span>
+<span id="cb30-48"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-48" tabindex="-1"></a>               <span class="at">color =</span> <span class="st">&quot;green&quot;</span>, <span class="at">size =</span> <span class="dv">1</span>) <span class="sc">+</span></span>
+<span id="cb30-49"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-49" tabindex="-1"></a>  <span class="fu">facet_wrap</span>(<span class="sc">~</span>parameter_label, <span class="at">scales =</span> <span class="st">&quot;free_x&quot;</span>, </span>
+<span id="cb30-50"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-50" tabindex="-1"></a>             <span class="at">labeller =</span> label_parsed, <span class="at">nrow =</span> <span class="dv">2</span>) <span class="sc">+</span></span>
+<span id="cb30-51"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-51" tabindex="-1"></a>  <span class="fu">scale_fill_viridis_d</span>(<span class="at">option =</span> <span class="st">&quot;viridis&quot;</span>, <span class="at">begin =</span> <span class="fl">0.2</span>, <span class="at">end =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
+<span id="cb30-52"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-52" tabindex="-1"></a>  <span class="fu">labs</span>(</span>
+<span id="cb30-53"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-53" tabindex="-1"></a>    <span class="at">title =</span> <span class="st">&quot;Monte Carlo Sample Distribution Varying Waves, RI-CLPM&quot;</span>,</span>
+<span id="cb30-54"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-54" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;Green line = median estimate | Dashed line = true value&quot;</span>,</span>
+<span id="cb30-55"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-55" tabindex="-1"></a>    <span class="at">x =</span> <span class="st">&quot;Parameter Estimate&quot;</span>,</span>
+<span id="cb30-56"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-56" tabindex="-1"></a>    <span class="at">y =</span> <span class="st">&quot;Number of Waves&quot;</span></span>
+<span id="cb30-57"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-57" tabindex="-1"></a>  ) <span class="sc">+</span></span>
+<span id="cb30-58"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-58" tabindex="-1"></a>  <span class="fu">theme_minimal</span>(<span class="at">base_size =</span> <span class="dv">12</span>) <span class="sc">+</span></span>
+<span id="cb30-59"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-59" tabindex="-1"></a>  <span class="fu">theme</span>(</span>
+<span id="cb30-60"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-60" tabindex="-1"></a>    <span class="at">legend.position =</span> <span class="st">&quot;none&quot;</span>,</span>
+<span id="cb30-61"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-61" tabindex="-1"></a>    <span class="at">strip.text =</span> <span class="fu">element_text</span>(<span class="at">size =</span> <span class="dv">11</span>, <span class="at">face =</span> <span class="st">&quot;bold&quot;</span>),</span>
+<span id="cb30-62"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-62" tabindex="-1"></a>    <span class="at">panel.grid.minor =</span> <span class="fu">element_blank</span>()</span>
+<span id="cb30-63"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb30-63" tabindex="-1"></a>  )</span></code></pre></div>
+<pre><code>## Picking joint bandwidth of 0.00655</code></pre>
+<pre><code>## Picking joint bandwidth of 0.00496</code></pre>
+<pre><code>## Picking joint bandwidth of 0.00486</code></pre>
+<pre><code>## Picking joint bandwidth of 0.00515</code></pre>
+<p><img src="_main_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p>Here is a summary table,</p>
+<div class="sourceCode" id="cb35"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb35-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-1" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb35-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-2" tabindex="-1"></a>bias_summary <span class="ot">&lt;-</span> results <span class="sc">|&gt;</span></span>
+<span id="cb35-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-3" tabindex="-1"></a>  <span class="fu">group_by</span>(waves) <span class="sc">|&gt;</span></span>
+<span id="cb35-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-4" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb35-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-5" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(beta_x, beta_y, omega_xy, omega_yx),</span>
+<span id="cb35-6"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-6" tabindex="-1"></a>           <span class="fu">list</span>(</span>
+<span id="cb35-7"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-7" tabindex="-1"></a>             <span class="at">mean =</span> mean,</span>
+<span id="cb35-8"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-8" tabindex="-1"></a>             <span class="at">bias =</span> <span class="sc">~</span><span class="fu">mean</span>(.) <span class="sc">-</span> true_params[[<span class="fu">cur_column</span>()]],</span>
+<span id="cb35-9"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-9" tabindex="-1"></a>             <span class="at">relative_bias =</span> <span class="sc">~</span> (<span class="fu">mean</span>(.) <span class="sc">-</span> true_params[[<span class="fu">cur_column</span>()]]) <span class="sc">/</span> true_params[[<span class="fu">cur_column</span>()]]<span class="sc">*</span><span class="dv">100</span>,</span>
+<span id="cb35-10"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-10" tabindex="-1"></a>             <span class="at">se =</span> <span class="sc">~</span><span class="fu">sd</span>(.)</span>
+<span id="cb35-11"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-11" tabindex="-1"></a>           ),</span>
+<span id="cb35-12"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-12" tabindex="-1"></a>           <span class="at">.names =</span> <span class="st">&quot;{.col}_{.fn}&quot;</span>)</span>
+<span id="cb35-13"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-13" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb35-14"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-14" tabindex="-1"></a>  <span class="fu">select</span>(waves,</span>
+<span id="cb35-15"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-15" tabindex="-1"></a>         <span class="fu">contains</span>(<span class="st">&quot;bias&quot;</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb35-16"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-16" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>)))</span>
+<span id="cb35-17"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-17" tabindex="-1"></a></span>
+<span id="cb35-18"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-18" tabindex="-1"></a>bias_summary <span class="sc">|&gt;</span></span>
+<span id="cb35-19"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-19" tabindex="-1"></a>  <span class="fu">gt</span>() <span class="sc">|&gt;</span></span>
+<span id="cb35-20"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-20" tabindex="-1"></a>  <span class="fu">tab_header</span>(</span>
+<span id="cb35-21"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-21" tabindex="-1"></a>    <span class="at">title =</span> <span class="fu">md</span>(<span class="st">&quot;**Monte Carlo Bias Analysis**&quot;</span>),</span>
+<span id="cb35-22"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-22" tabindex="-1"></a>    <span class="at">subtitle =</span> <span class="st">&quot;RICLPM Estimation: Varying the Number of Waves&quot;</span></span>
+<span id="cb35-23"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-23" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb35-24"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-24" tabindex="-1"></a>  <span class="fu">cols_label</span>(</span>
+<span id="cb35-25"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-25" tabindex="-1"></a>    <span class="at">waves =</span> <span class="st">&quot;Waves&quot;</span>,</span>
+<span id="cb35-26"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-26" tabindex="-1"></a>    <span class="at">beta_x_bias =</span>  <span class="st">&quot;Bias, AR(X)&quot;</span>,</span>
+<span id="cb35-27"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-27" tabindex="-1"></a>    <span class="at">beta_y_bias =</span>  <span class="st">&quot;Bias, AR(Y)&quot;</span>,</span>
+<span id="cb35-28"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-28" tabindex="-1"></a>    <span class="at">beta_x_relative_bias  =</span>  <span class="st">&quot;Relative Bias AR(X) %&quot;</span>,</span>
+<span id="cb35-29"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-29" tabindex="-1"></a>    <span class="at">beta_y_relative_bias  =</span>  <span class="st">&quot;Relative Bias AR(Y) %&quot;</span>,</span>
+<span id="cb35-30"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-30" tabindex="-1"></a>    <span class="at">omega_xy_bias  =</span>  <span class="st">&quot;Bias, CL(X→Y)&quot;</span>,</span>
+<span id="cb35-31"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-31" tabindex="-1"></a>    <span class="at">omega_yx_bias  =</span>  <span class="st">&quot;Bias, CL(Y→X)&quot;</span>,</span>
+<span id="cb35-32"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-32" tabindex="-1"></a>    <span class="at">omega_xy_relative_bias  =</span>  <span class="st">&quot;Relative Bias, CL(X→Y) %&quot;</span>,</span>
+<span id="cb35-33"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-33" tabindex="-1"></a>    <span class="at">omega_yx_relative_bias  =</span>  <span class="st">&quot;Relative Bias, CL(Y→X) %&quot;</span></span>
+<span id="cb35-34"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-34" tabindex="-1"></a>)<span class="sc">|&gt;</span></span>
+<span id="cb35-35"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-35" tabindex="-1"></a>   <span class="fu">tab_source_note</span>(</span>
+<span id="cb35-36"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-36" tabindex="-1"></a>     <span class="at">source_note =</span> <span class="fu">md</span>(<span class="st">&quot;*Note*: The results reported here are from 100 simulations, varying the number of waves.&quot;</span>)</span>
+<span id="cb35-37"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-37" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb35-38"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-38" tabindex="-1"></a>    <span class="fu">tab_footnote</span>(</span>
+<span id="cb35-39"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb35-39" tabindex="-1"></a>      <span class="at">footnote =</span> <span class="st">&quot;Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100&quot;</span>)</span></code></pre></div>
+<div id="magnxtnixu" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#magnxtnixu table {
+  font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+#magnxtnixu thead, #magnxtnixu tbody, #magnxtnixu tfoot, #magnxtnixu tr, #magnxtnixu td, #magnxtnixu th {
+  border-style: none;
+}
+
+#magnxtnixu p {
+  margin: 0;
+  padding: 0;
+}
+
+#magnxtnixu .gt_table {
+  display: table;
+  border-collapse: collapse;
+  line-height: normal;
+  margin-left: auto;
+  margin-right: auto;
+  color: #333333;
+  font-size: 16px;
+  font-weight: normal;
+  font-style: normal;
+  background-color: #FFFFFF;
+  width: auto;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #A8A8A8;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #A8A8A8;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_caption {
+  padding-top: 4px;
+  padding-bottom: 4px;
+}
+
+#magnxtnixu .gt_title {
+  color: #333333;
+  font-size: 125%;
+  font-weight: initial;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-color: #FFFFFF;
+  border-bottom-width: 0;
+}
+
+#magnxtnixu .gt_subtitle {
+  color: #333333;
+  font-size: 85%;
+  font-weight: initial;
+  padding-top: 3px;
+  padding-bottom: 5px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-color: #FFFFFF;
+  border-top-width: 0;
+}
+
+#magnxtnixu .gt_heading {
+  background-color: #FFFFFF;
+  text-align: center;
+  border-bottom-color: #FFFFFF;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_bottom_border {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_col_headings {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_col_heading {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 6px;
+  padding-left: 5px;
+  padding-right: 5px;
+  overflow-x: hidden;
+}
+
+#magnxtnixu .gt_column_spanner_outer {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: normal;
+  text-transform: inherit;
+  padding-top: 0;
+  padding-bottom: 0;
+  padding-left: 4px;
+  padding-right: 4px;
+}
+
+#magnxtnixu .gt_column_spanner_outer:first-child {
+  padding-left: 0;
+}
+
+#magnxtnixu .gt_column_spanner_outer:last-child {
+  padding-right: 0;
+}
+
+#magnxtnixu .gt_column_spanner {
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: bottom;
+  padding-top: 5px;
+  padding-bottom: 5px;
+  overflow-x: hidden;
+  display: inline-block;
+  width: 100%;
+}
+
+#magnxtnixu .gt_spanner_row {
+  border-bottom-style: hidden;
+}
+
+#magnxtnixu .gt_group_heading {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  text-align: left;
+}
+
+#magnxtnixu .gt_empty_group_heading {
+  padding: 0.5px;
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  vertical-align: middle;
+}
+
+#magnxtnixu .gt_from_md > :first-child {
+  margin-top: 0;
+}
+
+#magnxtnixu .gt_from_md > :last-child {
+  margin-bottom: 0;
+}
+
+#magnxtnixu .gt_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  margin: 10px;
+  border-top-style: solid;
+  border-top-width: 1px;
+  border-top-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 1px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 1px;
+  border-right-color: #D3D3D3;
+  vertical-align: middle;
+  overflow-x: hidden;
+}
+
+#magnxtnixu .gt_stub {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#magnxtnixu .gt_stub_row_group {
+  color: #333333;
+  background-color: #FFFFFF;
+  font-size: 100%;
+  font-weight: initial;
+  text-transform: inherit;
+  border-right-style: solid;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+  padding-left: 5px;
+  padding-right: 5px;
+  vertical-align: top;
+}
+
+#magnxtnixu .gt_row_group_first td {
+  border-top-width: 2px;
+}
+
+#magnxtnixu .gt_row_group_first th {
+  border-top-width: 2px;
+}
+
+#magnxtnixu .gt_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#magnxtnixu .gt_first_summary_row {
+  border-top-style: solid;
+  border-top-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_first_summary_row.thick {
+  border-top-width: 2px;
+}
+
+#magnxtnixu .gt_last_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_grand_summary_row {
+  color: #333333;
+  background-color: #FFFFFF;
+  text-transform: inherit;
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#magnxtnixu .gt_first_grand_summary_row {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-top-style: double;
+  border-top-width: 6px;
+  border-top-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_last_grand_summary_row_top {
+  padding-top: 8px;
+  padding-bottom: 8px;
+  padding-left: 5px;
+  padding-right: 5px;
+  border-bottom-style: double;
+  border-bottom-width: 6px;
+  border-bottom-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_striped {
+  background-color: rgba(128, 128, 128, 0.05);
+}
+
+#magnxtnixu .gt_table_body {
+  border-top-style: solid;
+  border-top-width: 2px;
+  border-top-color: #D3D3D3;
+  border-bottom-style: solid;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_footnotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_footnote {
+  margin: 0px;
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#magnxtnixu .gt_sourcenotes {
+  color: #333333;
+  background-color: #FFFFFF;
+  border-bottom-style: none;
+  border-bottom-width: 2px;
+  border-bottom-color: #D3D3D3;
+  border-left-style: none;
+  border-left-width: 2px;
+  border-left-color: #D3D3D3;
+  border-right-style: none;
+  border-right-width: 2px;
+  border-right-color: #D3D3D3;
+}
+
+#magnxtnixu .gt_sourcenote {
+  font-size: 90%;
+  padding-top: 4px;
+  padding-bottom: 4px;
+  padding-left: 5px;
+  padding-right: 5px;
+}
+
+#magnxtnixu .gt_left {
+  text-align: left;
+}
+
+#magnxtnixu .gt_center {
+  text-align: center;
+}
+
+#magnxtnixu .gt_right {
+  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+
+#magnxtnixu .gt_font_normal {
+  font-weight: normal;
+}
+
+#magnxtnixu .gt_font_bold {
+  font-weight: bold;
+}
+
+#magnxtnixu .gt_font_italic {
+  font-style: italic;
+}
+
+#magnxtnixu .gt_super {
+  font-size: 65%;
+}
+
+#magnxtnixu .gt_footnote_marks {
+  font-size: 75%;
+  vertical-align: 0.4em;
+  position: initial;
+}
+
+#magnxtnixu .gt_asterisk {
+  font-size: 100%;
+  vertical-align: 0;
+}
+
+#magnxtnixu .gt_indent_1 {
+  text-indent: 5px;
+}
+
+#magnxtnixu .gt_indent_2 {
+  text-indent: 10px;
+}
+
+#magnxtnixu .gt_indent_3 {
+  text-indent: 15px;
+}
+
+#magnxtnixu .gt_indent_4 {
+  text-indent: 20px;
+}
+
+#magnxtnixu .gt_indent_5 {
+  text-indent: 25px;
+}
+
+#magnxtnixu .katex-display {
+  display: inline-flex !important;
+  margin-bottom: 0.75em !important;
+}
+
+#magnxtnixu div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+  height: 0px !important;
+}
+</style>
+<table class="gt_table" data-quarto-disable-processing="false" data-quarto-bootstrap="false">
+  <thead>
+    <tr class="gt_heading">
+      <td colspan="9" class="gt_heading gt_title gt_font_normal" style><span class='gt_from_md'><strong>Monte Carlo Bias Analysis</strong></span></td>
+    </tr>
+    <tr class="gt_heading">
+      <td colspan="9" class="gt_heading gt_subtitle gt_font_normal gt_bottom_border" style>RICLPM Estimation: Varying the Number of Waves</td>
+    </tr>
+    <tr class="gt_col_headings">
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="waves">Waves</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="beta_x_bias">Bias, AR(X)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="beta_x_relative_bias">Relative Bias AR(X) %</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="beta_y_bias">Bias, AR(Y)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="beta_y_relative_bias">Relative Bias AR(Y) %</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="omega_xy_bias">Bias, CL(X→Y)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="omega_xy_relative_bias">Relative Bias, CL(X→Y) %</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="omega_yx_bias">Bias, CL(Y→X)</th>
+      <th class="gt_col_heading gt_columns_bottom_border gt_right" rowspan="1" colspan="1" scope="col" id="omega_yx_relative_bias">Relative Bias, CL(Y→X) %</th>
+    </tr>
+  </thead>
+  <tbody class="gt_table_body">
+    <tr><td headers="waves" class="gt_row gt_right">3</td>
+<td headers="beta_x_bias" class="gt_row gt_right">0.001</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">0.152</td>
+<td headers="beta_y_bias" class="gt_row gt_right">0.002</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">0.270</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">0.002</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">1.149</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">-0.005</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">-1.562</td></tr>
+    <tr><td headers="waves" class="gt_row gt_right">5</td>
+<td headers="beta_x_bias" class="gt_row gt_right">-0.002</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">-0.581</td>
+<td headers="beta_y_bias" class="gt_row gt_right">0.001</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">0.190</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">0.001</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">0.471</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">0.001</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">0.186</td></tr>
+    <tr><td headers="waves" class="gt_row gt_right">7</td>
+<td headers="beta_x_bias" class="gt_row gt_right">0.001</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">0.341</td>
+<td headers="beta_y_bias" class="gt_row gt_right">-0.001</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">-0.176</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">-0.001</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">-0.278</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">0.001</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">0.248</td></tr>
+    <tr><td headers="waves" class="gt_row gt_right">10</td>
+<td headers="beta_x_bias" class="gt_row gt_right">0.003</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">0.666</td>
+<td headers="beta_y_bias" class="gt_row gt_right">-0.001</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">-0.141</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">-0.002</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">-0.850</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">-0.001</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">-0.314</td></tr>
+    <tr><td headers="waves" class="gt_row gt_right">30</td>
+<td headers="beta_x_bias" class="gt_row gt_right">0.001</td>
+<td headers="beta_x_relative_bias" class="gt_row gt_right">0.145</td>
+<td headers="beta_y_bias" class="gt_row gt_right">0.000</td>
+<td headers="beta_y_relative_bias" class="gt_row gt_right">-0.006</td>
+<td headers="omega_xy_bias" class="gt_row gt_right">0.000</td>
+<td headers="omega_xy_relative_bias" class="gt_row gt_right">-0.101</td>
+<td headers="omega_yx_bias" class="gt_row gt_right">0.002</td>
+<td headers="omega_yx_relative_bias" class="gt_row gt_right">0.531</td></tr>
+  </tbody>
+  <tfoot>
+    <tr class="gt_footnotes">
+      <td class="gt_footnote" colspan="9"> Bias = Mean(estimate) - True value, Relative Bias = (Bias / True value) * 100</td>
+    </tr>
+    <tr class="gt_sourcenotes">
+      <td class="gt_sourcenote" colspan="9"><span class='gt_from_md'><em>Note</em>: The results reported here are from 100 simulations, varying the number of waves.</span></td>
+    </tr>
+  </tfoot>
+</table>
+</div>
+</div>
+<div id="change" class="section level2 hasAnchor" number="2.9">
+<h2><span class="header-section-number">2.9</span> Change<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#change" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>Below I attempt to do the same analysis but with the latent change score model with constant effects. In these simulations, I vary the degree of “between-unit” and “within-wave” variation. I didn’t have much luck here….strange results.</p>
+<div class="sourceCode" id="cb36"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb36-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-1" tabindex="-1"></a><span class="fu">library</span>(dplyr)</span>
+<span id="cb36-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-2" tabindex="-1"></a><span class="fu">library</span>(purrr)</span>
+<span id="cb36-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-3" tabindex="-1"></a><span class="fu">library</span>(tidyr)</span>
+<span id="cb36-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-4" tabindex="-1"></a></span>
+<span id="cb36-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-5" tabindex="-1"></a><span class="fu">baseRICLPM_sim</span>(<span class="at">n =</span> <span class="dv">1000</span>,</span>
+<span id="cb36-6"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-6" tabindex="-1"></a>               <span class="at">ar_x =</span> <span class="fl">0.4</span>,</span>
+<span id="cb36-7"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-7" tabindex="-1"></a>               <span class="at">ar_y =</span> <span class="fl">0.7</span>,</span>
+<span id="cb36-8"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-8" tabindex="-1"></a>               <span class="at">cl_xy =</span> <span class="fl">0.3</span>,</span>
+<span id="cb36-9"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-9" tabindex="-1"></a>               <span class="at">cl_yx =</span> <span class="fl">0.2</span>, </span>
+<span id="cb36-10"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-10" tabindex="-1"></a>               <span class="at">waves =</span> <span class="dv">10</span>) <span class="sc">|&gt;</span></span>
+<span id="cb36-11"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-11" tabindex="-1"></a>  <span class="fu">select</span>(<span class="sc">-</span><span class="fu">contains</span>(<span class="st">&quot;trait&quot;</span>)) <span class="ot">-&gt;</span> dat</span>
+<span id="cb36-12"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-12" tabindex="-1"></a></span>
+<span id="cb36-13"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-13" tabindex="-1"></a>fit <span class="ot">=</span> lavaan<span class="sc">::</span><span class="fu">lavaan</span>(<span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">10</span>,</span>
+<span id="cb36-14"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-14" tabindex="-1"></a>                                  <span class="at">variable_type =</span>    <span class="st">&quot;bivariate&quot;</span>), </span>
+<span id="cb36-15"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-15" tabindex="-1"></a>                                 <span class="at">data =</span> dat, </span>
+<span id="cb36-16"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-16" tabindex="-1"></a>                     <span class="at">warn =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb36-17"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-17" tabindex="-1"></a></span>
+<span id="cb36-18"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-18" tabindex="-1"></a></span>
+<span id="cb36-19"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-19" tabindex="-1"></a>true_params <span class="ot">&lt;-</span> <span class="fu">list</span>(<span class="at">beta_x =</span> <span class="sc">-</span><span class="fl">0.6</span> , <span class="at">beta_y =</span> <span class="sc">-</span><span class="fl">0.3</span>, </span>
+<span id="cb36-20"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-20" tabindex="-1"></a>                    <span class="at">omega_x =</span> <span class="fl">0.2</span>, <span class="at">omega_y =</span> <span class="fl">0.3</span>)</span>
+<span id="cb36-21"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-21" tabindex="-1"></a></span>
+<span id="cb36-22"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-22" tabindex="-1"></a>extract_params <span class="ot">&lt;-</span> <span class="cf">function</span>(fit) {</span>
+<span id="cb36-23"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-23" tabindex="-1"></a>  pe <span class="ot">&lt;-</span> lavaan<span class="sc">::</span><span class="fu">parameterEstimates</span>(fit)</span>
+<span id="cb36-24"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-24" tabindex="-1"></a>  <span class="fu">tibble</span>(</span>
+<span id="cb36-25"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-25" tabindex="-1"></a>    <span class="at">beta_x =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span>   <span class="st">&quot;beta_x&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb36-26"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-26" tabindex="-1"></a>    <span class="at">beta_y =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span>   <span class="st">&quot;beta_y&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb36-27"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-27" tabindex="-1"></a>    <span class="at">omega_x =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span> <span class="st">&quot;omega_x&quot;</span>][<span class="dv">1</span>],</span>
+<span id="cb36-28"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-28" tabindex="-1"></a>    <span class="at">omega_y =</span> pe<span class="sc">$</span>est[pe<span class="sc">$</span>label <span class="sc">==</span> <span class="st">&quot;omega_y&quot;</span>][<span class="dv">1</span>]</span>
+<span id="cb36-29"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-29" tabindex="-1"></a>  )</span>
+<span id="cb36-30"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-30" tabindex="-1"></a>}</span>
+<span id="cb36-31"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-31" tabindex="-1"></a></span>
+<span id="cb36-32"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-32" tabindex="-1"></a>results <span class="ot">&lt;-</span> <span class="fu">expand_grid</span>(</span>
+<span id="cb36-33"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-33" tabindex="-1"></a>  <span class="at">waves =</span> <span class="fu">c</span>(<span class="dv">3</span>, <span class="dv">5</span>, <span class="dv">10</span>, <span class="dv">30</span>),</span>
+<span id="cb36-34"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-34" tabindex="-1"></a>  <span class="at">innov_var =</span> <span class="fu">seq</span>(<span class="fl">0.25</span>, <span class="fl">1.25</span>, <span class="at">by =</span> <span class="dv">1</span>),</span>
+<span id="cb36-35"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-35" tabindex="-1"></a>  <span class="at">rep =</span> <span class="dv">1</span><span class="sc">:</span><span class="dv">50</span></span>
+<span id="cb36-36"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-36" tabindex="-1"></a>) <span class="sc">|&gt;</span></span>
+<span id="cb36-37"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-37" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-38"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-38" tabindex="-1"></a>  <span class="at">data =</span> <span class="fu">pmap</span>(<span class="fu">list</span>(<span class="at">waves =</span> waves, <span class="at">innov_var =</span> innov_var), <span class="sc">~</span>{</span>
+<span id="cb36-39"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-39" tabindex="-1"></a>  <span class="fu">baseRICLPM_sim</span>(</span>
+<span id="cb36-40"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-40" tabindex="-1"></a>    <span class="at">n =</span> <span class="dv">2000</span>,</span>
+<span id="cb36-41"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-41" tabindex="-1"></a>    <span class="at">innov_var =</span> ..<span class="dv">2</span>,  <span class="co"># second arg pmap</span></span>
+<span id="cb36-42"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-42" tabindex="-1"></a>    <span class="at">ar_x =</span> <span class="fl">0.4</span>, <span class="at">ar_y =</span> <span class="fl">0.7</span>,</span>
+<span id="cb36-43"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-43" tabindex="-1"></a>    <span class="at">cl_xy =</span> <span class="fl">0.3</span>, <span class="at">cl_yx =</span> <span class="fl">0.2</span>,</span>
+<span id="cb36-44"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-44" tabindex="-1"></a>    <span class="at">waves =</span> ..<span class="dv">1</span> <span class="co"># first arg in pmap</span></span>
+<span id="cb36-45"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-45" tabindex="-1"></a>  )</span>
+<span id="cb36-46"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-46" tabindex="-1"></a>}),</span>
+<span id="cb36-47"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-47" tabindex="-1"></a>    <span class="co"># This iterates over the data, x and waves y</span></span>
+<span id="cb36-48"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-48" tabindex="-1"></a>    <span class="at">fit =</span> <span class="fu">map2</span>(data, waves, <span class="sc">~</span>{</span>
+<span id="cb36-49"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-49" tabindex="-1"></a>      lavaan<span class="sc">::</span><span class="fu">lavaan</span>(<span class="fu">estimateLChange</span>(<span class="at">waves =</span> ..<span class="dv">2</span>,</span>
+<span id="cb36-50"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-50" tabindex="-1"></a>                                     <span class="at">variable_type =</span> <span class="st">&quot;bivariate&quot;</span>,</span>
+<span id="cb36-51"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-51" tabindex="-1"></a>                                     <span class="at">estimate_constant_change =</span> <span class="cn">FALSE</span>), </span>
+<span id="cb36-52"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-52" tabindex="-1"></a>                                 <span class="at">data =</span> ..<span class="dv">1</span>, </span>
+<span id="cb36-53"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-53" tabindex="-1"></a>                     <span class="at">warn =</span> <span class="cn">FALSE</span>, <span class="at">verbose =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb36-54"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-54" tabindex="-1"></a>    }),</span>
+<span id="cb36-55"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-55" tabindex="-1"></a>    <span class="at">params =</span> <span class="fu">map</span>(fit, extract_params)</span>
+<span id="cb36-56"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-56" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb36-57"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-57" tabindex="-1"></a>  <span class="fu">unnest</span>(params)</span>
+<span id="cb36-58"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-58" tabindex="-1"></a></span>
+<span id="cb36-59"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-59" tabindex="-1"></a>results <span class="sc">|&gt;</span></span>
+<span id="cb36-60"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-60" tabindex="-1"></a>  <span class="fu">mutate</span>(</span>
+<span id="cb36-61"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-61" tabindex="-1"></a>    <span class="at">beta_y =</span> beta_y ,</span>
+<span id="cb36-62"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-62" tabindex="-1"></a>    <span class="at">beta_x =</span> beta_x ) <span class="sc">|&gt;</span></span>
+<span id="cb36-63"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-63" tabindex="-1"></a>  <span class="fu">group_by</span>(waves, innov_var) <span class="sc">|&gt;</span></span>
+<span id="cb36-64"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-64" tabindex="-1"></a>  <span class="fu">summarise</span>(</span>
+<span id="cb36-65"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-65" tabindex="-1"></a>    <span class="fu">across</span>(<span class="fu">c</span>(beta_x, beta_y, omega_y, omega_x),</span>
+<span id="cb36-66"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-66" tabindex="-1"></a>           <span class="fu">list</span>(</span>
+<span id="cb36-67"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-67" tabindex="-1"></a>             <span class="at">mean =</span> mean,</span>
+<span id="cb36-68"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-68" tabindex="-1"></a>             <span class="at">bias =</span> <span class="sc">~</span><span class="fu">mean</span>(.) <span class="sc">-</span> true_params[[<span class="fu">cur_column</span>()]],</span>
+<span id="cb36-69"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-69" tabindex="-1"></a>             <span class="at">relative_bias =</span> <span class="sc">~</span> (<span class="fu">mean</span>(.) <span class="sc">-</span> true_params[[<span class="fu">cur_column</span>()]]) <span class="sc">/</span> true_params[[<span class="fu">cur_column</span>()]]<span class="sc">*</span><span class="dv">100</span>,</span>
+<span id="cb36-70"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-70" tabindex="-1"></a>             <span class="at">se =</span> <span class="sc">~</span><span class="fu">sd</span>(.)</span>
+<span id="cb36-71"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-71" tabindex="-1"></a>           ),</span>
+<span id="cb36-72"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb36-72" tabindex="-1"></a>           <span class="at">.names =</span> <span class="st">&quot;{.col}_{.fn}&quot;</span>)) <span class="ot">-&gt;</span> bias_summary</span></code></pre></div>
+<div class="sourceCode" id="cb37"><pre class="sourceCode r"><code class="sourceCode r"><span id="cb37-1"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb37-1" tabindex="-1"></a><span class="fu">library</span>(gt)</span>
+<span id="cb37-2"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb37-2" tabindex="-1"></a>bias_summary <span class="sc">|&gt;</span></span>
+<span id="cb37-3"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb37-3" tabindex="-1"></a>  <span class="fu">select</span>(waves,</span>
+<span id="cb37-4"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb37-4" tabindex="-1"></a>         <span class="fu">contains</span>(<span class="fu">c</span>(<span class="st">&quot;mean&quot;</span>, <span class="st">&quot;waves&quot;</span>, <span class="st">&quot;innov_var&quot;</span>))) <span class="sc">|&gt;</span></span>
+<span id="cb37-5"><a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#cb37-5" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), <span class="sc">~</span><span class="fu">round</span>(., <span class="dv">3</span>))) </span></code></pre></div>
+<pre><code>## # A tibble: 8 × 6
+## # Groups:   waves [4]
+##   waves beta_x_mean beta_y_mean omega_y_mean omega_x_mean innov_var
+##   &lt;dbl&gt;       &lt;dbl&gt;       &lt;dbl&gt;        &lt;dbl&gt;        &lt;dbl&gt;     &lt;dbl&gt;
+## 1     3      -0.035      -0.044        0.057        0.013      0.25
+## 2     3      -0.183      -0.169        0.208        0.068      1.25
+## 3     5      -0.024      -0.049        0.045       -0.001      0.25
+## 4     5      -0.141      -0.184        0.197        0.034      1.25
+## 5    10      -0.009      -0.058        0.033       -0.016      0.25
+## 6    10      -0.096      -0.194        0.186        0.001      1.25
+## 7    30       0.001      -0.059        0.018       -0.025      0.25
+## 8    30      -0.049      -0.181        0.151       -0.026      1.25</code></pre>
+</div>
+<div id="summary" class="section level2 hasAnchor" number="2.10">
+<h2><span class="header-section-number">2.10</span> Summary<a href="examples-of-estimating-cross-lagged-panel-models-in-r.html#summary" class="anchor-section" aria-label="Anchor link to header"></a></h2>
+<p>The change (LCM) and level score (CLPM; RICLPM) analysis are equivalent in the absence of unit effects. This suggests a close relationship between these models. However, when unit effects are present, the models diverge. When the DGP includes unit effects, the same interchangeable relationships disappear.</p>
+
+</div>
+</div>
+<h3>References</h3>
+<div id="refs" class="references csl-bib-body hanging-indent" entry-spacing="0">
+<div id="ref-allison1990" class="csl-entry">
+Allison, Paul D. 1990. <span>“Change Scores as Dependent Variables in Regression Analysis.”</span> <em>Sociological Methodology</em>, 93–114.
+</div>
+<div id="ref-hamaker_critique_2015" class="csl-entry">
+Hamaker, Ellen L., Rebecca M. Kuiper, and Raoul P. P. P. Grasman. 2015. <span>“A Critique of the Cross-Lagged Panel Model.”</span> <em>Psychological Methods</em> 20 (1): 102–16. <a href="https://doi.org/10.1037/a0038889">https://doi.org/10.1037/a0038889</a>.
+</div>
+<div id="ref-hsiao2022" class="csl-entry">
+Hsiao, Cheng. 2022. <em>Analysis of Panel Data</em>. 64. Cambridge university press.
+</div>
+</div>
+            </section>
+
+          </div>
+        </div>
+      </div>
+<a href="the-cross-lagged-panel-model-and-innovations.html" class="navigation navigation-prev " aria-label="Previous page"><i class="fa fa-angle-left"></i></a>
+<a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html" class="navigation navigation-next " aria-label="Next page"><i class="fa fa-angle-right"></i></a>
+    </div>
+  </div>
+<script src="libs/gitbook-2.6.7/js/app.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/clipboard.min.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-search.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-sharing.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-fontsettings.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-bookdown.js"></script>
+<script src="libs/gitbook-2.6.7/js/jquery.highlight.js"></script>
+<script src="libs/gitbook-2.6.7/js/plugin-clipboard.js"></script>
+<script>
+gitbook.require(["gitbook"], function(gitbook) {
+gitbook.start({
+  "sharing": {
+    "github": false,
+    "facebook": true,
+    "twitter": true,
+    "linkedin": false,
+    "weibo": false,
+    "instapaper": false,
+    "vk": false,
+    "whatsapp": false,
+    "all": ["facebook", "twitter", "linkedin", "weibo", "instapaper"]
+  },
+  "fontsettings": {
+    "theme": "white",
+    "family": "sans",
+    "size": 2
+  },
+  "edit": {
+    "link": "https://github.com/USERNAME/REPO/edit/BRANCH/02_CLPM_Estimation.Rmd",
+    "text": "Edit"
+  },
+  "history": {
+    "link": null,
+    "text": null
+  },
+  "view": {
+    "link": null,
+    "text": null
+  },
+  "download": null,
+  "search": {
+    "engine": "fuse",
+    "options": null
+  },
+  "toc": {
+    "collapse": "subsection"
+  }
+});
+});
+</script>
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    var src = "true";
+    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
+    if (location.protocol !== "file:")
+      if (/^https?:/.test(src))
+        src = src.replace(/^https?:/, '');
+    script.src = src;
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+</body>
+
+</html>
