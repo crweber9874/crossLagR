@@ -1,17 +1,17 @@
-# Panel Data Models
+# The Cross-Lagged Panel Model and Innovations
 
 
 Social scientists often turn to panel data to diagnose causal effects when experiments are impractical [@chiu_causal_2025]. Whereas dozens of options exist for analyzing longer time series, researchers wishing to analyze cross-sectionally dominant panel structures -- in which there are more units than time points -- face a more limited set of choices. National surveys like found in the American National Election Studies (ANES) may consist of just a handful of waves, with many respondents interviewed only once or twice.
 
-We consider of the popular methods for analyzing panel data in political science. We start by focusing on a common approach to estimate dynamic processes in panel data (particularly public opinion panel data that are "cross section" dominant, with far more respondents than panel waves: the cross-lagged panel model (CLPM). The CLPM -- introduced by @stanley1963 and extended on by @kenny1975 -- has been widely used to study reciprocal relationships between variables over time. These methods first appeared in the political science literature in the late 1970s [e.g, ;@abramowitz_impact_1978; @campbell_style_1979; @iyengar_testing_1978; @jennings_effect_1977; @markus_political_1979; @markus_dynamic_1979,@meier_issue_1979]. The availability of two large panel surveys with rich political content – Jennings and Niemi’s @jennings_political_1974 socialization study and the ANES 1972-1974-1976 panel – likely promoted the CLPM's adoption, as most of the cross-lagged analyses published in this era analyze these two datasets. Another factor leading to the widespread adoption of the CLPM was the availability of Jöreskog’s LISREL software, which allowed researchers to quickly and easily solve systems of equations using maximum likelihood [@markus_analyzing_1979; @mccullough_effects_1978; @shingles_causal_1976].
+We consider of the popular methods for analyzing panel data in political science. We start by focusing on a common approach to estimate dynamic processes in panel data (particularly public opinion panel data that are "cross section" dominant, with far more respondents than panel waves: the cross-lagged panel model (CLPM). The CLPM -- introduced by @stanley1963 and extended on by @kenny1975 -- has been widely used to study reciprocal relationships between variables over time. These methods first appeared in the political science literature in the late 1970s [@abramowitz_impact_1978; @campbell_style_1979; @iyengar_testing_1978; @jennings_effect_1977; @markus_political_1979; @markus_dynamic_1979,@meier_issue_1979]. The availability of two large panel surveys with rich political content – Jennings and Niemi’s @jennings_political_1974 socialization study and the ANES 1972-1974-1976 panel – likely promoted the CLPM's adoption, as most of the cross-lagged analyses published in this era analyze these two datasets. Another factor leading to the widespread adoption of the CLPM was the availability of Jöreskog’s LISREL software, which allowed researchers to quickly and easily solve systems of equations using maximum likelihood [@markus_analyzing_1979; @mccullough_effects_1978; @shingles_causal_1976].
 
 Much of the CLPM's appeal lies in its intuitive structure, flexibility, and ease of implementation. In the half century after its introduction, the CLPM has also been refined and extended, due to important limitations in its original formulation. For instance, the model can  account for unobserved heterogeneity across individuals -- stable characteristics of individuals that  confound the "dynamic" estimates in the CLPM [@usami2015; @usami2021; @klopack_and_wickrama2020; @kim_and_steiner2021; @ludtke2022; @mcardle2009]. Because the CLPM does not account for stable unit effects, the cross-lagged estimates will tend to be biased (upwards), as they conflate within-person dynamics with between-person differences. Though not directly referenced as a critique of the CLPM, @hsiao2022 shows that including a lagged dependent variable will produce a biased estimate of the lagged effect, because the variable is correlated with the error term. The correlation arises from the failure to account for "between unit" heterogeneity (pp. 64 -67). As a consequence, CLPM estimates may be biased, especially when the variables of interest exhibit high stability over time [@hamaker_critique_2015; @usami2015; @ludtke2022].
 
-This problem is elaborated on in@hsiao2022. Dynamic models -- models that include lagged dependent variables -- often result in correlations between the observed variables and the error terms, leading to biased estimates. @hsiao2022 proposes and **instrumental variable** approach using lagged values of the dependent variable as instruments. When stable unit effects are ignored, the lagged dependent variable becomes correlated with the error term, violating the **exogeneity** assumption. This correlation leads to biased estimates of the lagged effect. 
+This problem is elaborated on in @hsiao2022. Dynamic models -- models that include lagged dependent variables -- often result in correlations between the observed variables and the error terms, leading to biased estimates. @hsiao2022 proposes and instrumental variable approach using lagged values of the dependent variable as instruments. When stable unit effects are ignored, the lagged dependent variable becomes correlated with the error term, violating the exogeneity assumption. This correlation leads to biased estimates of the lagged effect. 
 
-Another popular extension to the CLPM is the random intercept cross-lagged panel model (RI-CLPM) proposed in @hamaker2015, which separates within-person dynamics from between-person "trait" effects [@usami2015; @ludtke2022]. Another approach is the Latent Change Score Model (LSCM), which focuses more directly on estimating different change processes; the LCSM  also accounts for stable unit effects, by accounting for unit averaged change [@usami2015; @mcardle2009; @kim_and_steiner2021]. Another alternative is the latent growth model (LGM), which models individual trajectories over time [@usami2015; @mcardle2003].
+Another popular extension to the CLPM is the random intercept cross-lagged panel model (RI-CLPM) proposed in @hamaker_critique_2015, which separates within-person dynamics from between-person "trait" effects [@usami2015; @ludtke2022]. Another approach is the Latent Change Score Model (LSCM), which focuses more directly on estimating different change processes; the LCSM  also accounts for stable unit effects, by accounting for unit averaged change [@usami2015; @mcardle2009; @kim_and_steiner2021]. Another alternative is the latent growth model (LGM), which models individual trajectories over time [@usami2015; @mcardle2003].
 
-Ultimately,preference for one model over another is strongly tied to data access and availability. While the CLPM and a restrictive version of the LCSM can be estimated with as few as two waves of data, the RI-CLPM, LGM, and LCSM require more panel waves to properly identify the models. Data with three or more waves of data afford more leverage to estimate dynamic relationships. In this project, we elaborate on these models, beginning with the CLPM and change score approach to modeling dynamic relationships. 
+Ultimately,preference for one model over another is strongly tied to data access and availability. While the CLPM and a restrictive version of the LCSM can be estimated with as few as two waves of data, the RI-CLPM, the Latent Growth Model, and Latent Change Score Model require more panel waves to properly identify the models. Data with three or more waves of data afford more leverage to estimate dynamic relationships. In this project, we elaborate on these models, beginning with the CLPM and change score approach to modeling dynamic relationships. 
 
 
 ## The Cross-Lagged Panel Model 
@@ -141,7 +141,7 @@ digraph RICLPM {
 
 clpm_diagram
 ```
-It's useful to write the CLPM in terms of latent variables -- "p" and "q" -- for the simple reason that this formulation can easily be extended to models with measurement error, varying factor structures, and multiple indicators per construct. In a "single indicator" latent variable model, $y = p$ and $x = q$. With multiple indicators, the CLPM can account for measurement error. Each indicator is defined by the latent variable, and an error term (the dashed loops). 
+It's useful to write the CLPM in terms of latent variables -- here denoted by *p* and *q* -- for the simple reason that this formulation can easily be extended to models with measurement error, varying factor structures, and multiple indicators per construct. In a "single indicator" latent variable model, $y = p$ and $x = q$. With multiple indicators, the CLPM can account for measurement error. Each indicator is defined by the latent variable, and an error term (the dashed loops). 
 
 ```{r error-clpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="The Cross-Lagged Panel Model with Multiple Indicators"}
 library(DiagrammeR)
@@ -365,12 +365,14 @@ $$
 
 The change regression and CLPM are interchangeable, and the lagged and cross-lagged effects simply become **proportional** and **cross-proportional** effects on change scores. . 
 
-## Example: CLPM and Change Score Regression
+### A Simple Demonstration: CLPM and Change Score Regression
 
 ```{r, echo = FALSE, message = FALSE, error = FALSE}
 library(dplyr)
-devtools::load_all()
+library(crossLagR)
 ```
+
+**Simulate Data under the CLPM**
 
 ```{r, echo = TRUE, message = FALSE, error = FALSE}
 # Simulate a five wave panel, with two variables, x y:
@@ -389,6 +391,7 @@ simCLPM(waves = 5)$data |>
 
 head(data)
 ```
+**Comparing Level and Change Results**
 
 ```{r, echo = FALSE, message = FALSE, error = FALSE}
 lm(delta_y ~ y_lag + x_lag, data = data) |> summary()
@@ -397,7 +400,7 @@ lm(y ~ y_lag + x_lag, data = data) |> summary()
 
 The cross-lagged parameters are equal, the AR parameters by $1-\beta$. In the latent change score model (an extension of the change score regression), one can explicitly model change as a latent variable, and decompose change into constituent processes, "proportional change," "constant change," and "dual change" [@grimmetal2012].
 
-## Types of Change
+### Types of Change
 
 The univariate change score regression model allows us to decompose change into three components: constant, proportional, and dual change processes [@grimmetal2012]. 
 
@@ -412,7 +415,7 @@ The $\alpha$ parameters are the effects of a stable trait level component, $s_i$
 
 The $\beta$ parameters are the proportional effect of $y$ and $x$ at time $t-1$ on the change score at time $t$. 
 
-The trajectory$y$ and $x$ from time $t=1$ to time $t=k$.
+The trajectory $y$ and $x$ from time $t=1$ to time $t=k$.
 
 $$
   y_{i,k} = y_{i,t=1} + \sum_{t=2}^{k} \Delta y_{ik} \\
@@ -612,7 +615,7 @@ lcm
 
 ## Unit Effects
 
-Some researchers have proposed including unit-level fixed effects in the CLPM to account for stable between-person differences. Following Hsiao (2021), the "fixed effects" model either includes dummy variables for each unit, or equivalently, subtracts the unit average from the dependent variable.
+Some researchers have proposed including unit-level fixed effects in the CLPM to account for stable between-person differences. Following @hsiao2022, the "fixed effects" model either includes dummy variables for each unit, or equivalently, subtracts the unit average from the dependent variable.
 
 Assume the true data generating process is a CLPM with dummy indicator in the error equation, $s_i$:
 

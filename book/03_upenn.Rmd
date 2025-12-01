@@ -11,70 +11,162 @@ These data are downloaded from data verse [@upenn_iscap_2022]. The data include 
   a. "I would rather live under our system of government than any other that I can think of"
   b. "At present I feel very critical of our political system"
   c. "The system does a good job representing the interests of people like me"
-  d. "Feel critical of our political system"
+  d. "Feel critical of our political system" ($\alpha \approx 0.6$, see below for exact estimates)
 
 ## Data
 
-
-```{r}
+```{r setup, include=FALSE}
 #devtools::install_github("crweber9874/crossLagR")
-library(crossLagR)
+library(naniar)
 library(dplyr)
 library(tidyr)
+library(ggplot2)
+library(tidyverse)
+library(crossLagR)
+library(psych)
+library(naniar)
+library(lavaan)
+library(brms)
+library(tidybayes)
+library(gt)
+knitr::opts_chunk$set(echo = FALSE, message = FALSE, warning = FALSE)
+```
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| cache: true
+
 data(upenn)
 head(upenn)
 ```
 ## Legitimacy Scale 
 
+The political legitimacy scale is composed of four items. 
+
 ```{r}
-library(psych)
-alpha(upenn |>
+#| echo: false
+#| message: false
+#| warning: false
+psych::alpha(upenn |>
   select(
     live_our_government_2012,
     critical_of_system_2012,
     system_needs_changes_2012,
     system_represents_interests_2012
   ))
-upenn |>
-  mutate(political_legitimacy = rowMeans(
-    c(
-      live_our_government_2012,
-      critical_of_system_2012,
-      system_needs_changes_2012,
-      system_represents_interests_2012
-  ), na.rm = TRUE
-         ))
+
+psych::alpha(upenn |>
+  select(
+    live_our_government_2016,
+    critical_of_system_2016,
+    system_needs_changes_2016,
+    system_represents_interests_2016
+  ))$alpha
+
+psych::alpha(upenn |>
+  select(
+    live_our_government_2018,
+    critical_of_system_2018,
+    system_needs_changes_2018,
+    system_represents_interests_2018
+  ))$alpha
+
+psych::alpha(upenn |>
+  select(
+    live_our_government_2020,
+    critical_of_system_2020,
+    system_needs_changes_2020,
+    system_represents_interests_2020
+  ))$alpha
+
+upenn = upenn |>
+  mutate(
+    political_legitimacy_2012 = rowMeans(
+      cbind(
+        live_our_government_2012,
+        critical_of_system_2012,
+        system_needs_changes_2012,
+        system_represents_interests_2012
+      ),
+      na.rm = TRUE
+  ) |> zero.one(),
+    political_legitimacy_2016 = rowMeans(
+      cbind(
+        live_our_government_2016,
+        critical_of_system_2016,
+        system_needs_changes_2016,
+        system_represents_interests_2016
+      ),
+      na.rm = TRUE
+    ) |> zero.one(),
+,
+  political_legitimacy_2018 = rowMeans(
+      cbind(
+        live_our_government_2018,
+        critical_of_system_2018,
+        system_needs_changes_2018,
+        system_represents_interests_2018
+      ),
+      na.rm = TRUE
+    ) |> zero.one(),
+    
+    political_legitimacy_2020 = rowMeans(
+      cbind(
+        live_our_government_2020,
+        critical_of_system_2020,
+        system_needs_changes_2020,
+        system_represents_interests_2020
+      ),
+      na.rm = TRUE
+    ) |> zero.one()
+  )
 ```
 
 The data are structured in `wide` format with variables followed with wave numbers (e.g., `_2012`). This isn't ideal for panel analysis. The `dplyr` package includes `pivot_longer()` function to reshape the data from wide to long format.
 
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 cat("The number of rows in the wide format data is:", nrow(upenn), "\n")
 cat("The complete data has ", sum(complete.cases(upenn)), "complete cases.\n")
 cat("There are ", sum(!complete.cases(upenn)), "rows with missing data.\n")
 ```
 
 ```{r}
-
+#| echo: true
+#| message: false
+#| warning: false
 upenn_long <- upenn %>%
   pivot_longer(
     cols = -c(identifier),
     names_to = c(".value", "wave"),
     names_pattern = "(.+)_(\\d+)$"  # Regex to extract _2012, etc part
   ) %>%
-  arrange(identifier, wave)
+  arrange(identifier, wave) |>
+  mutate(
+    party_identification = (party_identification - 1)/6,
+    ideology = (ideology - 1) /6
+  )
+head(upenn_long)
 ```
 
 ```{r}
-library(naniar)
+#| echo: true
+#| message: false
+#| warning: false
 legitimacy_data = upenn_long |>
-  select(identifier, wave,
+  dplyr::select(identifier, wave,
+         political_legitimacy,
          live_our_government,
          critical_of_system,
          system_needs_changes,
          system_represents_interests)
 
-miss_var_summary(legitimacy_data)
+miss_var_summary(legitimacy_data |> select(-c(identifier, wave)))
 ```
 
 Below I display the missing data patterns across all variables and respondents in the dataset. Dark cells indicate missing values.
@@ -83,26 +175,1125 @@ Below I display the missing data patterns across all variables and respondents i
 ## Missing Data by Wave
 
 ```{r}
+#| echo: true
+#| message: false
+#| warning: false
 legitimacy_data %>%
   group_by(wave) %>%
   miss_var_summary()
 ```
 
-## Missingness Pattern
 
-```{r fig.height=6, fig.width=8}
-gg_miss_var(legitimacy_data |> select(-c(identifier)), facet = wave)
-```
+## Autocorrelation
+
+Ignoring time dependence, and just fitting an OLS regression:
+
 ```{r}
-upenn_long %>%
-  group_by(identifier) %>%
-  summarise(
-    n_missing = sum(is.na(system_represents_interests) + 
-                      is.na(system_needs_changes) +
-                      is.na(critical_of_system) +
-                      is.na(live_our_government)),
-    .groups = 'drop'
-  ) %>%
-  group_by(n_missing) %>%
-  count(name = "n_respondents")
+#| echo: true
+#| message: false
+#| warning: false
+lm(political_legitimacy ~ female + college + party_identification, 
+                   data = upenn_long) |>
+summary() 
 ```
+
+## Unit Fixed Effects 
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+### Fixed Effect
+upenn_long |>
+  group_by(identifier) |>
+  mutate(
+    # Demean dependent variable
+    within_legitimacy = political_legitimacy - mean(political_legitimacy, na.rm = TRUE),
+    # Demean independent variables too!
+    within_female = female - mean(female, na.rm = TRUE),
+    within_college = college - mean(college, na.rm = TRUE),
+    within_party = party_identification - mean(party_identification, na.rm = TRUE)
+  ) |>
+  ungroup() -> data_panel
+
+options(scipen = 999)  # Avoid scientific notation
+
+lm(within_legitimacy ~ within_female + within_college + within_party, 
+                   data = data_panel) |>
+summary()
+```
+
+Compare this to the one-way fixed effect model in the `plm` package.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+library(plm)
+one_way <- plm(political_legitimacy ~ female + college + party_identification, 
+                   data  = data_panel, 
+                   model  = "within", 
+                   effect = "individual")
+
+summary(one_way)
+```
+
+
+## Fitting the Two Way Fixed Effects
+
+We could also demean the variable by wave to account for time fixed effects. Here is the `plm` output.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+library(plm)
+library(brms)
+library(tidybayes)
+
+data_panel <- pdata.frame(upenn_long, index = c("identifier", "wave"))
+# Two-way fixed effects (within estimator)
+model_twfe <- plm(political_legitimacy ~ female + college + party_identification, 
+                   data = data_panel, 
+                   model = "within", 
+                   effect = "twoways")
+
+summary(model_twfe)
+```
+
+
+Partisanship is stable, but it should color responses in election year. If we extend the two way fixed effect model to include interactions between `wave` and `party_identification`, we can capture some of this time varying effect.
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+
+one_way <- plm(political_legitimacy ~ female + college + party_identification:as.factor(wave) + as.factor(wave), 
+                   data = data_panel, 
+                   model = "within", 
+                   effect = "individual")
+
+summary(one_way)
+```
+
+## Fitting the Random Intercept Model
+
+Let's fit a variety of random effects models, using `brms`. 
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+# model -> design -> predictions -> summarize
+random_model <- brm(
+  political_legitimacy ~ female + college + party_identification:as.factor(wave) + as.factor(wave) + (1 | identifier),
+  data = data_panel,
+  family = gaussian(),
+  chains = 4,
+  iter = 2000,
+  warmup = 1000,
+  cores = 10
+)
+
+# design
+pred_grid <- expand_grid(
+  female = mean(data_panel$female, na.rm = TRUE),  
+  college = mean(data_panel$college, na.rm = TRUE),
+  party_identification = seq(0, 1, by = 0.1),  
+  wave = unique(data_panel$wave)
+)
+
+# Generate the posterior predictions
+pred_draws <- pred_grid |>
+  add_epred_draws(random_model, re_formula = NA) |>  
+  mutate(wave = as.factor(wave))
+
+# Summarize posterior
+pred_summary <- pred_draws |>
+  group_by(party_identification, wave) |>
+  summarise(
+    .prediction = mean(.epred),
+    .lower = quantile(.epred, 0.025),
+    .upper = quantile(.epred, 0.975),
+    .draw_count = n()
+  )
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+ggplot(pred_summary, aes(x = party_identification, y = .prediction)) +
+  geom_ribbon(aes(ymin = .lower, ymax = .upper), fill = "grey", alpha = 0.3) +
+  geom_line(color = "grey", linewidth = 0.7) +
+  facet_wrap(~wave, nrow = 2) +
+  theme_minimal() +
+  labs(
+    x = "Party Identification [0(Strong Democrat) to 1(Strong Republican)]",
+    y = "Predicted Political Legitimacy [1-5]",
+    title = "Posterior Predictions: Political Legitimacy by Party ID"
+  ) +
+  theme(plot.title = element_text(face = "bold", size = 14))
+```
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+lm(political_legitimacy ~ female + college + party_identification, 
+                   data  = data_panel |> filter(wave == 2012)) |> 
+summary()
+lm(political_legitimacy ~ female + college + party_identification, 
+                   data  = data_panel |> filter(wave == 2016)) |> 
+summary()
+lm(political_legitimacy ~ female + college + party_identification, 
+                   data  = data_panel |> filter(wave == 2018)) |> 
+summary()
+lm(political_legitimacy ~ female + college + party_identification, 
+                   data  = data_panel |> filter(wave == 2020)) |> 
+summary()
+```
+An alternative way to do this is to specify a random intercept for both wave and identifier, with random coefficients for partisanship and wave. The way it is currently specified is the wave variable is fixed, all observations pull around a common value. This now captures heterogeneity in the alignment of partisanship and legitimacy over time. 
+
+
+$$\begin{eqnarray}
+y_{it}=b_{0,i}+b_{1,i} x_{it}+ \sum_{t=2012}^{2020}\omega_{1,t} d_{t} + \sum_{t=2012}^{2020}\omega_{2,t} d_{t} x_{it} + e_{it}\\
+b_{0,i} \sim N(b_0, \sigma_0^2)\\
+b_{1,i} \sim N(b_1, \sigma_1^2) \\
+\omega_{1,t} \sim N (\omega_1, \sigma_{\omega_1}^2) \\
+\omega_{2,t} \sim N (\omega_2, \sigma_{\omega_2}^2) \\
+\end{eqnarray}$$
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(brms)
+library(tidybayes)
+
+# model -> design -> predictions -> summarize
+random_model <- brm(
+  political_legitimacy ~ female + college + party_identification:as.factor(wave) + (1 + party_identification | identifier),
+  data = data_panel,
+  family = gaussian(),
+  chains = 3,
+  iter = 3000,
+  cores = 10
+)
+
+# design
+pred_grid <- expand_grid(
+  female = mean(data_panel$female, na.rm = TRUE),  
+  college = mean(data_panel$college, na.rm = TRUE),
+  party_identification = seq(0, 1, by = 0.1),  
+  wave = unique(data_panel$wave)
+)
+
+# Generate the posterior predictions
+pred_draws <- pred_grid |>
+  add_epred_draws(random_model, re_formula = NA) |>  
+  mutate(wave = as.factor(wave))
+
+# Summarize posterior
+pred_summary <- pred_draws |>
+  group_by(party_identification, wave) |>
+  summarise(
+    .prediction = mean(.epred),
+    .lower = quantile(.epred, 0.025),
+    .upper = quantile(.epred, 0.975),
+    .draw_count = n()
+  )
+```
+
+When the Democratic candidate wins, Democrats are more likely to view the political system as legitimate, and when the Republican candidate wins, Republicans are more likely to view the political system as legitimate.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+ggplot(pred_summary, aes(x = party_identification, y = .prediction)) +
+  geom_ribbon(aes(ymin = .lower, ymax = .upper), fill = "grey", alpha = 0.3) +
+  geom_line(color = "grey", linewidth = 1) +
+  facet_wrap(~wave, nrow = 2) +
+  theme_minimal() +
+  labs(
+    x = "Party Identification [0(Strong Democrat) to 1(Strong Republican)]",
+    y = "Predicted Political Legitimacy [1-5]",
+    title = "Posterior Predictions: Political Legitimacy by Party ID"
+  ) +
+  theme(plot.title = element_text(face = "bold", size = 14))
+```
+
+### Expertise, Partisanship, and Political Legitimacy 
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(brms)
+library(tidybayes)
+
+# model -> design -> predictions -> summarize
+random_model <- brm(
+  political_legitimacy ~ female +  party_identification*as.factor(wave)*college + (1 | identifier),
+  data = data_panel,
+  family = gaussian(),
+  chains = 3,
+  iter = 3000,
+  cores = 10
+)
+
+# design
+pred_grid <- expand_grid(
+  female = mean(data_panel$female, na.rm = TRUE),  
+  college = c(0,1),
+  party_identification = seq(0, 1, by = 0.1),  
+  wave = unique(data_panel$wave)
+)
+
+# Generate the posterior predictions
+pred_draws <- pred_grid |>
+  add_epred_draws(random_model, re_formula = NA) |>  
+  mutate(wave = as.factor(wave))
+
+# Summarize posterior
+pred_summary <- pred_draws |>
+  group_by(party_identification, wave, college) |>
+  summarise(
+    .prediction = mean(.epred),
+    .lower = quantile(.epred, 0.025),
+    .upper = quantile(.epred, 0.975),
+    .draw_count = n()
+  )
+```
+
+```{r}
+pred_summary <- pred_summary |>
+  mutate(
+    wave = factor(
+      wave,
+      levels = c("2012", "2016", "2018", "2020"),
+      labels = c("2012", "2016", "2018", "2020")
+    ),
+    college = factor(
+      college,
+      levels = c(0, 1),
+      labels = c("No College Degree", "College Degree")
+    )
+  )
+ggplot(pred_summary, aes(x = party_identification, y = .prediction)) +
+  geom_ribbon(aes(ymin = .lower, ymax = .upper), fill = "grey", alpha = 0.3) +
+  geom_line(color = "grey", linewidth = 1) +
+  facet_wrap(~wave + college, nrow = 2) +
+  theme_minimal() +
+  labs(
+    x = "Party Identification [0(Strong Democrat) to 1(Strong Republican)]",
+    y = "Predicted Political Legitimacy [1-5]",
+    title = "Posterior Predictions: Political Legitimacy by Party ID"
+  ) +
+  theme(plot.title = element_text(face = "bold", size = 14))
+```
+# The Cross Lagged Panel Regression
+
+```{r clpm-diagram, fig.cap="The Cross-Lagged Panel Model"}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(DiagrammeR)
+# RI-CLPM with proper residuals as curved self-loops and correlated errors - 5 WAVE
+clpm_diagram <- grViz("
+digraph RICLPM {
+
+  graph [layout = neato, rankdir = TB, bgcolor = white]
+
+  node [shape = box, style = filled, fillcolor = white, fontsize = 11]
+
+  X1 [pos = '-2,2!', label = 'x1', width = 0.6, height = 0.3]
+  X2 [pos = '-1,2!', label = 'x2', width = 0.6, height = 0.3]
+  X3 [pos = '0,2!', label = 'x3', width = 0.6, height = 0.3]
+  X4 [pos = '1,2!', label = 'x4', width = 0.6, height = 0.3]
+  X5 [pos = '2,2!', label = 'x5', width = 0.6, height = 0.3]
+
+  # Within Person X
+  wX1 [pos = '-2,1!', shape = circle, fillcolor = white, label = 'q1']
+  wX2 [pos = '-1,1!', shape = circle, fillcolor = white, label = 'q2']
+  wX3 [pos = '0,1!', shape = circle, fillcolor = white, label = 'q3']
+  wX4 [pos = '1,1!', shape = circle, fillcolor = white, label = 'q4']
+  wX5 [pos = '2,1!', shape = circle, fillcolor = white, label = 'q5']
+
+  #  Within-person  Y
+  wY1 [pos = '-2,-1!', shape = circle, fillcolor = white, label = 'p1']
+  wY2 [pos = '-1,-1!', shape = circle, fillcolor = white, label = 'p2']
+  wY3 [pos = '0,-1!', shape = circle, fillcolor = white, label = 'p3']
+  wY4 [pos = '1,-1!', shape = circle, fillcolor = white, label = 'p4']
+  wY5 [pos = '2,-1!', shape = circle, fillcolor = white, label = 'p5']
+
+  # observed Y variables and RI_Y
+  Y1 [pos = '-2,-2!', label = 'y1', width = 0.6, height = 0.3]
+  Y2 [pos = '-1,-2!', label = 'y2', width = 0.6, height = 0.3]
+  Y3 [pos = '0,-2!', label = 'y3', width = 0.6, height = 0.3]
+  Y4 [pos = '1,-2!', label = 'y4', width = 0.6, height = 0.3]
+  Y5 [pos = '2,-2!', label = 'y5', width = 0.6, height = 0.3]
+
+  # Measurement model paths
+  wX1 -> X1 [label = '1', arrowsize = 0.5]
+  wX2 -> X2 [label = '1', arrowsize = 0.5]
+  wX3 -> X3 [label = '1', arrowsize = 0.5]
+  wX4 -> X4 [label = '1', arrowsize = 0.5]
+  wX5 -> X5 [label = '1', arrowsize = 0.5]
+  wY1 -> Y1 [label = '1', arrowsize = 0.5]
+  wY2 -> Y2 [label = '1', arrowsize = 0.5]
+  wY3 -> Y3 [label = '1', arrowsize = 0.5]
+  wY4 -> Y4 [label = '1', arrowsize = 0.5]
+  wY5 -> Y5 [label = '1', arrowsize = 0.5]
+
+  # Autoregressive paths
+  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]
+
+  # Cross-lagged paths with offset gamma labels and subscripts
+  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]
+
+  # Within-time correlations
+  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+
+
+
+  # Self-loops to repreesnt errors
+  wX2 -> wX2 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s , arrowsize = 0.5]
+  wX3 -> wX3 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX4 -> wX4 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX5 -> wX5 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wY2 -> wY2 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY3 -> wY3 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY4 -> wY4 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY5 -> wY5 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+
+
+  X1 -> X1 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X2 -> X2 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X3 -> X3 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X4 -> X4 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X5 -> X5 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+
+  Y1 -> Y1 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y2 -> Y2 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y3 -> Y3 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y4 -> Y4 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y5 -> Y5 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+
+
+}
+")
+# bookdown::render_book(quiet = FALSE, clean = TRUE)
+# browseURL("_book/introduction.html")
+
+clpm_diagram
+```
+
+In the CLPM framework, some interesting patterns emerge. It would seem that there is a high degree of autocorrelation for both legitimacy and partisanship. There are also consistent cross lagged effects. Republicans are consistently more likely to view the political system as legitimate. And those who view the political system as legitimate are more likely to identify as Republicans in the next wave.
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+library(lavaan)
+data.frame(y1 = zero.one(upenn_long$political_legitimacy[upenn_long$wave == 2012]),
+           y2 = zero.one(upenn_long$political_legitimacy[upenn_long$wave == 2016]),
+           y3 = zero.one(upenn_long$political_legitimacy[upenn_long$wave == 2018]),
+           y4 = zero.one(upenn_long$political_legitimacy[upenn_long$wave == 2020]),
+           x1 = upenn_long$party_identification[upenn_long$wave == 2012],
+           x2 = upenn_long$party_identification[upenn_long$wave == 2016],
+           x3 = upenn_long$party_identification[upenn_long$wave == 2018],
+           x4 = upenn_long$party_identification[upenn_long$wave == 2020]) -> clpm_data
+
+fit = lavaan(estimateCLPM(waves = 4, constrain_beta = FALSE, constrain_omega = FALSE), data = clpm_data)
+
+# Extract just regression coefficients
+parameterEstimates(fit) |>
+  filter(op == "~") |>
+  select(lhs, op, rhs, est, se, pvalue) |>
+  rename(
+    Outcome = lhs,
+    Predictor = rhs,
+    Estimate = est,
+    SE = se,
+    P_value = pvalue
+  ) |>
+  mutate(
+    Outcome = ifelse(Outcome == "p2", "Legitimacy (2016)",
+                     ifelse(Outcome == "p3", "Legitimacy (2018)",
+                            ifelse(Outcome == "p4", "Legitimacy (2020)",
+                                   ifelse(Outcome == "q2", "Partisanship (2016)",
+                                          ifelse(Outcome == "q3", "Partisanship (2018)",
+                                                 ifelse(Outcome == "q4", "Partisanship (2020)", Outcome)))))),
+    Predictor = ifelse(Predictor == "p1", "Legitimacy (2012)",
+                       ifelse(Predictor == "p2", "Legitimacy (2016)",
+                              ifelse(Predictor == "p3", "Legitimacy (2018)",
+                                     ifelse(Predictor == "q1", "Partisanship (2012)",
+                                            ifelse(Predictor == "q2", "Partisanship (2016)",
+                                                   ifelse(Predictor == "q3", "Partisanship (2018)", Predictor))))))
+  ) |>
+  select(-op) |>
+  gt() |>
+  tab_header(
+    title = "CLPM Estimates: Political Legitimacy and Party Identification"
+  ) |>
+  fmt_number(
+    columns = c(Estimate, SE, P_value),
+    decimals = 3
+  ) 
+
+```
+
+The problem is that both legitimacy and partisanship are highly stable constructs. The RI-CLPM accounts for this by separating stable between-person differences from within-person fluctuations. The RI-CLPM looks like this. 
+
+
+
+```{r riclpm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="Random Intercept Cross-Lagged Panel Model with 5 waves. The model shows autoregressive paths (solid arrows), cross-lagged effects (solid arrows), within-time correlations (dashed curved arrows), and residual terms (self-loops)."}
+
+library(DiagrammeR)
+# RI-CLPM with proper residuals as curved self-loops and correlated errors - 5 WAVE
+riclpm_diagram <- grViz("
+digraph RICLPM {
+
+  graph [layout = neato, rankdir = TB, bgcolor = white]
+
+  node [shape = box, style = filled, fillcolor = white, fontsize = 11]
+
+  RI_X [pos = '-3,2!', shape = circle, fillcolor = white, label = <ξ<sub>x</sub>>,  width = 0.5, height = 0.5]
+  X1 [pos = '-2,2!', label = 'x1', width = 0.6, height = 0.3]
+  X2 [pos = '-1,2!', label = 'x2', width = 0.6, height = 0.3]
+  X3 [pos = '0,2!', label = 'x3', width = 0.6, height = 0.3]
+  X4 [pos = '1,2!', label = 'x4', width = 0.6, height = 0.3]
+  X5 [pos = '2,2!', label = 'x5', width = 0.6, height = 0.3]
+
+  # Within Person X
+  wX1 [pos = '-2,1!', shape = circle, fillcolor = white, label = 'q1']
+  wX2 [pos = '-1,1!', shape = circle, fillcolor = white, label = 'q2']
+  wX3 [pos = '0,1!', shape = circle, fillcolor = white, label = 'q3']
+  wX4 [pos = '1,1!', shape = circle, fillcolor = white, label = 'q4']
+  wX5 [pos = '2,1!', shape = circle, fillcolor = white, label = 'q5']
+
+  #  Within-person  Y
+  wY1 [pos = '-2,-1!', shape = circle, fillcolor = white, label = 'p1']
+  wY2 [pos = '-1,-1!', shape = circle, fillcolor = white, label = 'p2']
+  wY3 [pos = '0,-1!', shape = circle, fillcolor = white, label = 'p3']
+  wY4 [pos = '1,-1!', shape = circle, fillcolor = white, label = 'p4']
+  wY5 [pos = '2,-1!', shape = circle, fillcolor = white, label = 'p5']
+
+  # observed Y variables and RI_Y
+  Y1 [pos = '-2,-2!', label = 'y1', width = 0.6, height = 0.3]
+  Y2 [pos = '-1,-2!', label = 'y2', width = 0.6, height = 0.3]
+  Y3 [pos = '0,-2!', label = 'y3', width = 0.6, height = 0.3]
+  Y4 [pos = '1,-2!', label = 'y4', width = 0.6, height = 0.3]
+  Y5 [pos = '2,-2!', label = 'y5', width = 0.6, height = 0.3]
+  RI_Y [pos = '-3,-2!', shape = circle, fillcolor = white, label = <ξ<sub>y</sub>>, width = 0.5, height = 0.5]
+
+
+  # Measurement model 
+  RI_X -> wX1 [label = '', arrowsize = 0.5]
+  RI_X -> wX2 [label = '', arrowsize = 0.5]
+  RI_X -> wX3 [label = '',  arrowsize = 0.5]
+  RI_X -> wX4 [label = '', arrowsize = 0.5]
+  RI_X -> wX5 [label = '', arrowsize = 0.5]
+  RI_Y -> wY1 [label = '', arrowsize = 0.5]
+  RI_Y -> wY2 [label = '', arrowsize = 0.5]
+  RI_Y -> wY3 [label = '', arrowsize = 0.5]
+  RI_Y -> wY4 [label = '', arrowsize = 0.5]
+  RI_Y -> wY5 [label = '', arrowsize = 0.5]
+
+  # Measurement model paths
+  wX1 -> X1 [label = '1', arrowsize = 0.5]
+  wX2 -> X2 [label = '1', arrowsize = 0.5]
+  wX3 -> X3 [label = '1', arrowsize = 0.5]
+  wX4 -> X4 [label = '1', arrowsize = 0.5]
+  wX5 -> X5 [label = '1', arrowsize = 0.5]
+  wY1 -> Y1 [label = '1', arrowsize = 0.5]
+  wY2 -> Y2 [label = '1', arrowsize = 0.5]
+  wY3 -> Y3 [label = '1', arrowsize = 0.5]
+  wY4 -> Y4 [label = '1', arrowsize = 0.5]
+  wY5 -> Y5 [label = '1', arrowsize = 0.5]
+
+  # Autoregressive paths
+  wX1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]
+
+  # Cross-lagged paths with offset gamma labels and subscripts
+  wX1 -> wY2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX2 -> wY3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX3 -> wY4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wX4 -> wY5 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY1 -> wX2 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY2 -> wX3 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY3 -> wX4 [color = black, penwidth = 2, arrowsize = 0.5]
+  wY4 -> wX5 [color = black, penwidth = 2, arrowsize = 0.5]
+
+  # Within-time correlations
+  wX1 -> wY1 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX2 -> wY2 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX3 -> wY3 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX4 -> wY4 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX5 -> wY5 [dir = both, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+
+  # Random intercept correlation 
+  RI_X -> RI_Y [dir = both, color = black, style = dashed, penwidth = 1, splines = curved, constraint = false,  arrowsize = 0.5]
+
+
+  # Self-loops to repreesnt errors
+  wX2 -> wX2 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s , arrowsize = 0.5]
+  wX3 -> wX3 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX4 -> wX4 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wX5 -> wX5 [dir = both, color = black, style = dashed, label = '', tailport = sw, headport = s, arrowsize = 0.5]
+  wY2 -> wY2 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY3 -> wY3 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY4 -> wY4 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+  wY5 -> wY5 [dir = both, color = black, style = dashed, label = '', tailport = nw, headport = n, arrowsize = 0.5]
+
+
+  X1 -> X1 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X2 -> X2 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X3 -> X3 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X4 -> X4 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X5 -> X5 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+
+  Y1 -> Y1 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y2 -> Y2 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y3 -> Y3 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y4 -> Y4 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y5 -> Y5 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+
+
+  # Residuals for random effects
+  RI_X -> RI_X [dir = both, color = black, style = dashed, label = 'ε', labelangle = 135, labeldistance = 1.5, tailport = w, headport = s, arrowsize = 0.5, width = 0.6, height = 0.3]
+  RI_Y -> RI_Y [dir = both, color = black, style = dashed, label = 'ε', labelangle = 135, labeldistance = 1.5, tailport = w, headport = n, arrowsize = 0.5, width = 0.6, height = 0.3]
+
+}
+")
+# bookdown::render_book(quiet = FALSE, clean = TRUE)
+# browseURL("_book/introduction.html")
+
+# Display the diagram
+riclpm_diagram
+```
+
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+fit = lavaan(estimateRICLPM(waves = 4, constrain_beta = FALSE, constrain_omega = FALSE, estimate_means = TRUE), data = clpm_data)
+
+parameterEstimates(fit) |>
+  filter(op == "~") |>
+  select(lhs, op, rhs, est, se, pvalue) |>
+  rename(
+    Outcome = lhs,
+    Predictor = rhs,
+    Estimate = est,
+    SE = se,
+    P_value = pvalue
+  ) |>
+  mutate(
+    Outcome = ifelse(Outcome == "p2", "Legitimacy (2016)",
+                     ifelse(Outcome == "p3", "Legitimacy (2018)",
+                            ifelse(Outcome == "p4", "Legitimacy (2020)",
+                                   ifelse(Outcome == "q2", "Partisanship (2016)",
+                                          ifelse(Outcome == "q3", "Partisanship (2018)",
+                                                 ifelse(Outcome == "q4", "Partisanship (2020)", Outcome)))))),
+    Predictor = ifelse(Predictor == "p1", "Legitimacy (2012)",
+                       ifelse(Predictor == "p2", "Legitimacy (2016)",
+                              ifelse(Predictor == "p3", "Legitimacy (2018)",
+                                     ifelse(Predictor == "q1", "Partisanship (2012)",
+                                            ifelse(Predictor == "q2", "Partisanship (2016)",
+                                                   ifelse(Predictor == "q3", "Partisanship (2018)", Predictor)))))),
+    Effect_Type = ifelse(
+      grepl("Legitimacy", Outcome) & grepl("Legitimacy", Predictor), "Autoregressive (Legitimacy)",
+      ifelse(grepl("Partisanship", Outcome) & grepl("Partisanship", Predictor), "Autoregressive (Partisanship)",
+             "Cross-Lagged")
+    ),
+    Sig = case_when(
+      P_value < 0.001 ~ "***",
+      P_value < 0.01 ~ "**",
+      P_value < 0.05 ~ "*",
+      P_value < 0.10 ~ "†",
+      TRUE ~ ""
+    )
+  ) |>
+  arrange(Effect_Type, Outcome) |>
+  select(Effect_Type, Outcome, Predictor, Estimate, SE, P_value, Sig) |>
+  gt(groupname_col = "Effect_Type") |>
+  tab_header(
+    title = "RI-CLPM Estimates: Political Legitimacy and Party Identification",
+    subtitle = "Autoregressive and Cross-Lagged Effects"
+  ) |>
+  fmt_number(
+    columns = c(Estimate, SE, P_value),
+    decimals = 3
+  ) |>
+  tab_options(
+    row_group.background.color = "#f0f0f0"
+  )
+```
+
+The model teases apart a constant relationship between x and y by allowing for a dynamic formulation -- for instance, we might ask, "if perceptions of legitimacy increase over time, does this lead to a subsequent shift to the political left or political right"? Changes can be modeled in a latent change model. 
+
+
+```{r lgm-diagram, echo=FALSE, message=FALSE, warning=FALSE, cache=FALSE, fig.cap="Latent Growth Model, Linear Trend. "}
+
+library(DiagrammeR)
+lgm_diagram <- grViz("
+digraph RICLPM {
+
+  graph [layout = neato, rankdir = TB, bgcolor = white]
+
+  node [shape = box, style = filled, fillcolor = white, fontsize = 11]
+
+  X1 [pos = '-2,2!', label = 'x1', width = 0.6, height = 0.3]
+  X2 [pos = '-1,2!', label = 'x2', width = 0.6, height = 0.3]
+  X3 [pos = '0,2!', label = 'x3', width = 0.6, height = 0.3]
+  X4 [pos = '1,2!', label = 'x4', width = 0.6, height = 0.3]
+  X5 [pos = '2,2!', label = 'x5', width = 0.6, height = 0.3]
+
+  # Within Person X
+  wX1 [pos = '-2,1!', shape = circle, fillcolor = white, label = 'q1']
+  wX2 [pos = '-1,1!', shape = circle, fillcolor = white, label = 'q2']
+  wX3 [pos = '0,1!', shape = circle, fillcolor = white, label = 'q3']
+  wX4 [pos = '1,1!', shape = circle, fillcolor = white, label = 'q4']
+  wX5 [pos = '2,1!', shape = circle, fillcolor = white, label = 'q5']
+
+  #  Within-person  Y
+  wY1 [pos = '-2,-1!', shape = circle, fillcolor = white, label = 'p1']
+  wY2 [pos = '-1,-1!', shape = circle, fillcolor = white, label = 'p2']
+  wY3 [pos = '0,-1!', shape = circle, fillcolor = white, label = 'p3']
+  wY4 [pos = '1,-1!', shape = circle, fillcolor = white, label = 'p4']
+  wY5 [pos = '2,-1!', shape = circle, fillcolor = white, label = 'p5']
+
+  # observed Y variables and RI_Y
+  Y1 [pos = '-2,-2!', label = 'y1', width = 0.6, height = 0.3]
+  Y2 [pos = '-1,-2!', label = 'y2', width = 0.6, height = 0.3]
+  Y3 [pos = '0,-2!', label = 'y3', width = 0.6, height = 0.3]
+  Y4 [pos = '1,-2!', label = 'y4', width = 0.6, height = 0.3]
+  Y5 [pos = '2,-2!', label = 'y5', width = 0.6, height = 0.3]
+  I_Y [pos = '-3.2, -1.8!', shape = circle, fillcolor = white, label = <I<sub>y</sub>>, width = 0.5, height = 0.5]
+  S_Y [pos = '-3, -0.4!', shape = circle, fillcolor = white, label = <S<sub>y</sub>>, width = 0.5, height = 0.5]
+  I_X [pos = '-3.2, 1.8!', shape = circle, fillcolor = white, label = <I<sub>x</sub>>, width = 0.5, height = 0.5]
+  S_X [pos = '-3.75, 0.4!', shape = circle, fillcolor = white, label = <S<sub>x</sub>>, width = 0.5, height = 0.5]
+
+  intercepts [pos = '-5, 0!', shape = triangle, fillcolor = white, label = <I>, width = 0.5, height = 0.5]
+
+  # Measurement model 
+  I_X -> wX1 [label = '1', arrowsize = 0.5]
+  I_X -> wX2 [label = '1', arrowsize = 0.5]
+  I_X -> wX3 [label = '1',  arrowsize = 0.5]
+  I_X -> wX4 [label = '1', arrowsize = 0.5]
+  I_X -> wX5 [label = '1', arrowsize = 0.5]
+  S_X -> wX1 [label = '', arrowsize = 0.5]
+  S_X -> wX2 [label = '', arrowsize = 0.5]
+  S_X -> wX3 [label = '',  arrowsize = 0.5]
+  S_X -> wX4 [label = '', arrowsize = 0.5]
+  S_X -> wX5 [label = '', arrowsize = 0.5]
+  
+  I_Y -> wY1 [label = '1', arrowsize = 0.5]
+  I_Y -> wY2 [label = '1', arrowsize = 0.5]
+  I_Y -> wY3 [label = '1',  arrowsize = 0.5]
+  I_Y -> wY4 [label = '1', arrowsize = 0.5]
+  I_Y -> wY5 [label = '1', arrowsize = 0.5]
+  S_Y -> wY1 [label = '', arrowsize = 0.5]
+  S_Y -> wY2 [label = '', arrowsize = 0.5]
+  S_Y -> wY3 [label = '',  arrowsize = 0.5]
+  S_Y -> wY4 [label = '', arrowsize = 0.5]
+  S_Y -> wY5 [label = '', arrowsize = 0.5]
+  
+  # Measurement model paths
+  wX1 -> X1 [label = '1', arrowsize = 0.5]
+  wX2 -> X2 [label = '1', arrowsize = 0.5]
+  wX3 -> X3 [label = '1', arrowsize = 0.5]
+  wX4 -> X4 [label = '1', arrowsize = 0.5]
+  wX5 -> X5 [label = '1', arrowsize = 0.5]
+  wY1 -> Y1 [label = '1', arrowsize = 0.5]
+  wY2 -> Y2 [label = '1', arrowsize = 0.5]
+  wY3 -> Y3 [label = '1', arrowsize = 0.5]
+  wY4 -> Y4 [label = '1', arrowsize = 0.5]
+  wY5 -> Y5 [label = '1', arrowsize = 0.5]
+
+  intercepts -> S_Y [label = '1', arrowsize = 0.5,   headport = w, tailport = e]
+  intercepts -> S_X [label = '1', arrowsize = 0.5,   headport = w, tailport = e]
+  intercepts -> I_Y [label = '1', arrowsize = 0.5,   headport = w, tailport = e]
+  intercepts -> I_X [label = '1', arrowsize = 0.5,   headport = w, tailport = e]
+  
+  # Within-time correlations
+   wX1 -> wY1 [dir = both, penwidth = 1.5, color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5]
+  wX2 -> wY2 [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX3 -> wY3 [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX4 -> wY4 [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+  wX5 -> wY5 [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5 ]
+
+
+S_X -> S_X [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5, tailport = w, headport = w]
+
+I_X -> I_X [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5, tailport = w, headport = w]
+
+S_Y -> S_Y [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5, tailport = w, headport = w]
+
+I_Y -> I_Y [dir = both, penwidth = 1.5,color = black, style = dashed, splines = curved, constraint = false, arrowsize = 0.5, tailport = w, headport = w]
+
+I_X -> S_X [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1]
+
+I_X -> S_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1, tailport = e, headport = e]
+
+S_X -> S_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1, tailport = e, headport = w]
+
+S_X -> I_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1]
+
+I_Y -> S_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1]
+
+I_X -> I_Y [dir = both, penwidth = 1, color = black, style = dashed, constraint = false, 
+arrowsize = 0.3, weight = 0.1,  tailport = w, headport = n]
+
+  # Self-loops to repreesnt errors
+  wX1 -> wX1 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s , arrowsize = 0.5]
+  wX2 -> wX2 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s , arrowsize = 0.5]
+  wX3 -> wX3 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.5]
+  wX4 -> wX4 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.5]
+  wX5 -> wX5 [dir = both, color = black, style = dashed, label = '', tailport = s, headport = s, arrowsize = 0.5]
+  wY1 -> wY1 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
+  wY2 -> wY2 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
+  wY3 -> wY3 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
+  wY4 -> wY4 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
+  wY5 -> wY5 [dir = both, color = black, style = dashed, label = '', tailport = n, headport = n, arrowsize = 0.5]
+
+
+  X1 -> X1 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X2 -> X2 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X3 -> X3 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X4 -> X4 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+  X5 -> X5 [dir = both, color = black, style = dashed, label = '0', tailport = n, headport = n , arrowsize = 0.5]
+
+  Y1 -> Y1 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y2 -> Y2 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y3 -> Y3 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y4 -> Y4 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+  Y5 -> Y5 [dir = both, color = black, style = dashed, label = '0', tailport = s, headport = s , arrowsize = 0.5]
+
+}
+")
+# bookdown::render_book(quiet = FALSE, clean = TRUE)
+# browseURL("_book/introduction.html")
+
+# Display the diagram
+lgm_diagram
+```
+
+
+If an individual shifts to the political right (i.e., more Republican) over time, there's a downward shift in perceptions of legitimacy. IF an individual believes the political system to be legitimate, they are more likely to identify as Republican. 
+
+## Change-to-Change and Cross-Lagged Effects
+
+**This model includes parameters where change in one variable predicts changes in the other.**
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+clpm_data_std <- clpm_data |>
+  mutate(across(starts_with(c("x", "y")), scale, .names = "{.col}_z"))
+
+fit = lavaan(estimateLChange(waves = 4,
+                             variable_type = "bivariate",
+                             constrain_beta = FALSE,
+                             constrain_omega = FALSE,
+                             estimate_constant_change = FALSE,
+                             estimate_change_to_change = FALSE,
+                             constrain_change_to_change = TRUE,
+                             constrain_change_cross_lag = TRUE), 
+             data = clpm_data_std, 
+             warn = FALSE, verbose = FALSE)
+
+
+parameterEstimates(fit) |>
+  filter(op == "~") |>
+  select(lhs, rhs, est, se, pvalue) |>
+  mutate(
+    outcome_type = ifelse(grepl("^cf_", lhs), "Constant", "Change"),
+    outcome_var = ifelse(grepl("_x", lhs), "Partisanship", 
+                         ifelse(grepl("_y", lhs), "Legitimacy", NA)),
+    outcome_wave = substr(lhs, 4, 4),
+    
+    predictor_type = ifelse(grepl("^cf_", rhs), "Constant", "Change"),
+    predictor_var = ifelse(grepl("_x", rhs), "Partisanship", 
+                           ifelse(grepl("_y", rhs), "Legitimacy", NA)),
+    
+    Effect_Type = case_when(
+      outcome_type == "Change" & predictor_type == "Constant" & outcome_var == predictor_var ~ "Proportional (Level→Self Change)",
+      outcome_type == "Change" & predictor_type == "Constant" & outcome_var != predictor_var ~ "Cross-Lagged (Level→Change)",
+      outcome_type == "Change" & predictor_type == "Change" & outcome_var == predictor_var ~ "Autoregressive (Change→Self Change)",
+      outcome_type == "Change" & predictor_type == "Change" & outcome_var != predictor_var ~ "Change-to-Change Cross-Lagged",
+      outcome_type == "Constant" & predictor_type == "Constant" ~ "Fixed Autoregressive",
+      TRUE ~ "Other"
+    ),
+    
+    Sig = case_when(
+      pvalue < 0.001 ~ "***",
+      pvalue < 0.01 ~ "**",
+      pvalue < 0.05 ~ "*",
+      pvalue < 0.10 ~ "†",
+      TRUE ~ ""
+    )
+  ) |>
+  filter(Effect_Type != "Fixed Autoregressive") |>
+  arrange(Effect_Type, outcome_var, outcome_wave) |>
+  select(Effect_Type, 
+         Outcome = outcome_var, 
+         Wave = outcome_wave,
+         Predictor = predictor_var,
+         Estimate = est, 
+         SE = se, 
+         P_Value = pvalue, 
+         Sig) |>
+  rename(alpha = Sig) |>
+  gt(groupname_col = "Effect_Type") |>
+  tab_header(
+    title = "Latent Change Score Model: Political Legitimacy and Party Identification",
+    subtitle = "Level-to-Change, Change-to-Change, and Cross-Lagged Effects (Unconstrained)"
+  ) |>
+  fmt_number(
+    columns = c(Estimate, SE, P_Value),
+    decimals = 3
+  ) |>
+  tab_style(
+    style = cell_fill(color = "white"),
+    locations = cells_body(rows = Effect_Type == "Cross-Lagged (Level→Change)")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "white"),
+    locations = cells_body(rows = Effect_Type %in% c("Autoregressive (Change→Self Change)", "Change-to-Change Cross-Lagged"))
+  ) |>
+  tab_options(
+    row_group.background.color = "#f0f0f0"
+  )
+```
+
+There's a significant cross-lagged effect in one wave. A Republican in 2016 was substantially more likely to show an increase in perceived legitimacy. The parameters are generally non-significant, suggesting that after we account for stable differences by calculating a mean score, there's no general trend of increasing or decreasing one's partisanship or legitimacy over time.
+
+
+
+
+### Removing Change-to-Change 
+
+**This model includes parameters where change in one variable predicts changes in the other.**
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+
+fit = lavaan(estimateLChange(waves = 4,
+                             variable_type = "bivariate",
+                             constrain_beta = FALSE,
+                             constrain_omega = FALSE,
+                             estimate_constant_change = FALSE,
+                             estimate_change_to_change = FALSE,
+                             constrain_change_to_change = FALSE,
+                             constrain_change_cross_lag = FALSE), 
+             data = clpm_data, 
+             warn = FALSE, verbose = FALSE)
+summary(fit, standardized = TRUE)
+
+parameterEstimates(fit) |>
+  filter(op == "~") |>
+  select(lhs, rhs, est, se, pvalue) |>
+  mutate(
+    outcome_type = ifelse(grepl("^cf_", lhs), "Constant", "Change"),
+    outcome_var = ifelse(grepl("_x", lhs), "Partisanship", 
+                         ifelse(grepl("_y", lhs), "Legitimacy", NA)),
+    outcome_wave = substr(lhs, 4, 4),
+    
+    predictor_type = ifelse(grepl("^cf_", rhs), "Constant", "Change"),
+    predictor_var = ifelse(grepl("_x", rhs), "Partisanship", 
+                           ifelse(grepl("_y", rhs), "Legitimacy", NA)),
+    
+    Effect_Type = case_when(
+      outcome_type == "Change" & predictor_type == "Constant" & outcome_var == predictor_var ~ "Proportional (Level→Self Change)",
+      outcome_type == "Change" & predictor_type == "Constant" & outcome_var != predictor_var ~ "Cross-Lagged (Level→Change)",
+      outcome_type == "Change" & predictor_type == "Change" & outcome_var == predictor_var ~ "Autoregressive (Change→Self Change)",
+      outcome_type == "Change" & predictor_type == "Change" & outcome_var != predictor_var ~ "Change-to-Change Cross-Lagged",
+      outcome_type == "Constant" & predictor_type == "Constant" ~ "Fixed Autoregressive",
+      TRUE ~ "Other"
+    ),
+    
+    Sig = case_when(
+      pvalue < 0.001 ~ "***",
+      pvalue < 0.01 ~ "**",
+      pvalue < 0.05 ~ "*",
+      pvalue < 0.10 ~ "†",
+      TRUE ~ ""
+    )
+  ) |>
+  filter(Effect_Type != "Fixed Autoregressive") |>
+  arrange(Effect_Type, outcome_var, outcome_wave) |>
+  select(Effect_Type, 
+         Outcome = outcome_var, 
+         Wave = outcome_wave,
+         Predictor = predictor_var,
+         Estimate = est, 
+         SE = se, 
+         P_Value = pvalue, 
+         Sig) |>
+  rename(alpha = Sig) |>
+  gt(groupname_col = "Effect_Type") |>
+  tab_header(
+    title = "Latent Change Score Model: Political Legitimacy and Party Identification",
+    subtitle = "Level-to-Change, Change-to-Change, and Cross-Lagged Effects (Unconstrained)"
+  ) |>
+  fmt_number(
+    columns = c(Estimate, SE, P_Value),
+    decimals = 3
+  ) |>
+  tab_style(
+    style = cell_fill(color = "white"),
+    locations = cells_body(rows = Effect_Type == "Cross-Lagged (Level→Change)")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "white"),
+    locations = cells_body(rows = Effect_Type %in% c("Autoregressive (Change→Self Change)", "Change-to-Change Cross-Lagged"))
+  ) |>
+  tab_options(
+    row_group.background.color = "#f0f0f0"
+  )
+```
+
+
+
+
+## Constant Change
+
+**This model includes a constant change parameter**
+
+```{r}
+#| echo: false
+#| message: false
+#| warning: false
+#| 
+clpm_data_std <- clpm_data |>
+  mutate(across(starts_with(c("x", "y")), scale, .names = "{.col}_z"))
+
+fit = lavaan(estimateLChange(waves = 4,
+                             variable_type = "bivariate",
+                             constrain_beta = FALSE,
+                             constrain_omega = FALSE,
+                             estimate_constant_change = TRUE,
+                             estimate_change_to_change = FALSE,
+                             constrain_change_to_change = TRUE,
+                             constrain_change_cross_lag = FALSE), 
+             data = clpm_data_std, 
+             warn = FALSE, verbose = FALSE)
+
+summary(fit, standardized = TRUE)
+parameterEstimates(fit) |>
+  filter(op == "~") |>
+  select(lhs, rhs, est, se, pvalue) |>
+  mutate(
+    outcome_type = ifelse(grepl("^cf_", lhs), "Constant", "Change"),
+    outcome_var = ifelse(grepl("_x", lhs), "Partisanship", 
+                         ifelse(grepl("_y", lhs), "Legitimacy", NA)),
+    outcome_wave = substr(lhs, 4, 4),
+    
+    predictor_type = ifelse(grepl("^cf_", rhs), "Constant", "Change"),
+    predictor_var = ifelse(grepl("_x", rhs), "Partisanship", 
+                           ifelse(grepl("_y", rhs), "Legitimacy", NA)),
+    
+    Effect_Type = case_when(
+      outcome_type == "Change" & predictor_type == "Constant" & outcome_var == predictor_var ~ "Proportional (Level→Self Change)",
+      outcome_type == "Change" & predictor_type == "Constant" & outcome_var != predictor_var ~ "Cross-Lagged (Level→Change)",
+      outcome_type == "Change" & predictor_type == "Change" & outcome_var == predictor_var ~ "Autoregressive (Change→Self Change)",
+      outcome_type == "Change" & predictor_type == "Change" & outcome_var != predictor_var ~ "Change-to-Change Cross-Lagged",
+      outcome_type == "Constant" & predictor_type == "Constant" ~ "Fixed Autoregressive",
+      TRUE ~ "Other"
+    ),
+    
+    Sig = case_when(
+      pvalue < 0.001 ~ "***",
+      pvalue < 0.01 ~ "**",
+      pvalue < 0.05 ~ "*",
+      pvalue < 0.10 ~ "†",
+      TRUE ~ ""
+    )
+  ) |>
+  filter(Effect_Type != "Fixed Autoregressive") |>
+  arrange(Effect_Type, outcome_var, outcome_wave) |>
+  select(Effect_Type, 
+         Outcome = outcome_var, 
+         Wave = outcome_wave,
+         Predictor = predictor_var,
+         Estimate = est, 
+         SE = se, 
+         P_Value = pvalue, 
+         Sig) |>
+  rename(alpha = Sig) |>
+  gt(groupname_col = "Effect_Type") |>
+  tab_header(
+    title = "Latent Change Score Model: Political Legitimacy and Party Identification",
+    subtitle = "Level-to-Change, Change-to-Change, and Cross-Lagged Effects (Unconstrained)"
+  ) |>
+  fmt_number(
+    columns = c(Estimate, SE, P_Value),
+    decimals = 3
+  ) |>
+  tab_style(
+    style = cell_fill(color = "white"),
+    locations = cells_body(rows = Effect_Type == "Cross-Lagged (Level→Change)")
+  ) |>
+  tab_style(
+    style = cell_fill(color = "white"),
+    locations = cells_body(rows = Effect_Type %in% c("Autoregressive (Change→Self Change)", "Change-to-Change Cross-Lagged"))
+  ) |>
+  tab_options(
+    row_group.background.color = "#f0f0f0"
+  )
+```
+
+
+

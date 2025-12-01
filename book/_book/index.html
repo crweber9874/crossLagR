@@ -4,26 +4,26 @@
 
   <meta charset="utf-8" />
   <meta http-equiv="X-UA-Compatible" content="IE=edge" />
-  <title>Cross Lagged Regression</title>
+  <title>Dynamic Panels and the Cross Lagged Panel Model</title>
   <meta name="description" content="Cross Lagged Regression" />
   <meta name="generator" content="bookdown 0.45 and GitBook 2.6.7" />
 
-  <meta property="og:title" content="Cross Lagged Regression" />
+  <meta property="og:title" content="Dynamic Panels and the Cross Lagged Panel Model" />
   <meta property="og:type" content="book" />
   
   <meta property="og:description" content="Cross Lagged Regression" />
   <meta name="github-repo" content="crweber9874/advancedRegression" />
 
   <meta name="twitter:card" content="summary" />
-  <meta name="twitter:title" content="Cross Lagged Regression" />
+  <meta name="twitter:title" content="Dynamic Panels and the Cross Lagged Panel Model" />
   
   <meta name="twitter:description" content="Cross Lagged Regression" />
   
 
-<meta name="author" content="Christopher Weber" />
+<meta name="author" content="Christopher Weber, Stanley Feldman, Adam Panish, and Bang Zheng" />
 
 
-<meta name="date" content="2025-11-28" />
+<meta name="date" content="2025-12-01" />
 
   <meta name="viewport" content="width=device-width, initial-scale=1" />
   <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -52,104 +52,12 @@
 <link href="libs/anchor-sections-1.1.0/anchor-sections.css" rel="stylesheet" />
 <link href="libs/anchor-sections-1.1.0/anchor-sections-hash.css" rel="stylesheet" />
 <script src="libs/anchor-sections-1.1.0/anchor-sections.js"></script>
-<link href="libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet" />
-<script src="libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
-<script src="libs/viz-1.8.2/viz.js"></script>
-<link href="libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet" />
-<script src="libs/grViz-binding-1.0.11/grViz.js"></script>
 
 
-<style type="text/css">
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { display: inline-block; text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-    color: #aaaaaa;
-  }
-pre.numberSource { margin-left: 3em; border-left: 1px solid #aaaaaa;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
-}
-code span.al { color: #ff0000; font-weight: bold; } /* Alert */
-code span.an { color: #60a0b0; font-weight: bold; font-style: italic; } /* Annotation */
-code span.at { color: #7d9029; } /* Attribute */
-code span.bn { color: #40a070; } /* BaseN */
-code span.bu { color: #008000; } /* BuiltIn */
-code span.cf { color: #007020; font-weight: bold; } /* ControlFlow */
-code span.ch { color: #4070a0; } /* Char */
-code span.cn { color: #880000; } /* Constant */
-code span.co { color: #60a0b0; font-style: italic; } /* Comment */
-code span.cv { color: #60a0b0; font-weight: bold; font-style: italic; } /* CommentVar */
-code span.do { color: #ba2121; font-style: italic; } /* Documentation */
-code span.dt { color: #902000; } /* DataType */
-code span.dv { color: #40a070; } /* DecVal */
-code span.er { color: #ff0000; font-weight: bold; } /* Error */
-code span.ex { } /* Extension */
-code span.fl { color: #40a070; } /* Float */
-code span.fu { color: #06287e; } /* Function */
-code span.im { color: #008000; font-weight: bold; } /* Import */
-code span.in { color: #60a0b0; font-weight: bold; font-style: italic; } /* Information */
-code span.kw { color: #007020; font-weight: bold; } /* Keyword */
-code span.op { color: #666666; } /* Operator */
-code span.ot { color: #007020; } /* Other */
-code span.pp { color: #bc7a00; } /* Preprocessor */
-code span.sc { color: #4070a0; } /* SpecialChar */
-code span.ss { color: #bb6688; } /* SpecialString */
-code span.st { color: #4070a0; } /* String */
-code span.va { color: #19177c; } /* Variable */
-code span.vs { color: #4070a0; } /* VerbatimString */
-code span.wa { color: #60a0b0; font-weight: bold; font-style: italic; } /* Warning */
-</style>
 
 <style type="text/css">
   
   div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
-</style>
-<style type="text/css">
-/* Used with Pandoc 2.11+ new --citeproc when CSL is used */
-div.csl-bib-body { }
-div.csl-entry {
-  clear: both;
-  margin-bottom: 0em;
-}
-.hanging div.csl-entry {
-  margin-left:2em;
-  text-indent:-2em;
-}
-div.csl-left-margin {
-  min-width:2em;
-  float:left;
-}
-div.csl-right-inline {
-  margin-left:2em;
-  padding-left:1em;
-}
-div.csl-indent {
-  margin-left: 2em;
-}
 </style>
 
 <link rel="stylesheet" href="style.css" type="text/css" />
@@ -190,16 +98,30 @@ div.csl-indent {
 <ul>
 <li class="chapter" data-level="2.5.1" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#hierarchical-brms-estimation"><i class="fa fa-check"></i><b>2.5.1</b> Hierarchical <code>brms</code> Estimation</a></li>
 </ul></li>
+<li class="chapter" data-level="2.6" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#the-fixed-effect-dynamic-panel-estimator"><i class="fa fa-check"></i><b>2.6</b> The Fixed Effect (Dynamic Panel) Estimator</a></li>
+<li class="chapter" data-level="2.7" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#the-riclpm"><i class="fa fa-check"></i><b>2.7</b> The RICLPM</a></li>
+<li class="chapter" data-level="2.8" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#change"><i class="fa fa-check"></i><b>2.8</b> Change</a></li>
+<li class="chapter" data-level="2.9" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#change-1"><i class="fa fa-check"></i><b>2.9</b> Change</a></li>
+<li class="chapter" data-level="2.10" data-path="simple-motivating-examples.html"><a href="simple-motivating-examples.html#summary"><i class="fa fa-check"></i><b>2.10</b> Summary</a></li>
 </ul></li>
-<li class="chapter" data-level="3" data-path="short-t-bias..html"><a href="short-t-bias..html"><i class="fa fa-check"></i><b>3</b> Short <em>t</em> bias.</a>
+<li class="chapter" data-level="3" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><i class="fa fa-check"></i><b>3</b> The Institute for the Study of Citizens and Politics (ISCAP) Panel</a>
 <ul>
-<li class="chapter" data-level="3.1" data-path="short-t-bias..html"><a href="short-t-bias..html#the-fixed-effect-dynamic-panel-estimator"><i class="fa fa-check"></i><b>3.1</b> The Fixed Effect (Dynamic Panel) Estimator</a></li>
-<li class="chapter" data-level="3.2" data-path="short-t-bias..html"><a href="short-t-bias..html#the-riclpm"><i class="fa fa-check"></i><b>3.2</b> The RICLPM</a></li>
-<li class="chapter" data-level="3.3" data-path="short-t-bias..html"><a href="short-t-bias..html#change"><i class="fa fa-check"></i><b>3.3</b> Change</a></li>
-<li class="chapter" data-level="3.4" data-path="short-t-bias..html"><a href="short-t-bias..html#change-1"><i class="fa fa-check"></i><b>3.4</b> Change</a></li>
-<li class="chapter" data-level="3.5" data-path="short-t-bias..html"><a href="short-t-bias..html#summary"><i class="fa fa-check"></i><b>3.5</b> Summary</a></li>
+<li class="chapter" data-level="3.1" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#data"><i class="fa fa-check"></i><b>3.1</b> Data</a></li>
+<li class="chapter" data-level="3.2" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#legitimacy-scale"><i class="fa fa-check"></i><b>3.2</b> Legitimacy Scale</a></li>
+<li class="chapter" data-level="3.3" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#missing-data-by-wave"><i class="fa fa-check"></i><b>3.3</b> Missing Data by Wave</a></li>
+<li class="chapter" data-level="3.4" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#missingness-pattern"><i class="fa fa-check"></i><b>3.4</b> Missingness Pattern</a></li>
+<li class="chapter" data-level="3.5" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#rescaling"><i class="fa fa-check"></i><b>3.5</b> Rescaling</a></li>
+<li class="chapter" data-level="3.6" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#autocorrelation"><i class="fa fa-check"></i><b>3.6</b> Autocorrelation</a></li>
+<li class="chapter" data-level="3.7" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#section"><i class="fa fa-check"></i><b>3.7</b> </a></li>
+<li class="chapter" data-level="3.8" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#fitting-the-two-way-fixed-effects"><i class="fa fa-check"></i><b>3.8</b> Fitting the Two Way Fixed Effects</a></li>
+<li class="chapter" data-level="3.9" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#fitting-the-error-components-model"><i class="fa fa-check"></i><b>3.9</b> Fitting the Error Components Model</a>
+<ul>
+<li class="chapter" data-level="3.9.1" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#expertise-partisanship-and-political-legitimacy"><i class="fa fa-check"></i><b>3.9.1</b> Expertise, Partisanship, and Political Legitimacy</a></li>
 </ul></li>
-<li class="chapter" data-level="4" data-path="outline.html"><a href="outline.html"><i class="fa fa-check"></i><b>4</b> Outline</a></li>
+<li class="chapter" data-level="3.10" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#change-to-change-and-cross-lagged-effects"><i class="fa fa-check"></i><b>3.10</b> Change-to-Change and Cross-Lagged Effects</a></li>
+<li class="chapter" data-level="3.11" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#change-to-change"><i class="fa fa-check"></i><b>3.11</b> Change-to-Change</a></li>
+<li class="chapter" data-level="3.12" data-path="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html"><a href="the-institute-for-the-study-of-citizens-and-politics-iscap-panel.html#change-to-change-and-cross-lagged-effects-1"><i class="fa fa-check"></i><b>3.12</b> Change-to-Change and Cross-Lagged Effects</a></li>
+</ul></li>
 </ul>
 
       </nav>
@@ -209,7 +131,7 @@ div.csl-indent {
       <div class="body-inner">
         <div class="book-header" role="navigation">
           <h1>
-            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Cross Lagged Regression</a>
+            <i class="fa fa-circle-o-notch fa-spin"></i><a href="./">Dynamic Panels and the Cross Lagged Panel Model</a>
           </h1>
         </div>
 
@@ -218,18 +140,20 @@ div.csl-indent {
 
             <section class="normal" id="section-">
 <div id="header">
-<h1 class="title">Cross Lagged Regression</h1>
-<p class="author"><em>Christopher Weber</em></p>
-<p class="date"><em>2025-11-28</em></p>
+<h1 class="title">Dynamic Panels and the Cross Lagged Panel Model</h1>
+<p class="author"><em>Christopher Weber, Stanley Feldman, Adam Panish, and Bang Zheng</em></p>
+<p class="date"><em>2025-12-01</em></p>
 </div>
 <div id="preface" class="section level1 unnumbered hasAnchor">
 <h1>Preface<a href="index.html#preface" class="anchor-section" aria-label="Anchor link to header"></a></h1>
-<p>The Cross-Lagged Panel Model (CLPM) is widely accepted as a standard method for longitudinal causal analysis in political science. Its application, however, is often susceptible to unaccounted time-invariant confounders and measurement error, leading to spurious estimates of autoregressive and cross-lagged relationships, as well as bias in statistical inferences and substantive conclusions. In these documentation files, I demonstrate the similarities and differences between different panel analysis models, showing in particular, that the standard CLPM is strongly related to a more flexible and robust alternatives, the change score regression model and the random-intercept cross-lagged regression model. Both the Latent Change Model (LCM) and the Random Intercept Cross-Lagged Panel Model (RI-CLPM) extend the standard CLPM by explicitly modeling “unit level” effects. In simulations and empirical examples, we show the myriad paths by which the CLPM produces biased parameter estimates due to unmodeled, stable-unit effects. Both approaches allow for “constant” differences between units over time: In the RI-CLPM, this is represented by a factor corresponding to unit-mean variation in the observed variables, a “random-intercept” while in the LCM, this is captured through a factor corresponding to unit-level change over time, a “random slope.”</p>
+<p>The Cross-Lagged Panel Model (CLPM) is widely utilized method to examine dynamic relationships in panel data. Its application, however, is often susceptible to unaccounted time-invariant confounders and measurement error, leading to spurious estimates of autoregressive and cross-lagged relationships, as well as bias in statistical inferences and substantive conclusions. Here, we document demonstrate the similarities and differences between different panel analysis models, showing in particular, that the standard CLPM is strongly related to a more flexible and robust alternatives, the change score regression model and the random-intercept cross-lagged regression model. Both the Latent Change Model (LCM) and the Random Intercept Cross-Lagged Panel Model (RI-CLPM) extend the standard CLPM by explicitly modeling “unit level” effects. In simulations and empirical examples, we show the myriad paths by which the CLPM produces biased parameter estimates due to unmodeled, stable-unit effects. Both approaches allow for “constant” differences between units over time: In the RI-CLPM, this is represented by a factor corresponding to unit-mean variation in the observed variables, a “random-intercept” while in the LCM, this is captured through a factor corresponding to unit-level change over time, a “random slope.”</p>
 <p>This documentation elaborates upon:</p>
 <ul>
 <li>The theoretical background for the CLPM, RI-CLPM, and LCM, highlighting their similarities and differences.</li>
 <li>An introduction to the <code>crossLagR</code> package, which includes various utilities to estimate and simulate effects from these models.</li>
 <li>A Monte Carlo simulation procedure that examines the degree of bias in parameter estimates from the CLPM, RI-CLPM, and LCM under different data-generating processes.</li>
+<li>An outline</li>
+<li>An empirical example using the The Institute for the Study of Citizens and Politics (ISCAP) Panel examining the relationship between political legitimacy and partisanship from 2012-2020.</li>
 </ul>
 
 </div>
@@ -293,20 +217,6 @@ gitbook.start({
 });
 </script>
 
-<!-- dynamically load mathjax for compatibility with self-contained -->
-<script>
-  (function () {
-    var script = document.createElement("script");
-    script.type = "text/javascript";
-    var src = "true";
-    if (src === "" || src === "true") src = "https://cdnjs.cloudflare.com/ajax/libs/mathjax/2.7.9/latest.js?config=TeX-MML-AM_CHTML";
-    if (location.protocol !== "file:")
-      if (/^https?:/.test(src))
-        src = src.replace(/^https?:/, '');
-    script.src = src;
-    document.getElementsByTagName("head")[0].appendChild(script);
-  })();
-</script>
 </body>
 
 </html>

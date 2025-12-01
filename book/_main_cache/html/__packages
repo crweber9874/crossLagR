@@ -16,3 +16,6 @@ ggridges
 DiagrammeR
 Rcpp
 brms
+psych
+naniar
+tidybayes
