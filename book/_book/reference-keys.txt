@@ -52,3 +52,4 @@ unit-fixed-effects
 fitting-the-random-intercept-model
 removing-change-to-change
 constant-change
+examples-of-estimating-cross-lagged-panel-models-in-r

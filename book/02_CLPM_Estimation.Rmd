@@ -3,7 +3,7 @@ output:
   pdf_document: default
   html_document: default
 ---
-# Simple Motivating Examples
+# Examples of Estimating Cross-Lagged Panel Models in R
 
 The package that accompanies this summary, `crossLagR`, includes functions to estimate several panel data models. They're structured such that functions that begin with `estimate` are simple functions to write latent variable panel models. The (working) package can be accessed on `github`:  `devtools::install_github("crweber9874/crossLagR")`
 
@@ -340,7 +340,7 @@ lm(y ~ y_lag + x_lag, data = data) |> summary()
 
 ```
 
-The `estimateCLPM()` function may be used to estimate a latent variable CLPM. Notice that if we simulate data under the latent change model (without constant change), the CLPM retrieves the correct estimates, $\hat\beta_{CLPM} - 1 \approx - -0.7$
+The `estimateCLPM()` function may be used to estimate a latent variable CLPM. Notice that if we simulate data under the latent change model (without constant change), the CLPM retrieves the correct estimates, $\hat\beta_{CLPM} - 1 \approx -0.7$
 
 
 ```{r, echo = FALSE, message = FALSE, error = FALSE}
@@ -748,7 +748,7 @@ summary(model)
 ```
 
 
-# Short *t* bias. 
+## Short *t* bias. 
 
 It is well established that estimating a dynamic fixed effects model with short *t* -- relatively few waves -- can lead to biased estimates. This is shown in @hsiao2022. To see this, here is a dynamic panel data simulation where the DGP is an RI-CLPM with known parameters. 
 
@@ -1070,80 +1070,7 @@ bias_summary |>
 ```
 
 
-
-
-
 ## Summary
 
 The change (LCM) and level score (CLPM; RICLPM) analysis are equivalent in the absence of unit effects. This suggests a close relationship between these models. However, when unit effects are present, the models diverge. When the DGP includes unit effects, the same interchangeable relationships disappear.
-
-
-# Outline
-
-I. Introduction/Outline
-
-A. Critique of the CLPM
-
-- Fails to consider unit effects
-
-- Confounds lag with unit effects
-
-- The CLPM can be written with lags or as a change score regression
-
-- Here we can use much of the work Adam finished on the earlier draft.
-
-- Alternative estimators
-
-B. Level Score Models
-
-- Fixed Effects Estimation with lagged effects (Dynamic Panel Model). Biased in short *t* panels
-
-- Random Intercept Cross-Lagged Panel Model (RI-CLPM)
-
-- Requires at least three waves of data
-
-- Separates between and within unit effects
-
-- Estimates represent within-unit changes from average scores
-
-- Computational limitations: Inefficient in short *t* panels
-
-C. Change Score Models
-
-- Latent Change Score Model (LCSM)
-
-- Models change processes directly and explicitly controls for unit effects
-
-- With two waves, first difference regression
-
-- With 3 waves, proportional change. How much does $y$ yesterday effect a change in $y$.
-
-- With 4+ waves, dual change; constant change and proportional change.
-
-II. Simulation/Monte Carlo Analysis
-
-A. Simulate data from a CLPM, a CLPM + Unit Effects (RICLPM), and LCM (with/without constant effects)
-
-B. Vary sample size, number of waves, and variance components (between/within variance)
-
-C. Estimate CLPM, CLPM+Fixed Effects, RICLPM, LCM, LCM+constant effects
-
-D. Highlight computational issues (convergence for RICLPM), bias and efficiency
-
-
-III. Applied Examples
-
-A. Short *t* panel. Stable constructs. ANES panel. Compare estimates. Personality and politics.
-
-B. Moderate *t* panel. LISS panel. Relatively stable constructs. Compare estimates. Personality and politics
-
-C. Moderate *t* panel, less stable constructs. 2012-2020. "Institute for the Study of Citizens and Politics Panel Study" (ISCP). Partisanship (stable) and political legitimacy (less stable, should fluctuate by partisanship based on president). "I would rather live under our system of government than any other that I can think of."
-
-D. Long t panel
-
-IV. Discussion/Conclusion
-
-- Summary of findings
-
-- Recommendations for applied researchers...models and data constraints -- e.g., RICLPM is effective with marginally stable constructs and moderate to longer *t* panels. LCM models change processes explicitly. The CLPM almost always will get it wrong.
 

@@ -1,11 +1,12 @@
 delete_merged_file: true
 language:
   ui:
-    chapter_name: "Chapter "
+    chapter_name: "Section "
 
 rmd_files: [
   "index.Rmd",
   "01_Panel_Models.Rmd",
   "02_CLPM_Estimation.Rmd",
   "03_upenn.Rmd",
+  "04_outline.Rmd"
 ]
