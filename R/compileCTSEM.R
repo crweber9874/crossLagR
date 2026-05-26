@@ -1,23 +1,27 @@
-#' @title compileCTSEM
-#' @description Create a continuous time model and generate a one unit discrete time
-#' prediction for auto and cross effects.
-#' The function returns the auto and cross effects translated to a discrete time model,
-#' and a change of t, dt = 1. These are the AR AND CL parameters in the CLPM.
+#' @title compCTSEM
+#' @description Create a continuous time model specification using the ctsem package.
 #'
-#' #'
-#' @param data Must be a long format data frame.
-#' @param id id, which is used to estimate subject specific effects.
-#' @importFrom dplyr %>% select mutate row_number group_by ungroup
-#' @importFrom tidyr pivot_longer
-#' @importFrom readr parse_number
+#' Wraps \code{ctsem::ctModel} to define a continuous-time structural equation model.
+#' Returns the model object for subsequent fitting.
 #'
+#' @param data A long-format data frame.
+#' @param id Character. Name of the ID column. Default is \code{"id"}.
+#' @param manifest_var_names Character vector of manifest variable names. Default is \code{c("x", "y")}.
+#' @param latent_var_names Character vector of latent variable names. Default is \code{c("x", "y")}.
+#' @param LAMBDA Factor loading matrix. Default is \code{diag(2)}.
+#' @param type Character. Type of ctsem model. Default is \code{"stanct"}.
+#' @param time_points Integer. Number of time points. Default is 10.
+#' @param cores Integer. Number of CPU cores for parallel computation.
+#' @param chains Integer. Number of MCMC chains.
+#' @param ... Additional arguments passed to \code{ctsem::ctModel}.
 #' @return A list; returns model and drift matrix
 #' #'
 #' @examples
+#' \dontrun{
+#' model <- compCTSEM(data = my_long_data, time_points = 5)
+#' }
 #'
 #' @export
-#'
-#'
 compCTSEM <- function(data = dat_long,
                       id = "id",
                       manifest_var_names = c("x", "y"),

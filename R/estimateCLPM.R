@@ -1,5 +1,5 @@
-#' @title estimateCLPM
-#' @description Generates model syntax for Cross-Lagged Panel Model (CLPM) with options to constrain parameters across waves.
+#' @title estimateCLPM. This follows the Usami, Murayama, & Hamaker (2019) unified framework for longitudinal models.
+#' @description Generates lavaan model syntax for the Cross-Lagged Panel Model (CLPM).
 #'
 #' @param waves The number of waves (time points) in the model.
 #' @param constrain_beta Logical. If TRUE, constrains autoregressive effects to equality across waves. Default is TRUE.
@@ -9,25 +9,42 @@
 #' @param estimate_means Logical. If TRUE, estimates means for the first wave. Default is TRUE.
 #' @param start_values Logical. If TRUE, provides starting values for key parameters. Default is FALSE.
 #'
-#' @return A character string containing the Lavaan model syntax for CLPM.
+#' @return A character string containing the lavaan model syntax for the CLPM.
 #'
 #' @details
-#' This function generates the model syntax for a Cross-Lagged Panel Model (CLPM)
-#' with a specified number of waves. The CLPM examines reciprocal relationships
-#' between two variables over time without separating stable between-person
-#' differences from within-person effects.
+#' This function generates lavaan syntax for a Cross-Lagged Panel Model following
+#' the unified framework of Usami, Murayama, & Hamaker (2019). In this framework,
+#' the CLPM uses only the decomposition equation (group-mean centering) and the
+#' dynamic equation (lagged regression), with no unique factors, trait factors,
+#' or growth factors.
 #'
-#' Key parameters estimated:
-#' - beta_y, beta_x: Autoregressive effects (stability parameters)
-#' - omega_xy, omega_yx: Cross-lagged effects (reciprocal influences)
-#' - var_x, var_y: Residual variances
-#' - cov_xy: Residual covariances (within-time associations)
+#' Parameter labels follow the unified naming convention:
+#' \itemize{
+#'   \item \code{ar_y}, \code{ar_x}: Autoregressive effects. In the CLPM these
+#'     reflect rank-order stability, conflating between- and within-person processes.
+#'   \item \code{cl_xy}, \code{cl_yx}: Cross-lagged effects (Granger-causal paths).
+#'     \code{cl_xy} = effect of X on Y; \code{cl_yx} = effect of Y on X.
+#'   \item \code{d_var_x}, \code{d_var_y}: Dynamic residual (innovation) variances.
+#'   \item \code{d_cov_xy}: Dynamic residual covariance (within-time association).
+#' }
 #'
-#' The model assumes that all effects are due to within-person processes,
-#' unlike the RI-CLPM which separates stable traits from dynamic effects.
+#' @references
+#' Usami, S., Murayama, K., & Hamaker, E. L. (2019). A unified framework of
+#'   longitudinal models to examine reciprocal relations. \emph{Psychological
+#'   Methods}, 24(5), 637-657.
 #'
 #' @examples
-
+#' \dontrun{
+#' # Generate CLPM syntax with 5 waves
+#' syntax <- estimateCLPM(waves = 5)
+#' cat(syntax)
+#'
+#' # Fit with lavaan
+#' library(lavaan)
+#' fit <- lavaan(syntax, data = my_data, meanstructure = TRUE)
+#' summary(fit, fit.measures = TRUE)
+#' }
+#'
 #' @export
 
 estimateCLPM <- function(waves = 5,
@@ -37,7 +54,6 @@ estimateCLPM <- function(waves = 5,
                          constrain_residual_covariances = TRUE,
                          estimate_means = TRUE,
                          start_values = FALSE) {
-
   # Input validation
   if (!is.numeric(waves) || waves <= 0 || waves != as.integer(waves)) {
     stop("Error: Parameter 'waves' must be a positive integer.")
@@ -91,7 +107,7 @@ estimateCLPM <- function(waves = 5,
 
   # Fix observed variable intercepts to 0
   for (w in 1:waves) {
-    model_string <- paste0( model_string, "    y", w, " ~ 0*1\n")
+    model_string <- paste0(model_string, "    y", w, " ~ 0*1\n")
     model_string <- paste0(model_string, "    x", w, "  ~0*1\n")
   }
 
@@ -99,14 +115,14 @@ estimateCLPM <- function(waves = 5,
   start_ar <- if (start_values) "start(0.1)*" else ""
   start_cl <- if (start_values) "start(0.1)*" else ""
 
-# Constraints to simplify model
+  # Constraints to simplify model
   if (constrain_beta && constrain_omega) {
     # Both autoregressive and cross-lagged effects constrained
     for (w in 2:waves) {
       model_string <- paste0(
         model_string,
-        "    p", w, " ~ ", start_ar, "beta_y*p", w - 1, " + ", start_cl, "omega_xy*q", w - 1, "\n",
-        "    q", w, " ~ ", start_ar, "beta_x*q", w - 1, " + ", start_cl, "omega_yx*p", w - 1, "\n"
+        "    p", w, " ~ ", start_ar, "ar_y*p", w - 1, " + ", start_cl, "cl_xy*q", w - 1, "\n",
+        "    q", w, " ~ ", start_ar, "ar_x*q", w - 1, " + ", start_cl, "cl_yx*p", w - 1, "\n"
       )
     }
   } else if (constrain_beta && !constrain_omega) {
@@ -114,16 +130,16 @@ estimateCLPM <- function(waves = 5,
     for (w in 2:waves) {
       model_string <- paste0(
         model_string,
-        "    p", w, " ~ ", start_ar, "beta_y*p", w - 1, " + ", start_cl, "p", w, "q", w - 1, "*q", w - 1, "\n",
-        "    q", w, " ~ ", start_ar, "beta_x*q", w - 1, " + ", start_cl, "q", w, "p", w - 1, "*p", w - 1, "\n"
+        "    p", w, " ~ ", start_ar, "ar_y*p", w - 1, " + ", start_cl, "cl_xy", w, "*q", w - 1, "\n",
+        "    q", w, " ~ ", start_ar, "ar_x*q", w - 1, " + ", start_cl, "cl_yx", w, "*p", w - 1, "\n"
       )
     }
   } else if (!constrain_beta && constrain_omega) {
     for (w in 2:waves) {
       model_string <- paste0(
         model_string,
-        "    p", w, " ~ ", start_ar, "p", w, "p", w - 1, "*p", w - 1, " + ", start_cl, "omega_xy*q", w - 1, "\n",
-        "    q", w, " ~ ", start_ar, "q", w, "q", w - 1, "*q", w - 1, " + ", start_cl, "omega_yx*p", w - 1, "\n"
+        "    p", w, " ~ ", start_ar, "ar_y", w, "*p", w - 1, " + ", start_cl, "cl_xy*q", w - 1, "\n",
+        "    q", w, " ~ ", start_ar, "ar_x", w, "*q", w - 1, " + ", start_cl, "cl_yx*p", w - 1, "\n"
       )
     }
   } else {
@@ -131,8 +147,8 @@ estimateCLPM <- function(waves = 5,
     for (w in 2:waves) {
       model_string <- paste0(
         model_string,
-        "    p", w, " ~ ", start_ar, "p", w, "p", w - 1, "*p", w - 1, " + ", start_cl, "p", w, "q", w - 1, "*q", w - 1, "\n",
-        "    q", w, " ~ ", start_ar, "q", w, "q", w - 1, "*q", w - 1, " + ", start_cl, "q", w, "p", w - 1, "*p", w - 1, "\n"
+        "    p", w, " ~ ", start_ar, "ar_y", w, "*p", w - 1, " + ", start_cl, "cl_xy", w, "*q", w - 1, "\n",
+        "    q", w, " ~ ", start_ar, "ar_x", w, "*q", w - 1, " + ", start_cl, "cl_yx", w, "*p", w - 1, "\n"
       )
     }
   }
@@ -140,14 +156,14 @@ estimateCLPM <- function(waves = 5,
   # Residual variances
   if (constrain_residual_variances) {
     # First wave variances (freely estimated)
-    model_string <- paste0(model_string, "    p1 ~~ var_y1*p1\n")
-    model_string <- paste0(model_string, "    q1 ~~ var_x1*q1\n")
+    model_string <- paste0(model_string, "    p1 ~~ d_var_y1*p1\n")
+    model_string <- paste0(model_string, "    q1 ~~ d_var_x1*q1\n")
 
     for (w in 2:waves) {
       model_string <- paste0(
         model_string,
-        "    p", w, " ~~ var_y*p", w, "\n",
-        "    q", w, " ~~ var_x*q", w, "\n"
+        "    p", w, " ~~ d_var_y*p", w, "\n",
+        "    q", w, " ~~ d_var_x*q", w, "\n"
       )
     }
   } else {
@@ -162,10 +178,10 @@ estimateCLPM <- function(waves = 5,
 
   # Residual covariances (within-time correlations)
   if (constrain_residual_covariances) {
-    model_string <- paste0(model_string, "    p1 ~~ cov_xy1*q1\n")
+    model_string <- paste0(model_string, "    p1 ~~ d_cov_xy1*q1\n")
 
     for (w in 2:waves) {
-      model_string <- paste0(model_string, "    p", w, " ~~ cov_xy*q", w, "\n")
+      model_string <- paste0(model_string, "    p", w, " ~~ d_cov_xy*q", w, "\n")
     }
   } else {
     # All covariances freely estimated

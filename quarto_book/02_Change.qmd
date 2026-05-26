@@ -1,0 +1,354 @@
+# Latent Change Score Models
+
+Whereas the previous chapter established dynamic lagged and cross lagged effects in *level* form (the CLPM and its bias under unit heterogeneity), this chapter turns to the **change** representation. By "differencing" the observed scores, this effectively absorbs all time-invariant heterogeneity, including stable between-person differences.
+
+The Latent Change Score Model (LCSM) parameterizes dynamics differently as *differences* across waves [@mcardle2009; @kim_and_steiner2021]. The logic is to remove out any stable respondent effects by simply calculating the wave to wave difference. The LCSM uses a measurement equation that separates latent true scores from unique factors, and a dynamic equation that maps lagged true scores onto latent change scores via a proportional self-feedback parameter ($\beta$, i.e. `ar_x`) and a coupling parameter ($\omega$, i.e. `cl_xy`). Finally, a second-order *constant change* factor can be specified which accumulates over waves, though requires 4+ waves for identification. This term captures stable, person-specific trajectories that are not accounted for by differencing.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(crossLagR)
+library(dplyr)
+library(ggplot2)
+library(lavaan)
+```
+
+
+## The LCSM
+
+@fig-lcm-simple sketches the bivariate LCSM with a constant-change factor, in the same DAG style introduced in the previous chapter. Each observed score is decomposed as $X_t = X_{t-1} + \Delta x_t$; each change score is regressed on prior levels via proportional change ($\beta$) and coupling ($\omega$), and accumulates a person-specific constant ($\Delta_x$, $\Delta_y$). The detailed measurement-model version with multiple indicators is reproduced in the appendix as @fig-lcm-full.
+
+```{r}
+#| label: fig-lcm-simple
+#| echo: false
+#| message: false
+#| warning: false
+#| out-width: 80%
+#| fig-cap: "Bivariate Latent Change Score Model. β = proportional change; ω = coupling. Δ_x, Δ_y are person-specific constant-change factors loading on each Δx_t and Δy_t."
+library(DiagrammeR)
+grViz("
+digraph LCSM_simple {
+  graph [layout = neato, bgcolor = white, splines = line]
+  node [shape = plaintext, fontsize = 24]
+  edge [arrowsize = 0.6]
+
+  Xt1 [pos = '-3.0,1.8!', label = <X<sub>1</sub>>]
+  Xt2 [pos = '-1.0,1.8!', label = <X<sub>2</sub>>]
+  Xt3 [pos = '1.0,1.8!',  label = <X<sub>3</sub>>]
+  Xt4 [pos = '3.0,1.8!',  label = <X<sub>4</sub>>]
+
+  dX2 [pos = '-1.0,0.6!', label = <Δx<sub>2</sub>>]
+  dX3 [pos = '1.0,0.6!',  label = <Δx<sub>3</sub>>]
+  dX4 [pos = '3.0,0.6!',  label = <Δx<sub>4</sub>>]
+
+  dY2 [pos = '-1.0,-0.6!', label = <Δy<sub>2</sub>>]
+  dY3 [pos = '1.0,-0.6!',  label = <Δy<sub>3</sub>>]
+  dY4 [pos = '3.0,-0.6!',  label = <Δy<sub>4</sub>>]
+
+  Yt1 [pos = '-3.0,-1.8!', label = <Y<sub>1</sub>>]
+  Yt2 [pos = '-1.0,-1.8!', label = <Y<sub>2</sub>>]
+  Yt3 [pos = '1.0,-1.8!',  label = <Y<sub>3</sub>>]
+  Yt4 [pos = '3.0,-1.8!',  label = <Y<sub>4</sub>>]
+
+  Ax [pos = '-4.5,1.2!',  label = <Δ<sub>x</sub>>]
+  Ay [pos = '-4.5,-1.2!', label = <Δ<sub>y</sub>>]
+
+  # Identity: X_t = X_{t-1} + Δx_t
+  Xt1 -> Xt2 [label = '1', fontsize = 14]
+  Xt2 -> Xt3 [label = '1', fontsize = 14]
+  Xt3 -> Xt4 [label = '1', fontsize = 14]
+  Yt1 -> Yt2 [label = '1', fontsize = 14]
+  Yt2 -> Yt3 [label = '1', fontsize = 14]
+  Yt3 -> Yt4 [label = '1', fontsize = 14]
+  dX2 -> Xt2 [label = '1', fontsize = 14]
+  dX3 -> Xt3 [label = '1', fontsize = 14]
+  dX4 -> Xt4 [label = '1', fontsize = 14]
+  dY2 -> Yt2 [label = '1', fontsize = 14]
+  dY3 -> Yt3 [label = '1', fontsize = 14]
+  dY4 -> Yt4 [label = '1', fontsize = 14]
+
+  # Proportional change (β)
+  Xt1 -> dX2 [label = <β>, fontsize = 16]
+  Xt2 -> dX3 [label = <β>, fontsize = 16]
+  Xt3 -> dX4 [label = <β>, fontsize = 16]
+  Yt1 -> dY2 [label = <β>, fontsize = 16]
+  Yt2 -> dY3 [label = <β>, fontsize = 16]
+  Yt3 -> dY4 [label = <β>, fontsize = 16]
+
+  # Coupling (ω)
+  Yt1 -> dX2 [label = <ω>, fontsize = 16]
+  Yt2 -> dX3 [label = <ω>, fontsize = 16]
+  Yt3 -> dX4 [label = <ω>, fontsize = 16]
+  Xt1 -> dY2 [label = <ω>, fontsize = 16]
+  Xt2 -> dY3 [label = <ω>, fontsize = 16]
+  Xt3 -> dY4 [label = <ω>, fontsize = 16]
+
+  # Constant-change accumulating factors (left side)
+  Ax -> dX2 [arrowsize = 0.5, label = '1', fontsize = 12]
+  Ax -> dX3 [arrowsize = 0.5, label = '1', fontsize = 12]
+  Ax -> dX4 [arrowsize = 0.5, label = '1', fontsize = 12]
+  Ay -> dY2 [arrowsize = 0.5, label = '1', fontsize = 12]
+  Ay -> dY3 [arrowsize = 0.5, label = '1', fontsize = 12]
+  Ay -> dY4 [arrowsize = 0.5, label = '1', fontsize = 12]
+}
+")
+```
+
+
+
+## `estimateLChange()`: Generated `lavaan` Syntax
+
+`estimateLChange()` returns a `lavaan` model string with the unified labels: `ar_x`, `ar_y` are proportional self-feedback (the effective autoregressive parameter is $1+AR()$); `cl_xy`, `cl_yx` are coupling (cross-lagged) parameters; `A_x`, `A_y` are accumulating constant-change factors; `u_var_x`, `u_var_y` are unique-factor (measurement-error) variances. The function returns syntax that can be passed directly to `lavaan::lavaan()`.
+
+### Univariate LCSM with constant change
+
+The simplest specification: one variable, four waves, constant-change factor switched to **on**.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+estimateLChange(waves                    = 4,
+                variable_type            = "univariate",
+                estimate_constant_change = TRUE) |>
+  cat()
+```
+
+### Bivariate LCSM with constant change
+
+This adds the second process and the coupling parameters `cl_xy`, `cl_yx`. With `constrain_beta = TRUE` and `constrain_omega = TRUE` the proportional and coupling parameters are held equal across waves.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+estimateLChange(waves                    = 4,
+                variable_type            = "bivariate",
+                constrain_beta           = TRUE,
+                constrain_omega          = TRUE,
+                estimate_constant_change = TRUE) |>
+  cat()
+```
+
+### Bivariate LCSM without constant change
+
+Dropping the accumulating factor leaves only proportional change and coupling — the LCSM analogue of the CLPM in change form.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+estimateLChange(waves                    = 4,
+                variable_type            = "bivariate",
+                estimate_constant_change = FALSE) |>
+  cat()
+```
+
+### Bivariate LCSM with change-to-change effects
+
+Requires $\geq 4$ waves; adds parameters `phi_x`, `phi_y` (change AR) and `phi_cl_x`, `phi_cl_y` (change cross-lag). 
+
+Unfortunately, there is not a "level" analogue to this specification. The change-to-change parameters capture change on change itself. In particular, $\phi_x$ is the effect of prior change in $x$ on subsequent change in $x$, while $\phi_{cl_x}$ is the effect of prior change in $y$ on current/subsequent change in $x$.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+estimateLChange(waves                     = 4,
+                constrain_beta           = TRUE,
+                constrain_omega          = TRUE,
+                estimate_constant_change = TRUE,
+                variable_type             = "bivariate",
+                estimate_change_to_change = TRUE) |>
+  cat()
+```
+
+## `simLChange()`: Simulating from the LCSM
+
+`simLChange()` simulates data under user specified true values. Arguments mirror the estimator syntax: `beta_x`/`beta_y` (proportional change), `omega_x`/`omega_y` (coupling), `constant_mean_x`/`constant_mean_y` and `latent_variance_x`/`latent_variance_y` (constant-change factor mean and variance), and `estimate_constant_change` to toggle accumulating change.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+sim <- simLChange(
+  waves                    = 5,
+  variable_type            = "bivariate",
+  beta_x                   = -0.7,
+  beta_y                   = -0.7,
+  omega_x                  = 0.5,
+  omega_y                  = 0.5,
+  estimate_constant_change = FALSE,
+  sample.nobs              = 500
+)
+str(sim$data, list.len = 6)
+```
+
+## Algebraic Equivalence: LCSM = CLPM in Change Form
+
+Without a constant-change factor and without measurement error, the LCSM dynamic equation $\Delta x_t = \beta_x x_{t-1} + \omega_x y_{t-1} + u$ rearranges to $x_t = (1+\beta_x) x_{t-1} + \omega_x y_{t-1} + u$ — exactly the CLPM regression on the level scores. The CLPM should recover $1+\beta$ for autoregressives and $\omega$ for cross-lags. I do a lot of this throughout the document -- it's useful to see the equivalence across models
+
+1. **Measurement error.** `simLChange()` defaults `indicator_variance_x = indicator_variance_y = 0.5`, putting noise on the observed scores. The CLPM has no latent measurement model, so its coefficients are attenuated by errors-in-variables. The LCSM separates true scores from indicators and is immune.
+2. **Constant change.** When the accumulating factor is on, each unit carries a stable trajectory; the CLPM treats this as wave-specific variation and biases AR up / CL down.
+
+The simulated data -- under the latent change specification -- leads to estimates for the CLPM which mirror the generating parameters. 
+
+
+```{r echo = TRUE, message = FALSE, warning = FALSE}
+clean <- simLChange(
+  waves                    = 5,
+  variable_type            = "bivariate",
+  beta_x                   = -0.2,
+  beta_y                   = -0.2,
+  omega_x                  = 0.20,
+  omega_y                  = 0.55,
+  indicator_variance_x     = 0.001,
+  indicator_variance_y     = 0.001,
+  estimate_constant_change = FALSE,
+  sample.nobs              = 1000
+)
+cat("DGP: LCSM, no constant change, near-zero measurement error.\n",
+    "Expect AR_x ≈ AR_y ≈ 0.80, CL_yx ≈ 0.20, CL_xy ≈ 0.55.\n", sep = "")
+summary(lavaan(estimateCLPM(waves = 5), data = clean$data),
+        standardized = TRUE)
+```
+
+## Constant Change and Unit Effects
+
+Now turn the constant-change factor on, keeping measurement error off. This creates an upward bias for the AR parameter and a downward bias for the CL parameter in the CLPM.
+
+```{r echo = TRUE, message = FALSE, warning = FALSE}
+lcsm_data <- simLChange(
+  waves                    = 5,
+  variable_type            = "bivariate",
+  beta_x                   = -0.5,
+  beta_y                   = -0.5,
+  omega_x                  = 0.20,
+  omega_y                  = 0.55,
+  indicator_variance_x     = 0.01,
+  indicator_variance_y     = 0.01,
+  estimate_constant_change = TRUE,
+  latent_variance_x        = 1,
+  latent_variance_y        = 1,
+  sample.nobs              = 1000
+)
+cat("DGP: LCSM with constant change (near-zero measurement error).\n",
+    "Estimator: CLPM (does not absorb unit effects).\n", sep = "")
+summary(lavaan(estimateCLPM(waves = 5), data = lcsm_data$data),
+        standardized = TRUE)
+```
+
+The corresponding LCSM fit on the same data recovers the generating parameters:
+
+```{r echo = TRUE, message = FALSE, warning = FALSE}
+summary(lavaan(estimateLChange(waves = 5, variable_type = "bivariate", estimate_constant_change = TRUE),
+               data = lcsm_data$data),
+        standardized = FALSE)
+```
+
+## Summary
+The LCSM is a powerful framework for modeling dynamics in change form. By differencing observed scores, it effectively absorbs all time-invariant heterogeneity, including stable between-person differences. The `estimateLChange()` function generates `lavaan` syntax for a variety of LCSM specifications, while `simLChange()` simulates data.
+
+There is a clear algebraic equivalence between the LCSM without constant change and the CLPM in change form. However, the presence of measurement error and/or constant change leads to bias in the CLPM estimates, while the LCSM can recover the true parameters. 
+
+
+## Appendix: Detailed LCSM DAG
+
+@fig-lcm-full shows the bivariate LCSM with its full measurement model: latent true scores $q_t$ (for $X$) and $p_t$ (for $Y$), constant-change factors $\Delta_x, \Delta_y$, change scores $\Delta x_t, \Delta y_t$, and observed indicators across five waves.
+
+```{r}
+#| label: fig-lcm-full
+#| echo: false
+#| message: false
+#| warning: false
+#| fig-cap: "Bivariate Latent Change Score Model with constant-change factors. Full measurement model across five waves."
+library(DiagrammeR)
+grViz("
+digraph LCM {
+  graph [layout = neato, rankdir = TB, bgcolor = white]
+  node [shape = box, style = filled, fillcolor = white, fontsize = 11]
+
+  A_X [pos = '-2.5,1!', shape = circle, fillcolor = white, label = <Δ<sub>x</sub>>,  width = 0.5, height = 0.5]
+  I [pos = '-2.5,0!', shape = triangle, fillcolor = white, label = 'I',  width = 0.5, height = 0.5]
+  X1 [pos = '-2,2.2!', label = 'x1', width = 0.6, height = 0.3]
+  X2 [pos = '-1,2.2!', label = 'x2', width = 0.6, height = 0.3]
+  X3 [pos = '0,2.2!', label = 'x3', width = 0.6, height = 0.3]
+  X4 [pos = '1,2.2!', label = 'x4', width = 0.6, height = 0.3]
+  X5 [pos = '2,2.2!', label = 'x5', width = 0.6, height = 0.3]
+
+  wX1 [pos = '-2,1.35!', shape = circle, fillcolor = white, label = 'q1']
+  wX2 [pos = '-1,1.35!', shape = circle, fillcolor = white, label = 'q2']
+  wX3 [pos = '0,1.35!', shape = circle, fillcolor = white, label = 'q3']
+  wX4 [pos = '1,1.35!', shape = circle, fillcolor = white, label = 'q4']
+  wX5 [pos = '2,1.35!', shape = circle, fillcolor = white, label = 'q5']
+
+  wY1 [pos = '-2,-1.35!', shape = circle, fillcolor = white, label = 'p1']
+  wY2 [pos = '-1,-1.35!', shape = circle, fillcolor = white, label = 'p2']
+  wY3 [pos = '0,-1.35!', shape = circle, fillcolor = white, label = 'p3']
+  wY4 [pos = '1,-1.35!', shape = circle, fillcolor = white, label = 'p4']
+  wY5 [pos = '2,-1.35!', shape = circle, fillcolor = white, label = 'p5']
+
+  dX2 [pos = '-1,0.5!', shape = circle, fillcolor = white, label = 'Δx2']
+  dX3 [pos = '0,0.5!', shape = circle, fillcolor = white, label = 'Δx3']
+  dX4 [pos = '1,0.5!', shape = circle, fillcolor = white, label = 'Δx4']
+  dX5 [pos = '2,0.5!', shape = circle, fillcolor = white, label = 'Δx5']
+
+  dY2 [pos = '-1,-0.5!', shape = circle, fillcolor = white, label = 'Δy2']
+  dY3 [pos = '0,-0.5!',  shape = circle, fillcolor = white, label = 'Δy3']
+  dY4 [pos = '1,-0.5!',  shape = circle, fillcolor = white, label = 'Δy4']
+  dY5 [pos = '2,-0.5!',  shape = circle, fillcolor = white, label = 'Δy5']
+
+  Y1 [pos = '-2,-2.2!', label = 'y1', width = 0.6, height = 0.3]
+  Y2 [pos = '-1,-2.2!', label = 'y2', width = 0.6, height = 0.3]
+  Y3 [pos = '0,-2.2!', label = 'y3', width = 0.6, height = 0.3]
+  Y4 [pos = '1,-2.2!', label = 'y4', width = 0.6, height = 0.3]
+  Y5 [pos = '2,-2.2!', label = 'y5', width = 0.6, height = 0.3]
+  A_Y [pos = '-2.5,-1!', shape = circle, fillcolor = white, label = <Δ<sub>y</sub>>, width = 0.5, height = 0.5]
+
+  A_X -> dX2 [arrowsize = 0.5, tailport = e, headport = n]
+  A_X -> dX3 [arrowsize = 0.5, tailport = e, headport = n]
+  A_X -> dX4 [arrowsize = 0.5, tailport = e, headport = n]
+  A_X -> dX5 [arrowsize = 0.5, tailport = e, headport = n]
+  A_Y -> dY2 [arrowsize = 0.5, tailport = e, headport = s]
+  A_Y -> dY3 [arrowsize = 0.5, tailport = e, headport = s]
+  A_Y -> dY4 [arrowsize = 0.5, tailport = e, headport = s]
+  A_Y -> dY5 [arrowsize = 0.5, tailport = e, headport = s]
+
+  I -> A_X [arrowsize = 0.5, tailport = n, headport = s]
+  I -> A_Y [arrowsize = 0.5, tailport = s, headport = n]
+  I -> wX1 [arrowsize = 0.5, tailport = n, headport = s]
+  I -> wY1 [arrowsize = 0.5, tailport = s, headport = n]
+
+  wX1 -> X1 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX2 -> X2 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX3 -> X3 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX4 -> X4 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX5 -> X5 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY1 -> Y1 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY2 -> Y2 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY3 -> Y3 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY4 -> Y4 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY5 -> Y5 [label = '1', arrowsize = 0.5, fontsize = 11]
+
+  wY1 -> dY2 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wY2 -> dY3 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wY3 -> dY4 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wY4 -> dY5 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wX1 -> dX2 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wX2 -> dX3 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wX3 -> dX4 [label = 'β', arrowsize = 0.5, fontsize = 10]
+  wX4 -> dX5 [label = 'β', arrowsize = 0.5, fontsize = 10]
+
+  wX1 -> dY2 [label = 'ω', arrowsize = 0.5, fontsize = 10]
+  wX2 -> dY3 [label = 'ω', arrowsize = 0.5, fontsize = 10]
+  wX3 -> dY4 [label = 'ω', arrowsize = 0.5, fontsize = 10]
+  wX4 -> dY5 [label = 'ω', arrowsize = 0.5, fontsize = 10]
+  wY1 -> dX2 [label = 'ω', arrowsize = 0.5, fontsize = 10]
+  wY2 -> dX3 [label = 'ω', arrowsize = 0.5, fontsize = 10]
+  wY3 -> dX4 [label = 'ω', arrowsize = 0.5, fontsize = 10]
+  wY4 -> dX5 [label = 'ω', arrowsize = 0.5, fontsize = 10]
+
+  wX1 -> wX2 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX2 -> wX3 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX3 -> wX4 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wX4 -> wX5 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY1 -> wY2 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY2 -> wY3 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY3 -> wY4 [label = '1', arrowsize = 0.5, fontsize = 11]
+  wY4 -> wY5 [label = '1', arrowsize = 0.5, fontsize = 11]
+
+  dX2 -> wX2 [arrowsize = 0.5]
+  dX3 -> wX3 [arrowsize = 0.5]
+  dX4 -> wX4 [arrowsize = 0.5]
+  dX5 -> wX5 [arrowsize = 0.5]
+  dY2 -> wY2 [arrowsize = 0.5]
+  dY3 -> wY3 [arrowsize = 0.5]
+  dY4 -> wY4 [arrowsize = 0.5]
+  dY5 -> wY5 [arrowsize = 0.5]
+}
+")
+```
+

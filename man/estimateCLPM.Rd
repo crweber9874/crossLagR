@@ -30,23 +30,43 @@ estimateCLPM(
 \item{start_values}{Logical. If TRUE, provides starting values for key parameters. Default is FALSE.}
 }
 \value{
-A character string containing the Lavaan model syntax for CLPM.
+A character string containing the lavaan model syntax for the CLPM.
 }
 \description{
-Generates model syntax for Cross-Lagged Panel Model (CLPM) with options to constrain parameters across waves.
+Generates lavaan model syntax for the Cross-Lagged Panel Model (CLPM).
 }
 \details{
-This function generates the model syntax for a Cross-Lagged Panel Model (CLPM)
-with a specified number of waves. The CLPM examines reciprocal relationships
-between two variables over time without separating stable between-person
-differences from within-person effects.
+This function generates lavaan syntax for a Cross-Lagged Panel Model following
+the unified framework of Usami, Murayama, & Hamaker (2019). In this framework,
+the CLPM uses only the decomposition equation (group-mean centering) and the
+dynamic equation (lagged regression), with no unique factors, trait factors,
+or growth factors.
 
-Key parameters estimated:
-- beta_y, beta_x: Autoregressive effects (stability parameters)
-- omega_xy, omega_yx: Cross-lagged effects (reciprocal influences)
-- var_x, var_y: Residual variances
-- cov_xy: Residual covariances (within-time associations)
+Parameter labels follow the unified naming convention:
+\itemize{
+  \item \code{ar_y}, \code{ar_x}: Autoregressive effects. In the CLPM these
+    reflect rank-order stability, conflating between- and within-person processes.
+  \item \code{cl_xy}, \code{cl_yx}: Cross-lagged effects (Granger-causal paths).
+    \code{cl_xy} = effect of X on Y; \code{cl_yx} = effect of Y on X.
+  \item \code{d_var_x}, \code{d_var_y}: Dynamic residual (innovation) variances.
+  \item \code{d_cov_xy}: Dynamic residual covariance (within-time association).
+}
+}
+\examples{
+\dontrun{
+# Generate CLPM syntax with 5 waves
+syntax <- estimateCLPM(waves = 5)
+cat(syntax)
 
-The model assumes that all effects are due to within-person processes,
-unlike the RI-CLPM which separates stable traits from dynamic effects.
+# Fit with lavaan
+library(lavaan)
+fit <- lavaan(syntax, data = my_data, meanstructure = TRUE)
+summary(fit, fit.measures = TRUE)
+}
+
+}
+\references{
+Usami, S., Murayama, K., & Hamaker, E. L. (2019). A unified framework of
+  longitudinal models to examine reciprocal relations. \emph{Psychological
+  Methods}, 24(5), 637-657.
 }

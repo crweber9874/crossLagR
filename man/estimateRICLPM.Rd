@@ -14,9 +14,8 @@ estimateRICLPM(
   constrain_residual_covariances = TRUE,
   estimate_means = FALSE,
   start_values = FALSE,
-  label_autoregressive = c("beta_y", "beta_x", "beta_z"),
-  label_crosslagged = c("omega_xy", "omega_yx", "omega_zx", "omega_zy", "omega_xz",
-    "omega_yz")
+  label_autoregressive = c("ar_x", "ar_y", "ar_z"),
+  label_crosslagged = c("cl_yx", "cl_xy", "cl_xz", "cl_yz", "cl_zx", "cl_zy")
 )
 }
 \arguments{
@@ -38,61 +37,57 @@ estimateRICLPM(
 
 \item{start_values}{Logical. If TRUE, provides starting values for key parameters. Default is FALSE.}
 
-\item{label_autoregressive}{Character vector for autoregressive parameter labels. Default is c("beta_y", "beta_x", "beta_z").}
+\item{label_autoregressive}{Character vector for autoregressive parameter labels.
+Default is \code{c("ar_x", "ar_y", "ar_z")}.}
 
-\item{label_crosslagged}{Character vector for cross-lagged parameter labels. Default is c("omega_xy", "omega_yx", "omega_zx", "omega_zy", "omega_xz", "omega_yz").}
+\item{label_crosslagged}{Character vector for cross-lagged parameter labels.
+Default is \code{c("cl_yx", "cl_xy", "cl_xz", "cl_yz", "cl_zx", "cl_zy")}.}
 }
 \value{
-A character string containing the Lavaan model syntax for RICLPM.
+A character string containing the lavaan model syntax for the RI-CLPM.
 }
 \description{
-Generates model syntax for Random Intercept Cross-Lagged Panel Model (RICLPM) with hard-coded variable names and comprehensive parameter control options
+Generates lavaan model syntax for the Random Intercept Cross-Lagged
+  Panel Model (RI-CLPM).
 }
 \details{
-This function generates the model syntax for a Random Intercept Cross-Lagged Panel Model (RICLPM)
-with a specified number of waves. The RICLPM separates stable between-person differences
-(random intercepts) from within-person dynamics (autoregressive and cross-lagged effects).
+This function generates lavaan syntax for a Random Intercept Cross-Lagged Panel
+Model following the unified framework of Usami, Murayama, & Hamaker (2019). The
+RI-CLPM uses both the decomposition equation (separating stable trait factors
+from within-person deviations) and the dynamic equation (lagged regression on
+the within-person deviations).
 
-Variable naming convention:
-- X variables: x1, x2, x3, ..., x[waves]
-- Y variables: y1, y2, y3, ..., y[waves]
-- Z variables (if included): z1, z2, z3, ..., z[waves]
+Parameter labels follow the unified naming convention:
+\itemize{
+  \item \code{ar_x}, \code{ar_y}, \code{ar_z}: Autoregressive effects. In the
+    RI-CLPM these represent \emph{within-person carry-over}, not rank-order
+    stability (which is captured by the trait factor I).
+  \item \code{cl_xy}, \code{cl_yx}: Cross-lagged effects operating at the
+    within-person level. \code{cl_xy} = effect of X on Y; \code{cl_yx} = effect
+    of Y on X.
+  \item \code{d_var_x}, \code{d_var_y}, \code{d_var_z}: Dynamic residual
+    (innovation) variances for within-person deviations.
+  \item \code{d_cov_xy}, \code{d_cov_xz}, \code{d_cov_yz}: Dynamic residual
+    covariances (within-time, within-person associations).
+  \item \code{I_x}, \code{I_y}, \code{I_z}: Stable trait factors (random
+    intercepts) representing time-invariant between-person differences. These
+    are unique to models that include decomposition of trait and state (no
+    direct analogue in the CLPM).
+}
 
-Your data must contain these exact variable names for the specified number of waves.
-
-Parameter labels follow consistent naming:
-- Autoregressive effects: beta_x (X→X), beta_y (Y→Y), beta_z (Z→Z)
-- Cross-lagged effects: omega_xy (Y→X), omega_yx (X→Y), omega_zx (Z→X),
-  omega_zy (Z→Y), omega_xz (X→Z), omega_yz (Y→Z)
-
-Key model components:
-- Random intercepts (BX, BY, BZ) that capture stable between-person differences
-- Wave-specific latent variables (p, q, r) that capture within-person deviations
-- Autoregressive effects within variables across time
-- Cross-lagged effects between variables across time
-- Within-time covariances between variables
-
-The model assumes that observed variables are indicators of latent within-person
-deviations plus stable individual differences (random intercepts).
-
-Constraint options allow for:
-- Equality constraints on autoregressive effects across waves
-- Equality constraints on cross-lagged effects across waves
-- Equality constraints on residual variances across waves
-- Equality constraints on residual covariances across waves
-
-When constraints are applied, parameters are constrained to equality across all waves
-from wave 2 onwards (since wave 1 has no predictors).
+Within-person latent deviations are labeled \code{p} (for X), \code{q} (for Y),
+and \code{r} (for Z). These structural latent variables have no direct analogue
+across all models and retain model-specific names.
 }
 \examples{
 \dontrun{
-# Basic RICLPM with 5 waves (assumes data has x1-x5, y1-y5)
+# Basic RI-CLPM with 5 waves (assumes data has x1-x5, y1-y5)
 model_syntax <- estimateRICLPM(waves = 5)
 
-# RICLPM with unconstrained cross-lagged effects
+# RI-CLPM with unconstrained cross-lagged effects
 model_syntax <- estimateRICLPM(waves = 5, constrain_omega = FALSE)
 
-# RICLPM with third variable (assumes data has x1-x5, y1-y5, z1-z5)
+# RI-CLPM with third variable (assumes data has x1-x5, y1-y5, z1-z5)
 model_syntax <- estimateRICLPM(waves = 5, include_z = TRUE)
 
 # Fit the model
@@ -101,4 +96,12 @@ fitted_model <- lavaan(model_syntax, data = your_data)
 summary(fitted_model, fit.measures = TRUE, standardized = TRUE)
 }
 
+}
+\references{
+Usami, S., Murayama, K., & Hamaker, E. L. (2019). A unified framework of
+  longitudinal models to examine reciprocal relations. \emph{Psychological
+  Methods}, 24(5), 637-657.
+
+Hamaker, E. L., Kuiper, R. M., & Grasman, R. P. P. P. (2015). A critique
+  of the cross-lagged panel model. \emph{Psychological Methods}, 20, 102-116.
 }

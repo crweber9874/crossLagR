@@ -2,7 +2,7 @@
 % Please edit documentation in R/compileCTSEM.R
 \name{compCTSEM}
 \alias{compCTSEM}
-\title{compileCTSEM}
+\title{compCTSEM}
 \usage{
 compCTSEM(
   data = dat_long,
@@ -18,19 +18,39 @@ compCTSEM(
 )
 }
 \arguments{
-\item{data}{Must be a long format data frame.}
+\item{data}{A long-format data frame.}
 
-\item{id}{id, which is used to estimate subject specific effects.}
+\item{id}{Character. Name of the ID column. Default is \code{"id"}.}
+
+\item{manifest_var_names}{Character vector of manifest variable names. Default is \code{c("x", "y")}.}
+
+\item{latent_var_names}{Character vector of latent variable names. Default is \code{c("x", "y")}.}
+
+\item{LAMBDA}{Factor loading matrix. Default is \code{diag(2)}.}
+
+\item{type}{Character. Type of ctsem model. Default is \code{"stanct"}.}
+
+\item{time_points}{Integer. Number of time points. Default is 10.}
+
+\item{cores}{Integer. Number of CPU cores for parallel computation.}
+
+\item{chains}{Integer. Number of MCMC chains.}
+
+\item{...}{Additional arguments passed to \code{ctsem::ctModel}.}
 }
 \value{
 A list; returns model and drift matrix
 #'
 }
 \description{
-Create a continuous time model and generate a one unit discrete time
-prediction for auto and cross effects.
-The function returns the auto and cross effects translated to a discrete time model,
-and a change of t, dt = 1. These are the AR AND CL parameters in the CLPM.
+Create a continuous time model specification using the ctsem package.
 
-#'
+Wraps \code{ctsem::ctModel} to define a continuous-time structural equation model.
+Returns the model object for subsequent fitting.
+}
+\examples{
+\dontrun{
+model <- compCTSEM(data = my_long_data, time_points = 5)
+}
+
 }

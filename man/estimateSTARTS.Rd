@@ -2,32 +2,48 @@
 % Please edit documentation in R/estimateSTARTS.R
 \name{estimateSTARTS}
 \alias{estimateSTARTS}
-\title{estimateHLM}
+\title{estimateSTARTS}
 \usage{
 estimateSTARTS(data = dat_long, residual_correlation = TRUE, ...)
 }
 \arguments{
-\item{data}{Long data frame, following structure from datLong() names() -> x, y, xlag, ylag}
+\item{data}{Long-format data frame with columns: id, x, y, xlag, ylag
+(as created by \code{reshape_long_sim_cr}).}
 
-\item{chains}{Specify the number of sampling chains, default 3}
+\item{residual_correlation}{Logical. Currently unused; included for interface
+consistency with other estimators. Default is TRUE.}
 
-\item{residual_correlations}{Logical, should residual correlations be estimated?}
-
-\item{iterations}{Number of iterations for the model, default 3000}
-
-\item{cores}{Number of cores to use for the model, default 10}
+\item{...}{Additional arguments (currently unused).}
 }
 \value{
-brms object
+A list with two elements:
+  \itemize{
+    \item \code{yeqn}: fitted \code{lm} object for the Y equation
+    \item \code{xeqn}: fitted \code{lm} object for the X equation
+  }
 }
 \description{
-Generates model for HLM model in brms
+Estimate a STARTS-style model using OLS with individual fixed effects.
+
+This function fits two OLS regression models with individual dummy variables
+(equivalent to fixed effects) to estimate cross-lagged and autoregressive effects.
 }
 \details{
-This function generates a model for a Hierarchical Linear Model (HLM) using the brms package.
-The data must be in long form, and include the lagged variables xlag and ylag.
-The model includes random intercepts and slopes for x and y.
+The model estimates:
+\itemize{
+  \item Y equation: \code{y ~ xlag + ylag + as.factor(id)}
+  \item X equation: \code{x ~ xlag + ylag + as.factor(id)}
+}
+
+This is equivalent to a fixed-effects panel regression with individual-specific
+intercepts estimated via dummy variables.
 }
 \examples{
-# Not Run
+\dontrun{
+sim_data <- simRICLPM(waves = 4, sample.nobs = 200)$data
+long_data <- reshape_long_sim_cr(sim_data)
+results <- estimateSTARTS(data = long_data)
+summary(results$yeqn)
+}
+
 }

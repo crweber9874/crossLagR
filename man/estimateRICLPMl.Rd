@@ -13,31 +13,50 @@ estimateRICLPMl(
 )
 }
 \arguments{
-\item{time_varying_x}{A list of vectors, each containing variable names for the X indicators at each wave. This is clunky, but basically declare the}
+\item{time_varying_x}{A list of vectors, each containing variable names for
+the X indicators at each wave.}
 
-\item{time_varying_y}{A list of vectors, each containing variable names for the Y indicators at each wave.}
+\item{time_varying_y}{A list of vectors, each containing variable names for
+the Y indicators at each wave.}
 
-\item{time_varying_z}{An optional list of vectors, each containing variable names for the Z indicators at each wave.}
+\item{time_varying_z}{An optional list of vectors for Z indicators at each wave.}
 
 \item{time_invariant_vars}{A vector of variable names for time-invariant variables.}
 
 \item{waves}{The number of waves (time points) in the model.}
 }
 \value{
-A character string containing the Lavaan model syntax for RICLPM with freed factor loadings after the first indicator.
+A character string containing lavaan model syntax.
 }
 \description{
-Generates model syntax for Random Intercept Cross-Lagged Panel Model (RICLPM) with multiple indicators per construct, where the first indicator of each latent variable has a fixed factor loading of 1, and subsequent indicators have free factor loadings.
+Generates lavaan model syntax for RI-CLPM with multiple indicators
+  per construct, where the first indicator has a fixed factor loading of 1 and
+  subsequent indicators have free factor loadings.
 }
 \details{
-This function generates the model syntax for a Random Intercept Cross-Lagged Panel Model (RICLPM)
-with a specified number of waves and multiple indicators for each construct. Importantly, for each
-latent variable at each wave, the factor loading of the first indicator is fixed to 1 for identification
-purposes, while the factor loadings of subsequent indicators are freely estimated.
+This function generates lavaan syntax for an RI-CLPM with multiple indicators,
+following the unified framework of Usami, Murayama, & Hamaker (2019). See
+\code{\link{estimateRICLPM}} for the unified parameter naming convention.
+
+Parameter labels:
+\itemize{
+  \item \code{ar_x}, \code{ar_y}, \code{ar_z}: Autoregressive (within-person carry-over).
+  \item \code{cl_xy}, \code{cl_yx}, etc.: Cross-lagged effects.
+  \item \code{I_x}, \code{I_y}, \code{I_z}: Trait factors (random intercepts).
+}
 }
 \examples{
 \dontrun{
+model_syntax <- estimateRICLPMl(
+  time_varying_x = list(c("x1_1", "x1_2"), c("x2_1", "x2_2")),
+  time_varying_y = list(c("y1_1", "y1_2"), c("y2_1", "y2_2")),
+  waves = 2)
 cat(model_syntax)
 }
 
+}
+\references{
+Usami, S., Murayama, K., & Hamaker, E. L. (2019). A unified framework of
+  longitudinal models to examine reciprocal relations. \emph{Psychological
+  Methods}, 24(5), 637-657.
 }

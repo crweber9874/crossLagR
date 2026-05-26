@@ -184,7 +184,7 @@
 #' combined_results <- do.call(rbind, all_results)
 #' }
 #'
-#' @import dplyr tictoc
+#' @import dplyr
 #' @export
 run_mc_sims <- function(estimator,
                         riclpm_type = "riclpm",
@@ -208,7 +208,8 @@ run_mc_sims <- function(estimator,
   }
 
   library(dplyr)
-  library(tictoc)
+
+  has_tictoc <- requireNamespace("tictoc", quietly = TRUE)
 
   # Valid estimators - UPDATED TO INCLUDE "RI"
   valid_estimators <- c("OLS", "RICLPM", "CLPM", "CTSEM", "FI", "LCHANGE", "RI")
@@ -325,9 +326,13 @@ run_mc_sims <- function(estimator,
     cat("Data generation process:", data_generation, "\n")
   }
 
-  # Start timing - disable tictoc auto-saving to prevent gzfile errors
-  options(tictoc.save = FALSE)
-  tic(paste("Full", estimator, "Monte Carlo Simulation"))
+  # Timing is optional to keep simulation runnable without extra dependencies.
+  if (has_tictoc) {
+    options(tictoc.save = FALSE)
+    tictoc::tic(paste("Full", estimator, "Monte Carlo Simulation"))
+  } else if (verbose) {
+    cat("Package 'tictoc' not installed; running without timing output.\n")
+  }
 
   # SIMPLE APPROACH: Use a basic loop instead of rowwise() + unnest()
   all_results <- list()
@@ -492,7 +497,9 @@ run_mc_sims <- function(estimator,
     }
   }
 
-  toc()
+  if (has_tictoc) {
+    tictoc::toc()
+  }
 
   return(final_results)
 }

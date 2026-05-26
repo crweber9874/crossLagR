@@ -1,0 +1,83 @@
+# The Random-Intercept CLPM
+
+Chapter 1 showed that the CLPM conflates stable between-person differences with within-person dynamics. Chapter 2 addressed this through *change* scores; the Latent Change Score Model. This chapter takes up the alternative decomposition popularized by @hamaker_critique_2015: the **Random-Intercept Cross-Lagged Panel Model (RI-CLPM)**, which splits each observed score into a stable trait ($I_x$, $I_y$) and a wave-specific within-person deviation ($p_t$, $q_t$). Lagged regressions are then specified on the deviations, not on the raw scores.
+
+```{r echo=FALSE, message=FALSE, warning=FALSE}
+library(crossLagR)
+library(dplyr)
+library(ggplot2)
+library(lavaan)
+library(purrr)
+library(tidyr)
+```
+
+## Decomposition
+
+$x_{it}$  and $y_{it}$ denote the observed scores for person $i$ at time $t$. It's useful to decompose the observed scores into constituent parts: an overall mean for each wave ($\mu_{xt}, \mu_{yt}$), a stable trait for each person ($I_{x,i}, I_{y,i}$), and a time-varying deviation from that trait ($x^*_{it}, y^*_{it}$).  Or more compactly, the effect of time, the effect of person, and the effect of random noise around these two components. 
+$$
+\begin{aligned}
+x_{it} &= \mu_{xt} + I_{x,i} + x^*_{it}, \\
+y_{it} &= \mu_{yt} + I_{y,i} + y^*_{it},
+\end{aligned}
+$$
+
+
+Unlike the CLPM though, the dynamic equation is not specified on the observed scores, but rather, the deviations from the trait, $x^*_{it}$ and $y^*_{it}$.
+$$
+\begin{aligned}
+x^*_{it} &= \text{ar}_x\,x^*_{i,t-1} + \text{cl}_{yx}\,y^*_{i,t-1} + u_{x,it}, \\
+y^*_{it} &= \text{ar}_y\,y^*_{i,t-1} + \text{cl}_{xy}\,x^*_{i,t-1} + u_{y,it}.
+\end{aligned}
+$$
+
+::: {.callout-note title="crossLagR syntax: `estimateRICLPM()`"}
+`estimateRICLPM()` emits lavaan syntax with the unified labels `ar_x`, `ar_y` (within-person carry-over), `cl_xy`, `cl_yx` (within-person cross-lags), `I_x`, `I_y` (stable traits), and `d_var_*`, `d_cov_xy` (dynamic residuals). Optional `include_z = TRUE` adds a third process; `time_invariant_vars` regresses traits on covariates.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+estimateRICLPM(waves           = 3,
+               constrain_beta  = TRUE,
+               constrain_omega = TRUE) |>
+  cat()
+```
+:::
+
+::: {.callout-note title="crossLagR syntax: `simRICLPM()`"}
+`simRICLPM()` simulates from the RI-CLPM at user-specified true values. `var_BX`, `var_BY` set the trait variances, `var_p`, `var_q` the within-person dynamic-residual variances, and `beta_x`/`beta_y`, `omega_xy`/`omega_yx` the AR and CL parameters.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+sim <- simRICLPM(waves       = 5,
+                 beta_x      = 0.3,
+                 beta_y      = 0.3,
+                 omega_xy    = 0.2,
+                 omega_yx    = 0.1,
+                 var_BX      = 1.0,
+                 var_BY      = 1.0,
+                 var_p       = 1.0,
+                 var_q       = 1.0,
+                 sample.nobs = 1000)
+str(sim$data, list.len = 6)
+```
+:::
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+ri <- simRICLPM(waves       = 5,
+                beta_x      = 0.3,
+                beta_y      = 0.3,
+                omega_xy    = 0.2,
+                omega_yx    = 0.1,
+                sample.nobs = 1000,
+                var_BX      = 0.5,
+                var_BY      = 0.5,
+                var_p       = 1,
+                var_q       = 1,
+                estimate_means = TRUE)
+
+cat("DGP: RI-CLPM | Estimator: CLPM (omits trait factors)\n")
+summary(lavaan(estimateCLPM(waves = 5),   data = ri$data))
+
+cat("\nDGP: RI-CLPM | Estimator: RI-CLPM (correctly specified)\n")
+summary(lavaan(estimateRICLPM(waves = 5), data = ri$data))
+```

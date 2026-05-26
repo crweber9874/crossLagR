@@ -1,0 +1,326 @@
+\documentclass[12pt]{article}
+\usepackage{geometry}
+\geometry{letterpaper, left=1in, right=1in, top=1in, bottom=1in}
+\usepackage[utf8]{inputenc}
+\usepackage{graphicx}
+\usepackage{amssymb, amsmath, amsfonts, ntheorem}
+\usepackage{setspace}
+\usepackage{sectsty}
+\usepackage{fancyhdr}
+\usepackage{indentfirst}
+\usepackage{float}
+\usepackage{xcolor}
+\usepackage{caption}
+\usepackage{booktabs}
+\usepackage{afterpage}
+\usepackage{longtable}
+\usepackage{rotating}
+\usepackage{lscape}
+\usepackage{times}
+\usepackage{titlesec}
+\usepackage{placeins}
+\usepackage{multirow, array}
+\usepackage{subfig}
+\usepackage{dcolumn}
+\usepackage{titling}
+\usepackage{makecell}
+\usepackage{csquotes}
+\usepackage{siunitx}
+\usepackage{pdflscape}
+\usepackage{verbatim}
+\usepackage{lipsum}
+\doublespacing
+
+% --- CITATION SETUP (NATBIB) ---
+\usepackage{natbib}
+\setcitestyle{aysep={}}
+\bibliographystyle{chicago-apsr-ph}
+
+% --- HYPERLINKS ---
+\usepackage{hyperref}
+\hypersetup{
+    colorlinks=true,
+    urlcolor=black,
+    citecolor=black,
+    linkcolor=black
+}
+\urlstyle{same}
+
+% --- TIKZ SETUP ---
+\usepackage{tikz}
+\usetikzlibrary{shapes.misc, shapes.geometric, arrows.meta, positioning, shadows.blur, chains, scopes, arrows, shapes.multipart, decorations.pathreplacing, calc, fit}
+
+% TikZ Styles
+\tikzstyle{latent} = [rectangle, draw=black, text centered, text width=2.5cm, minimum height=0.75cm]
+\tikzstyle{arrow} = [thick,->,>=stealth]
+
+% --- CUSTOM COMMANDS ---
+\newcolumntype{d}[1]{D{.}{.}{#1}}
+\renewcommand\theadalign{bc}
+\renewcommand\theadfont{\bfseries}
+\renewcommand\theadgape{\Gape[4pt]}
+\renewcommand\cellgape{\Gape[4pt]}
+
+\usepackage[bottom, hang, flushmargin]{footmisc}
+\usepackage[normalem]{ulem}
+\useunder{\uline}{\ul}{}
+\usepackage[affil-it]{authblk}
+
+% Caption setup
+\captionsetup*{
+  figurename=Figure,
+  tablename=Table,
+  font={bf},
+  labelsep=period,
+  justification=centering,
+  singlelinecheck=off
+}
+
+\newcommand{\floatnote}[1]{\vspace{4pt}\noindent\textit{Note: }#1}
+
+\renewcommand{\footnotesize}{\normalsize}
+\renewcommand{\footnotelayout}{\setstretch{1.5}}
+\setlength{\footnotesep}{\baselineskip}
+
+
+
+\title{The Statistical Limitations of the Cross-Lagged Panel Model}
+\author{}
+\date{}
+
+\begin{document}
+\maketitle
+
+Social scientists often turn to panel data to diagnose causal effects when experiments are impractical \cite{campbell_experimental_1963,campbell_1963}. Whereas dozens of options exist for analyzing longer time series, researchers wishing to analyze cross-sectionally dominant panel structures---in which there are more units than time points---face a more limited set of choices. National surveys like those in the American National Election Studies (ANES) may consist of just a handful of waves, with many respondents interviewed only several times.
+
+We consider popular methods for analyzing panel data in political science. We start by focusing on a common approach to estimate dynamic processes in panel data (particularly public opinion panel data that are cross-section dominant, with far more respondents than panel waves): the cross-lagged panel model (CLPM). The CLPM---introduced by \cite{campbell_experimental_1963} and extended by \cite{kenny1975}---has been widely used to study reciprocal relationships between variables over time. These methods first appeared in the political science literature in the late 1970s \cite{abramowitz_impact_1978,campbell_style_1979,iyengar_testing_1978,jennings_effect_1977,markus_political_1979,markus_dynamic_1979,meier_issue_1979}. The availability of two large panel surveys with rich political content---Jennings and Niemi's socialization study \cite{jennings_political_1974} and the ANES 1972--1974--1976 panel---likely promoted CLPM adoption. Another factor was the availability of Joreskog's LISREL software, which allowed researchers to solve systems of equations using maximum likelihood \cite{markus_analyzing_1979,mccullough_effects_1978,shingles_causal_1976}.
+
+Much of the CLPM's appeal lies in its intuitive structure, flexibility, and ease of implementation. In the half century after its introduction, the CLPM has also been refined and extended due to important limitations in its original formulation. For instance, the model may fail to account for unobserved heterogeneity across individuals---stable characteristics that confound dynamic estimates in the CLPM \cite{usami2015,usami2021,Klopack2020,Kim_Steiner2021}. Because the CLPM does not account for stable unit effects, cross-lagged estimates tend to be biased upward as they conflate within-person dynamics with between-person differences. Though not directly framed as a CLPM critique, \cite{hsiao2022} shows that including a lagged dependent variable can produce a biased lag estimate when the variable is correlated with the error term due to unmodeled between-unit heterogeneity (pp.~64--67). As a consequence, CLPM estimates may be biased, especially when variables are highly stable over time \cite{Hamaker2015,Hamaker2018,Ldtke2022}.
+
+This problem is elaborated in \cite{hsiao2022}. Dynamic models---those that include lagged dependent variables---often induce correlations between observed variables and error terms, yielding biased estimates. The now recognized limitations of the CLPM has contributed to a flourishing of alternative approaches building on the general structure and inherent limitations; examples include the  random intercept cross-lagged panel model (RI-CLPM), proposed in \cite{Hamaker2015}, which separates within-person dynamics from between-person trait effects \cite{Usami2019,Ldtke2022}. Another approach is the Latent Change Score Model (LCSM), which focuses on different change processes and also accounts for stable unit effects by modeling unit-averaged change \cite{Usami2015,McArdle2009,Kim2021}. Another alternative is the latent growth model (LGM), which models individual trajectories over time \cite{usami2015,mcardle2003}.
+
+In the next section, we elaborate on the CLPM, its strengths, and its limitations in different data structures.
+
+\section*{The Cross-Lagged Panel Model}
+
+The cross-lagged regression model follows an intuitive structure. Current realizations $x$ and $y$ are functions of autoregressive and cross-lagged effects. The autoregressive terms capture time dependence, while cross-lagged terms capture how one variable predicts change in the other.
+
+The CLPM may be estimated as a system of simultaneous equations with lagged realizations of $x_i$ and $y_i$:
+\begin{align}
+  y_{it} &= \alpha_{y} + \beta_{yy}y_{it-1} + \beta_{xy}x_{it-1} + \varepsilon_{y,it},\\
+  x_{it} &= \alpha_{x} + \beta_{xx}x_{it-1} + \beta_{yx}y_{it-1} + \varepsilon_{x,it}.
+\end{align}
+
+Here, $\alpha$ denotes intercepts, which may vary across units and waves. With mean-centered variables, intercepts are often set to zero. The parameters $\beta_{xx}$ and $\beta_{xy}$ denote autoregressive and cross-lagged effects for $x$, respectively; $\beta_{yy}$ and $\beta_{yx}$ do the same for $y$. Error terms are typically assumed mean zero with constant variance.
+
+The cross-lagged estimates are:
+\begin{align}
+\hat{\beta}_{xy}
+&=
+\frac{\operatorname{Cov}(x_{i,t-1},y_{it}\mid y_{i,t-1})}
+{\operatorname{Var}(x_{i,t-1}\mid y_{i,t-1})}, \\
+\hat{\beta}_{yx}
+&=
+\frac{\operatorname{Cov}(y_{i,t-1},x_{it}\mid x_{i,t-1})}
+{\operatorname{Var}(y_{i,t-1}\mid x_{i,t-1})}.
+\end{align}
+
+Autoregressive effects are:
+\begin{align}
+\hat{\beta}_{xx} &= \frac{\operatorname{Cov}(x_{it-1}, x_{it})}{\operatorname{Var}(x_{it-1})},\\
+\hat{\beta}_{yy} &= \frac{\operatorname{Cov}(y_{it-1}, y_{it})}{\operatorname{Var}(y_{it-1})}.
+\end{align}
+
+Assume observed variables are generated by a two-level trait-state model:
+\begin{align}
+x_{it} &= \mu_x + \eta_{x,i} + \omega_{x,it},\\
+y_{it} &= \mu_y + \eta_{y,i} + \omega_{y,it}.
+\end{align}
+
+Here, $\mu_x$ and $\mu_y$ are global means; $\eta_{x,i}$ and $\eta_{y,i}$ are time-invariant random intercepts (between-person trait components); and $\omega_{x,it}$ and $\omega_{y,it}$ are within-person, time-varying state deviations.
+
+The CLPM ignores this decomposition and conflates between- and within-person effects. For example, the covariance term in $\hat{\beta}_{xy}$ expands to:
+\begin{align}
+\operatorname{Cov}(x_{it-1}, y_{it}) &= \operatorname{Cov}(\mu_x + \eta_{x,i} + \omega_{x,it-1},\, \mu_y + \eta_{y,i} + \omega_{y,it}) \\
+&= \operatorname{Cov}(\eta_{x,i} + \omega_{x,it-1},\, \eta_{y,i} + \omega_{y,it}) \\
+&= \operatorname{Cov}(\eta_{x,i}, \eta_{y,i}) + \operatorname{Cov}(\eta_{x,i}, \omega_{y,it}) \\
+&\quad + \operatorname{Cov}(\omega_{x,it-1}, \eta_{y,i}) + \operatorname{Cov}(\omega_{x,it-1}, \omega_{y,it}).
+\end{align}
+
+Substituting into $\hat{\beta}_{xy}$ gives:
+\begin{align}
+\hat{\beta}_{xy}
+= \frac{\operatorname{Cov}(\eta_{x,i}, \eta_{y,i}) + \operatorname{Cov}(\eta_{x,i}, \omega_{y,it}) + \operatorname{Cov}(\omega_{x,it-1}, \eta_{y,i}) + \operatorname{Cov}(\omega_{x,it-1}, \omega_{y,it})}{\operatorname{Var}(x_{it-1})}.
+\end{align}
+
+The numerator contains four substantively distinct terms:
+\begin{enumerate}
+\item $\operatorname{Cov}(\eta_{x,i}, \eta_{y,i})$: covariance between stable traits. This is often a major source of CLPM bias.
+\item $\operatorname{Cov}(\eta_{x,i}, \omega_{y,it})$: covariance between stable $x$ level and time-specific $y$ deviation \cite{federico_feldman_weber}.
+\item $\operatorname{Cov}(\omega_{x,it-1}, \eta_{y,i})$: covariance between time-specific $x$ deviation and stable $y$ level \cite{federico_feldman_weber}.
+\item $\operatorname{Cov}(\omega_{x,it-1}, \omega_{y,it})$: the within-person dynamic effect of primary interest.
+\end{enumerate}
+
+The same logic applies to autoregressive terms. For $x$:
+\begin{align}
+\hat{\beta}_{xx} = \frac{\operatorname{Var}(\eta_{x,i}) + \operatorname{Cov}(\eta_{x,i}, \omega_{x,it}) + \operatorname{Cov}(\omega_{x,it-1}, \eta_{x,i}) + \operatorname{Cov}(\omega_{x,it-1}, \omega_{x,it})}{\operatorname{Var}(x_{it-1})}.
+\end{align}
+
+Thus, CLPM lag parameters combine within- and between-person sources rather than isolating pure dynamics.
+
+\section{The Dynamic Fixed Effects Model}
+
+A natural remedy is to remove between-person components before fitting dynamic regressions. The dynamic fixed effects (FE) estimator does this via demeaning:
+\begin{align}
+\tilde{x}_{it} &= x_{it} - \bar{x}_i,\\
+\tilde{y}_{it} &= y_{it} - \bar{y}_i,
+\end{align}
+where $\bar{x}_i = T^{-1}\sum_{t=1}^{T}x_{it}$ and similarly for $\bar{y}_i$.
+
+The within-person model is then:
+\begin{align}
+\tilde{y}_{it} &= \beta_{yy}\tilde{y}_{it-1} + \beta_{xy}\tilde{x}_{it-1} + \tilde{\varepsilon}_{y,it},\\
+\tilde{x}_{it} &= \beta_{xx}\tilde{x}_{it-1} + \beta_{yx}\tilde{y}_{it-1} + \tilde{\varepsilon}_{x,it}.
+\end{align}
+
+The cross-lag estimator simplifies to:
+\begin{align}
+\hat{\beta}_{xy}^{FE} = \frac{\operatorname{Cov}(\tilde{x}_{it-1}, \tilde{y}_{it})}{\operatorname{Var}(\tilde{x}_{it-1})}.
+\end{align}
+
+This removes between-unit covariance terms such as $\operatorname{Cov}(\eta_{x,i},\eta_{y,i})$. However, FE dynamic models can still exhibit Nickell bias in short panels because lagged demeaned regressors and demeaned errors share components of unit means \cite{nickell_biases_1981}. This bias decreases as $T$ increases.
+
+\section{The Bias in the CLPM}
+
+We can demonstrate CLPM bias via Monte Carlo simulation. The DGP generates observed scores as the sum of a time-invariant trait and within-person AR(1) dynamics---a structure that motivates separating between- and within-person variation. We then estimate CLPM via pooled OLS and compare estimates to true dynamic parameters.
+
+
+\begin{table}[H]
+\caption{Monte Carlo summary: bias and RMSE by estimator and condition}
+\centering
+\begin{tabular}[t]{llrrrrrr}
+\toprule
+Estimator & Parameter & Trait/State & Trait $\rho$ & Truth & Mean Est. & Bias & RMSE\\
+\midrule
+CLPM & AR(X) & 0.5 & 0.0 & 0.40 & 0.589 & 0.189 & 0.191\\
+CLPM & AR(Y) & 0.5 & 0.0 & 0.30 & 0.531 & 0.231 & 0.232\\
+CLPM & CL(X$\rightarrow$Y) & 0.5 & 0.0 & 0.15 & 0.059 & $-$0.091 & 0.094\\
+CLPM & CL(Y$\rightarrow$X) & 0.5 & 0.0 & 0.10 & 0.034 & $-$0.066 & 0.070\\
+FE-demeaned & AR(X) & 0.5 & 0.0 & 0.40 & $-$0.035 & $-$0.435 & 0.494\\
+\addlinespace
+FE-demeaned & AR(Y) & 0.5 & 0.0 & 0.30 & $-$0.091 & $-$0.391 & 0.445\\
+FE-demeaned & CL(X$\rightarrow$Y) & 0.5 & 0.0 & 0.15 & 0.091 & $-$0.059 & 0.077\\
+FE-demeaned & CL(Y$\rightarrow$X) & 0.5 & 0.0 & 0.10 & 0.054 & $-$0.046 & 0.061\\
+RI-CLPM & AR(X) & 0.5 & 0.0 & 0.40 & 0.396 & $-$0.004 & 0.044\\
+RI-CLPM & AR(Y) & 0.5 & 0.0 & 0.30 & 0.300 & 0.000 & 0.042\\
+\addlinespace
+RI-CLPM & CL(X$\rightarrow$Y) & 0.5 & 0.0 & 0.15 & 0.142 & $-$0.008 & 0.036\\
+RI-CLPM & CL(Y$\rightarrow$X) & 0.5 & 0.0 & 0.10 & 0.099 & $-$0.001 & 0.034\\
+RI-lme4 & AR(X) & 0.5 & 0.0 & 0.40 & 0.440 & 0.040 & 0.049\\
+RI-lme4 & AR(Y) & 0.5 & 0.0 & 0.30 & 0.332 & 0.032 & 0.041\\
+RI-lme4 & CL(X$\rightarrow$Y) & 0.5 & 0.0 & 0.15 & 0.089 & $-$0.061 & 0.064\\
+\addlinespace
+RI-lme4 & CL(Y$\rightarrow$X) & 0.5 & 0.0 & 0.10 & 0.048 & $-$0.052 & 0.055\\
+CLPM & AR(X) & 0.5 & 0.3 & 0.40 & 0.577 & 0.177 & 0.179\\
+CLPM & AR(Y) & 0.5 & 0.3 & 0.30 & 0.514 & 0.214 & 0.215\\
+CLPM & CL(X$\rightarrow$Y) & 0.5 & 0.3 & 0.15 & 0.110 & $-$0.040 & 0.046\\
+CLPM & CL(Y$\rightarrow$X) & 0.5 & 0.3 & 0.10 & 0.073 & $-$0.027 & 0.035\\
+\addlinespace
+FE-demeaned & AR(X) & 0.5 & 0.3 & 0.40 & $-$0.033 & $-$0.433 & 0.492\\
+FE-demeaned & AR(Y) & 0.5 & 0.3 & 0.30 & $-$0.092 & $-$0.392 & 0.449\\
+FE-demeaned & CL(X$\rightarrow$Y) & 0.5 & 0.3 & 0.15 & 0.099 & $-$0.051 & 0.074\\
+FE-demeaned & CL(Y$\rightarrow$X) & 0.5 & 0.3 & 0.10 & 0.050 & $-$0.050 & 0.066\\
+RI-CLPM & AR(X) & 0.5 & 0.3 & 0.40 & 0.397 & $-$0.003 & 0.047\\
+\addlinespace
+RI-CLPM & AR(Y) & 0.5 & 0.3 & 0.30 & 0.302 & 0.002 & 0.047\\
+RI-CLPM & CL(X$\rightarrow$Y) & 0.5 & 0.3 & 0.15 & 0.152 & 0.002 & 0.039\\
+RI-CLPM & CL(Y$\rightarrow$X) & 0.5 & 0.3 & 0.10 & 0.099 & $-$0.001 & 0.036\\
+RI-lme4 & AR(X) & 0.5 & 0.3 & 0.40 & 0.440 & 0.040 & 0.051\\
+RI-lme4 & AR(Y) & 0.5 & 0.3 & 0.30 & 0.335 & 0.035 & 0.049\\
+\addlinespace
+RI-lme4 & CL(X$\rightarrow$Y) & 0.5 & 0.3 & 0.15 & 0.127 & $-$0.023 & 0.030\\
+RI-lme4 & CL(Y$\rightarrow$X) & 0.5 & 0.3 & 0.10 & 0.081 & $-$0.019 & 0.027\\
+CLPM & AR(X) & 1.0 & 0.0 & 0.40 & 0.688 & 0.288 & 0.289\\
+CLPM & AR(Y) & 1.0 & 0.0 & 0.30 & 0.648 & 0.348 & 0.349\\
+CLPM & CL(X$\rightarrow$Y) & 1.0 & 0.0 & 0.15 & 0.032 & $-$0.118 & 0.120\\
+\addlinespace
+CLPM & CL(Y$\rightarrow$X) & 1.0 & 0.0 & 0.10 & 0.010 & $-$0.090 & 0.092\\
+FE-demeaned & AR(X) & 1.0 & 0.0 & 0.40 & $-$0.032 & $-$0.432 & 0.492\\
+FE-demeaned & AR(Y) & 1.0 & 0.0 & 0.30 & $-$0.093 & $-$0.393 & 0.449\\
+FE-demeaned & CL(X$\rightarrow$Y) & 1.0 & 0.0 & 0.15 & 0.102 & $-$0.048 & 0.067\\
+FE-demeaned & CL(Y$\rightarrow$X) & 1.0 & 0.0 & 0.10 & 0.051 & $-$0.049 & 0.065\\
+\addlinespace
+RI-CLPM & AR(X) & 1.0 & 0.0 & 0.40 & 0.397 & $-$0.003 & 0.044\\
+RI-CLPM & AR(Y) & 1.0 & 0.0 & 0.30 & 0.300 & 0.000 & 0.048\\
+RI-CLPM & CL(X$\rightarrow$Y) & 1.0 & 0.0 & 0.15 & 0.152 & 0.002 & 0.036\\
+RI-CLPM & CL(Y$\rightarrow$X) & 1.0 & 0.0 & 0.10 & 0.099 & $-$0.001 & 0.037\\
+RI-lme4 & AR(X) & 1.0 & 0.0 & 0.40 & 0.457 & 0.057 & 0.066\\
+\addlinespace
+RI-lme4 & AR(Y) & 1.0 & 0.0 & 0.30 & 0.339 & 0.039 & 0.048\\
+RI-lme4 & CL(X$\rightarrow$Y) & 1.0 & 0.0 & 0.15 & 0.083 & $-$0.067 & 0.069\\
+RI-lme4 & CL(Y$\rightarrow$X) & 1.0 & 0.0 & 0.10 & 0.033 & $-$0.067 & 0.070\\
+CLPM & AR(X) & 1.0 & 0.3 & 0.40 & 0.673 & 0.273 & 0.274\\
+CLPM & AR(Y) & 1.0 & 0.3 & 0.30 & 0.626 & 0.326 & 0.327\\
+\addlinespace
+CLPM & CL(X$\rightarrow$Y) & 1.0 & 0.3 & 0.15 & 0.085 & $-$0.065 & 0.068\\
+CLPM & CL(Y$\rightarrow$X) & 1.0 & 0.3 & 0.10 & 0.057 & $-$0.043 & 0.048\\
+FE-demeaned & AR(X) & 1.0 & 0.3 & 0.40 & $-$0.032 & $-$0.432 & 0.490\\
+FE-demeaned & AR(Y) & 1.0 & 0.3 & 0.30 & $-$0.098 & $-$0.398 & 0.454\\
+FE-demeaned & CL(X$\rightarrow$Y) & 1.0 & 0.3 & 0.15 & 0.100 & $-$0.050 & 0.067\\
+\addlinespace
+FE-demeaned & CL(Y$\rightarrow$X) & 1.0 & 0.3 & 0.10 & 0.050 & $-$0.050 & 0.067\\
+RI-CLPM & AR(X) & 1.0 & 0.3 & 0.40 & 0.397 & $-$0.003 & 0.050\\
+RI-CLPM & AR(Y) & 1.0 & 0.3 & 0.30 & 0.297 & $-$0.003 & 0.047\\
+RI-CLPM & CL(X$\rightarrow$Y) & 1.0 & 0.3 & 0.15 & 0.147 & $-$0.003 & 0.038\\
+RI-CLPM & CL(Y$\rightarrow$X) & 1.0 & 0.3 & 0.10 & 0.097 & $-$0.003 & 0.039\\
+\addlinespace
+RI-lme4 & AR(X) & 1.0 & 0.3 & 0.40 & 0.451 & 0.051 & 0.061\\
+RI-lme4 & AR(Y) & 1.0 & 0.3 & 0.30 & 0.333 & 0.033 & 0.043\\
+RI-lme4 & CL(X$\rightarrow$Y) & 1.0 & 0.3 & 0.15 & 0.118 & $-$0.032 & 0.038\\
+RI-lme4 & CL(Y$\rightarrow$X) & 1.0 & 0.3 & 0.10 & 0.075 & $-$0.025 & 0.031\\
+CLPM & AR(X) & 2.0 & 0.0 & 0.40 & 0.785 & 0.385 & 0.386\\
+\addlinespace
+CLPM & AR(Y) & 2.0 & 0.0 & 0.30 & 0.762 & 0.462 & 0.462\\
+CLPM & CL(X$\rightarrow$Y) & 2.0 & 0.0 & 0.15 & 0.010 & $-$0.140 & 0.141\\
+CLPM & CL(Y$\rightarrow$X) & 2.0 & 0.0 & 0.10 & $-$0.003 & $-$0.103 & 0.104\\
+FE-demeaned & AR(X) & 2.0 & 0.0 & 0.40 & $-$0.032 & $-$0.432 & 0.492\\
+FE-demeaned & AR(Y) & 2.0 & 0.0 & 0.30 & $-$0.096 & $-$0.396 & 0.451\\
+\addlinespace
+FE-demeaned & CL(X$\rightarrow$Y) & 2.0 & 0.0 & 0.15 & 0.100 & $-$0.050 & 0.069\\
+FE-demeaned & CL(Y$\rightarrow$X) & 2.0 & 0.0 & 0.10 & 0.049 & $-$0.051 & 0.066\\
+RI-CLPM & AR(X) & 2.0 & 0.0 & 0.40 & 0.397 & $-$0.003 & 0.049\\
+RI-CLPM & AR(Y) & 2.0 & 0.0 & 0.30 & 0.297 & $-$0.003 & 0.046\\
+RI-CLPM & CL(X$\rightarrow$Y) & 2.0 & 0.0 & 0.15 & 0.148 & $-$0.002 & 0.042\\
+\addlinespace
+RI-CLPM & CL(Y$\rightarrow$X) & 2.0 & 0.0 & 0.10 & 0.097 & $-$0.003 & 0.037\\
+RI-lme4 & AR(X) & 2.0 & 0.0 & 0.40 & 0.462 & 0.062 & 0.071\\
+RI-lme4 & AR(Y) & 2.0 & 0.0 & 0.30 & 0.345 & 0.045 & 0.050\\
+RI-lme4 & CL(X$\rightarrow$Y) & 2.0 & 0.0 & 0.15 & 0.074 & $-$0.076 & 0.078\\
+RI-lme4 & CL(Y$\rightarrow$X) & 2.0 & 0.0 & 0.10 & 0.029 & $-$0.071 & 0.073\\
+\addlinespace
+CLPM & AR(X) & 2.0 & 0.3 & 0.40 & 0.775 & 0.375 & 0.376\\
+CLPM & AR(Y) & 2.0 & 0.3 & 0.30 & 0.747 & 0.447 & 0.447\\
+CLPM & CL(X$\rightarrow$Y) & 2.0 & 0.3 & 0.15 & 0.059 & $-$0.091 & 0.092\\
+CLPM & CL(Y$\rightarrow$X) & 2.0 & 0.3 & 0.10 & 0.040 & $-$0.060 & 0.062\\
+FE-demeaned & AR(X) & 2.0 & 0.3 & 0.40 & $-$0.034 & $-$0.434 & 0.494\\
+\addlinespace
+FE-demeaned & AR(Y) & 2.0 & 0.3 & 0.30 & $-$0.089 & $-$0.389 & 0.443\\
+FE-demeaned & CL(X$\rightarrow$Y) & 2.0 & 0.3 & 0.15 & 0.097 & $-$0.053 & 0.072\\
+FE-demeaned & CL(Y$\rightarrow$X) & 2.0 & 0.3 & 0.10 & 0.053 & $-$0.047 & 0.064\\
+RI-CLPM & AR(X) & 2.0 & 0.3 & 0.40 & 0.398 & $-$0.002 & 0.050\\
+RI-CLPM & AR(Y) & 2.0 & 0.3 & 0.30 & 0.303 & 0.003 & 0.045\\
+\addlinespace
+RI-CLPM & CL(X$\rightarrow$Y) & 2.0 & 0.3 & 0.15 & 0.151 & 0.001 & 0.039\\
+RI-CLPM & CL(Y$\rightarrow$X) & 2.0 & 0.3 & 0.10 & 0.100 & 0.000 & 0.038\\
+RI-lme4 & AR(X) & 2.0 & 0.3 & 0.40 & 0.458 & 0.058 & 0.066\\
+RI-lme4 & AR(Y) & 2.0 & 0.3 & 0.30 & 0.342 & 0.042 & 0.050\\
+RI-lme4 & CL(X$\rightarrow$Y) & 2.0 & 0.3 & 0.15 & 0.116 & $-$0.034 & 0.040\\
+\addlinespace
+RI-lme4 & CL(Y$\rightarrow$X) & 2.0 & 0.3 & 0.10 & 0.069 & $-$0.031 & 0.035\\
+\bottomrule
+\end{tabular}
+\end{table}
+
+\bibliography{MPSA/bib/crosslag}
+
+\end{document}

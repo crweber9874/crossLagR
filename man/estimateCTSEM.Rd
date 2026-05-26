@@ -19,19 +19,43 @@ estimateCTSEM(
 )
 }
 \arguments{
-\item{data}{Must be a long format data frame.}
+\item{data}{A long-format data frame.}
 
-\item{id}{id, which is used to estimate subject specific effects.}
+\item{id}{Character. Name of the ID column. Default is \code{"id"}.}
+
+\item{manifest_var_names}{Character vector of manifest variable names. Default is \code{c("x", "y")}.}
+
+\item{latent_var_names}{Character vector of latent variable names. Default is \code{c("x", "y")}.}
+
+\item{LAMBDA}{Factor loading matrix. Default is \code{diag(2)}.}
+
+\item{type}{Character. Type of ctsem model. Default is \code{"stanct"}.}
+
+\item{time_points}{Integer. Number of time points. Default is 10.}
+
+\item{cores}{Integer. Number of CPU cores for parallel computation.}
+
+\item{chains}{Integer. Number of MCMC chains.}
+
+\item{model}{A pre-specified ctsem model (optional). Default is NA.}
+
+\item{...}{Additional arguments passed to \code{ctsem::ctModel} and \code{ctsem::ctStanFit}.}
 }
 \value{
 A list; returns model and drift matrix
 #'
 }
 \description{
-Create a continuous time model and generate a one unit discrete time
-prediction for auto and cross effects.
-The function returns the auto and cross effects translated to a discrete time model,
-and a change of t, dt = 1. These are the AR AND CL parameters in the CLPM.
+Estimate a continuous-time structural equation model and translate
+the drift matrix to discrete-time autoregressive and cross-lagged parameters.
 
-#'
+Uses the ctsem package to fit a continuous-time model and returns the
+dt=1 discrete-time drift matrix alongside the fitted model.
+}
+\examples{
+\dontrun{
+result <- estimateCTSEM(data = my_long_data, time_points = 5, cores = 2, chains = 2)
+result$drift
+}
+
 }

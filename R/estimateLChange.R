@@ -1,16 +1,88 @@
-# CORRECTED estimateLChange function - fixes the change-to-change cross-lagged bug
+#' @title estimateLChange
+#' @description Generate lavaan model syntax for univariate or bivariate Latent Change
+#'   Score Models (LCSM).
+#'
+#' @param waves Integer. Number of waves (time points). Must be >= 3.
+#' @param variable_type Character. Either \code{"univariate"} or \code{"bivariate"}.
+#'   Default is \code{"univariate"}.
+#' @param constrain_indicator_variances Logical. If TRUE, constrains observed
+#'   indicator residual variances (unique factors) to equality across waves.
+#'   Default is TRUE.
+#' @param constrain_beta Logical. If TRUE, constrains proportional (autoregressive)
+#'   effects to equality across waves. Default is TRUE.
+#' @param constrain_omega Logical. If TRUE, constrains cross-lagged coupling
+#'   parameters to equality across waves (bivariate only). Default is TRUE.
+#' @param estimate_change_to_change Logical. If TRUE, includes change-to-change
+#'   autoregressive and cross-lagged effects. Requires >= 4 waves. Default is FALSE.
+#' @param constrain_change_to_change Logical. If TRUE, constrains change-to-change
+#'   autoregressive effects to equality across waves. Default is FALSE.
+#' @param constrain_change_cross_lag Logical. If TRUE, constrains change-to-change
+#'   cross-lagged effects to equality across waves. Default is FALSE.
+#' @param estimate_constant_change Logical. If TRUE, estimates a second-order
+#'   constant change (accumulating) factor that loads on all latent change scores.
+#'   Default is TRUE.
+#'
+#' @return A character string containing lavaan model syntax for the specified LCSM.
+#'
+#' @details
+#' This function generates lavaan syntax for a Latent Change Score Model following
+#' the unified framework of Usami, Murayama, & Hamaker (2019). The LCS model uses
+#' the measurement equation (separating latent true scores from unique factors)
+#' and the dynamic equation (with accumulating factors and lagged regression).
+#'
+#' Parameter labels follow the unified naming convention:
+#' \itemize{
+#'   \item \code{ar_x}, \code{ar_y}: Proportional change coefficients. In the LCS,
+#'     the effective autoregressive parameter is \eqn{1 + ar}, so \code{ar_x} is the
+#'     proportional self-feedback (denoted \eqn{\beta_x} in Usami et al.).
+#'   \item \code{cl_yx}, \code{cl_xy}: Coupling parameters (cross-lagged effects).
+#'     \code{cl_yx} = effect of Y level on X change; \code{cl_xy} = effect of X
+#'     level on Y change. Referred to as \eqn{\gamma} in Usami et al.
+#'   \item \code{u_var_x}, \code{u_var_y}: Unique factor (measurement error) variances.
+#'   \item \code{A_x}, \code{A_y}: Accumulating factors (constant change factors).
+#'     Unlike growth factors (I, S) in the LCM-SR which have only direct effects,
+#'     these accumulating factors have both direct and indirect effects on scores
+#'     through the lagged relations.
+#' }
+#'
+#' Change-to-change parameters (\code{phi_x}, \code{phi_y}, \code{phi_cl_x},
+#' \code{phi_cl_y}) are unique to the LCS model and have no direct analogue in
+#' other models in the unified framework.
+#'
+#' @references
+#' Usami, S., Murayama, K., & Hamaker, E. L. (2019). A unified framework of
+#'   longitudinal models to examine reciprocal relations. \emph{Psychological
+#'   Methods}, 24(5), 637-657.
+#'
+#' McArdle, J. J., & Hamagami, F. (2001). Latent difference score structural
+#'   models for linear dynamic analyses with incomplete longitudinal data.
+#'
+#' @examples
+#' \dontrun{
+#' # Univariate LCSM with 5 waves
+#' syntax <- estimateLChange(waves = 5)
+#' cat(syntax)
+#'
+#' # Bivariate LCSM with coupling parameters
+#' syntax <- estimateLChange(waves = 5, variable_type = "bivariate")
+#'
+#' # Fit with lavaan
+#' library(lavaan)
+#' fit <- lavaan(syntax, data = my_data, meanstructure = TRUE)
+#' summary(fit)
+#' }
+#'
+#' @export
 
 estimateLChange <- function(waves = 10,
-                                  variable_type = c('univariate', 'bivariate'),
-                                  constrain_indicator_variances = TRUE,
-                                  constrain_beta = TRUE,
-                                  constrain_omega = TRUE,
-                                  estimate_change_to_change = FALSE,
-                                  constrain_change_to_change = FALSE,
-                                  constrain_change_cross_lag = FALSE,
-                                  estimate_constant_change = TRUE
-) {
-
+                            variable_type = c("univariate", "bivariate"),
+                            constrain_indicator_variances = TRUE,
+                            constrain_beta = TRUE,
+                            constrain_omega = TRUE,
+                            estimate_change_to_change = FALSE,
+                            constrain_change_to_change = FALSE,
+                            constrain_change_cross_lag = FALSE,
+                            estimate_constant_change = TRUE) {
   # Validate inputs
   if (!is.numeric(waves) || waves <= 0 || waves != as.integer(waves)) {
     stop("Error: Parameter 'waves' must be a positive integer.")
@@ -25,9 +97,8 @@ estimateLChange <- function(waves = 10,
   model_string <- ""
   if (variable_type == "univariate") {
     # ==================== SINGLE VARIABLE MODEL ====================
-    # [Keep all the univariate code the same - bug is only in bivariate section]
 
-    # cf = change factor
+    # Measurement equation: latent true scores
     for (w in 1:waves) {
       model_string <- paste0(model_string, "    cf", w, " =~ 1*x", w, "\n")
     }
@@ -47,9 +118,10 @@ estimateLChange <- function(waves = 10,
       model_string <- paste0(model_string, "    x", w, " ~ 0*1\n")
     }
 
+    # Unique factor variances (measurement equation)
     if (constrain_indicator_variances) {
       for (w in 1:waves) {
-        model_string <- paste0(model_string, "    x", w, " ~~ sigma2_indicator*x", w, "\n")
+        model_string <- paste0(model_string, "    x", w, " ~~ u_var_x*x", w, "\n")
       }
     } else {
       for (w in 1:waves) {
@@ -57,43 +129,44 @@ estimateLChange <- function(waves = 10,
       }
     }
 
+    # Autoregressive structure (fixed = 1)
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    cf", w, " ~ 1*cf", w - 1, "\n")
     }
 
-    # Latent change loadings, fixed to 1 for identification with a single variable indicator model
+    # Latent change scores
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    ld", w, " =~ 1*cf", w, "\n")
     }
 
-    # Latent change score means (constrained to 0), for ident
+    # Latent change score means (constrained to 0)
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    ld", w, " ~ 0*1\n")
     }
 
     if (estimate_constant_change) {
-      # Latent change score variances (constrained to 0) when estimating higher order factor, constant change
+      # Latent change score variances (constrained to 0) when estimating accumulating factor
       for (w in 2:waves) {
         model_string <- paste0(model_string, "    ld", w, " ~~ 0*ld", w, "\n")
       }
 
-      # Constant change factor (loadings = 1)
-      model_string <- paste0(model_string, "    general =~ 1*ld2\n")
+      # Accumulating factor A (loadings = 1)
+      model_string <- paste0(model_string, "    A_x =~ 1*ld2\n")
       for (w in 3:waves) {
         model_string <- paste0(model_string, "          + 1*ld", w, "\n")
       }
 
-      # Constant change factor mean and variance
-      model_string <- paste0(model_string, "    general ~ 1\n")
-      model_string <- paste0(model_string, "    general ~~ general\n")
+      # Accumulating factor mean and variance
+      model_string <- paste0(model_string, "    A_x ~ 1\n")
+      model_string <- paste0(model_string, "    A_x ~~ A_x\n")
 
-      # Constant change factor covariance with the initial true score
-      model_string <- paste0(model_string, "    general ~~ cf1\n")
+      # Accumulating factor covariance with the initial true score
+      model_string <- paste0(model_string, "    A_x ~~ cf1\n")
     } else {
-      # Free latent change score variances when not estimating constant change
+      # Free latent change score variances when not estimating accumulating factor
       if (constrain_indicator_variances) {
         for (w in 2:waves) {
-          model_string <- paste0(model_string, "    ld", w, " ~~ var_ld*ld", w, "\n")
+          model_string <- paste0(model_string, "    ld", w, " ~~ d_var_x*ld", w, "\n")
         }
       } else {
         for (w in 2:waves) {
@@ -102,32 +175,32 @@ estimateLChange <- function(waves = 10,
       }
     }
 
-    # Proportional effects (constrained equal if specified)
+    # Proportional effects (autoregressive in unified framework)
     if (constrain_beta) {
       for (w in 2:waves) {
-        model_string <- paste0(model_string, "    ld", w, " ~ beta*cf", w - 1, "\n")
+        model_string <- paste0(model_string, "    ld", w, " ~ ar_x*cf", w - 1, "\n")
       }
     } else {
       for (w in 2:waves) {
         model_string <- paste0(model_string, "    ld", w, " ~ cf", w - 1, "\n")
       }
     }
-
   } else if (variable_type == "bivariate") {
-    # ==================== BIVARIATE MODEL (WITH FIXES) ====================
-
+    # ==================== BIVARIATE MODEL ====================
+    # -------------------- X VARIABLE --------------------
+    # Measurement equation: latent true scores for X
     for (w in 1:waves) {
       model_string <- paste0(model_string, "    cf_x", w, " =~ 1*x", w, "\n")
     }
 
     # Latent true score means (initial free, others = 0)
-    model_string <- paste0(model_string, "    cf_x1 ~ indicator_mean_x*1\n")
+    model_string <- paste0(model_string, "    cf_x1 ~ 1\n")
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    cf_x", w, " ~ 0*1\n")
     }
 
     # Latent true score variances (initial free, others = 0)
-    model_string <- paste0(model_string, "    cf_x1 ~~ start(15)*latent_indicator_mean_x*cf_x1\n")
+    model_string <- paste0(model_string, "    cf_x1 ~~ start(15)*cf_x1\n")
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    cf_x", w, " ~~ 0*cf_x", w, "\n")
     }
@@ -137,10 +210,10 @@ estimateLChange <- function(waves = 10,
       model_string <- paste0(model_string, "    x", w, " ~ 0*1\n")
     }
 
-    # Observed residual variances (constrained to equality)
+    # Unique factor variances (measurement equation)
     if (constrain_indicator_variances) {
       for (w in 1:waves) {
-        model_string <- paste0(model_string, "    x", w, " ~~ indicator_variance_x*x", w, "\n")
+        model_string <- paste0(model_string, "    x", w, " ~~ u_var_x*x", w, "\n")
       }
     } else {
       for (w in 1:waves) {
@@ -148,12 +221,12 @@ estimateLChange <- function(waves = 10,
       }
     }
 
-    # Autoregressions (fixed = 1)
+    # Autoregressive structure (fixed = 1)
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    cf_x", w, " ~ 1*cf_x", w - 1, "\n")
     }
 
-    # Latent change scores (fixed = 1)
+    # Latent change scores
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    ld_x", w, " =~ 1*cf_x", w, "\n")
     }
@@ -169,25 +242,23 @@ estimateLChange <- function(waves = 10,
         model_string <- paste0(model_string, "    ld_x", w, " ~~ 0*ld_x", w, "\n")
       }
 
-      # Constant change factor (loadings = 1)
-      model_string <- paste0(model_string, "    general_x =~ 1*ld_x2\n")
+      # Accumulating factor A_x (loadings = 1)
+      model_string <- paste0(model_string, "    A_x =~ 1*ld_x2\n")
       for (w in 3:waves) {
         model_string <- paste0(model_string, "    + 1*ld_x", w, "\n")
       }
 
-      # Constant change factor mean
-      model_string <- paste0(model_string, "    general_x ~ constant_mean_x*1\n")
+      # Accumulating factor mean and variance
+      model_string <- paste0(model_string, "    A_x ~ 1\n")
+      model_string <- paste0(model_string, "    A_x ~~ A_var_x*A_x\n")
 
-      # Constant change factor variance
-      model_string <- paste0(model_string, "    general_x ~~ latent_variance_x*general_x\n")
-
-      # Constant change factor covariance with the initial true score
-      model_string <- paste0(model_string, "    general_x ~~ cf_x1\n")
+      # Accumulating factor covariance with the initial true score
+      model_string <- paste0(model_string, "    A_x ~~ cf_x1\n")
     } else {
-      # Free latent change score variances when not estimating constant change
+      # Free latent change score variances when not estimating accumulating factor
       if (constrain_indicator_variances) {
         for (w in 2:waves) {
-          model_string <- paste0(model_string, "    ld_x", w, " ~~ var_ld_x*ld_x", w, "\n")
+          model_string <- paste0(model_string, "    ld_x", w, " ~~ d_var_x*ld_x", w, "\n")
         }
       } else {
         for (w in 2:waves) {
@@ -196,10 +267,10 @@ estimateLChange <- function(waves = 10,
       }
     }
 
-    # Proportional effects for X (constrained equal)
+    # Proportional effects for X (ar_x in unified framework)
     if (constrain_beta) {
       for (w in 2:waves) {
-        model_string <- paste0(model_string, "    ld_x", w, " ~ start(-0.15)*beta_x*cf_x", w - 1, "\n")
+        model_string <- paste0(model_string, "    ld_x", w, " ~ start(-0.15)*ar_x*cf_x", w - 1, "\n")
       }
     } else {
       for (w in 2:waves) {
@@ -208,20 +279,19 @@ estimateLChange <- function(waves = 10,
     }
 
     # -------------------- Y VARIABLE --------------------
-
-    # Define the latent true scores for Y
+    # Measurement equation: latent true scores for Y
     for (w in 1:waves) {
       model_string <- paste0(model_string, "    cf_y", w, " =~ 1*y", w, "\n")
     }
 
     # Latent true score means (initial free, others = 0)
-    model_string <- paste0(model_string, "    cf_y1 ~ indicator_mean_y*1\n")
+    model_string <- paste0(model_string, "    cf_y1 ~ 1\n")
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    cf_y", w, " ~ 0*1\n")
     }
 
     # Latent true score variances (initial free, others = 0)
-    model_string <- paste0(model_string, "    cf_y1 ~~ start(15)*latent_variance_y*cf_y1\n")
+    model_string <- paste0(model_string, "    cf_y1 ~~ start(15)*cf_y1\n")
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    cf_y", w, " ~~ 0*cf_y", w, "\n")
     }
@@ -231,10 +301,10 @@ estimateLChange <- function(waves = 10,
       model_string <- paste0(model_string, "    y", w, " ~ 0*1\n")
     }
 
-    # Observed residual variances (constrained to equality)
+    # Unique factor variances (measurement equation)
     if (constrain_indicator_variances) {
       for (w in 1:waves) {
-        model_string <- paste0(model_string, "    y", w, " ~~ indicator_variance_y*y", w, "\n")
+        model_string <- paste0(model_string, "    y", w, " ~~ u_var_y*y", w, "\n")
       }
     } else {
       for (w in 1:waves) {
@@ -242,12 +312,12 @@ estimateLChange <- function(waves = 10,
       }
     }
 
-    # Autoregressions (fixed = 1)
+    # Autoregressive structure (fixed = 1)
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    cf_y", w, " ~ 1*cf_y", w - 1, "\n")
     }
 
-    # Latent change scores (fixed = 1)
+    # Latent change scores
     for (w in 2:waves) {
       model_string <- paste0(model_string, "    ld_y", w, " =~ 1*cf_y", w, "\n")
     }
@@ -263,25 +333,23 @@ estimateLChange <- function(waves = 10,
         model_string <- paste0(model_string, "    ld_y", w, " ~~ 0*ld_y", w, "\n")
       }
 
-      # Constant change factor (loadings = 1)
-      model_string <- paste0(model_string, "    general_y =~ 1*ld_y2\n")
+      # Accumulating factor A_y (loadings = 1)
+      model_string <- paste0(model_string, "    A_y =~ 1*ld_y2\n")
       for (w in 3:waves) {
         model_string <- paste0(model_string, "          + 1*ld_y", w, "\n")
       }
 
-      # Constant change factor mean
-      model_string <- paste0(model_string, "    general_y ~ constant_mean_y*1\n")
+      # Accumulating factor mean and variance
+      model_string <- paste0(model_string, "    A_y ~ 1\n")
+      model_string <- paste0(model_string, "    A_y ~~ A_var_y*A_y\n")
 
-      # Constant change factor variance
-      model_string <- paste0(model_string, "    general_y ~~ latent_variance_y*general_y\n")
-
-      # Constant change factor covariance with the initial true score
-      model_string <- paste0(model_string, "    general_y ~~ cf_y1\n")
+      # Accumulating factor covariance with the initial true score
+      model_string <- paste0(model_string, "    A_y ~~ cf_y1\n")
     } else {
-      # Free latent change score variances when not estimating constant change
+      # Free latent change score variances when not estimating accumulating factor
       if (constrain_indicator_variances) {
         for (w in 2:waves) {
-          model_string <- paste0(model_string, "    ld_y", w, " ~~ var_ld_y*ld_y", w, "\n")
+          model_string <- paste0(model_string, "    ld_y", w, " ~~ d_var_y*ld_y", w, "\n")
         }
       } else {
         for (w in 2:waves) {
@@ -290,10 +358,10 @@ estimateLChange <- function(waves = 10,
       }
     }
 
-    # Proportional effects for Y (constrained equal)
+    # Proportional effects for Y (ar_y in unified framework)
     if (constrain_beta) {
       for (w in 2:waves) {
-        model_string <- paste0(model_string, "    ld_y", w, " ~ beta_y*cf_y", w - 1, "\n")
+        model_string <- paste0(model_string, "    ld_y", w, " ~ ar_y*cf_y", w - 1, "\n")
       }
     } else {
       for (w in 2:waves) {
@@ -301,12 +369,12 @@ estimateLChange <- function(waves = 10,
       }
     }
 
-    # -------------------- COUPLING PARAMETERS --------------------
-    # Basic bivariate LCSM: levels affect changes
+    # -------------------- COUPLING PARAMETERS (Cross-lagged) --------------------
+    # cl_yx = effect of Y level on X change; cl_xy = effect of X level on Y change
     if (constrain_omega) {
       for (w in 2:waves) {
-        model_string <- paste0(model_string, "    ld_x", w, " ~ start(-0.2)*omega_x*cf_y", w - 1, "\n")
-        model_string <- paste0(model_string, "    ld_y", w, " ~ start(-0.2)*omega_y*cf_x", w - 1, "\n")
+        model_string <- paste0(model_string, "    ld_x", w, " ~ start(-0.2)*cl_yx*cf_y", w - 1, "\n")
+        model_string <- paste0(model_string, "    ld_y", w, " ~ start(-0.2)*cl_xy*cf_x", w - 1, "\n")
       }
     } else {
       for (w in 2:waves) {
@@ -315,14 +383,14 @@ estimateLChange <- function(waves = 10,
       }
     }
 
-    # -------------------- CHANGE-TO-CHANGE EFFECTS (FIXED) --------------------
-    # ONLY include these if explicitly requested
-    if(estimate_change_to_change) {
+    # -------------------- CHANGE-TO-CHANGE EFFECTS --------------------
+    # These are unique to the LCS model (no direct analogue in unified framework)
+    if (estimate_change_to_change) {
       if (waves < 4) {
         stop("Error: Change-to-change effects require at least 4 waves.")
       }
 
-      # Change-to-change autoregressive effects
+      # Change-to-change autoregressive effects (phi)
       if (constrain_change_to_change) {
         for (w in 3:waves) {
           model_string <- paste0(model_string, "    ld_y", w, " ~ phi_y*ld_y", w - 1, "\n")
@@ -335,41 +403,39 @@ estimateLChange <- function(waves = 10,
         }
       }
 
-      # Change-to-change cross-lagged effects (ONLY if requested)
+      # Change-to-change cross-lagged effects
       if (constrain_change_cross_lag) {
         for (w in 3:waves) {
-          model_string <- paste0(model_string, "    ld_x", w, " ~ cross_change_x*ld_y", w - 1, "\n")
-          model_string <- paste0(model_string, "    ld_y", w, " ~ cross_change_y*ld_x", w - 1, "\n")
+          model_string <- paste0(model_string, "    ld_x", w, " ~ phi_cl_x*ld_y", w - 1, "\n")
+          model_string <- paste0(model_string, "    ld_y", w, " ~ phi_cl_y*ld_x", w - 1, "\n")
         }
       } else {
-        # NOTE: Only include this block if you want unconstrained change-to-change cross-lags
-        # Most users probably don't want these, so you could comment this out
         for (w in 3:waves) {
           model_string <- paste0(model_string, "    ld_x", w, " ~ ld_y", w - 1, "\n")
           model_string <- paste0(model_string, "    ld_y", w, " ~ ld_x", w - 1, "\n")
         }
       }
-    }  # CRITICAL: This closing brace was missing in the original!
+    }
 
     # -------------------- COVARIANCES --------------------
     if (estimate_constant_change) {
-      # Covariance between constant change factors
-      model_string <- paste0(model_string, "    general_x ~~ general_y\n")
+      # Covariance between accumulating factors
+      model_string <- paste0(model_string, "    A_x ~~ A_y\n")
 
       # Covariance between initial true scores
       model_string <- paste0(model_string, "    cf_x1 ~~ cf_y1\n")
 
-      # Covariance between wave 1 scores and constant change scores
-      model_string <- paste0(model_string, "    cf_x1 ~~ general_y\n")
-      model_string <- paste0(model_string, "    cf_y1 ~~ general_x\n")
+      # Cross-covariances between initial true scores and accumulating factors
+      model_string <- paste0(model_string, "    cf_x1 ~~ A_y\n")
+      model_string <- paste0(model_string, "    cf_y1 ~~ A_x\n")
     } else {
       # Covariance between initial true scores only
       model_string <- paste0(model_string, "    cf_x1 ~~ cf_y1\n")
 
-      # Covariances between latent change scores when no constant change factors
+      # Covariances between latent change scores when no accumulating factors
       if (constrain_indicator_variances) {
         for (w in 2:waves) {
-          model_string <- paste0(model_string, "    ld_x", w, " ~~ cov_ld*ld_y", w, "\n")
+          model_string <- paste0(model_string, "    ld_x", w, " ~~ d_cov_xy*ld_y", w, "\n")
         }
       } else {
         for (w in 2:waves) {

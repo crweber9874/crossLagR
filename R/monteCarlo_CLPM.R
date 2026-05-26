@@ -180,10 +180,10 @@ monteCarloCLPM <- function(
             # Extract coefficients
             param_table <- lavaan::parameterEstimates(model)
 
-            ar_x <- param_table[param_table$label == "ar_yeqn", "est"]
-            ar_y <- param_table[param_table$label == "ar_xeqn", "est"]
-            cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"]
-            cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"]
+            ar_x <- param_table[param_table$label == "ar_x", "est"]
+            ar_y <- param_table[param_table$label == "ar_y", "est"]
+            cl_x_to_y <- param_table[param_table$label == "cl_xy", "est"]
+            cl_y_to_x <- param_table[param_table$label == "cl_yx", "est"]
 
           }, warning = function(w) {
             warnings_collected <<- c(warnings_collected, w$message)
@@ -316,10 +316,10 @@ monteCarloCLPM <- function(
             # Extract coefficients
             param_table <- lavaan::parameterEstimates(model)
 
-            ar_x <- param_table[param_table$label == "ar_yeqn", "est"]
-            ar_y <- param_table[param_table$label == "ar_xeqn", "est"]
-            cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"]
-            cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"]
+            ar_x <- param_table[param_table$label == "ar_x", "est"]
+            ar_y <- param_table[param_table$label == "ar_y", "est"]
+            cl_x_to_y <- param_table[param_table$label == "cl_xy", "est"]
+            cl_y_to_x <- param_table[param_table$label == "cl_yx", "est"]
 
           }, warning = function(w) {
             warnings_collected <<- c(warnings_collected, w$message)
@@ -503,10 +503,10 @@ monteCarloCLPM <- function(
             # Extract coefficients
             param_table <- lavaan::parameterEstimates(model)
 
-            ar_x <- param_table[param_table$label == "ar_yeqn", "est"]
-            ar_y <- param_table[param_table$label == "ar_xeqn", "est"]
-            cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"]
-            cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"]
+            ar_x <- param_table[param_table$label == "ar_x", "est"]
+            ar_y <- param_table[param_table$label == "ar_y", "est"]
+            cl_x_to_y <- param_table[param_table$label == "cl_xy", "est"]
+            cl_y_to_x <- param_table[param_table$label == "cl_yx", "est"]
 
           }, warning = function(w) {
             warnings_collected <<- c(warnings_collected, w$message)
@@ -663,10 +663,10 @@ monteCarloCLPM <- function(
             # Extract CLPM coefficients
             param_table <- lavaan::parameterEstimates(model)
 
-            ar_x <- param_table[param_table$label == "ar_yeqn", "est"]
-            ar_y <- param_table[param_table$label == "ar_xeqn", "est"]
-            cl_x_to_y <- param_table[param_table$label == "cl_xeqn", "est"]
-            cl_y_to_x <- param_table[param_table$label == "cl_yeqn", "est"]
+            ar_x <- param_table[param_table$label == "ar_x", "est"]
+            ar_y <- param_table[param_table$label == "ar_y", "est"]
+            cl_x_to_y <- param_table[param_table$label == "cl_xy", "est"]
+            cl_y_to_x <- param_table[param_table$label == "cl_yx", "est"]
 
           }, warning = function(w) {
             warnings_collected <<- c(warnings_collected, w$message)

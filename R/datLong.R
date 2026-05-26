@@ -7,11 +7,12 @@
 #' @return A long-format data frame with columns 'id', 'wave', 'x', 'y', 'xlag', and 'ylag'.
 #'
 #' @examples
-#'
-#'
-#' dat = simulate_observed_clr(waves = 3)$data
-#'
+#' \dontrun{
+#' dat <- simCLPM(waves = 3)
 #' head(dat)
+#' long_dat <- reshape_long_sim_cr(dat)
+#' head(long_dat)
+#' }
 #'
 #' @importFrom dplyr %>% select mutate row_number group_by ungroup
 #' @importFrom tidyr pivot_longer
@@ -36,10 +37,12 @@ reshape_long_sim_cr <- function(data = dat) {
   dat <- cbind(x, y) %>%
     dplyr::mutate(wave = readr::parse_number(x_var)) %>%
     dplyr::group_by(id) %>%
-   mutate(i.average = mean(x),
-          within.x = x-i.average,
-          i.average.y = mean(y),
-          within.y = y-i.average.y) %>%
+    mutate(
+      i.average = mean(x),
+      within.x = x - i.average,
+      i.average.y = mean(y),
+      within.y = y - i.average.y
+    ) %>%
     dplyr::mutate(
       xlagw = dplyr::lag(within.x, order_by = wave),
       ylagw = dplyr::lag(within.y, order_by = wave),
@@ -48,8 +51,5 @@ reshape_long_sim_cr <- function(data = dat) {
     ) %>%
     dplyr::ungroup() %>%
     dplyr::select(id, wave, x, y, xlag, xlagw, ylag, ylagw, within.x, within.y) %>%
-
-  return(dat)
+    return(dat)
 }
-
-

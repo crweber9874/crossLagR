@@ -1,5 +1,27 @@
 .Rproj.user
 .Rhistory
-.RData
 .Ruserdata
+.Renv
+docs
+.Rdata
+.RData
+.httr-oauth
+.DS_Store
+.quarto
+*.key
+*.pub
+buildEncryption.R
+*.rda
+.enc
 raw
+
+# Tooling / scratch (added by Claude)
+.obsidian/
+.agents/
+tmp_*.R
+"create a link.md"
+
+# More tooling / scratch
+crossLagR/
+archive/
+agent_workflow/

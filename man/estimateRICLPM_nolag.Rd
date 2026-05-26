@@ -13,24 +13,49 @@ estimateRICLPM_nolag(
 )
 }
 \arguments{
-\item{time_varying_x}{A vector of variable names for the X variables, ordered from earliest to latest.}
+\item{time_varying_x}{A vector of variable names for X, ordered earliest to latest.}
 
-\item{time_varying_y}{A vector of variable names for the Y variables, ordered from earliest to latest.}
+\item{time_varying_y}{A vector of variable names for Y, ordered earliest to latest.}
 
-\item{time_varying_z}{An optional vector of variable names for an additional Z variable, ordered from earliest to latest.}
+\item{time_varying_z}{An optional vector of variable names for Z.}
 
 \item{time_invariant_vars}{A vector of variable names for time-invariant variables.}
 
 \item{waves}{The number of waves (time points) in the model.}
 }
 \value{
-A character string containing the Lavaan model syntax for RICLPM.
+A character string containing lavaan model syntax.
 }
 \description{
-Generates model syntax for Random Intercept Cross-Lagged Panel Model (RICLPM), no AR paths.
+Generates lavaan model syntax for RI-CLPM without autoregressive
+  paths (cross-lagged only).
 }
 \details{
-This function generates the model syntax for a Random Intercept Cross-Lagged Panel Model (RICLPM)
-with a specified number of waves. The model includes latent variables for each wave, stability paths,
-and covariances between the latent variables.
+This function generates lavaan syntax for an RI-CLPM with no autoregressive
+paths (cross-lagged only), following the unified framework of Usami, Murayama,
+& Hamaker (2019). See \code{\link{estimateRICLPM}} for the unified parameter
+naming convention.
+
+Parameter labels:
+\itemize{
+  \item \code{cl_yx}: Cross-lagged effect of Y on X (no AR for X/Y).
+  \item \code{cl_xy}: Cross-lagged effect of X on Y.
+  \item \code{I_x}, \code{I_y}, \code{I_z}: Trait factors (random intercepts).
+}
+}
+\examples{
+\dontrun{
+syntax <- estimateRICLPM_nolag(
+  time_varying_x = paste0("x", 1:5),
+  time_varying_y = paste0("y", 1:5),
+  waves = 5
+)
+cat(syntax)
+}
+
+}
+\references{
+Usami, S., Murayama, K., & Hamaker, E. L. (2019). A unified framework of
+  longitudinal models to examine reciprocal relations. \emph{Psychological
+  Methods}, 24(5), 637-657.
 }

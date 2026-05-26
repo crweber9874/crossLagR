@@ -1,0 +1,40 @@
+project:
+  type: book
+  output-dir: _book
+
+book:
+  title: "crossLagR: A User Guide to Cross-Lagged Panel Models in R"
+  author:
+    - Christopher Weber
+    - Adam Panish
+    - Bang Zheng
+  date: today
+  chapters:
+    - index.qmd
+    - 00_Install.qmd
+    - 01_Panel_Models.qmd
+    - 02_Change.qmd
+    - 03_RICLPM.qmd
+    - 04_Usami.qmd
+    - 05_simulations.qmd
+    - part: "Applications"
+      chapters:
+        - 06_iscap.qmd
+        - 07_liss.qmd
+    - part: "Appendix"
+      chapters:
+        - 08_bakker_appendix.qmd
+#
+bibliography:
+  - book.bib
+  - packages.bib
+link-citations: true
+
+execute:
+  cache: false
+  freeze: false
+
+format:
+  html:
+    theme: cosmo
+    toc: true

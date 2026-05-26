@@ -11,86 +11,93 @@ estimateLChange(
   constrain_beta = TRUE,
   constrain_omega = TRUE,
   estimate_change_to_change = FALSE,
-  change_to_change = FALSE,
+  constrain_change_to_change = FALSE,
   constrain_change_cross_lag = FALSE,
   estimate_constant_change = TRUE
 )
 }
 \arguments{
-\item{waves}{The number of waves (time points) in the model.}
+\item{waves}{Integer. Number of waves (time points). Must be >= 3.}
 
-\item{variable_type}{Specify whether estimating "univariate" (single variable) or "bivariate" (dual variable). The "bivariate" option allows for cross-lagged effects between two variables.}
+\item{variable_type}{Character. Either \code{"univariate"} or \code{"bivariate"}.
+Default is \code{"univariate"}.}
 
-\item{constrain_indicator_variances}{Logical. If TRUE, constrains indicator latent variances (true scores) to equality across waves. Default is TRUE.}
+\item{constrain_indicator_variances}{Logical. If TRUE, constrains observed
+indicator residual variances (unique factors) to equality across waves.
+Default is TRUE.}
 
-\item{constrain_beta}{Logical. If TRUE, constrains proportional effects (autoregressive) to equality across waves. Default is TRUE.}
+\item{constrain_beta}{Logical. If TRUE, constrains proportional (autoregressive)
+effects to equality across waves. Default is TRUE.}
 
-\item{constrain_omega}{Logical. If TRUE, constrains cross-lagged (coupling) effects to equality. Default is FALSE for bivariate.}
+\item{constrain_omega}{Logical. If TRUE, constrains cross-lagged coupling
+parameters to equality across waves (bivariate only). Default is TRUE.}
 
-\item{estimate_change_to_change}{Logical. Extension to the Latent Change Model. Estimate lagged difference effects -- autoregressive and cross lagged. Requires 4 or more waves of data. Default is FALSE for bivariate.}
+\item{estimate_change_to_change}{Logical. If TRUE, includes change-to-change
+autoregressive and cross-lagged effects. Requires >= 4 waves. Default is FALSE.}
 
-\item{estimate_constant_change}{Logical. If TRUE, estimates constant change factors (intercept and slope components). If FALSE, omits constant change factors (pure proportional and coupling effects only). Default is TRUE.}
+\item{constrain_change_to_change}{Logical. If TRUE, constrains change-to-change
+autoregressive effects to equality across waves. Default is FALSE.}
 
-\item{constrain_change_to_change}{Logical. Extension to the Latent Change Model. Constrain change to change (AR) parameters to equality. Default is FALSE for bivariate.}
+\item{constrain_change_cross_lag}{Logical. If TRUE, constrains change-to-change
+cross-lagged effects to equality across waves. Default is FALSE.}
+
+\item{estimate_constant_change}{Logical. If TRUE, estimates a second-order
+constant change (accumulating) factor that loads on all latent change scores.
+Default is TRUE.}
 }
 \value{
-A character string containing the Lavaan model syntax for the latent change score model.
+A character string containing lavaan model syntax for the specified LCSM.
 }
 \description{
-Syntax to estimate single and two variable latent change models. The function returns the lavaan model syntax, with options to constrain parameters, estimate various change components:
-like the bivariate change model, the dual change model, and change to change parameters. Three or more waves of data are required for estimation absent change-to-change parameters. Change-to-Change
-specification requires four or more waves of data.
+Generate lavaan model syntax for univariate or bivariate Latent Change
+  Score Models (LCSM).
 }
 \details{
-This function generates the model syntax for a Latent Change Score Model with a specified
-number of waves.
+This function generates lavaan syntax for a Latent Change Score Model following
+the unified framework of Usami, Murayama, & Hamaker (2019). The LCS model uses
+the measurement equation (separating latent true scores from unique factors)
+and the dynamic equation (with accumulating factors and lagged regression).
 
-For single variable models (variable_type = "univariate"):
-- Latent true scores at each wave
-- Latent change scores from wave 2 onwards
-- A constant change factor (if estimate_constant_change = TRUE)
-- Proportional effects (level affecting own change)
+Parameter labels follow the unified naming convention:
+\itemize{
+  \item \code{ar_x}, \code{ar_y}: Proportional change coefficients. In the LCS,
+    the effective autoregressive parameter is \eqn{1 + ar}, so \code{ar_x} is the
+    proportional self-feedback (denoted \eqn{\beta_x} in Usami et al.).
+  \item \code{cl_yx}, \code{cl_xy}: Coupling parameters (cross-lagged effects).
+    \code{cl_yx} = effect of Y level on X change; \code{cl_xy} = effect of X
+    level on Y change. Referred to as \eqn{\gamma} in Usami et al.
+  \item \code{u_var_x}, \code{u_var_y}: Unique factor (measurement error) variances.
+  \item \code{A_x}, \code{A_y}: Accumulating factors (constant change factors).
+    Unlike growth factors (I, S) in the LCM-SR which have only direct effects,
+    these accumulating factors have both direct and indirect effects on scores
+    through the lagged relations.
+}
 
-For dual change models (variable_type = "bivariate"):
-- All components from single variable model for both X and Y
-- Coupling effects (X level affecting Y change and vice versa)
-For bivariate change models (variable_type = "bivariate", constrain_change_to_change_estimates = FALSE ):
-- All components from single variable model for both X and Y
-- Coupling effects (X level affecting Y change and vice versa)
-For bivariate dual change models (variable_type = "bivariate", constrain_change_to_change_estimates = TRUE ):
-- All components from single variable model for both X and Y
-- Cross-lagged (coupling) effects (X level affecting Y change and vice versa)
-- Change-to-change effects (autoregressive and cross-lagged).
-
-When estimate_constant_change = FALSE:
-- No constant change factors are estimated
-- Only proportional and coupling effects drive change
-- Useful when constant change variances are near zero or causing estimation problems
-
-Key parameters estimated:
-- beta_x, beta_y: Proportional effects (level -> own change)
-- omega_x, omega_y: Cross-lagged effects (other level -> change)
-- phi_x, phi_y: Change-to-change effects
-- cross_change_x, cross_change_y: Change-to-change cross-lagged effects
-- constant_mean_x, constant_mean_y: Means of constant change factors (if estimated)
-- latent_variance_x, latent_variance_y: Variances of constant change factors (if estimated)
-- indicator_variance_x, indicator_variance_y: Measurement error variances
+Change-to-change parameters (\code{phi_x}, \code{phi_y}, \code{phi_cl_x},
+\code{phi_cl_y}) are unique to the LCS model and have no direct analogue in
+other models in the unified framework.
 }
 \examples{
-# Single variable latent change model
-model_syntax_single <- estimateLChange(waves = 5, variable_type = "univariate")
-cat(model_syntax_single)
+\dontrun{
+# Univariate LCSM with 5 waves
+syntax <- estimateLChange(waves = 5)
+cat(syntax)
 
-# Dual change model
-model_syntax_dual <- estimateLChange(waves = 5, variable_type = "bivariate")
-cat(model_syntax_dual)
+# Bivariate LCSM with coupling parameters
+syntax <- estimateLChange(waves = 5, variable_type = "bivariate")
 
-# Bivariate model without constant change factors
-model_syntax_no_constant <- estimateLChange(
-  waves = 5,
-  variable_type = "bivariate",
-  estimate_constant_change = FALSE
-)
-cat(model_syntax_no_constant)
+# Fit with lavaan
+library(lavaan)
+fit <- lavaan(syntax, data = my_data, meanstructure = TRUE)
+summary(fit)
+}
 
+}
+\references{
+Usami, S., Murayama, K., & Hamaker, E. L. (2019). A unified framework of
+  longitudinal models to examine reciprocal relations. \emph{Psychological
+  Methods}, 24(5), 637-657.
+
+McArdle, J. J., & Hamagami, F. (2001). Latent difference score structural
+  models for linear dynamic analyses with incomplete longitudinal data.
 }

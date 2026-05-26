@@ -2,7 +2,7 @@
 % Please edit documentation in R/simpleSim.R
 \name{monteCarlo_OLS}
 \alias{monteCarlo_OLS}
-\title{monteCarlo_OLS}
+\title{simpleSim}
 \usage{
 monteCarlo_OLS(
   trials = 10,
@@ -36,7 +36,7 @@ monteCarlo_OLS(
 A data frame containing the results of the simulation.
 }
 \description{
-A somewhat strange function. It's common to estimate the cross-lagged panel model with two OLS regression models.
-allows the user to specify different Data Generating conditions, and apply the OLS model to the data.
-The output is a data frame that includes the estimated coefficients across these trials
+Monte Carlo simulation comparing OLS and CLPM estimators.
+Allows the user to specify different data-generating conditions (CLPM or RI-CLPM),
+and apply either an OLS or CLPM model to the data.
 }

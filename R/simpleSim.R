@@ -1,7 +1,7 @@
-#' @title monteCarlo_OLS
-#' @description A somewhat strange function. It's common to estimate the cross-lagged panel model with two OLS regression models.
-#' allows the user to specify different Data Generating conditions, and apply the OLS model to the data.
-#' The output is a data frame that includes the estimated coefficients across these trials
+#' @title simpleSim
+#' @description Monte Carlo simulation comparing OLS and CLPM estimators.
+#' Allows the user to specify different data-generating conditions (CLPM or RI-CLPM),
+#' and apply either an OLS or CLPM model to the data.
 #' @param trials The number of trials for the Monte Carlo simulation.
 #' @param waves The number of waves (time points) in the model.
 #' @param model Specify whether an "ols" or "clpm" model.
@@ -15,18 +15,18 @@
 #'
 #' @export
 monteCarlo_OLS <- function(
-    trials = 10,
-    waves = 5,
-    variance_between_x = 0.5,
-    variance_between_y = 0.5,
-    stability_q = 0.25,
-    stability_p = 0.25,
-    cross_p = 0,
-    cross_q = 0,
-    variance_p = 1,
-    variance_q = 1,
-    sample_size = 2500,
-    ...
+  trials = 10,
+  waves = 5,
+  variance_between_x = 0.5,
+  variance_between_y = 0.5,
+  stability_q = 0.25,
+  stability_p = 0.25,
+  cross_p = 0,
+  cross_q = 0,
+  variance_p = 1,
+  variance_q = 1,
+  sample_size = 2500,
+  ...
 ) {
   simulation_parameters <- expand.grid(
     variance_between_x = variance_between_x,
@@ -36,7 +36,8 @@ monteCarlo_OLS <- function(
     cross_p = cross_p,
     cross_q = cross_q,
     variance_p = variance_p,
-    variance_q = variance_q) %>% as.data.frame()
+    variance_q = variance_q
+  ) %>% as.data.frame()
   # Initialize an empty list to store results
   results <- list()
   # Loop through each combination of parameters and trials
@@ -46,8 +47,8 @@ monteCarlo_OLS <- function(
       dat <- simRICLPM(
         waves = waves,
         sample_nobs = sample_size,
-        stability_p =  params$stability_p,
-        stability_q =  params$stability_q,
+        stability_p = params$stability_p,
+        stability_q = params$stability_q,
         cross_p = params$cross_p,
         cross_q = params$cross_q,
         variance_p = params$variance_p,
@@ -55,14 +56,16 @@ monteCarlo_OLS <- function(
         variance_between_x = params$variance_between_x,
         variance_between_y = params$variance_between_y,
       )$data %>%
-        reshape_long_sim_cr() %>% as.data.frame() %>% na.omit()
+        reshape_long_sim_cr() %>%
+        as.data.frame() %>%
+        na.omit()
       # Fit the OLS model and extract coefficients
       model_fit_y <- lm(y ~ xlag + ylag, dat)
       model_fit_x <- lm(x ~ xlag + ylag, dat)
-      xvalue_x <-  model_fit_x$coefficients[["xlag"]]
-      yvalue_x <-  model_fit_x$coefficients[["ylag"]]
-      xvalue_y <-  model_fit_y$coefficients[["xlag"]]
-      yvalue_y <-  model_fit_y$coefficients[["ylag"]]
+      xvalue_x <- model_fit_x$coefficients[["xlag"]]
+      yvalue_x <- model_fit_x$coefficients[["ylag"]]
+      xvalue_y <- model_fit_y$coefficients[["xlag"]]
+      yvalue_y <- model_fit_y$coefficients[["ylag"]]
       # model_fit <- lm(y ~ -1 + xlag + ylag, dat)
       # xvalue <- coef(model_fit)[["xlag"]]
       # yvalue <- coef(model_fit)[["ylag"]]
@@ -70,8 +73,8 @@ monteCarlo_OLS <- function(
       results[[length(results) + 1]] <- data.frame(
         variance_between_x = params$variance_between_x,
         variance_between_y = params$variance_between_y,
-        stability_p =  params$stability_p,
-        stability_q =  params$stability_q,
+        stability_p = params$stability_p,
+        stability_q = params$stability_q,
         cross_p = params$cross_p,
         cross_q = params$cross_q,
         variance_p = params$variance_p,

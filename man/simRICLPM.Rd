@@ -53,9 +53,9 @@ simRICLPM(
 
 \item{beta_z}{Autoregressive effect for Z (Z(t-1) -> Z(t)), if included. Default is 0.3.}
 
-\item{omega_xy}{Cross-lagged effect of Y on X (Y(t-1) -> X(t)). Default is 0.1.}
+\item{omega_xy}{Cross-lagged effect of X on Y (X(t-1) -> Y(t)). Default is 0.1.}
 
-\item{omega_yx}{Cross-lagged effect of X on Y (X(t-1) -> Y(t)). Default is 0.1.}
+\item{omega_yx}{Cross-lagged effect of Y on X (Y(t-1) -> X(t)). Default is 0.1.}
 
 \item{omega_zx}{Cross-lagged effect of Z on X (Z(t-1) -> X(t)), if Z included. Default is 0.1.}
 

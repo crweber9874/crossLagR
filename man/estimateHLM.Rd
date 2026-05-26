@@ -16,15 +16,24 @@ estimateHLM(
 )
 }
 \arguments{
-\item{data}{Long data frame, following structure from datLong() names() -> x, y, xlag, ylag}
+\item{data}{Long-format data frame with columns: x, y, xlag, ylag, id.}
 
-\item{chains}{Specify the number of sampling chains, default 3}
+\item{residual_correlation}{Logical. If TRUE, estimates residual correlations
+between equations. Default is TRUE.}
 
-\item{cores}{Number of cores to use for the model, default 10}
+\item{chains}{Integer. Number of MCMC sampling chains. Default is 3.}
 
-\item{iterations}{Number of iterations for the model, default 3000}
+\item{cores}{Integer. Number of CPU cores. Default is 10.}
 
-\item{residual_correlations}{Logical, should residual correlations be estimated?}
+\item{iterations}{Integer. Number of MCMC iterations. Default is 3000.}
+
+\item{variational}{Logical. If TRUE, uses variational inference (meanfield)
+instead of full MCMC sampling. Default is FALSE.}
+
+\item{control}{List of control parameters for Stan sampler. Default is
+\code{list(adapt_delta = 0.95)}.}
+
+\item{...}{Additional arguments passed to \code{brms::brm}.}
 }
 \value{
 brms object

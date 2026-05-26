@@ -1,5 +1,6 @@
 #' @title estimateRICLPM
-#' @description Generates model syntax for Random Intercept Cross-Lagged Panel Model (RICLPM) with hard-coded variable names and comprehensive parameter control options
+#' @description Generates lavaan model syntax for the Random Intercept Cross-Lagged
+#'   Panel Model (RI-CLPM).
 #'
 #' @param waves The number of waves (time points) in the model.
 #' @param include_z Logical. If TRUE, includes a third variable Z in the model. Default is FALSE.
@@ -8,58 +9,60 @@
 #' @param constrain_omega Logical. If TRUE, constrains cross-lagged effects to equality across waves. Default is TRUE.
 #' @param constrain_residual_variances Logical. If TRUE, constrains residual variances to equality across waves. Default is TRUE.
 #' @param constrain_residual_covariances Logical. If TRUE, constrains residual covariances to equality across waves. Default is TRUE.
-#' @param estimate_means Logical. If TRUE, estimates means for latent variables. Default is FALSE.
 #' @param start_values Logical. If TRUE, provides starting values for key parameters. Default is FALSE.
-#' @param label_autoregressive Character vector for autoregressive parameter labels. Default is c("beta_y", "beta_x", "beta_z").
-#' @param label_crosslagged Character vector for cross-lagged parameter labels. Default is c("omega_xy", "omega_yx", "omega_zx", "omega_zy", "omega_xz", "omega_yz").
+#' @param label_autoregressive Character vector for autoregressive parameter labels.
+#'   Default is \code{c("ar_x", "ar_y", "ar_z")}.
+#' @param label_crosslagged Character vector for cross-lagged parameter labels.
+#'   Default is \code{c("cl_yx", "cl_xy", "cl_xz", "cl_yz", "cl_zx", "cl_zy")}.
 #'
-#' @return A character string containing the Lavaan model syntax for RICLPM.
+#' @return A character string containing the lavaan model syntax for the RI-CLPM.
 #'
 #' @details
-#' This function generates the model syntax for a Random Intercept Cross-Lagged Panel Model (RICLPM)
-#' with a specified number of waves. The RICLPM separates stable between-person differences
-#' (random intercepts) from within-person dynamics (autoregressive and cross-lagged effects).
+#' This function generates lavaan syntax for a Random Intercept Cross-Lagged Panel
+#' Model following the unified framework of Usami, Murayama, & Hamaker (2019). The
+#' RI-CLPM uses both the decomposition equation (separating stable trait factors
+#' from within-person deviations) and the dynamic equation (lagged regression on
+#' the within-person deviations).
 #'
-#' Variable naming convention:
-#' - X variables: x1, x2, x3, ..., x[waves]
-#' - Y variables: y1, y2, y3, ..., y[waves]
-#' - Z variables (if included): z1, z2, z3, ..., z[waves]
+#' Parameter labels follow the unified naming convention:
+#' \itemize{
+#'   \item \code{ar_x}, \code{ar_y}, \code{ar_z}: Autoregressive effects. In the
+#'     RI-CLPM these represent \emph{within-person carry-over}, not rank-order
+#'     stability (which is captured by the trait factor I).
+#'   \item \code{cl_xy}, \code{cl_yx}: Cross-lagged effects operating at the
+#'     within-person level. \code{cl_xy} = effect of X on Y; \code{cl_yx} = effect
+#'     of Y on X.
+#'   \item \code{d_var_x}, \code{d_var_y}, \code{d_var_z}: Dynamic residual
+#'     (innovation) variances for within-person deviations.
+#'   \item \code{d_cov_xy}, \code{d_cov_xz}, \code{d_cov_yz}: Dynamic residual
+#'     covariances (within-time, within-person associations).
+#'   \item \code{I_x}, \code{I_y}, \code{I_z}: Stable trait factors (random
+#'     intercepts) representing time-invariant between-person differences. These
+#'     are unique to models that include decomposition of trait and state (no
+#'     direct analogue in the CLPM).
+#' }
 #'
-#' Your data must contain these exact variable names for the specified number of waves.
+#' Within-person latent deviations are labeled \code{p} (for X), \code{q} (for Y),
+#' and \code{r} (for Z). These structural latent variables have no direct analogue
+#' across all models and retain model-specific names.
 #'
-#' Parameter labels follow consistent naming:
-#' - Autoregressive effects: beta_x (X→X), beta_y (Y→Y), beta_z (Z→Z)
-#' - Cross-lagged effects: omega_xy (Y→X), omega_yx (X→Y), omega_zx (Z→X),
-#'   omega_zy (Z→Y), omega_xz (X→Z), omega_yz (Y→Z)
+#' @references
+#' Usami, S., Murayama, K., & Hamaker, E. L. (2019). A unified framework of
+#'   longitudinal models to examine reciprocal relations. \emph{Psychological
+#'   Methods}, 24(5), 637-657.
 #'
-#' Key model components:
-#' - Random intercepts (BX, BY, BZ) that capture stable between-person differences
-#' - Wave-specific latent variables (p, q, r) that capture within-person deviations
-#' - Autoregressive effects within variables across time
-#' - Cross-lagged effects between variables across time
-#' - Within-time covariances between variables
-#'
-#' The model assumes that observed variables are indicators of latent within-person
-#' deviations plus stable individual differences (random intercepts).
-#'
-#' Constraint options allow for:
-#' - Equality constraints on autoregressive effects across waves
-#' - Equality constraints on cross-lagged effects across waves
-#' - Equality constraints on residual variances across waves
-#' - Equality constraints on residual covariances across waves
-#'
-#' When constraints are applied, parameters are constrained to equality across all waves
-#' from wave 2 onwards (since wave 1 has no predictors).
+#' Hamaker, E. L., Kuiper, R. M., & Grasman, R. P. P. P. (2015). A critique
+#'   of the cross-lagged panel model. \emph{Psychological Methods}, 20, 102-116.
 #'
 #' @examples
 #' \dontrun{
-#' # Basic RICLPM with 5 waves (assumes data has x1-x5, y1-y5)
+#' # Basic RI-CLPM with 5 waves (assumes data has x1-x5, y1-y5)
 #' model_syntax <- estimateRICLPM(waves = 5)
 #'
-#' # RICLPM with unconstrained cross-lagged effects
+#' # RI-CLPM with unconstrained cross-lagged effects
 #' model_syntax <- estimateRICLPM(waves = 5, constrain_omega = FALSE)
 #'
-#' # RICLPM with third variable (assumes data has x1-x5, y1-y5, z1-z5)
+#' # RI-CLPM with third variable (assumes data has x1-x5, y1-y5, z1-z5)
 #' model_syntax <- estimateRICLPM(waves = 5, include_z = TRUE)
 #'
 #' # Fit the model
@@ -76,26 +79,25 @@ estimateRICLPM <- function(waves,
                            constrain_omega = TRUE,
                            constrain_residual_variances = TRUE,
                            constrain_residual_covariances = TRUE,
-                           estimate_means = FALSE,
                            start_values = FALSE,
-                           label_autoregressive = c("beta_y", "beta_x", "beta_z"),
-                           label_crosslagged = c("omega_xy", "omega_yx", "omega_zx", "omega_zy", "omega_xz", "omega_yz")) {
+                           label_autoregressive = c("ar_x", "ar_y", "ar_z"),
+                           label_crosslagged = c("cl_yx", "cl_xy", "cl_xz", "cl_yz", "cl_zx", "cl_zy")) {
 
   # Input validation
   if (!is.numeric(waves) || waves <= 0 || waves != as.integer(waves)) {
-    stop("❌ Error: 'waves' must be a positive integer.")
+    stop("Error: 'waves' must be a positive integer.")
   }
 
   if (waves < 2) {
-    stop("❌ Error: RICLPM requires at least 2 waves. Cannot estimate with fewer than 2 waves.")
+    stop("Error: RICLPM requires at least 2 waves. Cannot estimate with fewer than 2 waves.")
   }
 
   if (!is.logical(include_z)) {
-    stop("❌ Error: 'include_z' must be logical (TRUE/FALSE).")
+    stop("Error: 'include_z' must be logical (TRUE/FALSE).")
   }
 
   if (!is.null(time_invariant_vars) && !is.character(time_invariant_vars)) {
-    stop("❌ Error: 'time_invariant_vars' must be a character vector of variable names (e.g., c('gender', 'education')).")
+    stop("Error: 'time_invariant_vars' must be a character vector of variable names (e.g., c('gender', 'education')).")
   }
 
   # Generate hard-coded variable names
@@ -109,35 +111,34 @@ estimateRICLPM <- function(waves,
     constrain_omega = constrain_omega,
     constrain_residual_variances = constrain_residual_variances,
     constrain_residual_covariances = constrain_residual_covariances,
-    estimate_means = estimate_means,
     start_values = start_values
   )
 
   for (param_name in names(logical_params)) {
     if (!is.logical(logical_params[[param_name]])) {
-      stop(paste0("❌ Error: Parameter '", param_name, "' must be logical (TRUE/FALSE)."))
+      stop(paste0("Error: Parameter '", param_name, "' must be logical (TRUE/FALSE)."))
     }
   }
 
   # Initialize model string
   model_string <- ""
 
-  # ==================== RANDOM INTERCEPTS ====================
+  # ==================== RANDOM INTERCEPTS (Trait Factors I) ====================
   # Random intercept for X
-  model_string <- paste0(model_string, "\n# Random Intercepts\nBX =~ 1*", time_varying_x[1])
+  model_string <- paste0(model_string, "\n# Random Intercepts (Trait Factors I)\nI_x =~ 1*", time_varying_x[1])
   for (w in 2:waves) {
     model_string <- paste0(model_string, " + 1*", time_varying_x[w])
   }
 
   # Random intercept for Y
-  model_string <- paste0(model_string, "\nBY =~ 1*", time_varying_y[1])
+  model_string <- paste0(model_string, "\nI_y =~ 1*", time_varying_y[1])
   for (w in 2:waves) {
     model_string <- paste0(model_string, " + 1*", time_varying_y[w])
   }
 
   # Random intercept for Z (if specified)
   if (!is.null(time_varying_z)) {
-    model_string <- paste0(model_string, "\nBZ =~ 1*", time_varying_z[1])
+    model_string <- paste0(model_string, "\nI_z =~ 1*", time_varying_z[1])
     for (w in 2:waves) {
       model_string <- paste0(model_string, " + 1*", time_varying_z[w])
     }
@@ -160,26 +161,41 @@ estimateRICLPM <- function(waves,
     }
   }
 
-  # ==================== MEANS ====================
-  if (estimate_means) {
-    model_string <- paste0(model_string, "\n\n# Latent Variable Means")
-    for (w in 1:waves) {
-      model_string <- paste0(model_string, "\np", w, " ~ 1\n")
-      model_string <- paste0(model_string, "q", w, " ~ 1\n")
-      if (!is.null(time_varying_z)) {
-        model_string <- paste0(model_string, "r", w, " ~ 1\n")
-      }
-    }
-  } else {
-    model_string <- paste0(model_string, "\n\n# Latent Variable Means (Fixed to 0)")
-    for (w in 1:waves) {
-      model_string <- paste0(model_string, "\np", w, " ~ 0*1\n")
-      model_string <- paste0(model_string, "q", w, " ~ 0*1\n")
-      if (!is.null(time_varying_z)) {
-        model_string <- paste0(model_string, "r", w, " ~ 0*1\n")
-      }
+  # ==================== MEAN STRUCTURE ====================
+  # Canonical RI-CLPM (Mulder & Hamaker 2021):
+  #   - Within-person factors p_w, q_w have zero means (deviations by definition).
+  #   - Trait factors I_x, I_y have free means (interpretable as the average
+  #     between-person level).
+  #   - Observed intercepts are fixed to zero so the trait-factor mean is
+  #     identified rather than absorbed into wave-specific intercepts.
+  # Requires lavaan() to be called with meanstructure = TRUE (or use sem()/cfa()).
+  model_string <- paste0(model_string, "\n\n# Within-person factor means (fixed to 0)")
+  for (w in 1:waves) {
+    model_string <- paste0(model_string, "\np", w, " ~ 0*1")
+    model_string <- paste0(model_string, "\nq", w, " ~ 0*1")
+    if (!is.null(time_varying_z)) {
+      model_string <- paste0(model_string, "\nr", w, " ~ 0*1")
     }
   }
+  model_string <- paste0(model_string, "\n")
+
+  model_string <- paste0(model_string, "\n# Trait factor means (free)")
+  model_string <- paste0(model_string, "\nI_x ~ 1")
+  model_string <- paste0(model_string, "\nI_y ~ 1")
+  if (!is.null(time_varying_z)) {
+    model_string <- paste0(model_string, "\nI_z ~ 1")
+  }
+  model_string <- paste0(model_string, "\n")
+
+  model_string <- paste0(model_string, "\n# Observed intercepts (fixed to 0)")
+  for (w in 1:waves) {
+    model_string <- paste0(model_string, "\n", time_varying_x[w], " ~ 0*1")
+    model_string <- paste0(model_string, "\n", time_varying_y[w], " ~ 0*1")
+    if (!is.null(time_varying_z)) {
+      model_string <- paste0(model_string, "\n", time_varying_z[w], " ~ 0*1")
+    }
+  }
+  model_string <- paste0(model_string, "\n")
 
   # ==================== AUTOREGRESSIVE AND CROSS-LAGGED PATHS ====================
   model_string <- paste0(model_string, "\n# Autoregressive and Cross-lagged Effects")
@@ -217,40 +233,40 @@ estimateRICLPM <- function(waves,
       # Only autoregressive effects constrained
       model_string <- paste0(
         model_string, "\np", w, " ~ ", start_ar, label_autoregressive[1], "*p", w - 1,
-        " + ", start_cl, "omega_xy", w, "*q", w - 1
+        " + ", start_cl, "cl_yx", w, "*q", w - 1
       )
       model_string <- paste0(
         model_string, "\nq", w, " ~ ", start_ar, label_autoregressive[2], "*q", w - 1,
-        " + ", start_cl, "omega_yx", w, "*p", w - 1
+        " + ", start_cl, "cl_xy", w, "*p", w - 1
       )
 
       if (!is.null(time_varying_z)) {
         model_string <- paste0(
           model_string, "\nr", w, " ~ ", start_ar, label_autoregressive[3], "*r", w - 1,
-          " + ", start_cl, "omega_zx", w, "*p", w - 1,
-          " + ", start_cl, "omega_zy", w, "*q", w - 1
+          " + ", start_cl, "cl_xz", w, "*p", w - 1,
+          " + ", start_cl, "cl_yz", w, "*q", w - 1
         )
         model_string <- paste0(
-          model_string, "\np", w, " ~ ", start_cl, "omega_xz", w, "*r", w - 1
+          model_string, "\np", w, " ~ ", start_cl, "cl_zx", w, "*r", w - 1
         )
         model_string <- paste0(
-          model_string, "\nq", w, " ~ ", start_cl, "omega_yz", w, "*r", w - 1
+          model_string, "\nq", w, " ~ ", start_cl, "cl_zy", w, "*r", w - 1
         )
       }
     } else if (!constrain_beta && constrain_omega) {
       # Only cross-lagged effects constrained
       model_string <- paste0(
-        model_string, "\np", w, " ~ ", start_ar, "beta_y", w, "*p", w - 1,
+        model_string, "\np", w, " ~ ", start_ar, "ar_x", w, "*p", w - 1,
         " + ", start_cl, label_crosslagged[1], "*q", w - 1
       )
       model_string <- paste0(
-        model_string, "\nq", w, " ~ ", start_ar, "beta_x", w, "*q", w - 1,
+        model_string, "\nq", w, " ~ ", start_ar, "ar_y", w, "*q", w - 1,
         " + ", start_cl, label_crosslagged[2], "*p", w - 1
       )
 
       if (!is.null(time_varying_z)) {
         model_string <- paste0(
-          model_string, "\nr", w, " ~ ", start_ar, "beta_z", w, "*r", w - 1,
+          model_string, "\nr", w, " ~ ", start_ar, "ar_z", w, "*r", w - 1,
           " + ", start_cl, label_crosslagged[3], "*p", w - 1,
           " + ", start_cl, label_crosslagged[4], "*q", w - 1
         )
@@ -264,41 +280,41 @@ estimateRICLPM <- function(waves,
     } else {
       # No constraints - all effects free
       model_string <- paste0(
-        model_string, "\np", w, " ~ ", start_ar, "beta_y", w, "*p", w - 1,
-        " + ", start_cl, "omega_xy", w, "*q", w - 1
+        model_string, "\np", w, " ~ ", start_ar, "ar_x", w, "*p", w - 1,
+        " + ", start_cl, "cl_yx", w, "*q", w - 1
       )
       model_string <- paste0(
-        model_string, "\nq", w, " ~ ", start_ar, "beta_x", w, "*q", w - 1,
-        " + ", start_cl, "omega_yx", w, "*p", w - 1
+        model_string, "\nq", w, " ~ ", start_ar, "ar_y", w, "*q", w - 1,
+        " + ", start_cl, "cl_xy", w, "*p", w - 1
       )
 
       if (!is.null(time_varying_z)) {
         model_string <- paste0(
-          model_string, "\nr", w, " ~ ", start_ar, "beta_z", w, "*r", w - 1,
-          " + ", start_cl, "omega_zx", w, "*p", w - 1,
-          " + ", start_cl, "omega_zy", w, "*q", w - 1
+          model_string, "\nr", w, " ~ ", start_ar, "ar_z", w, "*r", w - 1,
+          " + ", start_cl, "cl_xz", w, "*p", w - 1,
+          " + ", start_cl, "cl_yz", w, "*q", w - 1
         )
         model_string <- paste0(
-          model_string, "\np", w, " ~ ", start_cl, "omega_xz", w, "*r", w - 1
+          model_string, "\np", w, " ~ ", start_cl, "cl_zx", w, "*r", w - 1
         )
         model_string <- paste0(
-          model_string, "\nq", w, " ~ ", start_cl, "omega_yz", w, "*r", w - 1
+          model_string, "\nq", w, " ~ ", start_cl, "cl_zy", w, "*r", w - 1
         )
       }
     }
   }
 
   # ==================== RESIDUAL VARIANCES ====================
-  model_string <- paste0(model_string, "\n\n# Residual Variances")
+  model_string <- paste0(model_string, "\n\n# Dynamic Residual Variances")
   if (constrain_residual_variances) {
     for (w in 1:waves) {
       model_string <- paste0(
-        model_string, "\np", w, " ~~ var_p*p", w,
-        "\nq", w, " ~~ var_q*q", w
+        model_string, "\np", w, " ~~ d_var_x*p", w,
+        "\nq", w, " ~~ d_var_y*q", w
       )
       if (!is.null(time_varying_z)) {
         model_string <- paste0(
-          model_string, "\nr", w, " ~~ var_r*r", w
+          model_string, "\nr", w, " ~~ d_var_z*r", w
         )
       }
     }
@@ -317,16 +333,16 @@ estimateRICLPM <- function(waves,
   }
 
   # ==================== RESIDUAL COVARIANCES ====================
-  model_string <- paste0(model_string, "\n\n# Residual Covariances")
+  model_string <- paste0(model_string, "\n\n# Dynamic Residual Covariances")
   if (constrain_residual_covariances) {
     for (w in 1:waves) {
       model_string <- paste0(
-        model_string, "\np", w, " ~~ cov_pq*q", w
+        model_string, "\np", w, " ~~ d_cov_xy*q", w
       )
       if (!is.null(time_varying_z)) {
         model_string <- paste0(
-          model_string, "\np", w, " ~~ cov_pr*r", w,
-          "\nq", w, " ~~ cov_qr*r", w
+          model_string, "\np", w, " ~~ d_cov_xz*r", w,
+          "\nq", w, " ~~ d_cov_yz*r", w
         )
       }
     }
@@ -363,21 +379,21 @@ estimateRICLPM <- function(waves,
     }
   }
 
-  # ==================== RANDOM INTERCEPT VARIANCES AND COVARIANCES ====================
-  model_string <- paste0(model_string, "\n\n# Random Intercept Variances and Covariances")
+  # ==================== TRAIT FACTOR VARIANCES AND COVARIANCES ====================
+  model_string <- paste0(model_string, "\n\n# Trait Factor (I) Variances and Covariances")
   model_string <- paste0(
     model_string,
-    "\nBX ~~ BX",
-    "\nBY ~~ BY",
-    "\nBX ~~ BY"
+    "\nI_x ~~ I_x",
+    "\nI_y ~~ I_y",
+    "\nI_x ~~ I_y"
   )
 
   if (!is.null(time_varying_z)) {
     model_string <- paste0(
       model_string,
-      "\nBZ ~~ BZ",
-      "\nBX ~~ BZ",
-      "\nBY ~~ BZ"
+      "\nI_z ~~ I_z",
+      "\nI_x ~~ I_z",
+      "\nI_y ~~ I_z"
     )
   }
 

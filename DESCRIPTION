@@ -27,7 +27,8 @@ Imports:
 Suggests:
     knitr,
     rmarkdown,
-    testthat (>= 3.0.0)
+    testthat (>= 3.0.0),
+    blavaan
 VignetteBuilder: knitr
 URL: https://crweber9874.github.io/crossLagR/
 Config/testthat/edition: 3

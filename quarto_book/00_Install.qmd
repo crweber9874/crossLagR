@@ -1,0 +1,162 @@
+# Installation and Package Syntax
+
+## Installation
+
+`crossLagR` can be found on GitHub and is not yet on CRAN. Install with `devtools` (or `remotes`):
+
+```r
+# install.packages("devtools")
+devtools::install_github("crweber9874/crossLagR")
+```
+
+The package is generally just a wrapper around `lavaan` for SEM estimation, `MASS` for multivariate normal draws in some simulators, and the usual tidyverse tools (`dplyr`, `tidyr`, `tibble`, `purrr`, `stringr`) for data wrangling. `DiagrammeR` is used to render the path diagrams reproduced throughout this guide. All dependencies are listed in the DESCRIPTION file and will be installed automatically with the above command.
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+library(crossLagR)
+library(lavaan)
+library(dplyr)
+```
+
+## Package Conventions
+
+The way the functions are written is that they fall into three families, identifiable by their prefix:
+
+- `estimate*()` — generate `lavaan` model syntax. Each returns a character string that can be fed directly into `lavaan::lavaan()` or `lavaan::sem()`. So `estimateRICLPM(waves = 4)` returns a string of lavaan syntax for a 4-wave RI-CLPM, for instance.
+- `sim*()` — simulate data from a specified DGP. Each returns a list with `$model` (the population lavaan syntax) and `$data` (a wide-format tibble with one row per unit and columns `x1, …, xT, y1, …, yT`).
+- `monteCarlo*()` — wrappers that repeat a simulate-then-fit cycle and return a tibble table of results.
+
+All `estimate*()` functions in the unified family share a common labeling convention so that estimates from different models can be lined up side-by-side. The convention is to generally follow the framework introduced by @usami2019:
+
+| Label | Meaning | Used in |
+|:---|:---|:---|
+| `ar_x`, `ar_y` | Autoregressive parameters | every estimator |
+| `cl_xy`, `cl_yx` | Cross-lagged parameters | every estimator |
+| `I_x`, `I_y` | Trait / intercept factor | RI-CLPM, B&B, ALT, LCM-SR |
+| `S_x`, `S_y` | Slope factor | ALT, LCM-SR, LGM |
+| `A_x`, `A_y` | Accumulating change factor | LCSM |
+| `u_var_x`, `u_var_y` | Unique factor (measurement-error) variance | LCSM |
+| `d_var_x`, `d_var_y` | Dynamic residual variance | RI-CLPM, ALT, LCM-SR |
+| `d_cov_xy` | Dynamic residual covariance | RI-CLPM, ALT, LCM-SR |
+
+: Unified parameter labels in `crossLagR`. The *substantive* interpretation depends on the model — see Chapter 4 — but the labels themselves are stable across estimators. An AR parameter in one model may not mean the same as an AR parameter in another, but they will both be labeled `ar_x` or `ar_y` in the output.
+
+## Common Arguments
+
+Every `estimate*()` accepts at least:
+
+- `waves` — number of time points. Lower bound depends on the model (2 for CLPM, 3 for most others, 4 for `estimate_change_to_change`).
+- `constrain_beta` — equality constraint across waves on AR parameters. Default `TRUE`.
+- `constrain_omega` — equality constraint across waves on CL parameters. Default `TRUE`.
+
+Bivariate/multivariate models add:
+
+- `variable_type = c("univariate", "bivariate")` — for `estimateLChange()` and `estimateLGM()`.
+- `include_z = TRUE` — for `estimateRICLPM()`; adds a third process.
+- `constrain_residual_variances`, `constrain_residual_covariances` — equality constraints on innovation variances and within-wave covariances.
+
+Sim wrappers accept the same constraint arguments plus true population values: `beta_x`/`beta_y` (AR), `omega_xy`/`omega_yx` (CL), and variance components specific to each model (e.g. `var_BX`, `var_BY` for RI-CLPM trait variances, `var_p`, `var_q` for within-person dynamic-residual variances).
+
+::: {.callout-note title="Sim/estimate argument names differ from output labels"}
+For historical reasons the `sim*()` true-value arguments use `beta_*` and `omega_*`, but the `estimate*()` syntax labels its parameters `ar_*` and `cl_*`. This is intentional — `beta` / `omega` refer to the DGP's true values, while `ar` / `cl` refer to *estimates from any model in the family*.
+:::
+
+## Estimator Quick Reference
+
+```{r echo=TRUE, eval=FALSE}
+# CLPM — baseline cross-lagged panel
+estimateCLPM(waves = 4)
+
+# RI-CLPM — random intercept + within-person AR/CL
+estimateRICLPM(waves = 4)
+
+# Latent Change — proportional change with optional accumulating factor
+estimateLChange(waves = 4, variable_type = "bivariate",
+                estimate_constant_change = TRUE)
+
+# Linear Growth — intercept + slope, no dynamics
+estimateLGM(waves = 4, variable_type = "bivariate")
+
+# ALT — growth + AR/CL on observed scores (compounding)
+estimateALT(waves = 4)
+
+# LCM-SR / GCLM — growth + AR/CL on structured residuals
+estimateLCMSR(waves = 4)
+
+# Bollen & Brand — latent fixed effects dynamic panel
+estimateBollen_and_Brand(waves = 4)
+
+# Trait-State-Occasion — three-component variance decomposition
+estimateTSO(waves = 4)
+```
+
+Each call returns a character string. To fit, pipe it into `lavaan`:
+
+```{r echo=TRUE, eval=FALSE}
+fit <- lavaan(estimateRICLPM(waves = 4), data = my_panel)
+summary(fit, standardized = TRUE)
+```
+
+## Simulation Quick Reference
+
+```{r echo=TRUE, eval=FALSE}
+# CLPM with two waves
+sim <- simCLPM(waves = 4, beta_x = 0.5, beta_y = 0.5,
+               omega_xy = 0.2, omega_yx = 0.1,
+               sample.nobs = 1000)
+
+# RI-CLPM with traits
+sim <- simRICLPM(waves = 4, beta_x = 0.3, beta_y = 0.3,
+                 omega_xy = 0.2, omega_yx = 0.1,
+                 var_BX = 1, var_BY = 1,
+                 sample.nobs = 1000)
+
+# Latent change
+sim <- simLChange(waves = 5, variable_type = "bivariate",
+                  beta_x = -0.5, beta_y = -0.5,
+                  omega_x = 0.3, omega_y = 0.3,
+                  sample.nobs = 1000)
+
+# Wide tibble: id, x1..xT, y1..yT
+str(sim$data, list.len = 6)
+```
+
+The wide-format output is what every `estimate*()` expects when fed to `lavaan`. A long-format helper `reshape_long_sim_cr()` is available for plotting, but generally the convention here is to keep the data in wide format.
+
+## Quick Example
+
+```{r echo=TRUE, message=FALSE, warning=FALSE}
+set.seed(2026)
+
+# Simulate from an RI-CLPM
+sim <- simRICLPM(waves       = 5,
+                 beta_x      = 0.3,
+                 beta_y      = 0.3,
+                 omega_xy    = 0.2,
+                 omega_yx    = 0.1,
+                 var_BX      = 1,
+                 var_BY      = 1,
+                 sample.nobs = 1000)
+
+# Fit the RI-CLPM
+fit <- lavaan(estimateRICLPM(waves = 5), data = sim$data)
+
+# Pull just the AR and CL parameters
+parameterEstimates(fit) |>
+  dplyr::filter(label %in% c("ar_x", "ar_y", "cl_xy", "cl_yx")) |>
+  dplyr::select(label, est, se, pvalue) |>
+  dplyr::mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+The same labels (`ar_x`, `cl_yx`, …) will appear in the `parameterEstimates()` output regardless of which `estimate*()` function generated the syntax — that's what makes the unified framing useful when comparing estimators on the same data.
+
+## Help and Documentation
+
+Every exported function has a roxygen-generated help page. The usual access:
+
+```r
+?estimateRICLPM
+?simLChange
+help(package = "crossLagR")
+```
+
+Source code is on GitHub at <https://github.com/crweber9874/crossLagR>; issues and feature requests welcome.

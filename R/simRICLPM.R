@@ -12,8 +12,8 @@
 #' @param beta_x Autoregressive effect for X (X(t-1) -> X(t)). Default is 0.3.
 #' @param beta_y Autoregressive effect for Y (Y(t-1) -> Y(t)). Default is 0.3.
 #' @param beta_z Autoregressive effect for Z (Z(t-1) -> Z(t)), if included. Default is 0.3.
-#' @param omega_xy Cross-lagged effect of Y on X (Y(t-1) -> X(t)). Default is 0.1.
-#' @param omega_yx Cross-lagged effect of X on Y (X(t-1) -> Y(t)). Default is 0.1.
+#' @param omega_xy Cross-lagged effect of X on Y (X(t-1) -> Y(t)). Default is 0.1.
+#' @param omega_yx Cross-lagged effect of Y on X (Y(t-1) -> X(t)). Default is 0.1.
 #' @param omega_zx Cross-lagged effect of Z on X (Z(t-1) -> X(t)), if Z included. Default is 0.1.
 #' @param omega_zy Cross-lagged effect of Z on Y (Z(t-1) -> Y(t)), if Z included. Default is 0.1.
 #' @param omega_xz Cross-lagged effect of X on Z (X(t-1) -> Z(t)), if Z included. Default is 0.1.
@@ -252,85 +252,85 @@ simRICLPM <- function(waves = 5,
     if (constrain_beta && constrain_omega) {
       # Both autoregressive and cross-lagged effects constrained
       model_string <- paste0(
-        model_string, "\np", w, " ~ ", beta_y, "*p", w - 1, " + ", omega_xy, "*q", w - 1
+        model_string, "\np", w, " ~ ", beta_x, "*p", w - 1, " + ", omega_yx, "*q", w - 1
       )
       model_string <- paste0(
-        model_string, "\nq", w, " ~ ", beta_x, "*q", w - 1, " + ", omega_yx, "*p", w - 1
+        model_string, "\nq", w, " ~ ", beta_y, "*q", w - 1, " + ", omega_xy, "*p", w - 1
       )
 
       if (include_z) {
         model_string <- paste0(
           model_string, "\nr", w, " ~ ", beta_z, "*r", w - 1,
-          " + ", omega_zx, "*p", w - 1, " + ", omega_zy, "*q", w - 1
+          " + ", omega_xz, "*p", w - 1, " + ", omega_yz, "*q", w - 1
         )
         model_string <- paste0(
-          model_string, "\np", w, " ~ ", omega_xz, "*r", w - 1
+          model_string, "\np", w, " ~ ", omega_zx, "*r", w - 1
         )
         model_string <- paste0(
-          model_string, "\nq", w, " ~ ", omega_yz, "*r", w - 1
+          model_string, "\nq", w, " ~ ", omega_zy, "*r", w - 1
         )
       }
     } else if (constrain_beta && !constrain_omega) {
       # Only autoregressive effects constrained
       model_string <- paste0(
-        model_string, "\np", w, " ~ ", beta_y, "*p", w - 1, " + omega_xy", w, "*q", w - 1
+        model_string, "\np", w, " ~ ", beta_x, "*p", w - 1, " + omega_yx", w, "*q", w - 1
       )
       model_string <- paste0(
-        model_string, "\nq", w, " ~ ", beta_x, "*q", w - 1, " + omega_yx", w, "*p", w - 1
+        model_string, "\nq", w, " ~ ", beta_y, "*q", w - 1, " + omega_xy", w, "*p", w - 1
       )
 
       if (include_z) {
         model_string <- paste0(
           model_string, "\nr", w, " ~ ", beta_z, "*r", w - 1,
-          " + omega_zx", w, "*p", w - 1, " + omega_zy", w, "*q", w - 1
+          " + omega_xz", w, "*p", w - 1, " + omega_yz", w, "*q", w - 1
         )
         model_string <- paste0(
-          model_string, "\np", w, " ~ omega_xz", w, "*r", w - 1
+          model_string, "\np", w, " ~ omega_zx", w, "*r", w - 1
         )
         model_string <- paste0(
-          model_string, "\nq", w, " ~ omega_yz", w, "*r", w - 1
+          model_string, "\nq", w, " ~ omega_zy", w, "*r", w - 1
         )
       }
     } else if (!constrain_beta && constrain_omega) {
       # Only cross-lagged effects constrained
       model_string <- paste0(
-        model_string, "\np", w, " ~ beta_y", w, "*p", w - 1, " + ", omega_xy, "*q", w - 1
+        model_string, "\np", w, " ~ beta_x", w, "*p", w - 1, " + ", omega_yx, "*q", w - 1
       )
       model_string <- paste0(
-        model_string, "\nq", w, " ~ beta_x", w, "*q", w - 1, " + ", omega_yx, "*p", w - 1
+        model_string, "\nq", w, " ~ beta_y", w, "*q", w - 1, " + ", omega_xy, "*p", w - 1
       )
 
       if (include_z) {
         model_string <- paste0(
           model_string, "\nr", w, " ~ beta_z", w, "*r", w - 1,
-          " + ", omega_zx, "*p", w - 1, " + ", omega_zy, "*q", w - 1
+          " + ", omega_xz, "*p", w - 1, " + ", omega_yz, "*q", w - 1
         )
         model_string <- paste0(
-          model_string, "\np", w, " ~ ", omega_xz, "*r", w - 1
+          model_string, "\np", w, " ~ ", omega_zx, "*r", w - 1
         )
         model_string <- paste0(
-          model_string, "\nq", w, " ~ ", omega_yz, "*r", w - 1
+          model_string, "\nq", w, " ~ ", omega_zy, "*r", w - 1
         )
       }
     } else {
       # No constraints - all effects have unique labels per wave
       model_string <- paste0(
-        model_string, "\np", w, " ~ beta_y", w, "*p", w - 1, " + omega_xy", w, "*q", w - 1
+        model_string, "\np", w, " ~ beta_x", w, "*p", w - 1, " + omega_yx", w, "*q", w - 1
       )
       model_string <- paste0(
-        model_string, "\nq", w, " ~ beta_x", w, "*q", w - 1, " + omega_yx", w, "*p", w - 1
+        model_string, "\nq", w, " ~ beta_y", w, "*q", w - 1, " + omega_xy", w, "*p", w - 1
       )
 
       if (include_z) {
         model_string <- paste0(
           model_string, "\nr", w, " ~ beta_z", w, "*r", w - 1,
-          " + omega_zx", w, "*p", w - 1, " + omega_zy", w, "*q", w - 1
+          " + omega_xz", w, "*p", w - 1, " + omega_yz", w, "*q", w - 1
         )
         model_string <- paste0(
-          model_string, "\np", w, " ~ omega_xz", w, "*r", w - 1
+          model_string, "\np", w, " ~ omega_zx", w, "*r", w - 1
         )
         model_string <- paste0(
-          model_string, "\nq", w, " ~ omega_yz", w, "*r", w - 1
+          model_string, "\nq", w, " ~ omega_zy", w, "*r", w - 1
         )
       }
     }

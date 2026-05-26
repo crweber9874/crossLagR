@@ -1,0 +1,1021 @@
+# Replication: Bakker, Lelkes, & Malka (2021)
+
+This chapter relies on the LISS panel analysis from @bakker_reconsidering_2021, using `crossLagR::estimateCLPM()`. Three waves (May 2008, May 2013, May 2019 for personality; Dec 2007–2018 for politics); "closed personality" = openness (reversed) + conscientiousness; and five political items were analyzed, consistent with the models found in @bakker_reconsidering_2021. So, this forms a three-wave panel with two observed variables (closed personality and each political item), and we fit a separate CLPM for each political item. 
+
+This chapter forms a partial replication of @bakker_reconsidering_2021 LISS panel, re-estimates their models with alternative models in `crossLagR`, and checks the factor structure of the personality items and each Big Five trait's effects on political preferences, and vice versa, across various specifications. However, the chapter is intended to address a broader topic in political psychology, the relationship between personality and political preferences, and which construct is causally prior. 
+
+## Setup
+
+```{r setup}
+#| message: false
+#| warning: false
+#| cache: false
+#| echo: true
+library(tidyverse)
+library(lavaan)
+library(psych)
+library(crossLagR)
+library(here)
+## Anchor here() to the package root (one level up from quarto_book/)
+here::i_am("crossLagR.Rproj")
+devtools::load_all()
+load(here("data", "liss_long.rda"))
+```
+
+## Reliability (Cronbach's $\alpha$)
+ 
+Here, we identify the LISS personality and political variables and calculate Cronbach's alpha for each scale.  
+
+There are so many variables used in the analysis (with just one *x* and *y*) that it's easier to list them together in a named list, and then just loop through all the names in the list to calculate the alphas. We follow the same approach throughout the analysis.
+
+```{r alphas}
+#| echo: true
+#| message: false
+#| warning: false
+scale_items <- list(
+    Openness = c(
+        "rich_vocab", "dffclt_undrstnd", "vivid_imagin", "no_interest",
+        "excellent_ideas", "poor_imagin", "quick_undrstnd",
+        "dffclt_words", "reflecting", "full_of_ideas"
+    ),
+    Conscientiousness = c(
+        "always_prepared", "leave_belongings", "pay_attention",
+        "make_mess", "chores_done", "forget_to_put", "like_order",
+        "shirk_duties", "follow_sched", "exacting"
+    ),
+    Extraversion = c(
+        "life_party", "dont_talk", "comfortable", "stay_in_back",
+        "start_convos", "say_little", "talk_at_parties",
+        "avoid_attention", "like_attention", "quiet"
+    ),
+    Agreeableness = c(
+        "no_concern", "interest_people", "insult_people",
+        "sympathize", "no_care_probs", "soft_heart",
+        "no_interest_probs", "time_for_others", "feel_emotions",
+        "others_at_ease"
+    ),
+    Neuroticism = c(
+        "stress_easy", "relaxed", "worry", "easy_disturb",
+        "upset_easily", "seldom_blue", "often_blue", "change_mood",
+        "mood_swings", "irritate_easy"
+    ),
+    PANAS_Positive = c(
+        "interested", "excited", "strong", "enthusiastic", "proud",
+        "alert", "inspired", "determined", "attentive", "active"
+    ),
+    PANAS_Negative = c(
+        "distressed", "upset", "guilty", "scared", "hostile",
+        "irritable", "ashamed", "nervous", "jittery", "afraid"
+    ),
+    Politics = c(
+        "left_right", "euthenasia", "income_diffs", "euro_unify",
+        "assimilation", "diversity", "easy_asylum",
+        "immig_benefits", "immigrants"
+    )
+)
+```
+
+
+
+```{r}
+#| echo: true
+#| message: false
+#| warning: false
+## A useful little function to calculate alpha and identify reverse-keyed items. From psych...
+alpha_one <- function(s, items) {
+    d <- liss_long |>
+        select(all_of(items)) |>
+        drop_na()
+
+    # Identify reverse-keyed items from raw item-total correlations,
+    # BEFORE letting psych::alpha auto-flip. Robust across psych versions.
+    if (ncol(d) >= 2) {
+        total <- rowSums(d)
+        cor_with_total <- vapply(d, function(x) suppressWarnings(cor(x, total - x)),
+                                 numeric(1))
+        flipped <- names(cor_with_total)[!is.na(cor_with_total) & cor_with_total < 0]
+    } else {
+        flipped <- character(0)
+    }
+
+    res <- suppressWarnings(suppressMessages(
+        psych::alpha(d, check.keys = TRUE, warnings = FALSE)
+    ))
+
+    tibble(
+        scale = s,
+        n_items = length(items),
+        n_obs = nrow(d),
+        alpha = round(res$total$raw_alpha, 3),
+    )
+}
+
+alpha_table <- map2_dfr(names(scale_items), scale_items, alpha_one)
+alpha_table
+```
+
+@alphas shows that the scales have acceptable reliability.
+
+## Closed Personality
+
+@bakker_reconsidering_2021 estimate a CLPM with conscientiousness and openness scales as indicators of a latent "closed personality" factor. These constructs independently (but equally) are included in the regression model, but they constrain "incoming" and "outgoing" paths to be equal across the two constructs. They also account for the fact that the data are in long format (subject x personality construct x wave) and adjust the standard errors accordingly.\footnote{The `long` format data structure consists of one row per subject per wave per personality construct.}
+
+We took a somewhat different route by constructing a "closed personality" composite -- but do analyze each personality construct separately later this in this chapter. We simply combine the conscientiousness and openness items into a respondent composite score. Aggregating and then disaggregating "closed personality" into its two Big 5 components allows us to check whether the results are driven by one trait or the other. This also sidesteps the issue of whether the two traits *should* be specified to have equal paths in the CLPM, which is a rather strong assumption. Finally, the `crossLagR` package, which builds models in `lavaan`, is designed (or at least biased towards) data that are in wide format (one row per subject, with separate columns for each wave and variable), which makes averaging (or specifying a latent variable) advantageous. 
+
+
+```{r closed}
+#| message: false
+#| warning: false
+#| echo: true
+#| 
+# In `liss_long`, IPIP-50 reverse-keyed items have already been flipped (see
+# constructData_LISS.qmd Step 2.4) so every item points toward its named
+# construct: high openness = open, high conscientiousness = conscientious.
+#
+# Closed personality = (low openness + high conscientiousness) / 2.
+# Flip openness once at the composite level rather than item-level.
+
+
+years_use <- c(2008, 2013, 2019)
+n_waves <- length(years_use)
+
+politics <- c(
+    "left_right", "euthenasia", "income_diffs", "euro_unify",
+    "immigrants"
+)
+conscientiousness_items <- c(
+    "always_prepared", "leave_belongings", "pay_attention", "make_mess",
+    "chores_done", "forget_to_put", "like_order", "shirk_duties",
+    "follow_sched", "exacting"
+)
+openness_items <- c(
+    "rich_vocab", "dffclt_undrstnd", "vivid_imagin", "no_interest",
+    "excellent_ideas", "poor_imagin", "quick_undrstnd", "dffclt_words",
+    "reflecting", "full_of_ideas"
+)
+
+dat <- liss_long |>
+    rowwise() |>
+    mutate(
+        openness          = mean(c_across(all_of(openness_items)),          na.rm = TRUE),
+        conscientiousness = mean(c_across(all_of(conscientiousness_items)), na.rm = TRUE)
+    ) |>
+    ungroup() |>
+    mutate(across(c(openness, conscientiousness),
+                  ~ if_else(is.nan(.x), NA_real_, .x))) |>
+    mutate(closed = ((1 - openness) + conscientiousness) / 2)
+
+
+```
+
+The LISS data we analyze consists of three waves, 2008, 2013, 2019 and a separate CLPM for each of five political items: left–right self-placement, euthanasia, income differences, European integration, immigration.
+
+### CLPM Results
+
+We leave the autoregressive and cross-lagged paths **unconstrained** across waves (so wave-2-on-wave-1 coefficients differ from wave-3-on-wave-2).
+
+We also standardize the variables. 
+
+```{r fit}
+## Bakker et al.'s CLPM syntax — observed-variable, unconstrained
+## I use the crossLagR syntax below, which is more flexible.
+CLPM_u <- "
+  x2 + y2 ~ x1 + y1
+  x3 + y3 ~ x2 + y2
+  x1 ~~ x1; x2 ~~ x2; x3 ~~ x3
+  y1 ~~ y1; y2 ~~ y2; y3 ~~ y3
+  y1 ~~ x1; y2 ~~ x2; y3 ~~ x3
+"
+
+## This should be rewritten to be more flexible and impolemnented alongside the personality
+## and political items. It's hard to follow. But it works with the sequence and generates
+## a wide format data frame with the right variable names for lavaan (x1, y1, x2, y2, x3, y3).
+## NEED MOVE UP THIS BLOCK.
+
+build_wide <- function(pol_item) {
+    dat |>
+        filter(year %in% years_use) |>
+        mutate(wave = match(year, years_use)) |>
+        select(case_id, wave, x = closed, y = all_of(pol_item)) |>
+        pivot_wider(
+            id_cols = case_id,
+            names_from = wave,
+            values_from = c(x, y),
+            names_glue = "{.value}{wave}"
+        ) |>
+        select(case_id, all_of(c(
+            paste0("x", 1:n_waves),
+            paste0("y", 1:n_waves)
+        )))
+}
+
+fit_one <- function(pol_item) {
+    wide <- build_wide(pol_item)
+    ## Pre-standardize (Bakker et al. z-score), again move this up.
+    for (v in paste0(rep(c("x", "y"), each = n_waves), 1:n_waves)) {
+        wide[[v]] <- as.numeric(scale(wide[[v]]))
+    }
+    fit <- suppressWarnings(sem(CLPM_u, data = wide, missing = "ML", fixed.x = FALSE))
+    parameterEstimates(fit, level = 0.90) |>
+        filter(
+            (lhs == "x2" & rhs == "y1") | (lhs == "x3" & rhs == "y2") |
+                (lhs == "y2" & rhs == "x1") | (lhs == "y3" & rhs == "x2")
+        ) |>
+        mutate(
+            politics = pol_item,
+            direction = if_else(grepl("^x", lhs),
+                "DV: Policy Preference\nIV: Personality",
+                "DV: Personality\nIV: Policy Preference"
+            ),
+            transition = paste0(
+                "Wave ", gsub("[^0-9]", "", lhs),
+                " \u2190 Wave ", gsub("[^0-9]", "", rhs)
+            )
+        ) |>
+        select(
+            politics, direction, transition, est, se, pvalue,
+            ci.lower, ci.upper
+        )
+}
+
+results <- map_dfr(politics, fit_one)
+
+# Persist for the Bakker-comparison appendix (Chapter 8)
+saveRDS(results, here::here("data", "liss_clpm_results.rds"))
+```
+
+## Figure 2 
+
+We plot our estimates in @fig-bakker, which closely replicates the main figure from @bakker_reconsidering_2021. Again, we suspect the slight deviations are an artifact of how the personality variables modeled in the CLPM. 
+
+```{r fig-bakker, fig.width = 9, fig.height = 4}
+#| label: fig-bakker-replication
+#| fig-cap: "Standardized cross-lagged coefficients in the LISS panel, replicating Bakker, Lelkes, & Malka (2021)."
+plot_dat <- results |>
+    mutate(
+        politics = factor(politics,
+            levels = c(
+                "euro_unify", "euthenasia", "left_right",
+                "immigrants", "income_diffs"
+            ),
+            labels = c(
+                "EU", "Euthanasia", "Ideology",
+                "Immigration", "Income\nDifferences"
+            )
+        )
+    )
+
+ggplot(plot_dat, aes(politics, est,
+    shape = transition, group = transition
+)) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
+    geom_pointrange(aes(ymin = ci.lower, ymax = ci.upper),
+        position = position_dodge(width = 0.5)
+    ) +
+    facet_wrap(~direction) +
+    scale_shape_manual(values = c(16, 17), name = "Model") +
+    labs(x = "Policy Variable", y = "Standardized Coefficient") +
+    theme_bw() +
+    theme(
+        legend.position = "bottom",
+        axis.text.x = element_text(angle = 30, hjust = 1)
+    )
+```
+
+@tbl-coefs shows the coefficients from the model.
+
+```{r table}
+#| label: tbl-coefs
+results |>
+    select(politics, direction, transition, est, se, pvalue) |>
+    mutate(across(c(est, se), \(x) round(x, 3)),
+        pvalue = signif(pvalue, 2)
+    ) |>
+    arrange(politics, direction, transition) |>
+    knitr::kable()
+```
+
+
+## The ICC
+
+The intraclass correlation $\text{ICC} = \sigma^2_b / (\sigma^2_b + \sigma^2_w)$ gives the share of total variance attributable to stable between-person differences. We estimate it with an empty random-intercept model via `lmer`: `y ~ 1 + (1 | case_id)`. High ICC means most variance is between-person (trait-like); this is the variance that biases the CLPM cross-lagged coefficients in the next section.
+
+```{r icc}
+#| message: false
+#| warning: false
+library(lme4)
+
+## Build a politics scale (mean of the five items)
+dat <- dat |>
+    rowwise() |>
+    mutate(politics_scale = mean(c_across(all_of(politics)), na.rm = TRUE)) |>
+    ungroup() |>
+    mutate(politics_scale = if_else(is.nan(politics_scale), NA_real_, politics_scale))
+
+## ICC helper
+get_icc <- function(var, data) {
+    f <- as.formula(paste(var, "~ 1 + (1 | case_id)"))
+    fit <- lmer(f,
+        data = data,
+        REML = FALSE, 
+        control = lmerControl(calc.derivs = FALSE)
+    )
+    vc <- as.data.frame(VarCorr(fit))
+    vc$vcov[1] / sum(vc$vcov)
+}
+
+icc_table <- tibble(
+    variable = c("Closed Personality", "Politics Scale"),
+    ICC = c(
+        get_icc("closed", dat |> mutate(case_id = factor(case_id)) |> drop_na(closed)),
+        get_icc("politics_scale", dat |> mutate(case_id = factor(case_id)) |> drop_na(politics_scale))
+    )
+) |>
+    mutate(ICC = round(ICC, 3))
+icc_table
+```
+
+
+Both politics and personality are reasonably stable -- but the ICC is still far from 1. 
+
+
+## Now Replicate with `crossLagR` Package
+
+The same analysis using `crossLagR::estimateCLPM()` — the package generates the lavaan syntax automatically and returns fully standardized estimates via `lavaan::standardizedSolution()`. We used `p` and `q` in the code to denote the personality and political variables, respectively, to avoid confusion with the `x` and `y` variable names in the lavaan syntax.
+
+```{r fit-package}
+#| message: false
+#| warning: false
+fit_one_pkg <- function(pol_item) {
+    wide <- build_wide(pol_item)
+    syntax <- estimateCLPM(
+        waves = n_waves,
+        constrain_beta = FALSE,
+        constrain_omega = FALSE,
+        constrain_residual_variances = FALSE,
+        constrain_residual_covariances = FALSE
+    )
+    fit <- suppressWarnings(lavaan(syntax,
+        data = wide, missing = "fiml",
+        meanstructure = TRUE, int.ov.free = TRUE
+    ))
+    standardizedSolution(fit) |>
+        filter(op == "~") |>
+        filter(
+            (lhs == "p2" & rhs == "q1") | (lhs == "p3" & rhs == "q2") |
+                (lhs == "q2" & rhs == "p1") | (lhs == "q3" & rhs == "p2")
+        ) |>
+        mutate(
+            politics = pol_item,
+            direction = if_else(grepl("^p", lhs),
+                "DV: Policy Preference\nIV: Personality",
+                "DV: Personality\nIV: Policy Preference"
+            ),
+            transition = paste0(
+                "Wave ", gsub("[^0-9]", "", lhs),
+                " \u2190 Wave ", gsub("[^0-9]", "", rhs)
+            )
+        ) |>
+        select(politics, direction, transition, est.std, se, pvalue)
+}
+
+results_pkg <- map_dfr(politics, fit_one_pkg)
+```
+
+```{r table-package}
+#| label: tbl-coefs-package
+results_pkg |>
+    select(politics, direction, transition, est.std, se, pvalue) |>
+    mutate(across(c(est.std, se), \(x) round(x, 3)),
+        pvalue = signif(pvalue, 2)
+    ) |>
+    arrange(politics, direction, transition) |>
+    knitr::kable()
+```
+
+## Accounting for Unit Effects
+
+The CLPM coefficients above leave one obvious question: *would Bakker's substantive conclusion survive an estimator that actually partitions between- from within-person variance?* The CLPM treats every wave of variation as wave-specific. With the closed-personality composite ICC at ~0.6 (next section), that's almost certainly mis-attributing trait variance to autoregression and attenuating cross-lags. We refit the same data with five alternatives from the @usami2019 unified family — RI-CLPM, Latent Change Score, Bollen & Brand, ALT, and GCLM.
+
+```{r sensitivity-fit}
+#| message: false
+#| warning: false
+
+## Helper: extract standardized cross-lagged estimates from one fit.
+## In build_wide(): x = closed/personality, y = politics.
+##   - CLPM/RI-CLPM/Bollen-Brand: cl_xy = X→Y = personality→politics (T-path);
+##                                cl_yx = Y→X = politics→personality (H-path).
+##   - LCSM: ld_x ~ cf_y = change in personality from politics (H-path);
+##           ld_y ~ cf_x = change in politics from personality (T-path).
+extract_cl <- function(fit, mod) {
+    if (is.null(fit) || !lavInspect(fit, "converged")) return(tibble())
+    pe <- standardizedSolution(fit) |> filter(op == "~")
+    out <- if (mod == "LCSM") {
+        pe |>
+            filter((grepl("^ld_x", lhs) & grepl("^cf_y", rhs)) |
+                   (grepl("^ld_y", lhs) & grepl("^cf_x", rhs))) |>
+            mutate(direction = if_else(grepl("^ld_x", lhs),
+                                       "Politics → Personality",
+                                       "Personality → Politics"),
+                   transition = paste0("Wave ", gsub("[^0-9]", "", lhs),
+                                       " ← Wave ", gsub("[^0-9]", "", rhs)))
+    } else {
+        pe |>
+            filter(grepl("^cl_", label)) |>
+            mutate(direction = if_else(grepl("^cl_yx", label),
+                                       "Politics → Personality",
+                                       "Personality → Politics"),
+                   transition = paste0("Wave ", gsub("[^0-9]", "", lhs),
+                                       " ← Wave ", gsub("[^0-9]", "", rhs)))
+    }
+    out |>
+        select(direction, transition, est.std, se, pvalue) |>
+        mutate(model = mod)
+}
+
+sensitivity_results <- map_dfr(politics, function(pol_item) {
+    wide <- build_wide(pol_item)
+
+    fit_clpm <- tryCatch(suppressWarnings(lavaan(
+        estimateCLPM(waves = n_waves,
+                     constrain_beta = FALSE, constrain_omega = FALSE,
+                     constrain_residual_variances = FALSE,
+                     constrain_residual_covariances = FALSE),
+        data = wide, missing = "fiml",
+        meanstructure = TRUE, int.ov.free = TRUE)), error = function(e) NULL)
+
+    fit_ri <- tryCatch(suppressWarnings(lavaan(
+        estimateRICLPM(waves = n_waves,
+                       constrain_beta = FALSE, constrain_omega = FALSE,
+                       constrain_residual_variances = FALSE,
+                       constrain_residual_covariances = FALSE),
+        data = wide, missing = "fiml",
+        meanstructure = TRUE, int.ov.free = TRUE)), error = function(e) NULL)
+
+    fit_lcs <- tryCatch(suppressWarnings(lavaan(
+        estimateLChange(waves = n_waves, variable_type = "bivariate",
+                        constrain_beta = TRUE, constrain_omega = TRUE,
+                        constrain_indicator_variances = FALSE,
+                        estimate_constant_change = FALSE),
+        data = wide, missing = "fiml",
+        meanstructure = TRUE, int.ov.free = TRUE)), error = function(e) NULL)
+
+    fit_bb <- tryCatch(suppressWarnings(lavaan(
+        estimateBollen_and_Brand(waves = n_waves,
+                                 x_effect = "lagged",
+                                 x_autoregression = TRUE,
+                                 y_effect_on_x = TRUE,
+                                 constrain_coefficients = TRUE,
+                                 constrain_residual_variances = TRUE),
+        data = wide, missing = "fiml",
+        meanstructure = TRUE, int.ov.free = TRUE)), error = function(e) NULL)
+
+    fit_alt <- tryCatch(suppressWarnings(lavaan(
+        estimateALT(waves = n_waves,
+                    constrain_beta = TRUE, constrain_omega = TRUE,
+                    constrain_residual_variances = TRUE,
+                    constrain_residual_covariances = TRUE),
+        data = wide, missing = "fiml",
+        meanstructure = TRUE, int.ov.free = TRUE)), error = function(e) NULL)
+
+    fit_lcmsr <- tryCatch(suppressWarnings(lavaan(
+        estimateLCMSR(waves = n_waves,
+                      constrain_beta = TRUE, constrain_omega = TRUE,
+                      constrain_residual_variances = TRUE,
+                      constrain_residual_covariances = TRUE),
+        data = wide, missing = "fiml",
+        meanstructure = TRUE, int.ov.free = TRUE)), error = function(e) NULL)
+
+    bind_rows(
+        extract_cl(fit_clpm,  "CLPM"),
+        extract_cl(fit_ri,    "RI-CLPM"),
+        extract_cl(fit_lcs,   "LCSM"),
+        extract_cl(fit_bb,    "Bollen-Brand"),
+        extract_cl(fit_alt,   "ALT"),
+        extract_cl(fit_lcmsr, "LCM-SR")
+    ) |> mutate(politics = pol_item)
+})
+```
+
+### RI-CLPM
+
+The RI-CLPM extracts a stable trait component for both `closed` and the politics item, then estimates AR/CL on the *within-person deviations* from those traits.
+
+### Latent Change Score Model
+
+The LCSM rewrites the dynamic in terms of wave-to-wave *changes* rather than levels, with an accumulating constant-change factor to absorb stable trajectories -- heterogeneity in the change process. The cross-lag interpretation flips: `cl_xy` is now level of politics at $t-1$ predicts the *change* in closed personality between $t-1$ and $t$, for instance. 
+
+### Bollen-Brand CLPM
+
+Bollen & Brand absorb unit-specific heterogeneity into a *latent fixed effect* — the SEM analogue of Arellano-Bond — and condition on the first wave as exogenous. The RI-CLPM assumes indepedence between the trait and state components. The Bollen-Brand model includes covariances between the latent fixed effect and the observed variables at each wave, which allows for correlation between the trait and state components.
+
+### ALT
+
+The Autoregressive Latent Trajectory model combines a bivariate latent growth structure (intercept + slope) with AR/CL dynamics on the *observed scores themselves*, conditioning on wave 1 as exogenous. This is tenuously identified with three waves, so we constrain the AR/CL paths to be equal across waves. 
+### LCM-SR
+
+The Latent Curve Model with Structured Residuals (also called the GCLM) fits a bivariate latent growth model and then estimates AR/CL dynamics on the *residuals* from each person's trajectory.
+
+
+### Visual comparison
+
+@fig-sensitivity and @tbl-sensitivity provides a comparison of the estimates. 
+
+```{r fig-sensitivity}
+#| label: fig-sensitivity
+#| fig-cap: "Standardized cross-lagged coefficients on the closed-personality composite by estimator (CLPM, RI-CLPM, LCSM, Bollen-Brand, ALT, LCM-SR), politics item, and wave transition. Bakker et al. (2021) reported H-paths overlaid as red X marks (H-direction only, wave 2 ← wave 1)."
+#| fig-width: 10
+#| fig-height: 6
+#| message: false
+#| warning: false
+
+bakker_h <- tribble(
+    ~politics,      ~direction,                 ~transition,        ~est_bakker,
+    "immigrants",   "Politics → Personality", "Wave 2 ← Wave 1", 0.03,
+    "euro_unify",   "Politics → Personality", "Wave 2 ← Wave 1", 0.02,
+    "euthenasia",   "Politics → Personality", "Wave 2 ← Wave 1", 0.01,
+    "left_right",   "Politics → Personality", "Wave 2 ← Wave 1", 0.01,
+    "income_diffs", "Politics → Personality", "Wave 2 ← Wave 1", 0.00,
+    "immigrants",   "Politics → Personality", "Wave 3 ← Wave 2", 0.01,
+    "euro_unify",   "Politics → Personality", "Wave 3 ← Wave 2", 0.01,
+    "euthenasia",   "Politics → Personality", "Wave 3 ← Wave 2", 0.00,
+    "left_right",   "Politics → Personality", "Wave 3 ← Wave 2", 0.02,
+    "income_diffs", "Politics → Personality", "Wave 3 ← Wave 2", 0.00
+)
+
+politics_labels <- c(
+    euro_unify = "EU", euthenasia = "Euthanasia", left_right = "Ideology",
+    immigrants = "Immigration", income_diffs = "Income\nDifferences"
+)
+
+model_levels <- c("CLPM", "RI-CLPM", "LCSM", "Bollen-Brand", "ALT", "LCM-SR")
+
+sensitivity_plot_data <- sensitivity_results |>
+    mutate(politics = factor(politics,
+                             levels = names(politics_labels),
+                             labels = politics_labels),
+           model    = factor(model, levels = model_levels))
+
+bakker_plot_data <- bakker_h |>
+    mutate(politics = factor(politics,
+                             levels = names(politics_labels),
+                             labels = politics_labels))
+
+ggplot(sensitivity_plot_data,
+       aes(x = politics, y = est.std, color = model, shape = model)) +
+    geom_hline(yintercept = 0, linetype = "dashed", color = "grey60") +
+    geom_point(position = position_dodge(width = 0.6), size = 2.6) +
+    geom_point(data = bakker_plot_data,
+               aes(x = politics, y = est_bakker),
+               color = "firebrick", shape = 4, size = 3.5, stroke = 1.1,
+               inherit.aes = FALSE) +
+    facet_grid(direction ~ transition) +
+    scale_color_viridis_d(option = "D", end = 0.85, drop = FALSE) +
+    scale_shape_manual(values = c(CLPM = 16, `RI-CLPM` = 17,
+                                  LCSM = 15, `Bollen-Brand` = 18,
+                                  ALT  = 8,  `LCM-SR`      = 3),
+                       drop = FALSE) +
+    labs(x = NULL, y = "Standardized estimate",
+         color = "Estimator", shape = "Estimator",
+         caption = "Red ✖ = Bakker et al. (2021) reported H-path (paper text pp. 1486–1487)") +
+    theme_bw(base_size = 11) +
+    theme(legend.position = "bottom",
+          axis.text.x = element_text(angle = 30, hjust = 1),
+          strip.background = element_rect(fill = "grey95", color = NA),
+          strip.text = element_text(face = "bold"),
+          panel.grid.minor = element_blank())
+```
+
+```{r tbl-sensitivity}
+#| label: tbl-sensitivity
+#| message: false
+sensitivity_results |>
+    mutate(sig = case_when(
+                pvalue < 0.001 ~ "***",
+                pvalue < 0.01  ~ "**",
+                pvalue < 0.05  ~ "*",
+                pvalue < 0.10  ~ "†",
+                TRUE           ~ ""),
+           est.std = round(est.std, 3),
+           cell    = paste0(est.std, sig),
+           model   = factor(model,
+                            levels = c("CLPM", "RI-CLPM", "LCSM",
+                                       "Bollen-Brand", "ALT", "LCM-SR"))) |>
+    select(politics, direction, transition, model, cell) |>
+    pivot_wider(names_from = model, values_from = cell,
+                names_expand = TRUE) |>
+    arrange(politics, direction, transition) |>
+    knitr::kable(caption = "Standardized cross-lagged estimates by estimator. Significance: † p<.10, * p<.05, ** p<.01, *** p<.001.")
+```
+
+### CFA Results
+
+We fit a confirmatory five-factor model spanning the full Big Five — **Extraversion**, **Agreeableness**, **Conscientiousness**, **Neuroticism**, and **Openness** — each measured by its 10 IPIP-50 items. Factors are allowed to correlate freely. Each item is constrained to load only on its expected (a priori) factor; no cross-loadings are estimated.
+
+The model fits reasonably well. The CFI and TLI are on the low end, but the RMSEA is good. 
+
+```{r cfa}
+#| message: false
+#| warning: false
+big5_items <- list(
+    Extraversion = c(
+        "life_party", "dont_talk", "comfortable", "stay_in_back",
+        "start_convos", "say_little", "talk_at_parties",
+        "avoid_attention", "like_attention", "quiet"
+    ),
+    Agreeableness = c(
+        "no_concern", "interest_people", "insult_people",
+        "sympathize", "no_care_probs", "soft_heart",
+        "no_interest_probs", "time_for_others", "feel_emotions",
+        "others_at_ease"
+    ),
+    Conscientiousness = c(
+        "always_prepared", "leave_belongings", "pay_attention",
+        "make_mess", "chores_done", "forget_to_put", "like_order",
+        "shirk_duties", "follow_sched", "exacting"
+    ),
+    Neuroticism = c(
+        "stress_easy", "relaxed", "worry", "easy_disturb",
+        "upset_easily", "seldom_blue", "often_blue", "change_mood",
+        "mood_swings", "irritate_easy"
+    ),
+    Openness = c(
+        "rich_vocab", "dffclt_undrstnd", "vivid_imagin", "no_interest",
+        "excellent_ideas", "poor_imagin", "quick_undrstnd",
+        "dffclt_words", "reflecting", "full_of_ideas"
+    )
+)
+
+cfa_syntax <- "
+Extraversion =~ life_party + dont_talk + comfortable + stay_in_back +
+    start_convos + say_little + talk_at_parties + avoid_attention +
+    like_attention + quiet
+Agreeableness =~ no_concern + interest_people + insult_people + sympathize +
+    no_care_probs + soft_heart + no_interest_probs + time_for_others +
+    feel_emotions + others_at_ease
+Conscientiousness =~ always_prepared + leave_belongings + pay_attention + make_mess +
+    chores_done + forget_to_put + like_order + shirk_duties + follow_sched + exacting
+Neuroticism =~ stress_easy + relaxed + worry + easy_disturb + upset_easily +
+    seldom_blue + often_blue + change_mood + mood_swings + irritate_easy
+Openness =~ rich_vocab + dffclt_undrstnd + vivid_imagin + no_interest +
+    excellent_ideas + poor_imagin + quick_undrstnd + dffclt_words +
+    reflecting + full_of_ideas
+Closed =~ Openness + Conscientiousness
+"
+
+big5_names <- unlist(big5_items, use.names = FALSE)
+
+cfa_dat <- liss_long |>
+    select(all_of(big5_names))
+
+cfa_fit <- cfa(cfa_syntax,
+    data = cfa_dat,
+    missing = "fiml",
+    std.lv = TRUE
+)
+
+cat("n_obs =", nrow(cfa_dat),
+    "; n_complete =", sum(complete.cases(cfa_dat)),
+    "; n_miss =", sum(is.na(cfa_dat)),
+    "\n")
+
+fitMeasures(cfa_fit, c(
+    "cfi", "tli", "rmsea", "rmsea.ci.lower",
+    "rmsea.ci.upper", "srmr"
+)) |>
+    round(3) |>
+    as.list() |>
+    as_tibble() |>
+    knitr::kable(caption = "Hierarchical CFA (Big Five + higher-order Closed): global fit.")
+
+standardizedSolution(cfa_fit) |>
+    filter(op == "=~") |>
+    select(factor = lhs, item = rhs, est.std, se, pvalue) |>
+    mutate(across(c(est.std, se), \(x) round(x, 3)),
+        pvalue = signif(pvalue, 2)
+    ) |>
+    knitr::kable(caption = "Standardized loadings (each item on its expected factor).")
+
+standardizedSolution(cfa_fit) |>
+    filter(op == "~~", lhs != rhs,
+           lhs %in% c(names(big5_items), "Closed"),
+           rhs %in% c(names(big5_items), "Closed")) |>
+    select(factor1 = lhs, factor2 = rhs, est.std, se, pvalue) |>
+    mutate(across(c(est.std, se), \(x) round(x, 3)),
+        pvalue = signif(pvalue, 2)
+    ) |>
+    knitr::kable(caption = "Standardized factor correlations/covariances among latent factors.")
+```
+
+
+### Estimates for Each Big Five Personality Trait
+
+We now repeat the CLPM and RI-CLPM analyses for each Big Five trait individually (not just the closed-personality composite) against all five political items, and report ICCs for each trait.
+
+```{r score-traits}
+#| echo: false
+#| message: false
+#| warning: false
+## Define Big Five items (matching scale_items from the alpha section)
+trait_items <- list(
+    Extraversion = c(
+        "life_party", "dont_talk", "comfortable", "stay_in_back",
+        "start_convos", "say_little", "talk_at_parties",
+        "avoid_attention", "like_attention", "quiet"
+    ),
+    Agreeableness = c(
+        "no_concern", "interest_people", "insult_people",
+        "sympathize", "no_care_probs", "soft_heart",
+        "no_interest_probs", "time_for_others", "feel_emotions",
+        "others_at_ease"
+    ),
+    Conscientiousness = c(
+        "always_prepared", "leave_belongings", "pay_attention",
+        "make_mess", "chores_done", "forget_to_put", "like_order",
+        "shirk_duties", "follow_sched", "exacting"
+    ),
+    Neuroticism = c(
+        "stress_easy", "relaxed", "worry", "easy_disturb",
+        "upset_easily", "seldom_blue", "often_blue", "change_mood",
+        "mood_swings", "irritate_easy"
+    ),
+    Openness = c(
+        "rich_vocab", "dffclt_undrstnd", "vivid_imagin", "no_interest",
+        "excellent_ideas", "poor_imagin", "quick_undrstnd",
+        "dffclt_words", "reflecting", "full_of_ideas"
+    )
+)
+
+## Score each trait: auto-detect reverse keying, flip, mean
+score_trait <- function(data, items) {
+    item_dat <- data[, items, drop = FALSE]
+    res <- suppressWarnings(psych::alpha(item_dat, check.keys = TRUE))
+    keys <- unlist(res$keys)
+    neg <- names(keys)[keys < 0]
+    scored <- data |>
+        mutate(across(all_of(neg), \(x) 1 - x)) |>
+        rowwise() |>
+        mutate(.score = mean(c_across(all_of(items)), na.rm = TRUE)) |>
+        ungroup() |>
+        mutate(.score = if_else(is.nan(.score), NA_real_, .score))
+    scored$.score
+}
+
+## Add trait composites to dat
+for (tr in names(trait_items)) {
+    dat[[tolower(tr)]] <- score_trait(dat, trait_items[[tr]])
+}
+```
+
+#### ICCs by Trait
+
+```{r icc-traits}
+#| message: false
+#| warning: false
+icc_traits <- map_dfr(names(trait_items), function(tr) {
+    v <- tolower(tr)
+    d <- dat |>
+        mutate(case_id = factor(case_id)) |>
+        drop_na(all_of(v))
+    tibble(trait = tr, ICC = get_icc(v, d))
+})
+## Add politics scale ICC
+icc_traits <- bind_rows(
+    icc_traits,
+    tibble(
+        trait = "Politics Scale",
+        ICC = get_icc(
+            "politics_scale",
+            dat |> mutate(case_id = factor(case_id)) |> drop_na(politics_scale)
+        )
+    )
+)
+icc_traits |>
+    mutate(ICC = round(ICC, 4)) |>
+    knitr::kable()
+```
+
+
+
+
+#### CLPM, RI-CLPM, LChange, Bollen-Brand, ALT, and LCM-SR for Each Trait × Political Item
+
+```{r fit-traits}
+#| message: false
+#| warning: false
+
+## Per-trait analogue of build_wide(): swap closed-personality composite
+## for whichever Big Five trait composite we're testing.
+build_wide_trait <- function(trait_var, pol_item) {
+    dat |>
+        filter(year %in% years_use) |>
+        mutate(wave = match(year, years_use)) |>
+        select(case_id, wave,
+               x = all_of(trait_var),
+               y = all_of(pol_item)) |>
+        pivot_wider(
+            id_cols    = case_id,
+            names_from = wave,
+            values_from = c(x, y),
+            names_glue = "{.value}{wave}"
+        ) |>
+        select(case_id, all_of(c(
+            paste0("x", 1:n_waves),
+            paste0("y", 1:n_waves)
+        )))
+}
+
+## Run CLPM, RI-CLPM, LChange, Bollen-Brand, ALT, and LCM-SR for each trait × politics combination
+trait_results <- map_dfr(names(trait_items), function(tr) {
+    trait_var <- tolower(tr)
+    map_dfr(politics, function(pol_item) {
+        wide <- build_wide_trait(trait_var, pol_item)
+
+        ## Helper: extract cross-lagged rows from standardizedSolution
+        extract_cl <- function(fit, mod) {
+            if (is.null(fit) || !lavInspect(fit, "converged")) {
+                return(tibble())
+            }
+            standardizedSolution(fit) |>
+                filter(op == "~", grepl("^cl_", label)) |>
+                mutate(model = mod)
+        }
+
+        ## ---- CLPM ----
+        fit_clpm <- tryCatch(
+            suppressWarnings(lavaan(
+                estimateCLPM(
+                    waves = n_waves,
+                    constrain_beta = FALSE, constrain_omega = FALSE,
+                    constrain_residual_variances = FALSE,
+                    constrain_residual_covariances = FALSE
+                ),
+                data = wide, missing = "fiml",
+                meanstructure = TRUE, int.ov.free = TRUE
+            )),
+            error = function(e) NULL
+        )
+
+        ## ---- RI-CLPM ----
+        fit_ri <- tryCatch(
+            suppressWarnings(lavaan(
+                estimateRICLPM(
+                    waves = n_waves,
+                    constrain_beta = FALSE, constrain_omega = FALSE,
+                    constrain_residual_variances = FALSE,
+                    constrain_residual_covariances = FALSE
+                ),
+                data = wide, missing = "fiml",
+                meanstructure = TRUE, int.ov.free = TRUE
+            )),
+            error = function(e) NULL
+        )
+
+        ## ---- Latent Change Score ----
+        fit_lcs <- tryCatch(
+            suppressWarnings(lavaan(
+                estimateLChange(
+                    waves = n_waves,
+                    variable_type = "bivariate",
+                    constrain_beta = TRUE, constrain_omega = TRUE,
+                    constrain_indicator_variances = TRUE,
+                    estimate_constant_change = TRUE
+                ),
+                data = wide, missing = "fiml",
+                meanstructure = TRUE, int.ov.free = TRUE
+            )),
+            error = function(e) NULL
+        )
+        lcs_out <- if (!is.null(fit_lcs) && lavInspect(fit_lcs, "converged")) {
+            standardizedSolution(fit_lcs) |>
+                filter(op == "~") |>
+                filter(
+                    (grepl("^ld_x", lhs) & grepl("^cf_y", rhs)) |
+                        (grepl("^ld_y", lhs) & grepl("^cf_x", rhs))
+                ) |>
+                mutate(
+                    model = "LChange",
+                    label = if_else(grepl("^ld_y", lhs), "cl_xy", "cl_yx")
+                ) |>
+                distinct(label, .keep_all = TRUE)
+        } else {
+            tibble()
+        }
+
+        ## ---- Bollen-Brand ----
+        fit_bb <- tryCatch(
+            suppressWarnings(lavaan(
+                estimateBollen_and_Brand(
+                    waves = n_waves,
+                    constrain_coefficients = TRUE,
+                    constrain_residual_variances = FALSE
+                ),
+                data = wide, missing = "fiml",
+                meanstructure = TRUE, int.ov.free = TRUE
+            )),
+            error = function(e) NULL
+        )
+        bb_out <- if (!is.null(fit_bb) && lavInspect(fit_bb, "converged")) {
+            standardizedSolution(fit_bb) |>
+                filter(op == "~", label %in% c("cl_xy", "cl_yx")) |>
+                mutate(model = "Bollen-Brand") |>
+                distinct(label, .keep_all = TRUE)
+        } else {
+            tibble()
+        }
+
+        ## ---- ALT ----
+        fit_alt <- tryCatch(
+            suppressWarnings(lavaan(
+                estimateALT(
+                    waves = n_waves,
+                    constrain_beta = TRUE, constrain_omega = TRUE,
+                    constrain_residual_variances = TRUE,
+                    constrain_residual_covariances = TRUE
+                ),
+                data = wide, missing = "fiml",
+                meanstructure = TRUE, int.ov.free = TRUE
+            )),
+            error = function(e) NULL
+        )
+        alt_out <- if (!is.null(fit_alt) && lavInspect(fit_alt, "converged")) {
+            standardizedSolution(fit_alt) |>
+                filter(op == "~", label %in% c("cl_xy", "cl_yx")) |>
+                mutate(model = "ALT") |>
+                distinct(label, .keep_all = TRUE)
+        } else {
+            tibble()
+        }
+
+        ## ---- LCM-SR ----
+        fit_lcmsr <- tryCatch(
+            suppressWarnings(lavaan(
+                estimateLCMSR(
+                    waves = n_waves,
+                    constrain_beta = TRUE, constrain_omega = TRUE,
+                    constrain_residual_variances = TRUE,
+                    constrain_residual_covariances = TRUE
+                ),
+                data = wide, missing = "fiml",
+                meanstructure = TRUE, int.ov.free = TRUE
+            )),
+            error = function(e) NULL
+        )
+        lcmsr_out <- if (!is.null(fit_lcmsr) && lavInspect(fit_lcmsr, "converged")) {
+            standardizedSolution(fit_lcmsr) |>
+                filter(op == "~", label %in% c("cl_xy", "cl_yx")) |>
+                mutate(model = "LCM-SR") |>
+                distinct(label, .keep_all = TRUE)
+        } else {
+            tibble()
+        }
+
+        bind_rows(
+            extract_cl(fit_clpm, "CLPM"),
+            extract_cl(fit_ri, "RI-CLPM"),
+            lcs_out,
+            bb_out,
+            alt_out,
+            lcmsr_out
+        ) |>
+            mutate(
+                trait = tr,
+                politics = pol_item,
+                direction = if_else(grepl("cl_xy", label),
+                    "Personality \u2192 Politics",
+                    "Politics \u2192 Personality"
+                )
+            ) |>
+            group_by(trait, politics, model, direction) |>
+            summarise(
+                est.std = mean(est.std),
+                pvalue = mean(pvalue),
+                .groups = "drop"
+            )
+    })
+})
+```
+
+```{r table-traits}
+#| label: tbl-traits-summary
+trait_results |>
+    mutate(
+        sig = case_when(
+            pvalue < 0.001 ~ "***",
+            pvalue < 0.01 ~ "**",
+            pvalue < 0.05 ~ "*",
+            pvalue < 0.10 ~ "\u2020",
+            TRUE ~ ""
+        ),
+        cell  = paste0(round(est.std, 3), sig),
+        model = factor(model,
+                       levels = c("CLPM", "RI-CLPM", "LChange",
+                                  "Bollen-Brand", "ALT", "LCM-SR"))
+    ) |>
+    select(trait, politics, direction, model, cell) |>
+    pivot_wider(names_from = model, values_from = cell,
+                names_expand = TRUE) |>
+    arrange(trait, politics, direction) |>
+    knitr::kable()
+```
+
