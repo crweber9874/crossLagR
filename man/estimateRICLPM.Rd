@@ -12,7 +12,6 @@ estimateRICLPM(
   constrain_omega = TRUE,
   constrain_residual_variances = TRUE,
   constrain_residual_covariances = TRUE,
-  estimate_means = FALSE,
   start_values = FALSE,
   label_autoregressive = c("ar_x", "ar_y", "ar_z"),
   label_crosslagged = c("cl_yx", "cl_xy", "cl_xz", "cl_yz", "cl_zx", "cl_zy")
@@ -32,8 +31,6 @@ estimateRICLPM(
 \item{constrain_residual_variances}{Logical. If TRUE, constrains residual variances to equality across waves. Default is TRUE.}
 
 \item{constrain_residual_covariances}{Logical. If TRUE, constrains residual covariances to equality across waves. Default is TRUE.}
-
-\item{estimate_means}{Logical. If TRUE, estimates means for latent variables. Default is FALSE.}
 
 \item{start_values}{Logical. If TRUE, provides starting values for key parameters. Default is FALSE.}
 

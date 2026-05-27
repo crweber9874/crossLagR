@@ -1,0 +1,102 @@
+---
+title: "ISCAP panel: party identification ↔ ideology"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{ISCAP panel: party identification ↔ ideology}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  message  = FALSE,
+  warning  = FALSE
+)
+```
+
+This vignette walks through a minimal cross-lagged analysis of the ISCAP panel
+[@upenn_iscap_2022]: do shifts in party identification predict shifts in
+ideological self-placement, or the reverse? See the
+[user guide](https://crweber9874.github.io/crossLagR/book/06_iscap.html)
+for the full treatment.
+
+## Setup
+
+```{r setup}
+library(crossLagR)
+library(lavaan)
+library(dplyr)
+library(tidyr)
+
+data(upenn)
+```
+
+The ISCAP panel includes three waves we'll use here (2012, 2016, 2018). The
+relevant columns are `party_identification_*` (7-point, 7 = Strong Republican)
+and `ideology_*` (7-point, 7 = Extremely Conservative).
+
+## Wide data
+
+```{r}
+wide <- upenn |>
+  transmute(
+    x1 = party_identification_2012,
+    x2 = party_identification_2016,
+    x3 = party_identification_2018,
+    y1 = ideology_2012,
+    y2 = ideology_2016,
+    y3 = ideology_2018
+  ) |>
+  drop_na()
+
+n_obs  <- nrow(wide)
+n_miss <- sum(is.na(upenn[, c("party_identification_2012",
+                              "party_identification_2016",
+                              "party_identification_2018",
+                              "ideology_2012",
+                              "ideology_2016",
+                              "ideology_2018")]))
+
+cat("Complete cases used:", n_obs, " (", n_miss, "missing cells in source)\n")
+```
+
+## CLPM
+
+`estimateCLPM()` returns lavaan model syntax with the conventional `beta_*`
+(autoregressive) and `omega_*` (cross-lag) labels.
+
+```{r}
+clpm_fit <- lavaan(estimateCLPM(waves = 3), data = wide)
+summary(clpm_fit, standardized = TRUE)
+```
+
+## RI-CLPM
+
+`estimateRICLPM()` adds random intercepts $I_x, I_y$ that absorb stable
+between-person differences. The AR and CL coefficients are now estimated
+on the within-person deviations.
+
+```{r}
+riclpm_fit <- lavaan(estimateRICLPM(waves = 3), data = wide)
+summary(riclpm_fit, standardized = TRUE)
+```
+
+## Reading the contrast
+
+A pattern that recurs in the book:
+
+- The CLPM AR coefficients are inflated by stable between-person trait
+  variance and the CL coefficients tend to be conservatively biased.
+- The RI-CLPM AR coefficients are smaller (within-person carry-over only).
+  CL coefficients show whether **change** in one variable forecasts
+  **change** in the other.
+
+For the ISCAP data the cross-lags are modest in either specification,
+with party identification appearing to lead ideology slightly more than
+the reverse. See [the book chapter](https://crweber9874.github.io/crossLagR/book/06_iscap.html)
+for the full discussion including a system-legitimacy block, latent-change
+specifications, and Bayesian fits via `brms`.
+
+## References

@@ -21,9 +21,6 @@ book:
       chapters:
         - 06_iscap.qmd
         - 07_liss.qmd
-    - part: "Appendix"
-      chapters:
-        - 08_bakker_appendix.qmd
 #
 bibliography:
   - book.bib

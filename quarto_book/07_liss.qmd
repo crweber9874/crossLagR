@@ -77,8 +77,8 @@ scale_items <- list(
 
 
 
-```{r}
-#| echo: true
+```{r alpha-table}
+#| echo: false
 #| message: false
 #| warning: false
 ## A useful little function to calculate alpha and identify reverse-keyed items. From psych...
@@ -114,7 +114,7 @@ alpha_table <- map2_dfr(names(scale_items), scale_items, alpha_one)
 alpha_table
 ```
 
-@alphas shows that the scales have acceptable reliability.
+@alpha-table shows that the scales have acceptable reliability.
 
 ## Closed Personality
 
@@ -126,7 +126,7 @@ We took a somewhat different route by constructing a "closed personality" compos
 ```{r closed}
 #| message: false
 #| warning: false
-#| echo: true
+#| echo: false
 #| 
 # In `liss_long`, IPIP-50 reverse-keyed items have already been flipped (see
 # constructData_LISS.qmd Step 2.4) so every item points toward its named
@@ -177,6 +177,7 @@ We leave the autoregressive and cross-lagged paths **unconstrained** across wave
 We also standardize the variables. 
 
 ```{r fit}
+#| echo: false
 ## Bakker et al.'s CLPM syntax — observed-variable, unconstrained
 ## I use the crossLagR syntax below, which is more flexible.
 CLPM_u <- "
@@ -244,11 +245,11 @@ results <- map_dfr(politics, fit_one)
 saveRDS(results, here::here("data", "liss_clpm_results.rds"))
 ```
 
-## Figure 2 
 
 We plot our estimates in @fig-bakker, which closely replicates the main figure from @bakker_reconsidering_2021. Again, we suspect the slight deviations are an artifact of how the personality variables modeled in the CLPM. 
 
 ```{r fig-bakker, fig.width = 9, fig.height = 4}
+#| echo: false
 #| label: fig-bakker-replication
 #| fig-cap: "Standardized cross-lagged coefficients in the LISS panel, replicating Bakker, Lelkes, & Malka (2021)."
 plot_dat <- results |>
@@ -296,13 +297,14 @@ results |>
 ```
 
 
-## The ICC
+## The Intra Class Correlation
 
 The intraclass correlation $\text{ICC} = \sigma^2_b / (\sigma^2_b + \sigma^2_w)$ gives the share of total variance attributable to stable between-person differences. We estimate it with an empty random-intercept model via `lmer`: `y ~ 1 + (1 | case_id)`. High ICC means most variance is between-person (trait-like); this is the variance that biases the CLPM cross-lagged coefficients in the next section.
 
 ```{r icc}
 #| message: false
 #| warning: false
+#| echo: false
 library(lme4)
 
 ## Build a politics scale (mean of the five items)
@@ -339,13 +341,14 @@ icc_table
 Both politics and personality are reasonably stable -- but the ICC is still far from 1. 
 
 
-## Now Replicate with `crossLagR` Package
+## Replication with `crossLagR` Package
 
 The same analysis using `crossLagR::estimateCLPM()` — the package generates the lavaan syntax automatically and returns fully standardized estimates via `lavaan::standardizedSolution()`. We used `p` and `q` in the code to denote the personality and political variables, respectively, to avoid confusion with the `x` and `y` variable names in the lavaan syntax.
 
 ```{r fit-package}
 #| message: false
 #| warning: false
+#| echo: false
 fit_one_pkg <- function(pol_item) {
     wide <- build_wide(pol_item)
     syntax <- estimateCLPM(
@@ -395,11 +398,12 @@ results_pkg |>
 
 ## Accounting for Unit Effects
 
-The CLPM coefficients above leave one obvious question: *would Bakker's substantive conclusion survive an estimator that actually partitions between- from within-person variance?* The CLPM treats every wave of variation as wave-specific. With the closed-personality composite ICC at ~0.6 (next section), that's almost certainly mis-attributing trait variance to autoregression and attenuating cross-lags. We refit the same data with five alternatives from the @usami2019 unified family — RI-CLPM, Latent Change Score, Bollen & Brand, ALT, and GCLM.
+The CLPM coefficients above leave one obvious question: *would Bakker's substantive conclusion survive an estimator that actually partitions between- from within-person variance?* The CLPM treats every wave of variation as wave-specific. With the closed-personality composite ICC at ~0.6 (next section), that's almost certainly mis-attributing trait variance to autoregression and attenuating cross-lags. We refit the same data with four alternatives from the @usami2019 unified family — RI-CLPM, Latent Change Score, Bollen & Brand, and GCLM.
 
 ```{r sensitivity-fit}
 #| message: false
 #| warning: false
+#| echo: false
 
 ## Helper: extract standardized cross-lagged estimates from one fit.
 ## In build_wide(): x = closed/personality, y = politics.
@@ -470,14 +474,6 @@ sensitivity_results <- map_dfr(politics, function(pol_item) {
         data = wide, missing = "fiml",
         meanstructure = TRUE, int.ov.free = TRUE)), error = function(e) NULL)
 
-    fit_alt <- tryCatch(suppressWarnings(lavaan(
-        estimateALT(waves = n_waves,
-                    constrain_beta = TRUE, constrain_omega = TRUE,
-                    constrain_residual_variances = TRUE,
-                    constrain_residual_covariances = TRUE),
-        data = wide, missing = "fiml",
-        meanstructure = TRUE, int.ov.free = TRUE)), error = function(e) NULL)
-
     fit_lcmsr <- tryCatch(suppressWarnings(lavaan(
         estimateLCMSR(waves = n_waves,
                       constrain_beta = TRUE, constrain_omega = TRUE,
@@ -491,7 +487,6 @@ sensitivity_results <- map_dfr(politics, function(pol_item) {
         extract_cl(fit_ri,    "RI-CLPM"),
         extract_cl(fit_lcs,   "LCSM"),
         extract_cl(fit_bb,    "Bollen-Brand"),
-        extract_cl(fit_alt,   "ALT"),
         extract_cl(fit_lcmsr, "LCM-SR")
     ) |> mutate(politics = pol_item)
 })
@@ -509,21 +504,16 @@ The LCSM rewrites the dynamic in terms of wave-to-wave *changes* rather than lev
 
 Bollen & Brand absorb unit-specific heterogeneity into a *latent fixed effect* — the SEM analogue of Arellano-Bond — and condition on the first wave as exogenous. The RI-CLPM assumes indepedence between the trait and state components. The Bollen-Brand model includes covariances between the latent fixed effect and the observed variables at each wave, which allows for correlation between the trait and state components.
 
-### ALT
-
-The Autoregressive Latent Trajectory model combines a bivariate latent growth structure (intercept + slope) with AR/CL dynamics on the *observed scores themselves*, conditioning on wave 1 as exogenous. This is tenuously identified with three waves, so we constrain the AR/CL paths to be equal across waves. 
 ### LCM-SR
 
 The Latent Curve Model with Structured Residuals (also called the GCLM) fits a bivariate latent growth model and then estimates AR/CL dynamics on the *residuals* from each person's trajectory.
 
-
-### Visual comparison
-
 @fig-sensitivity and @tbl-sensitivity provides a comparison of the estimates. 
 
 ```{r fig-sensitivity}
+#| echo: false
 #| label: fig-sensitivity
-#| fig-cap: "Standardized cross-lagged coefficients on the closed-personality composite by estimator (CLPM, RI-CLPM, LCSM, Bollen-Brand, ALT, LCM-SR), politics item, and wave transition. Bakker et al. (2021) reported H-paths overlaid as red X marks (H-direction only, wave 2 ← wave 1)."
+#| fig-cap: "Standardized cross-lagged coefficients on the closed-personality composite by estimator (CLPM, RI-CLPM, LCSM, Bollen-Brand, LCM-SR), politics item, and wave transition. Bakker et al. (2021) reported H-paths overlaid as red X marks (H-direction only, wave 2 ← wave 1)."
 #| fig-width: 10
 #| fig-height: 6
 #| message: false
@@ -548,7 +538,7 @@ politics_labels <- c(
     immigrants = "Immigration", income_diffs = "Income\nDifferences"
 )
 
-model_levels <- c("CLPM", "RI-CLPM", "LCSM", "Bollen-Brand", "ALT", "LCM-SR")
+model_levels <- c("CLPM", "RI-CLPM", "LCSM", "Bollen-Brand", "LCM-SR")
 
 sensitivity_plot_data <- sensitivity_results |>
     mutate(politics = factor(politics,
@@ -573,7 +563,7 @@ ggplot(sensitivity_plot_data,
     scale_color_viridis_d(option = "D", end = 0.85, drop = FALSE) +
     scale_shape_manual(values = c(CLPM = 16, `RI-CLPM` = 17,
                                   LCSM = 15, `Bollen-Brand` = 18,
-                                  ALT  = 8,  `LCM-SR`      = 3),
+                                  `LCM-SR` = 3),
                        drop = FALSE) +
     labs(x = NULL, y = "Standardized estimate",
          color = "Estimator", shape = "Estimator",
@@ -600,7 +590,7 @@ sensitivity_results |>
            cell    = paste0(est.std, sig),
            model   = factor(model,
                             levels = c("CLPM", "RI-CLPM", "LCSM",
-                                       "Bollen-Brand", "ALT", "LCM-SR"))) |>
+                                       "Bollen-Brand", "LCM-SR"))) |>
     select(politics, direction, transition, model, cell) |>
     pivot_wider(names_from = model, values_from = cell,
                 names_expand = TRUE) |>
@@ -608,7 +598,7 @@ sensitivity_results |>
     knitr::kable(caption = "Standardized cross-lagged estimates by estimator. Significance: † p<.10, * p<.05, ** p<.01, *** p<.001.")
 ```
 
-### CFA Results
+## The Factor Structure of the Big Five 
 
 We fit a confirmatory five-factor model spanning the full Big Five — **Extraversion**, **Agreeableness**, **Conscientiousness**, **Neuroticism**, and **Openness** — each measured by its 10 IPIP-50 items. Factors are allowed to correlate freely. Each item is constrained to load only on its expected (a priori) factor; no cross-loadings are estimated.
 
@@ -617,6 +607,7 @@ The model fits reasonably well. The CFI and TLI are on the low end, but the RMSE
 ```{r cfa}
 #| message: false
 #| warning: false
+#| eval: false
 big5_items <- list(
     Extraversion = c(
         "life_party", "dont_talk", "comfortable", "stay_in_back",
@@ -770,6 +761,7 @@ for (tr in names(trait_items)) {
 #### ICCs by Trait
 
 ```{r icc-traits}
+#| echo: false
 #| message: false
 #| warning: false
 icc_traits <- map_dfr(names(trait_items), function(tr) {
@@ -798,7 +790,7 @@ icc_traits |>
 
 
 
-#### CLPM, RI-CLPM, LChange, Bollen-Brand, ALT, and LCM-SR for Each Trait × Political Item
+#### All Estimators for Each Trait × Political Item
 
 ```{r fit-traits}
 #| message: false
@@ -825,7 +817,7 @@ build_wide_trait <- function(trait_var, pol_item) {
         )))
 }
 
-## Run CLPM, RI-CLPM, LChange, Bollen-Brand, ALT, and LCM-SR for each trait × politics combination
+## Run CLPM, RI-CLPM, LChange, Bollen-Brand, and LCM-SR for each trait × politics combination
 trait_results <- map_dfr(names(trait_items), function(tr) {
     trait_var <- tolower(tr)
     map_dfr(politics, function(pol_item) {
@@ -924,29 +916,6 @@ trait_results <- map_dfr(names(trait_items), function(tr) {
             tibble()
         }
 
-        ## ---- ALT ----
-        fit_alt <- tryCatch(
-            suppressWarnings(lavaan(
-                estimateALT(
-                    waves = n_waves,
-                    constrain_beta = TRUE, constrain_omega = TRUE,
-                    constrain_residual_variances = TRUE,
-                    constrain_residual_covariances = TRUE
-                ),
-                data = wide, missing = "fiml",
-                meanstructure = TRUE, int.ov.free = TRUE
-            )),
-            error = function(e) NULL
-        )
-        alt_out <- if (!is.null(fit_alt) && lavInspect(fit_alt, "converged")) {
-            standardizedSolution(fit_alt) |>
-                filter(op == "~", label %in% c("cl_xy", "cl_yx")) |>
-                mutate(model = "ALT") |>
-                distinct(label, .keep_all = TRUE)
-        } else {
-            tibble()
-        }
-
         ## ---- LCM-SR ----
         fit_lcmsr <- tryCatch(
             suppressWarnings(lavaan(
@@ -975,7 +944,6 @@ trait_results <- map_dfr(names(trait_items), function(tr) {
             extract_cl(fit_ri, "RI-CLPM"),
             lcs_out,
             bb_out,
-            alt_out,
             lcmsr_out
         ) |>
             mutate(
@@ -1010,7 +978,7 @@ trait_results |>
         cell  = paste0(round(est.std, 3), sig),
         model = factor(model,
                        levels = c("CLPM", "RI-CLPM", "LChange",
-                                  "Bollen-Brand", "ALT", "LCM-SR"))
+                                  "Bollen-Brand", "LCM-SR"))
     ) |>
     select(trait, politics, direction, model, cell) |>
     pivot_wider(names_from = model, values_from = cell,

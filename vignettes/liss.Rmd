@@ -1,0 +1,129 @@
+---
+title: "LISS panel: personality ↔ political orientation"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{LISS panel: personality ↔ political orientation}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  message  = FALSE,
+  warning  = FALSE
+)
+```
+
+This vignette is an abbreviated partial replication of @bakker_reconsidering_2021,
+using the LISS panel data ship with `crossLagR`. We ask whether the
+"closed-personality" composite (low openness + high conscientiousness) leads
+right-leaning political orientation (left–right self-placement), or vice versa.
+See the [user guide](https://crweber9874.github.io/crossLagR/book/07_liss.html)
+for the full chapter, which also covers each Big-Five trait, all five
+political items, and several alternative specifications.
+
+## Setup
+
+```{r setup}
+library(crossLagR)
+library(lavaan)
+library(dplyr)
+library(tidyr)
+
+data(liss_long)
+```
+
+`liss_long` is in long form with one row per (respondent × wave). For the
+CLPM we need three waves of two observed variables in wide form. Bakker et al.
+use the May 2008, 2013, and 2019 personality waves. Here we use the same
+three waves and pair personality with the left–right item from the
+preceding December.
+
+## Construct the composites
+
+The closed-personality composite is the mean of reverse-scored openness items
+plus conscientiousness items. We compute a simple per-wave mean ignoring the
+factor model (the book chapter fits a measurement model instead).
+
+```{r}
+open_items <- c("rich_vocab", "dffclt_undrstnd", "vivid_imagin", "no_interest",
+                "excellent_ideas", "poor_imagin", "quick_undrstnd",
+                "dffclt_words", "reflecting", "full_of_ideas")
+
+cons_items <- c("always_prepared", "leave_belongings", "pay_attention",
+                "make_mess", "chores_done", "forget_to_put", "like_order",
+                "shirk_duties", "follow_sched", "exacting")
+
+# Items reverse-scored in the LISS Big-Five battery (5-pt scale).
+open_rev <- c("dffclt_undrstnd", "no_interest", "poor_imagin",
+              "dffclt_words")
+cons_rev <- c("leave_belongings", "make_mess", "forget_to_put",
+              "shirk_duties")
+
+reverse5 <- function(x) 6 - x
+
+liss <- liss_long |>
+  mutate(across(all_of(open_rev), reverse5),
+         across(all_of(cons_rev), reverse5)) |>
+  rowwise() |>
+  mutate(
+    openness_high      = mean(c_across(all_of(open_items)), na.rm = TRUE),
+    conscientiousness  = mean(c_across(all_of(cons_items)), na.rm = TRUE),
+    closed_personality = mean(c(6 - openness_high, conscientiousness),
+                              na.rm = TRUE)
+  ) |>
+  ungroup()
+```
+
+## Reshape to wide (3 waves: 2008, 2013, 2019)
+
+```{r}
+target_waves <- c(8, 13, 19)
+
+wide <- liss |>
+  filter(wave %in% target_waves) |>
+  mutate(wave_label = match(wave, target_waves)) |>
+  select(case_id, wave_label, closed_personality, left_right) |>
+  pivot_wider(names_from  = wave_label,
+              values_from = c(closed_personality, left_right),
+              names_glue  = "{.value}{wave_label}") |>
+  transmute(
+    x1 = closed_personality1, x2 = closed_personality2, x3 = closed_personality3,
+    y1 = left_right1,         y2 = left_right2,         y3 = left_right3
+  ) |>
+  drop_na()
+
+cat("Complete cases:", nrow(wide), "\n")
+```
+
+## CLPM
+
+```{r}
+clpm_fit <- lavaan(estimateCLPM(waves = 3), data = wide)
+summary(clpm_fit, standardized = TRUE)
+```
+
+## RI-CLPM
+
+```{r}
+riclpm_fit <- lavaan(estimateRICLPM(waves = 3), data = wide)
+summary(riclpm_fit, standardized = TRUE)
+```
+
+## Reading the contrast
+
+Following @bakker_reconsidering_2021, the CLPM cross-lags suggest a
+modest reciprocal coupling between closed personality and right-leaning
+self-placement. The RI-CLPM, which absorbs stable between-person trait
+differences into the random intercepts $I_x$ and $I_y$, typically reports
+much smaller within-person cross-lags — consistent with the idea that the
+two constructs are correlated *traits* more than wave-to-wave drivers of one
+another.
+
+For the per-trait breakdown (all Big-Five facets × five political items),
+alternative specifications, and a discussion of the substantive
+implications, see [the book chapter](https://crweber9874.github.io/crossLagR/book/07_liss.html).
+
+## References

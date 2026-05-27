@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimateLCMSR.R
 \name{estimateLCMSR}
 \alias{estimateLCMSR}
-\title{estimateLCMSR}
+\title{estimateLCMSR. This is just the GCLPM. Structure the means here.}
 \usage{
 estimateLCMSR(
   waves = 5,

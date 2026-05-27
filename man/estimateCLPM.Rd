@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimateCLPM.R
 \name{estimateCLPM}
 \alias{estimateCLPM}
-\title{estimateCLPM}
+\title{estimateCLPM. This follows the Usami, Murayama, & Hamaker (2019) unified framework for longitudinal models.}
 \usage{
 estimateCLPM(
   waves = 5,

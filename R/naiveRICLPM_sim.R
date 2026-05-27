@@ -38,11 +38,11 @@
 #'   \code{cor_traits}
 #'
 #' **Within-person level (for t >= 2):**
-#' \deqn{X_t = \mu_x + ar_x(X_{t-1} - \mu_x) + cl_yx(Y_{t-1} - \mu_y) + \epsilon_{x,t}}
-#' \deqn{Y_t = \mu_y + ar_y(Y_{t-1} - \mu_y) + cl_xy(X_{t-1} - \mu_x) + \epsilon_{y,t}}
+#' \deqn{X_t = \mu_x + ar_x(X_{t-1} - \mu_x) + cl_{yx}(Y_{t-1} - \mu_y) + e_{x,t}}
+#' \deqn{Y_t = \mu_y + ar_y(Y_{t-1} - \mu_y) + cl_{xy}(X_{t-1} - \mu_x) + e_{y,t}}
 #'
 #' where \eqn{\mu_x} and \eqn{\mu_y} are individual-specific traits (random intercepts),
-#' and innovations have \code{Cor(\epsilon_{x,t}, \epsilon_{y,t}) = cor_xy}.
+#' and innovations have \eqn{Cor(e_{x,t}, e_{y,t}) = cor_{xy}}.
 #'
 #' @examples
 #' # Basic simulation with defaults

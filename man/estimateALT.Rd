@@ -2,7 +2,7 @@
 % Please edit documentation in R/estimateALT.R
 \name{estimateALT}
 \alias{estimateALT}
-\title{estimateALT}
+\title{estimateALT, following Usami, Murayama, & Hamaker (2019) unified frameowk.}
 \usage{
 estimateALT(
   waves = 5,

@@ -1,3 +1,77 @@
 url: https://crweber9874.github.io/crossLagR/
+
 template:
   bootstrap: 5
+
+navbar:
+  structure:
+    left:  [intro, reference, articles, book, news]
+    right: [search, github]
+  components:
+    book:
+      text: User Guide (Book)
+      href: book/index.html
+
+articles:
+  - title: "Worked examples"
+    contents:
+      - iscap
+      - liss
+
+reference:
+  - title: "Estimators (lavaan syntax generators)"
+    desc: "Functions that emit lavaan model syntax for panel-data models."
+    contents:
+      - estimateCLPM
+      - estimateRICLPM
+      - estimateRICLPM3
+      - estimateRICLPMl
+      - estimateRICLPM_nolag
+      - estimateRI
+      - estimateLChange
+      - estimateLGM
+      - estimateALT
+      - estimateLCMSR
+      - estimateBollen_and_Brand
+      - estimateTSO
+      - estimateStTr
+      - estimateAllisonChamberlainFI
+      - estimateCLPM_MI
+      - estimateRICLPM_MI
+      - estimateALT_MI
+      - estimateLCMSR_MI
+      - estimateBollen_and_Brand_MI
+
+  - title: "Data simulators"
+    desc: "Generate panel data under known parameters."
+    contents:
+      - simCLPM
+      - simCLPMu
+      - simCLPM_timeInvariantU
+      - simRICLPM
+      - simRICLPM3
+      - simRICLPMl
+      - simLChange
+      - simLGM
+      - simWithinBetween
+      - sim_trait_state
+      - baseRICLPM_sim
+
+  - title: "Monte Carlo runners"
+    desc: "Replication wrappers that fit estimators across many simulated datasets."
+    contents:
+      - has_concept("monteCarlo")
+      - matches("^monteCarlo")
+      - monteCarlo_OLS
+      - run_mc_sims
+
+  - title: "Helpers"
+    desc: "Utilities for reshaping, plotting, and continuous-time SEM."
+    contents:
+      - reshape_long_sim_cr
+      - compCTSEM
+      - riclpm_graph
+      - withinBetween
+      - plotWithinBetween
+      - zero.one
+      - generate_riclpm_indicator_lists_for_estimation

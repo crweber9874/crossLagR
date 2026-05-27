@@ -201,9 +201,9 @@ sim1 <- sim1 |>
   )
 ```
 
-### Distribution of Estimates
+### Distributions of Estimates
 
-@fig-sim1-ridges shows the sampling distribution of each estimator's recovery of the four AR/CL parameters. Vertical lines mark the true value; each ridge is colored by its mean absolute deviation from truth — green ridges sit on truth, red ridges drift far from it.
+@fig-sim1-ridges shows the sampling distribution of each estimator's recovery of the four AR/CL parameters. Vertical lines mark the true value; each ridge is colored by its mean absolute deviation from truth — the more green the closer to the truth, red ridges drift far from the true value. One important caveat: The LCGM autoregressive parameters drift far from true parameter values, but the AR parameter should be interpreted as $1+\beta$ where $\beta$ is the true slope generated from the RI-CLPM. 
 
 ```{r}
 #| label: fig-sim1-ridges
@@ -240,14 +240,14 @@ sim1 |>
 
 ### Bias and Precision
 
-@fig-sim1-bias collapses the distributions into mean bias with 95% MC intervals. The gradient axis is the `bw_ratio` — left to right is "mostly within-person noise" to "mostly between-person trait." Estimators that ignore the trait component drift away from zero as the ratio grows.
+@fig-sim1-bias collapses the distributions into mean bias with 95% MC intervals. It's also pretty revealing. The CLPM breaks down with a moderate amount of trait variance. Also the spikes that appear for some are because only a handful of models actually converge, so these are means of only a handful of actual estimates. 
 
 ```{r}
 #| label: fig-sim1-bias
 #| echo: false
 #| message: false
 #| warning: false
-#| fig-cap: "Bias of AR/CL estimates as a function of between:within variance ratio (RI-CLPM DGP). Points are means across replications; vertical segments are 95% Monte Carlo intervals. The dashed line at zero is unbiased. The horizontal gradient maps directly to the bw_ratio axis."
+#| fig-cap: "Bias of AR/CL estimates as a function of between:within variance ratio (RI-CLPM DGP). Points are means across replications; vertical segments are 95% Monte Carlo intervals. The dashed line at zero is unbiased."
 #| fig-height: 7
 #| fig-width: 13
 
@@ -262,23 +262,35 @@ sim1_bias <- sim1 |>
     .groups   = "drop"
   )
 
-ggplot(sim1_bias, aes(x = bw_ratio, y = mean_bias, color = bw_ratio)) +
+parameter_labels <- c(
+  ar_x  = "AR(X)",
+  ar_y  = "AR(Y)",
+  cl_xy = "CL(X→Y)",
+  cl_yx = "CL(Y→X)"
+)
+
+ggplot(sim1_bias, aes(x = bw_ratio, y = mean_bias)) +
   geom_hline(yintercept = 0, linetype = "dashed", color = "grey50", linewidth = 0.3) +
-  geom_linerange(aes(ymin = ci_low, ymax = ci_high), linewidth = 0.8) +
-  geom_point(size = 2.2) +
-  geom_line(aes(group = 1), color = "grey30", linewidth = 0.3) +
-  facet_grid(parameter ~ estimator, scales = "free_y", switch = "y") +
+  geom_line(aes(group = 1), color = "grey60", linewidth = 0.3) +
+  geom_linerange(aes(ymin = ci_low, ymax = ci_high),
+                 color = "grey20", linewidth = 0.6) +
+  geom_point(size = 2.2, alpha = 0.6, color = "black") +
+  facet_grid(parameter ~ estimator, switch = "y",
+             labeller = labeller(parameter = parameter_labels)) +
   scale_x_continuous(trans = "log10", breaks = bw_ratios) +
-  scale_color_viridis_c(option = "C", trans = "log10",
-                        breaks = bw_ratios,
-                        guide = "none") +
+  coord_cartesian(ylim = c(-1, 1)) +
   labs(x = "Between:within variance ratio (log scale)",
        y = "Bias (estimate − truth)",
        title = "Simulation 1: Bias by Estimator and Parameter") +
   theme_grand +
-  theme(panel.spacing = unit(0.3, "lines"),
-        strip.placement = "outside")
+  theme(panel.spacing   = unit(0.3, "lines"),
+        strip.placement = "outside",
+        axis.text.x     = element_text(angle = 45, hjust = 1))
 ```
+
+The RMSEA estimates vary wildly across models [@fig-sim1-rmse], and the CLPM generally fits poorly. Though most models collapse when there is effectively only trait variance. 
+
+@fig-sim1-rmse
 
 ```{r}
 #| label: fig-sim1-rmse
@@ -295,18 +307,28 @@ sim1_rmse <- sim1 |>
   summarise(rmse = sqrt(mean((estimate - true)^2, na.rm = TRUE)), .groups = "drop")
 
 ggplot(sim1_rmse, aes(x = bw_ratio, y = rmse, color = estimator)) +
+  geom_hline(yintercept = 0.05, linetype = "dashed",
+             color = "grey50", linewidth = 0.4) +
   geom_line(linewidth = 0.9) +
   geom_point(size = 2.2) +
-  facet_wrap(~ parameter, nrow = 1, scales = "free_y") +
+  facet_wrap(~ parameter, nrow = 1,
+             labeller = labeller(parameter = parameter_labels)) +
   scale_x_continuous(trans = "log10", breaks = bw_ratios) +
-  scale_color_viridis_d(option = "D", end = 0.92) +
-  labs(x = "Between:within variance ratio (log scale)",
-       y = "RMSE", color = NULL,
-       title = "Simulation 1: RMSE by Estimator") +
-  theme_grand
+  scale_color_manual(
+    values = RColorBrewer::brewer.pal(9, "YlOrRd")[4:9],
+    name   = NULL,
+    guide  = guide_legend(override.aes = list(linewidth = 1.4, size = 3))) +
+  labs(x = "Between : within variance ratio (log scale)",
+       y = "RMSE",
+       title    = "Simulation 1: RMSE by Estimator",
+       subtitle = "Dashed line at RMSE = 0.05 (typical 'small bias' cutoff).") +
+  theme_grand +
+  theme(axis.text.x = element_text(angle = 45, hjust = 1))
 ```
 
 ### Convergence
+
+@tbl-sim1-convergence displays the convergence statistics. This is an important indicator of each models ability to operate in extreme conditions, but conditions that are quite common in panel data in the social sciences. The convergence rate is simply the proportion of replications that produce parameter estimates. The Heywood rate is the proportion of *converged* replications that produce at least one negative variance estimate. These errors are quite common in over parameterized models. The ALT and LCM-SR have very high rates of Heywood cases, especially as the trait variance grows. 
 
 ```{r}
 #| label: tbl-sim1-convergence
@@ -332,283 +354,20 @@ sim1 |>
              subtitle = paste0(trials, " replications · n = ", n_obs))
 ```
 
-## Simulation 2: When the True Effect is Contemporaneous
-
-A pointed critique of the RI-CLPM in short-$T$ panels, due to @bakker_reconsidering_2021 (and earlier Leszczensky & Wolbring 2019; Vaisey & Miles 2017): if the true causal effect of $X$ on $Y$ is *contemporaneous* (within-wave) rather than *lagged* (across-wave), the RI-CLPM produces a severely biased estimate of the lagged coefficient — often in the wrong direction. The standard CLPM is also biased in this scenario, but far less so (≈ 50% off vs. ≈ 100% off for the RI-CLPM, by Bakker et al.'s 4-condition Monte Carlo).
-
-The screenshot below is paraphrased from that supplementary information. The Bakker et al. simulation sets the *lagged* effect to $0.2$, the autocorrelation to $0.7$, and varies whether a contemporaneous effect is present. The headline result: with a contemporaneous effect present, the RI-CLPM lagged estimate flips sign on average.
-
-**Why this happens.** The RI-CLPM places a free *covariance* parameter between within-person factors at each wave (`p_t ~~ q_t`) but no *directed* contemporaneous path. When the DGP actually has $y_t \leftarrow x_t$, that asymmetric relationship cannot be cleanly absorbed by a symmetric covariance. With high autoregression ($p_{t-1}$ highly correlated with $p_t$), the model satisfies the implied moments by driving the *lagged* `cl_xy` coefficient negative — it has to, because otherwise the implied covariance matrix doesn't match the data. The CLPM doesn't separate within from between, so the absorption logic is different and the bias is smaller (though nonzero). This is **simultaneity bias** that the RI-CLPM is not designed to handle. The fix is to either explicitly model the contemporaneous path or to choose a measurement interval short enough that $X \to Y$ really is lagged in the underlying process [@hamaker_critique_2015].
-
-**Simulation design.** 3 waves, $n = 1000$. AR = 0.7 for both processes. True *lagged* $cl_{xy} = 0.2$, no lagged $cl_{yx}$. The contemporaneous effect varies $\in \{0, 0.1, 0.2, 0.3\}$. Standard RI-CLPM and standard CLPM are fit to each replication. The cell of interest is the **estimated lagged $cl_{xy}$**, which should be $0.2$ if the estimator is unbiased.
-
-```{r}
-#| label: sim3-dgp
-#| message: false
-#| warning: false
-
-# 3-wave RI-CLPM-with-contemporaneous-effect DGP. Built as a population lavaan
-# syntax string so we can inject the directed contemporaneous regression
-# q_t ~ contemp * p_t cleanly.
-make_contemp_pop <- function(contemp, waves = 3,
-                             ar = 0.7, cl_lagged = 0.2,
-                             bw_var = 1.0, init_var = 1.0,
-                             dyn_var = 0.5, innov_cov = 0.0,
-                             trait_cor = 0.3) {
-  loadings_x <- paste0("1*x", 1:waves, collapse = " + ")
-  loadings_y <- paste0("1*y", 1:waves, collapse = " + ")
-  parts <- c(
-    "# Random intercepts",
-    paste0("I_x =~ ", loadings_x),
-    paste0("I_y =~ ", loadings_y),
-    "# Within-person latents (perfect indicators)",
-    paste0("p", 1:waves, " =~ 1*x", 1:waves),
-    paste0("q", 1:waves, " =~ 1*y", 1:waves),
-    paste0("x", 1:waves, " ~~ 0*x", 1:waves),
-    paste0("y", 1:waves, " ~~ 0*y", 1:waves),
-    "# Lagged regressions",
-    paste0("p", 2:waves, " ~ ", ar, "*p", 1:(waves - 1)),
-    paste0("q", 2:waves, " ~ ", ar, "*q", 1:(waves - 1),
-           " + ", cl_lagged, "*p", 1:(waves - 1)),
-    "# Trait (co)variances",
-    paste0("I_x ~~ ", bw_var, "*I_x"),
-    paste0("I_y ~~ ", bw_var, "*I_y"),
-    paste0("I_x ~~ ", trait_cor * bw_var, "*I_y"),
-    "# Wave-1 within-person (co)variances",
-    paste0("p1 ~~ ", init_var, "*p1"),
-    paste0("q1 ~~ ", init_var, "*q1"),
-    paste0("p1 ~~ ", innov_cov, "*q1"),
-    "# Wave 2+ dynamic residual (co)variances",
-    paste0("p", 2:waves, " ~~ ", dyn_var, "*p", 2:waves),
-    paste0("q", 2:waves, " ~~ ", dyn_var, "*q", 2:waves),
-    paste0("p", 2:waves, " ~~ ", innov_cov, "*q", 2:waves)
-  )
-  if (contemp != 0) {
-    parts <- c(parts,
-               "# Contemporaneous Y_t <- X_t",
-               paste0("q", 2:waves, " ~ ", contemp, "*p", 2:waves))
-  }
-  paste(parts, collapse = "\n")
-}
-```
-
-```{r}
-#| label: sim3-run
-#| message: false
-#| warning: false
-#| cache: false
-
-sim3_file <- here::here("data", "sim3_contemp.rds")
-contemp_levels <- c(0, 0.1, 0.2, 0.3)
-sim3_trials    <- 200
-sim3_waves     <- 3
-
-riclpm3_syn <- estimateRICLPM(waves = sim3_waves)
-clpm3_syn   <- estimateCLPM(waves = sim3_waves)
-
-fit_contemp_one <- function(syntax, dat, name) {
-  fit <- tryCatch(suppressWarnings(lavaan::lavaan(syntax, data = dat)),
-                  error = function(e) NULL)
-  if (is.null(fit) || !lavInspect(fit, "converged")) {
-    return(tibble(estimator = name, cl_xy_hat = NA_real_, converged = FALSE))
-  }
-  pe <- parameterEstimates(fit)
-  v  <- pe$est[pe$label == "cl_xy"]
-  tibble(estimator = name,
-         cl_xy_hat = if (length(v)) v[1] else NA_real_,
-         converged = TRUE)
-}
-
-if (!file.exists(sim3_file)) {
-  set.seed(2028)
-  sim3 <- vector("list", length(contemp_levels) * sim3_trials)
-  k <- 1L
-  for (cc in contemp_levels) {
-    pop_syn <- make_contemp_pop(cc, waves = sim3_waves)
-    for (j in seq_len(sim3_trials)) {
-      dat <- tryCatch(simulateData(pop_syn, sample.nobs = n_obs),
-                      error = function(e) NULL)
-      if (is.null(dat)) next
-      res <- bind_rows(
-        fit_contemp_one(riclpm3_syn, dat, "RI-CLPM"),
-        fit_contemp_one(clpm3_syn,   dat, "CLPM")
-      )
-      res$contemp <- cc
-      res$trial   <- j
-      sim3[[k]] <- res
-      k <- k + 1L
-    }
-  }
-  sim3 <- bind_rows(sim3)
-  if (!dir.exists(dirname(sim3_file))) dir.create(dirname(sim3_file), recursive = TRUE)
-  saveRDS(sim3, sim3_file)
-} else {
-  sim3 <- readRDS(sim3_file)
-}
-```
-
-```{r}
-#| label: fig-sim3
-#| echo: false
-#| message: false
-#| warning: false
-#| fig-cap: "Distribution of estimated *lagged* cl_xy when the data-generating process has a contemporaneous X → Y effect. The dashed line is the true lagged effect (0.2). As the contemporaneous effect grows from 0 to 0.3, the RI-CLPM's lagged estimate is pushed sharply negative; the CLPM is biased but less so."
-#| fig-height: 6
-#| fig-width: 11
-
-sim3 |>
-  filter(converged, !is.na(cl_xy_hat)) |>
-  mutate(contemp_f = factor(contemp, levels = sort(unique(contemp)))) |>
-  ggplot(aes(x = cl_xy_hat, y = contemp_f, fill = contemp)) +
-  geom_density_ridges(scale = 1.4, rel_min_height = 0.01,
-                      color = "white", linewidth = 0.2, alpha = 0.9) +
-  geom_vline(xintercept = 0.2, linetype = "dashed", color = "grey20", linewidth = 0.4) +
-  geom_vline(xintercept = 0, linetype = "dotted", color = "grey50", linewidth = 0.3) +
-  facet_wrap(~ estimator, nrow = 1) +
-  scale_fill_viridis_c(option = "A", end = 0.9,
-                       breaks = contemp_levels,
-                       name = "True contemporaneous\neffect (Y_t ← X_t)") +
-  labs(x = expression(paste("Estimated lagged ", cl[xy])),
-       y = "True contemporaneous effect",
-       title = "Simulation 3: RI-CLPM Collapses When the Effect is Contemporaneous",
-       subtitle = paste0("3 waves · AR = 0.7 · n = ", n_obs, " · ",
-                         sim3_trials, " replications · dashed line = true lagged cl_xy = 0.2")) +
-  theme_grand +
-  theme(panel.spacing = unit(0.4, "lines"))
-```
-
-```{r}
-#| label: tbl-sim3
-#| echo: false
-#| message: false
-
-sim3 |>
-  filter(converged, !is.na(cl_xy_hat)) |>
-  group_by(estimator, contemp) |>
-  summarise(
-    mean_estimate = mean(cl_xy_hat),
-    bias          = mean(cl_xy_hat) - 0.2,
-    rel_bias_pct  = 100 * (mean(cl_xy_hat) - 0.2) / 0.2,
-    sd_estimate   = sd(cl_xy_hat),
-    pct_wrong_sign = 100 * mean(cl_xy_hat < 0),
-    .groups       = "drop"
-  ) |>
-  mutate(across(where(is.numeric), ~ round(., 3))) |>
-  pivot_wider(id_cols = contemp,
-              names_from = estimator,
-              values_from = c(mean_estimate, bias, rel_bias_pct, pct_wrong_sign),
-              names_glue = "{estimator}_{.value}") |>
-  gt() |>
-  tab_header(
-    title = "Simulation 3: Estimated Lagged cl_xy Under Contemporaneous Bias",
-    subtitle = "True lagged cl_xy = 0.20. Relative bias > 100% means estimate has flipped sign."
-  ) |>
-  cols_label(contemp = "True contemp.")
-```
-
-The pattern reproduces the Bakker et al. finding. At `contemp = 0` (no contemporaneous effect, as the RI-CLPM assumes), both estimators recover the true lagged $cl_{xy} \approx 0.2$. As soon as a contemporaneous effect is added, the RI-CLPM lagged estimate is dragged sharply negative — and at `contemp = 0.3` a substantial share of replications produce wrong-sign estimates. The CLPM, despite its other well-known biases, is closer to the truth here because it doesn't impose the within-time covariance structure that creates the simultaneity problem.
-
-**Practical takeaway.** If you suspect the true effect operates faster than your measurement interval — common in attitudinal research where attitudes can shift within hours, not years — the RI-CLPM is *not* the conservative choice. A model that explicitly includes a contemporaneous regression (e.g., a structural model with $y_t \leftarrow x_t$ identified through instruments or theory), or a model fit on shorter measurement intervals, will be necessary. The RI-CLPM solves the unobserved-heterogeneity problem at the cost of being more vulnerable to simultaneity bias than the CLPM it was designed to replace.
-
-## Non-Response
-
-Panel attrition is a routine threat to longitudinal inference. If dropout is driven by stable between-person characteristics — say, people with chronically high $X$ are more likely to leave the study — then complete-case analysis biases the random intercept distribution and, through it, the within-person AR/CL estimates. The RI-CLPM offers a natural handle on this: because the model already separates stable trait variance ($I_x$, $I_y$) from within-person dynamics, we can let trait means and variances vary across dropout patterns while keeping the within-person dynamics common. This is a **pattern-mixture model** in the sense of @little1993.
-
-Below we generate one dataset from the RI-CLPM, induce trait-driven dropout (people with high $I_x$ are more likely to leave after wave 2), and compare three approaches:
-
-1. **Complete cases** — listwise deletion.
-2. **FIML** — full information maximum likelihood, MAR assumption.
-3. **Pattern-mixture** — single-group RI-CLPM with the dropout indicator regressed on the random intercepts. (Multi-group pattern-mixture is the textbook formulation, but with monotone dropout the late-wave variables are 100% missing in the dropout group, so the multi-group likelihood is undefined. Regressing the random intercepts on the dropout indicator is the algebraically equivalent parameterization that handles monotone dropout cleanly — see @enders2010 §10.)
-
-```{r}
-#| label: nonresponse-demo
-#| message: false
-#| warning: false
-
-set.seed(123)
-pop_pt   <- make_riclpm_pop(bw_ratio = 1)
-dat_full <- simulateData(pop_pt, sample.nobs = 1000)
-
-prob_drop    <- plogis(-1 + 1.2 * scale(dat_full$x1)[, 1])
-drop_after_2 <- rbinom(nrow(dat_full), 1, prob_drop) == 1
-
-dat_miss <- dat_full
-dat_miss$x3[drop_after_2] <- NA
-dat_miss$y3[drop_after_2] <- NA
-dat_miss$x4[drop_after_2] <- NA
-dat_miss$y4[drop_after_2] <- NA
-dat_miss$dropout <- as.integer(is.na(dat_miss$x3))
-table(dat_miss$dropout)
-```
-
-```{r}
-#| label: nonresponse-fits
-#| message: false
-#| warning: false
-
-riclpm_syn <- estimateRICLPM(waves = 4)
-
-fit_cc <- lavaan(riclpm_syn, data = dat_miss[dat_miss$dropout == 0, ],
-                 meanstructure = TRUE)
-fit_fiml <- lavaan(riclpm_syn, data = dat_miss, missing = "fiml",
-                   meanstructure = TRUE)
-
-riclpm_pm_syn <- paste0(riclpm_syn,
-                        "\n# Pattern-mixture: trait means depend on dropout indicator\n",
-                        "I_x ~ dropout\nI_y ~ dropout\n")
-fit_pm <- lavaan(riclpm_pm_syn, data = dat_miss, missing = "fiml",
-                 meanstructure = TRUE, fixed.x = TRUE)
-
-get_arcl <- function(fit, method) {
-  pe <- parameterEstimates(fit)
-  want <- c("ar_x", "ar_y", "cl_xy", "cl_yx")
-  pe |>
-    dplyr::filter(label %in% want) |>
-    dplyr::distinct(label, .keep_all = TRUE) |>
-    dplyr::transmute(method = method, parameter = label,
-                     estimate = round(est, 3))
-}
-
-bind_rows(
-  get_arcl(fit_cc,   "Complete cases"),
-  get_arcl(fit_fiml, "FIML"),
-  get_arcl(fit_pm,   "Pattern-mixture")
-) |>
-  pivot_wider(names_from = parameter, values_from = estimate) |>
-  gt() |>
-  tab_header(
-    title = "AR/CL Estimates Under Three Missing-Data Strategies",
-    subtitle = "Trait-driven dropout. True values: ar_x = 0.30, ar_y = 0.20, cl_xy = 0.15, cl_yx = 0.10."
-  )
-```
-
-The complete-cases analysis throws away the dropouts and biases the trait distribution toward low-$I_x$ individuals. FIML uses all available data under MAR. The pattern-mixture model goes further: it lets the trait means depend on dropout status, so the within-person AR/CL coefficients are estimated *net of* whatever between-person shift the dropout indicator absorbs.
-
-```{r}
-#| label: nonresponse-trait-means
-#| message: false
-
-parameterEstimates(fit_pm) |>
-  filter(op == "~", rhs == "dropout") |>
-  select(lhs, op, rhs, est, se, z, pvalue) |>
-  mutate(across(where(is.numeric), ~round(., 3))) |>
-  gt() |>
-  tab_header(title = "Random Intercept ~ Dropout Indicator")
-```
-
-A significant `I_x ~ dropout` coefficient is direct evidence that attrition is associated with the latent trait — and a justification for reporting the pattern-mixture estimates as the primary analysis.
-
 ## Bayesian RI-CLPM with Informative Priors
 
-The 9:1 between-to-within ratio is exactly the regime where the ML RI-CLPM falls apart: within-person residual variances are tiny relative to the random-intercept variances, the likelihood is flat near the boundary, and we get Heywood cases or non-convergence on a large fraction of replications. Informative priors anchor the variance components away from zero and shrink the AR/CL coefficients toward sensible values, fixing the empirical underidentification without changing the model.
+One of the issues with the RI-CLPM is that it can be difficult to fit when there is a lot of trait variance. The Bayesian approach allows us to put informative priors on the parameters.
 
-This is a small Monte Carlo demo (50 replications, 9:1 ratio, RI-CLPM DGP). It is intentionally small because Stan compilation/sampling is expensive. The point is to compare ML vs Bayesian behavior in this hard regime.
+```{r}
+make_riclpm_pop(8) |> head()
+```
 
 ```{r}
 #| label: bayes-riclpm-demo
 #| message: false
 #| warning: false
 #| cache: false
+#| echo: false
 #| eval: !expr requireNamespace("blavaan", quietly = TRUE)
 
 library(blavaan)
@@ -702,14 +461,3 @@ bayes_summary |>
              subtitle = paste0(nrow(bayes_summary), " replications, n = ", n_obs))
 ```
 
-The ML column shows the underidentification problem in action — most replications either fail to converge or land on a boundary solution with at least one negative variance estimate. The Bayesian column should show every replication completing cleanly with admissible variances. The priors aren't doing anything exotic: they just rule out the corner of parameter space the ML optimizer keeps wandering into.
-
-## Summary
-
-<!-- TODO: Fill in after reviewing simulation output. Key points to address:
-
-1. At small bw_ratio, all DGPs collapse toward a pure CLPM and most estimators recover approximately unbiased AR/CL.
-2. As trait variance grows, CLPM AR is inflated by ICC; CL is attenuated. RI-CLPM and Bollen & Brand stay near zero. ALT/LCM-SR also recover the truth but at the cost of variance (over-parameterization).
-3. When the true effect is contemporaneous (Sim 2), the RI-CLPM produces sign-flipped lagged coefficients; the CLPM is biased but in the same direction as truth.
-4. Convergence at extreme conditions — RI-CLPM at 9:1 — is where the Bayesian formulation pays.
--->

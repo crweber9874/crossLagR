@@ -7,3 +7,11 @@
 ^pkgdown$
 ^\.github$
 ^book$
+^quarto_book$
+^shiny$
+^shinySim$
+^archive$
+^agent_workflow$
+^_pkgdown\.yaml$
+^.*\.bib$
+^scripts$
