@@ -310,6 +310,19 @@ window.Quarto = {
 </header>
 
 
+<div class="callout callout-style-default callout-note callout-titled">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+Note
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<p>The LISS panel data are proprietary and not redistributed with this package. Code in this chapter is shown but not executed in the public build; run the chapter locally with the LISS files in <code>data/</code> to see the fitted output.</p>
+</div>
+</div>
 <p>This chapter relies on the LISS panel analysis from <span class="citation" data-cites="bakker_reconsidering_2021">Bakker, Lelkes, and Malka (<a href="#ref-bakker_reconsidering_2021" role="doc-biblioref">2021</a>)</span>, using <code>crossLagR::estimateCLPM()</code>. Three waves (May 2008, May 2013, May 2019 for personality; Dec 2007–2018 for politics); “closed personality” = openness (reversed) + conscientiousness; and five political items were analyzed, consistent with the models found in <span class="citation" data-cites="bakker_reconsidering_2021">Bakker, Lelkes, and Malka (<a href="#ref-bakker_reconsidering_2021" role="doc-biblioref">2021</a>)</span>. So, this forms a three-wave panel with two observed variables (closed personality and each political item), and we fit a separate CLPM for each political item.</p>
 <p>This chapter forms a partial replication of <span class="citation" data-cites="bakker_reconsidering_2021">Bakker, Lelkes, and Malka (<a href="#ref-bakker_reconsidering_2021" role="doc-biblioref">2021</a>)</span> LISS panel, re-estimates their models with alternative models in <code>crossLagR</code>, and checks the factor structure of the personality items and each Big Five trait’s effects on political preferences, and vice versa, across various specifications. However, the chapter is intended to address a broader topic in political psychology, the relationship between personality and political preferences, and which construct is causally prior.</p>
 <section id="setup" class="level2" data-number="8.1">

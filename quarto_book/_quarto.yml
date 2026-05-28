@@ -31,7 +31,7 @@ link-citations: true
 
 execute:
   cache: false
-  freeze: false
+  freeze: auto
 
 format:
   html:

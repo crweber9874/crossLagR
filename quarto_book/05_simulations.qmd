@@ -371,7 +371,7 @@ make_riclpm_pop(8) |> head()
 #| warning: false
 #| cache: false
 #| echo: false
-#| eval: !expr requireNamespace("blavaan", quietly = TRUE) && Sys.getenv("CI") != "true"
+#| eval: false
 
 library(blavaan)
 

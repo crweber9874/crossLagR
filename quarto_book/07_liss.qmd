@@ -1,6 +1,18 @@
+---
+execute:
+  eval: !expr 'Sys.getenv("CI") != "true"'
+---
+
 # Replication: Bakker, Lelkes, & Malka (2021)
 
-This chapter relies on the LISS panel analysis from @bakker_reconsidering_2021, using `crossLagR::estimateCLPM()`. Three waves (May 2008, May 2013, May 2019 for personality; Dec 2007–2018 for politics); "closed personality" = openness (reversed) + conscientiousness; and five political items were analyzed, consistent with the models found in @bakker_reconsidering_2021. So, this forms a three-wave panel with two observed variables (closed personality and each political item), and we fit a separate CLPM for each political item. 
+::: {.callout-note}
+The LISS panel data are proprietary and not redistributed with this
+package. Code in this chapter is shown but not executed in the public
+build; run the chapter locally with the LISS files in `data/` to see
+the fitted output.
+:::
+
+This chapter relies on the LISS panel analysis from @bakker_reconsidering_2021, using `crossLagR::estimateCLPM()`. Three waves (May 2008, May 2013, May 2019 for personality; Dec 2007–2018 for politics); "closed personality" = openness (reversed) + conscientiousness; and five political items were analyzed, consistent with the models found in @bakker_reconsidering_2021. So, this forms a three-wave panel with two observed variables (closed personality and each political item), and we fit a separate CLPM for each political item.
 
 This chapter forms a partial replication of @bakker_reconsidering_2021 LISS panel, re-estimates their models with alternative models in `crossLagR`, and checks the factor structure of the personality items and each Big Five trait's effects on political preferences, and vice versa, across various specifications. However, the chapter is intended to address a broader topic in political psychology, the relationship between personality and political preferences, and which construct is causally prior. 
 
