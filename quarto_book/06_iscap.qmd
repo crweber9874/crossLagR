@@ -1058,6 +1058,7 @@ Let's fit a variety of random effects models, using `brms`.
 #| echo: false
 #| message: false
 #| warning: false
+#| eval: !expr Sys.getenv("CI") != "true"
 # model -> design -> predictions -> summarize
 random_model <- brm(
   political_legitimacy ~ female + college + party_identification:as.factor(wave) + as.factor(wave) + (1 | identifier),
@@ -1097,6 +1098,7 @@ pred_summary <- pred_draws |>
 #| echo: false
 #| message: false
 #| warning: false
+#| eval: !expr Sys.getenv("CI") != "true"
 
 ggplot(pred_summary, aes(x = party_identification, y = .prediction)) +
   geom_ribbon(aes(ymin = .lower, ymax = .upper), fill = "grey", alpha = 0.3) +
@@ -1145,6 +1147,7 @@ b_{1,i} \sim N(b_1, \sigma_1^2) \\
 #| echo: false
 #| message: false
 #| warning: false
+#| eval: !expr Sys.getenv("CI") != "true"
 
 library(brms)
 library(tidybayes)
@@ -1189,6 +1192,7 @@ When the Democratic candidate wins, Democrats are more likely to view the politi
 #| echo: false
 #| message: false
 #| warning: false
+#| eval: !expr Sys.getenv("CI") != "true"
 
 ggplot(pred_summary, aes(x = party_identification, y = .prediction)) +
   geom_ribbon(aes(ymin = .lower, ymax = .upper), fill = "grey", alpha = 0.3) +
@@ -1209,6 +1213,7 @@ ggplot(pred_summary, aes(x = party_identification, y = .prediction)) +
 #| echo: false
 #| message: false
 #| warning: false
+#| eval: !expr Sys.getenv("CI") != "true"
 
 library(brms)
 library(tidybayes)
@@ -1248,6 +1253,7 @@ pred_summary <- pred_draws |>
 ```
 
 ```{r brm-expertise-plot}
+#| eval: !expr Sys.getenv("CI") != "true"
 pred_summary <- pred_summary |>
   mutate(
     wave = factor(
