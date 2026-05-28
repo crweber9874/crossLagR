@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>8&nbsp; Replication: Bakker, Lelkes, &amp; Malka (2021) – crossLagR: A User Guide to Cross-Lagged Panel Models in R</title>
+<title>8&nbsp; Replication: Bakker, Lelkes, &amp; Malka (2021) – crossLagR</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -181,7 +181,7 @@ window.Quarto = {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">crossLagR: A User Guide to Cross-Lagged Panel Models in R</a> 
+      <a href="./">crossLagR</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -314,65 +314,11 @@ window.Quarto = {
 <p>This chapter forms a partial replication of <span class="citation" data-cites="bakker_reconsidering_2021">Bakker, Lelkes, and Malka (<a href="#ref-bakker_reconsidering_2021" role="doc-biblioref">2021</a>)</span> LISS panel, re-estimates their models with alternative models in <code>crossLagR</code>, and checks the factor structure of the personality items and each Big Five trait’s effects on political preferences, and vice versa, across various specifications. However, the chapter is intended to address a broader topic in political psychology, the relationship between personality and political preferences, and which construct is causally prior.</p>
 <section id="setup" class="level2" data-number="8.1">
 <h2 data-number="8.1" class="anchored" data-anchor-id="setup"><span class="header-section-number">8.1</span> Setup</h2>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(tidyverse)</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(psych)</span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(here)</span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a><span class="do">## Anchor here() to the package root (one level up from quarto_book/)</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>here<span class="sc">::</span><span class="fu">i_am</span>(<span class="st">"crossLagR.Rproj"</span>)</span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">load_all</span>()</span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a><span class="fu">load</span>(<span class="fu">here</span>(<span class="st">"data"</span>, <span class="st">"liss_long.rda"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 </section>
 <section id="reliability-cronbachs-alpha" class="level2" data-number="8.2">
 <h2 data-number="8.2" class="anchored" data-anchor-id="reliability-cronbachs-alpha"><span class="header-section-number">8.2</span> Reliability (Cronbach’s <span class="math inline">\(\alpha\)</span>)</h2>
 <p>Here, we identify the LISS personality and political variables and calculate Cronbach’s alpha for each scale.</p>
 <p>There are so many variables used in the analysis (with just one <em>x</em> and <em>y</em>) that it’s easier to list them together in a named list, and then just loop through all the names in the list to calculate the alphas. We follow the same approach throughout the analysis.</p>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a>scale_items <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">Openness =</span> <span class="fu">c</span>(</span>
-<span id="cb2-3"><a href="#cb2-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"rich_vocab"</span>, <span class="st">"dffclt_undrstnd"</span>, <span class="st">"vivid_imagin"</span>, <span class="st">"no_interest"</span>,</span>
-<span id="cb2-4"><a href="#cb2-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"excellent_ideas"</span>, <span class="st">"poor_imagin"</span>, <span class="st">"quick_undrstnd"</span>,</span>
-<span id="cb2-5"><a href="#cb2-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dffclt_words"</span>, <span class="st">"reflecting"</span>, <span class="st">"full_of_ideas"</span></span>
-<span id="cb2-6"><a href="#cb2-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb2-7"><a href="#cb2-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Conscientiousness =</span> <span class="fu">c</span>(</span>
-<span id="cb2-8"><a href="#cb2-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"always_prepared"</span>, <span class="st">"leave_belongings"</span>, <span class="st">"pay_attention"</span>,</span>
-<span id="cb2-9"><a href="#cb2-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"make_mess"</span>, <span class="st">"chores_done"</span>, <span class="st">"forget_to_put"</span>, <span class="st">"like_order"</span>,</span>
-<span id="cb2-10"><a href="#cb2-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"shirk_duties"</span>, <span class="st">"follow_sched"</span>, <span class="st">"exacting"</span></span>
-<span id="cb2-11"><a href="#cb2-11" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb2-12"><a href="#cb2-12" aria-hidden="true" tabindex="-1"></a>    <span class="at">Extraversion =</span> <span class="fu">c</span>(</span>
-<span id="cb2-13"><a href="#cb2-13" aria-hidden="true" tabindex="-1"></a>        <span class="st">"life_party"</span>, <span class="st">"dont_talk"</span>, <span class="st">"comfortable"</span>, <span class="st">"stay_in_back"</span>,</span>
-<span id="cb2-14"><a href="#cb2-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"start_convos"</span>, <span class="st">"say_little"</span>, <span class="st">"talk_at_parties"</span>,</span>
-<span id="cb2-15"><a href="#cb2-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"avoid_attention"</span>, <span class="st">"like_attention"</span>, <span class="st">"quiet"</span></span>
-<span id="cb2-16"><a href="#cb2-16" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb2-17"><a href="#cb2-17" aria-hidden="true" tabindex="-1"></a>    <span class="at">Agreeableness =</span> <span class="fu">c</span>(</span>
-<span id="cb2-18"><a href="#cb2-18" aria-hidden="true" tabindex="-1"></a>        <span class="st">"no_concern"</span>, <span class="st">"interest_people"</span>, <span class="st">"insult_people"</span>,</span>
-<span id="cb2-19"><a href="#cb2-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"sympathize"</span>, <span class="st">"no_care_probs"</span>, <span class="st">"soft_heart"</span>,</span>
-<span id="cb2-20"><a href="#cb2-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"no_interest_probs"</span>, <span class="st">"time_for_others"</span>, <span class="st">"feel_emotions"</span>,</span>
-<span id="cb2-21"><a href="#cb2-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"others_at_ease"</span></span>
-<span id="cb2-22"><a href="#cb2-22" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb2-23"><a href="#cb2-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">Neuroticism =</span> <span class="fu">c</span>(</span>
-<span id="cb2-24"><a href="#cb2-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">"stress_easy"</span>, <span class="st">"relaxed"</span>, <span class="st">"worry"</span>, <span class="st">"easy_disturb"</span>,</span>
-<span id="cb2-25"><a href="#cb2-25" aria-hidden="true" tabindex="-1"></a>        <span class="st">"upset_easily"</span>, <span class="st">"seldom_blue"</span>, <span class="st">"often_blue"</span>, <span class="st">"change_mood"</span>,</span>
-<span id="cb2-26"><a href="#cb2-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mood_swings"</span>, <span class="st">"irritate_easy"</span></span>
-<span id="cb2-27"><a href="#cb2-27" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb2-28"><a href="#cb2-28" aria-hidden="true" tabindex="-1"></a>    <span class="at">PANAS_Positive =</span> <span class="fu">c</span>(</span>
-<span id="cb2-29"><a href="#cb2-29" aria-hidden="true" tabindex="-1"></a>        <span class="st">"interested"</span>, <span class="st">"excited"</span>, <span class="st">"strong"</span>, <span class="st">"enthusiastic"</span>, <span class="st">"proud"</span>,</span>
-<span id="cb2-30"><a href="#cb2-30" aria-hidden="true" tabindex="-1"></a>        <span class="st">"alert"</span>, <span class="st">"inspired"</span>, <span class="st">"determined"</span>, <span class="st">"attentive"</span>, <span class="st">"active"</span></span>
-<span id="cb2-31"><a href="#cb2-31" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb2-32"><a href="#cb2-32" aria-hidden="true" tabindex="-1"></a>    <span class="at">PANAS_Negative =</span> <span class="fu">c</span>(</span>
-<span id="cb2-33"><a href="#cb2-33" aria-hidden="true" tabindex="-1"></a>        <span class="st">"distressed"</span>, <span class="st">"upset"</span>, <span class="st">"guilty"</span>, <span class="st">"scared"</span>, <span class="st">"hostile"</span>,</span>
-<span id="cb2-34"><a href="#cb2-34" aria-hidden="true" tabindex="-1"></a>        <span class="st">"irritable"</span>, <span class="st">"ashamed"</span>, <span class="st">"nervous"</span>, <span class="st">"jittery"</span>, <span class="st">"afraid"</span></span>
-<span id="cb2-35"><a href="#cb2-35" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb2-36"><a href="#cb2-36" aria-hidden="true" tabindex="-1"></a>    <span class="at">Politics =</span> <span class="fu">c</span>(</span>
-<span id="cb2-37"><a href="#cb2-37" aria-hidden="true" tabindex="-1"></a>        <span class="st">"left_right"</span>, <span class="st">"euthenasia"</span>, <span class="st">"income_diffs"</span>, <span class="st">"euro_unify"</span>,</span>
-<span id="cb2-38"><a href="#cb2-38" aria-hidden="true" tabindex="-1"></a>        <span class="st">"assimilation"</span>, <span class="st">"diversity"</span>, <span class="st">"easy_asylum"</span>,</span>
-<span id="cb2-39"><a href="#cb2-39" aria-hidden="true" tabindex="-1"></a>        <span class="st">"immig_benefits"</span>, <span class="st">"immigrants"</span></span>
-<span id="cb2-40"><a href="#cb2-40" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb2-41"><a href="#cb2-41" aria-hidden="true" tabindex="-1"></a>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
 <div class="cell">
 <div class="cell-output cell-output-stdout">
 <pre><code># A tibble: 8 × 4
@@ -416,13 +362,6 @@ Figure&nbsp;8.1: Standardized cross-lagged coefficients in the LISS panel, repli
 </div>
 <p><a href="#tbl-coefs" class="quarto-xref">Table&nbsp;<span>8.1</span></a> shows the coefficients from the model.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>results <span class="sc">|&gt;</span></span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(politics, direction, transition, est, se, pvalue) <span class="sc">|&gt;</span></span>
-<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(est, se), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)),</span>
-<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">pvalue =</span> <span class="fu">signif</span>(pvalue, <span class="dv">2</span>)</span>
-<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
-<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(politics, direction, transition) <span class="sc">|&gt;</span></span>
-<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div id="tbl-coefs" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl quarto-uncaptioned" id="tbl-coefs-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -797,13 +736,6 @@ Table&nbsp;8.1
 <h2 data-number="8.5" class="anchored" data-anchor-id="replication-with-crosslagr-package"><span class="header-section-number">8.5</span> Replication with <code>crossLagR</code> Package</h2>
 <p>The same analysis using <code>crossLagR::estimateCLPM()</code> — the package generates the lavaan syntax automatically and returns fully standardized estimates via <code>lavaan::standardizedSolution()</code>. We used <code>p</code> and <code>q</code> in the code to denote the personality and political variables, respectively, to avoid confusion with the <code>x</code> and <code>y</code> variable names in the lavaan syntax.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a>results_pkg <span class="sc">|&gt;</span></span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(politics, direction, transition, est.std, se, pvalue) <span class="sc">|&gt;</span></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(est.std, se), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)),</span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>        <span class="at">pvalue =</span> <span class="fu">signif</span>(pvalue, <span class="dv">2</span>)</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(politics, direction, transition) <span class="sc">|&gt;</span></span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div id="tbl-coefs-package" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl quarto-uncaptioned" id="tbl-coefs-package-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -1193,23 +1125,6 @@ Figure&nbsp;8.2: Standardized cross-lagged coefficients on the closed-personalit
 </div>
 </div>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a>sensitivity_results <span class="sc">|&gt;</span></span>
-<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="at">sig =</span> <span class="fu">case_when</span>(</span>
-<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                pvalue <span class="sc">&lt;</span> <span class="fl">0.001</span> <span class="sc">~</span> <span class="st">"***"</span>,</span>
-<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                pvalue <span class="sc">&lt;</span> <span class="fl">0.01</span>  <span class="sc">~</span> <span class="st">"**"</span>,</span>
-<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                pvalue <span class="sc">&lt;</span> <span class="fl">0.05</span>  <span class="sc">~</span> <span class="st">"*"</span>,</span>
-<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                pvalue <span class="sc">&lt;</span> <span class="fl">0.10</span>  <span class="sc">~</span> <span class="st">"†"</span>,</span>
-<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                <span class="cn">TRUE</span>           <span class="sc">~</span> <span class="st">""</span>),</span>
-<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a>           <span class="at">est.std =</span> <span class="fu">round</span>(est.std, <span class="dv">3</span>),</span>
-<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a>           <span class="at">cell    =</span> <span class="fu">paste0</span>(est.std, sig),</span>
-<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>           <span class="at">model   =</span> <span class="fu">factor</span>(model,</span>
-<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a>                            <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"CLPM"</span>, <span class="st">"RI-CLPM"</span>, <span class="st">"LCSM"</span>,</span>
-<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a>                                       <span class="st">"Bollen-Brand"</span>, <span class="st">"LCM-SR"</span>))) <span class="sc">|&gt;</span></span>
-<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(politics, direction, transition, model, cell) <span class="sc">|&gt;</span></span>
-<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> model, <span class="at">values_from =</span> cell,</span>
-<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>                <span class="at">names_expand =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(politics, direction, transition) <span class="sc">|&gt;</span></span>
-<span id="cb7-17"><a href="#cb7-17" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Standardized cross-lagged estimates by estimator. Significance: † p&lt;.10, * p&lt;.05, ** p&lt;.01, *** p&lt;.001."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div id="tbl-sensitivity" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-sensitivity-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
@@ -1455,94 +1370,94 @@ Table&nbsp;8.3: Standardized cross-lagged estimates by estimator. Significance: 
 <p>We fit a confirmatory five-factor model spanning the full Big Five — <strong>Extraversion</strong>, <strong>Agreeableness</strong>, <strong>Conscientiousness</strong>, <strong>Neuroticism</strong>, and <strong>Openness</strong> — each measured by its 10 IPIP-50 items. Factors are allowed to correlate freely. Each item is constrained to load only on its expected (a priori) factor; no cross-loadings are estimated.</p>
 <p>The model fits reasonably well. The CFI and TLI are on the low end, but the RMSEA is good.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>big5_items <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">Extraversion =</span> <span class="fu">c</span>(</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"life_party"</span>, <span class="st">"dont_talk"</span>, <span class="st">"comfortable"</span>, <span class="st">"stay_in_back"</span>,</span>
-<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"start_convos"</span>, <span class="st">"say_little"</span>, <span class="st">"talk_at_parties"</span>,</span>
-<span id="cb8-5"><a href="#cb8-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"avoid_attention"</span>, <span class="st">"like_attention"</span>, <span class="st">"quiet"</span></span>
-<span id="cb8-6"><a href="#cb8-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb8-7"><a href="#cb8-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Agreeableness =</span> <span class="fu">c</span>(</span>
-<span id="cb8-8"><a href="#cb8-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"no_concern"</span>, <span class="st">"interest_people"</span>, <span class="st">"insult_people"</span>,</span>
-<span id="cb8-9"><a href="#cb8-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"sympathize"</span>, <span class="st">"no_care_probs"</span>, <span class="st">"soft_heart"</span>,</span>
-<span id="cb8-10"><a href="#cb8-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"no_interest_probs"</span>, <span class="st">"time_for_others"</span>, <span class="st">"feel_emotions"</span>,</span>
-<span id="cb8-11"><a href="#cb8-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"others_at_ease"</span></span>
-<span id="cb8-12"><a href="#cb8-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb8-13"><a href="#cb8-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">Conscientiousness =</span> <span class="fu">c</span>(</span>
-<span id="cb8-14"><a href="#cb8-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"always_prepared"</span>, <span class="st">"leave_belongings"</span>, <span class="st">"pay_attention"</span>,</span>
-<span id="cb8-15"><a href="#cb8-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"make_mess"</span>, <span class="st">"chores_done"</span>, <span class="st">"forget_to_put"</span>, <span class="st">"like_order"</span>,</span>
-<span id="cb8-16"><a href="#cb8-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"shirk_duties"</span>, <span class="st">"follow_sched"</span>, <span class="st">"exacting"</span></span>
-<span id="cb8-17"><a href="#cb8-17" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb8-18"><a href="#cb8-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Neuroticism =</span> <span class="fu">c</span>(</span>
-<span id="cb8-19"><a href="#cb8-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"stress_easy"</span>, <span class="st">"relaxed"</span>, <span class="st">"worry"</span>, <span class="st">"easy_disturb"</span>,</span>
-<span id="cb8-20"><a href="#cb8-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"upset_easily"</span>, <span class="st">"seldom_blue"</span>, <span class="st">"often_blue"</span>, <span class="st">"change_mood"</span>,</span>
-<span id="cb8-21"><a href="#cb8-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mood_swings"</span>, <span class="st">"irritate_easy"</span></span>
-<span id="cb8-22"><a href="#cb8-22" aria-hidden="true" tabindex="-1"></a>    ),</span>
-<span id="cb8-23"><a href="#cb8-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">Openness =</span> <span class="fu">c</span>(</span>
-<span id="cb8-24"><a href="#cb8-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">"rich_vocab"</span>, <span class="st">"dffclt_undrstnd"</span>, <span class="st">"vivid_imagin"</span>, <span class="st">"no_interest"</span>,</span>
-<span id="cb8-25"><a href="#cb8-25" aria-hidden="true" tabindex="-1"></a>        <span class="st">"excellent_ideas"</span>, <span class="st">"poor_imagin"</span>, <span class="st">"quick_undrstnd"</span>,</span>
-<span id="cb8-26"><a href="#cb8-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dffclt_words"</span>, <span class="st">"reflecting"</span>, <span class="st">"full_of_ideas"</span></span>
-<span id="cb8-27"><a href="#cb8-27" aria-hidden="true" tabindex="-1"></a>    )</span>
-<span id="cb8-28"><a href="#cb8-28" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-29"><a href="#cb8-29" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-30"><a href="#cb8-30" aria-hidden="true" tabindex="-1"></a>cfa_syntax <span class="ot">&lt;-</span> <span class="st">"</span></span>
-<span id="cb8-31"><a href="#cb8-31" aria-hidden="true" tabindex="-1"></a><span class="st">Extraversion =~ life_party + dont_talk + comfortable + stay_in_back +</span></span>
-<span id="cb8-32"><a href="#cb8-32" aria-hidden="true" tabindex="-1"></a><span class="st">    start_convos + say_little + talk_at_parties + avoid_attention +</span></span>
-<span id="cb8-33"><a href="#cb8-33" aria-hidden="true" tabindex="-1"></a><span class="st">    like_attention + quiet</span></span>
-<span id="cb8-34"><a href="#cb8-34" aria-hidden="true" tabindex="-1"></a><span class="st">Agreeableness =~ no_concern + interest_people + insult_people + sympathize +</span></span>
-<span id="cb8-35"><a href="#cb8-35" aria-hidden="true" tabindex="-1"></a><span class="st">    no_care_probs + soft_heart + no_interest_probs + time_for_others +</span></span>
-<span id="cb8-36"><a href="#cb8-36" aria-hidden="true" tabindex="-1"></a><span class="st">    feel_emotions + others_at_ease</span></span>
-<span id="cb8-37"><a href="#cb8-37" aria-hidden="true" tabindex="-1"></a><span class="st">Conscientiousness =~ always_prepared + leave_belongings + pay_attention + make_mess +</span></span>
-<span id="cb8-38"><a href="#cb8-38" aria-hidden="true" tabindex="-1"></a><span class="st">    chores_done + forget_to_put + like_order + shirk_duties + follow_sched + exacting</span></span>
-<span id="cb8-39"><a href="#cb8-39" aria-hidden="true" tabindex="-1"></a><span class="st">Neuroticism =~ stress_easy + relaxed + worry + easy_disturb + upset_easily +</span></span>
-<span id="cb8-40"><a href="#cb8-40" aria-hidden="true" tabindex="-1"></a><span class="st">    seldom_blue + often_blue + change_mood + mood_swings + irritate_easy</span></span>
-<span id="cb8-41"><a href="#cb8-41" aria-hidden="true" tabindex="-1"></a><span class="st">Openness =~ rich_vocab + dffclt_undrstnd + vivid_imagin + no_interest +</span></span>
-<span id="cb8-42"><a href="#cb8-42" aria-hidden="true" tabindex="-1"></a><span class="st">    excellent_ideas + poor_imagin + quick_undrstnd + dffclt_words +</span></span>
-<span id="cb8-43"><a href="#cb8-43" aria-hidden="true" tabindex="-1"></a><span class="st">    reflecting + full_of_ideas</span></span>
-<span id="cb8-44"><a href="#cb8-44" aria-hidden="true" tabindex="-1"></a><span class="st">Closed =~ Openness + Conscientiousness</span></span>
-<span id="cb8-45"><a href="#cb8-45" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
-<span id="cb8-46"><a href="#cb8-46" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-47"><a href="#cb8-47" aria-hidden="true" tabindex="-1"></a>big5_names <span class="ot">&lt;-</span> <span class="fu">unlist</span>(big5_items, <span class="at">use.names =</span> <span class="cn">FALSE</span>)</span>
-<span id="cb8-48"><a href="#cb8-48" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-49"><a href="#cb8-49" aria-hidden="true" tabindex="-1"></a>cfa_dat <span class="ot">&lt;-</span> liss_long <span class="sc">|&gt;</span></span>
-<span id="cb8-50"><a href="#cb8-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">all_of</span>(big5_names))</span>
-<span id="cb8-51"><a href="#cb8-51" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-52"><a href="#cb8-52" aria-hidden="true" tabindex="-1"></a>cfa_fit <span class="ot">&lt;-</span> <span class="fu">cfa</span>(cfa_syntax,</span>
-<span id="cb8-53"><a href="#cb8-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> cfa_dat,</span>
-<span id="cb8-54"><a href="#cb8-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing =</span> <span class="st">"fiml"</span>,</span>
-<span id="cb8-55"><a href="#cb8-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">std.lv =</span> <span class="cn">TRUE</span></span>
-<span id="cb8-56"><a href="#cb8-56" aria-hidden="true" tabindex="-1"></a>)</span>
-<span id="cb8-57"><a href="#cb8-57" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-58"><a href="#cb8-58" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"n_obs ="</span>, <span class="fu">nrow</span>(cfa_dat),</span>
-<span id="cb8-59"><a href="#cb8-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"; n_complete ="</span>, <span class="fu">sum</span>(<span class="fu">complete.cases</span>(cfa_dat)),</span>
-<span id="cb8-60"><a href="#cb8-60" aria-hidden="true" tabindex="-1"></a>    <span class="st">"; n_miss ="</span>, <span class="fu">sum</span>(<span class="fu">is.na</span>(cfa_dat)),</span>
-<span id="cb8-61"><a href="#cb8-61" aria-hidden="true" tabindex="-1"></a>    <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
-<span id="cb8-62"><a href="#cb8-62" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-63"><a href="#cb8-63" aria-hidden="true" tabindex="-1"></a><span class="fu">fitMeasures</span>(cfa_fit, <span class="fu">c</span>(</span>
-<span id="cb8-64"><a href="#cb8-64" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cfi"</span>, <span class="st">"tli"</span>, <span class="st">"rmsea"</span>, <span class="st">"rmsea.ci.lower"</span>,</span>
-<span id="cb8-65"><a href="#cb8-65" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rmsea.ci.upper"</span>, <span class="st">"srmr"</span></span>
-<span id="cb8-66"><a href="#cb8-66" aria-hidden="true" tabindex="-1"></a>)) <span class="sc">|&gt;</span></span>
-<span id="cb8-67"><a href="#cb8-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="dv">3</span>) <span class="sc">|&gt;</span></span>
-<span id="cb8-68"><a href="#cb8-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.list</span>() <span class="sc">|&gt;</span></span>
-<span id="cb8-69"><a href="#cb8-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
-<span id="cb8-70"><a href="#cb8-70" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Hierarchical CFA (Big Five + higher-order Closed): global fit."</span>)</span>
-<span id="cb8-71"><a href="#cb8-71" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-72"><a href="#cb8-72" aria-hidden="true" tabindex="-1"></a><span class="fu">standardizedSolution</span>(cfa_fit) <span class="sc">|&gt;</span></span>
-<span id="cb8-73"><a href="#cb8-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"=~"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb8-74"><a href="#cb8-74" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="at">factor =</span> lhs, <span class="at">item =</span> rhs, est.std, se, pvalue) <span class="sc">|&gt;</span></span>
-<span id="cb8-75"><a href="#cb8-75" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(est.std, se), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)),</span>
-<span id="cb8-76"><a href="#cb8-76" aria-hidden="true" tabindex="-1"></a>        <span class="at">pvalue =</span> <span class="fu">signif</span>(pvalue, <span class="dv">2</span>)</span>
-<span id="cb8-77"><a href="#cb8-77" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
-<span id="cb8-78"><a href="#cb8-78" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Standardized loadings (each item on its expected factor)."</span>)</span>
-<span id="cb8-79"><a href="#cb8-79" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb8-80"><a href="#cb8-80" aria-hidden="true" tabindex="-1"></a><span class="fu">standardizedSolution</span>(cfa_fit) <span class="sc">|&gt;</span></span>
-<span id="cb8-81"><a href="#cb8-81" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"~~"</span>, lhs <span class="sc">!=</span> rhs,</span>
-<span id="cb8-82"><a href="#cb8-82" aria-hidden="true" tabindex="-1"></a>           lhs <span class="sc">%in%</span> <span class="fu">c</span>(<span class="fu">names</span>(big5_items), <span class="st">"Closed"</span>),</span>
-<span id="cb8-83"><a href="#cb8-83" aria-hidden="true" tabindex="-1"></a>           rhs <span class="sc">%in%</span> <span class="fu">c</span>(<span class="fu">names</span>(big5_items), <span class="st">"Closed"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb8-84"><a href="#cb8-84" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="at">factor1 =</span> lhs, <span class="at">factor2 =</span> rhs, est.std, se, pvalue) <span class="sc">|&gt;</span></span>
-<span id="cb8-85"><a href="#cb8-85" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(est.std, se), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)),</span>
-<span id="cb8-86"><a href="#cb8-86" aria-hidden="true" tabindex="-1"></a>        <span class="at">pvalue =</span> <span class="fu">signif</span>(pvalue, <span class="dv">2</span>)</span>
-<span id="cb8-87"><a href="#cb8-87" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
-<span id="cb8-88"><a href="#cb8-88" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Standardized factor correlations/covariances among latent factors."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>big5_items <span class="ot">&lt;-</span> <span class="fu">list</span>(</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>    <span class="at">Extraversion =</span> <span class="fu">c</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>        <span class="st">"life_party"</span>, <span class="st">"dont_talk"</span>, <span class="st">"comfortable"</span>, <span class="st">"stay_in_back"</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>        <span class="st">"start_convos"</span>, <span class="st">"say_little"</span>, <span class="st">"talk_at_parties"</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>        <span class="st">"avoid_attention"</span>, <span class="st">"like_attention"</span>, <span class="st">"quiet"</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>    <span class="at">Agreeableness =</span> <span class="fu">c</span>(</span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>        <span class="st">"no_concern"</span>, <span class="st">"interest_people"</span>, <span class="st">"insult_people"</span>,</span>
+<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>        <span class="st">"sympathize"</span>, <span class="st">"no_care_probs"</span>, <span class="st">"soft_heart"</span>,</span>
+<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a>        <span class="st">"no_interest_probs"</span>, <span class="st">"time_for_others"</span>, <span class="st">"feel_emotions"</span>,</span>
+<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a>        <span class="st">"others_at_ease"</span></span>
+<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a>    <span class="at">Conscientiousness =</span> <span class="fu">c</span>(</span>
+<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a>        <span class="st">"always_prepared"</span>, <span class="st">"leave_belongings"</span>, <span class="st">"pay_attention"</span>,</span>
+<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a>        <span class="st">"make_mess"</span>, <span class="st">"chores_done"</span>, <span class="st">"forget_to_put"</span>, <span class="st">"like_order"</span>,</span>
+<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a>        <span class="st">"shirk_duties"</span>, <span class="st">"follow_sched"</span>, <span class="st">"exacting"</span></span>
+<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a>    <span class="at">Neuroticism =</span> <span class="fu">c</span>(</span>
+<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a>        <span class="st">"stress_easy"</span>, <span class="st">"relaxed"</span>, <span class="st">"worry"</span>, <span class="st">"easy_disturb"</span>,</span>
+<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a>        <span class="st">"upset_easily"</span>, <span class="st">"seldom_blue"</span>, <span class="st">"often_blue"</span>, <span class="st">"change_mood"</span>,</span>
+<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a>        <span class="st">"mood_swings"</span>, <span class="st">"irritate_easy"</span></span>
+<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a>    ),</span>
+<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a>    <span class="at">Openness =</span> <span class="fu">c</span>(</span>
+<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a>        <span class="st">"rich_vocab"</span>, <span class="st">"dffclt_undrstnd"</span>, <span class="st">"vivid_imagin"</span>, <span class="st">"no_interest"</span>,</span>
+<span id="cb3-25"><a href="#cb3-25" aria-hidden="true" tabindex="-1"></a>        <span class="st">"excellent_ideas"</span>, <span class="st">"poor_imagin"</span>, <span class="st">"quick_undrstnd"</span>,</span>
+<span id="cb3-26"><a href="#cb3-26" aria-hidden="true" tabindex="-1"></a>        <span class="st">"dffclt_words"</span>, <span class="st">"reflecting"</span>, <span class="st">"full_of_ideas"</span></span>
+<span id="cb3-27"><a href="#cb3-27" aria-hidden="true" tabindex="-1"></a>    )</span>
+<span id="cb3-28"><a href="#cb3-28" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-29"><a href="#cb3-29" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-30"><a href="#cb3-30" aria-hidden="true" tabindex="-1"></a>cfa_syntax <span class="ot">&lt;-</span> <span class="st">"</span></span>
+<span id="cb3-31"><a href="#cb3-31" aria-hidden="true" tabindex="-1"></a><span class="st">Extraversion =~ life_party + dont_talk + comfortable + stay_in_back +</span></span>
+<span id="cb3-32"><a href="#cb3-32" aria-hidden="true" tabindex="-1"></a><span class="st">    start_convos + say_little + talk_at_parties + avoid_attention +</span></span>
+<span id="cb3-33"><a href="#cb3-33" aria-hidden="true" tabindex="-1"></a><span class="st">    like_attention + quiet</span></span>
+<span id="cb3-34"><a href="#cb3-34" aria-hidden="true" tabindex="-1"></a><span class="st">Agreeableness =~ no_concern + interest_people + insult_people + sympathize +</span></span>
+<span id="cb3-35"><a href="#cb3-35" aria-hidden="true" tabindex="-1"></a><span class="st">    no_care_probs + soft_heart + no_interest_probs + time_for_others +</span></span>
+<span id="cb3-36"><a href="#cb3-36" aria-hidden="true" tabindex="-1"></a><span class="st">    feel_emotions + others_at_ease</span></span>
+<span id="cb3-37"><a href="#cb3-37" aria-hidden="true" tabindex="-1"></a><span class="st">Conscientiousness =~ always_prepared + leave_belongings + pay_attention + make_mess +</span></span>
+<span id="cb3-38"><a href="#cb3-38" aria-hidden="true" tabindex="-1"></a><span class="st">    chores_done + forget_to_put + like_order + shirk_duties + follow_sched + exacting</span></span>
+<span id="cb3-39"><a href="#cb3-39" aria-hidden="true" tabindex="-1"></a><span class="st">Neuroticism =~ stress_easy + relaxed + worry + easy_disturb + upset_easily +</span></span>
+<span id="cb3-40"><a href="#cb3-40" aria-hidden="true" tabindex="-1"></a><span class="st">    seldom_blue + often_blue + change_mood + mood_swings + irritate_easy</span></span>
+<span id="cb3-41"><a href="#cb3-41" aria-hidden="true" tabindex="-1"></a><span class="st">Openness =~ rich_vocab + dffclt_undrstnd + vivid_imagin + no_interest +</span></span>
+<span id="cb3-42"><a href="#cb3-42" aria-hidden="true" tabindex="-1"></a><span class="st">    excellent_ideas + poor_imagin + quick_undrstnd + dffclt_words +</span></span>
+<span id="cb3-43"><a href="#cb3-43" aria-hidden="true" tabindex="-1"></a><span class="st">    reflecting + full_of_ideas</span></span>
+<span id="cb3-44"><a href="#cb3-44" aria-hidden="true" tabindex="-1"></a><span class="st">Closed =~ Openness + Conscientiousness</span></span>
+<span id="cb3-45"><a href="#cb3-45" aria-hidden="true" tabindex="-1"></a><span class="st">"</span></span>
+<span id="cb3-46"><a href="#cb3-46" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-47"><a href="#cb3-47" aria-hidden="true" tabindex="-1"></a>big5_names <span class="ot">&lt;-</span> <span class="fu">unlist</span>(big5_items, <span class="at">use.names =</span> <span class="cn">FALSE</span>)</span>
+<span id="cb3-48"><a href="#cb3-48" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-49"><a href="#cb3-49" aria-hidden="true" tabindex="-1"></a>cfa_dat <span class="ot">&lt;-</span> liss_long <span class="sc">|&gt;</span></span>
+<span id="cb3-50"><a href="#cb3-50" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="fu">all_of</span>(big5_names))</span>
+<span id="cb3-51"><a href="#cb3-51" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-52"><a href="#cb3-52" aria-hidden="true" tabindex="-1"></a>cfa_fit <span class="ot">&lt;-</span> <span class="fu">cfa</span>(cfa_syntax,</span>
+<span id="cb3-53"><a href="#cb3-53" aria-hidden="true" tabindex="-1"></a>    <span class="at">data =</span> cfa_dat,</span>
+<span id="cb3-54"><a href="#cb3-54" aria-hidden="true" tabindex="-1"></a>    <span class="at">missing =</span> <span class="st">"fiml"</span>,</span>
+<span id="cb3-55"><a href="#cb3-55" aria-hidden="true" tabindex="-1"></a>    <span class="at">std.lv =</span> <span class="cn">TRUE</span></span>
+<span id="cb3-56"><a href="#cb3-56" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb3-57"><a href="#cb3-57" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-58"><a href="#cb3-58" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"n_obs ="</span>, <span class="fu">nrow</span>(cfa_dat),</span>
+<span id="cb3-59"><a href="#cb3-59" aria-hidden="true" tabindex="-1"></a>    <span class="st">"; n_complete ="</span>, <span class="fu">sum</span>(<span class="fu">complete.cases</span>(cfa_dat)),</span>
+<span id="cb3-60"><a href="#cb3-60" aria-hidden="true" tabindex="-1"></a>    <span class="st">"; n_miss ="</span>, <span class="fu">sum</span>(<span class="fu">is.na</span>(cfa_dat)),</span>
+<span id="cb3-61"><a href="#cb3-61" aria-hidden="true" tabindex="-1"></a>    <span class="st">"</span><span class="sc">\n</span><span class="st">"</span>)</span>
+<span id="cb3-62"><a href="#cb3-62" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-63"><a href="#cb3-63" aria-hidden="true" tabindex="-1"></a><span class="fu">fitMeasures</span>(cfa_fit, <span class="fu">c</span>(</span>
+<span id="cb3-64"><a href="#cb3-64" aria-hidden="true" tabindex="-1"></a>    <span class="st">"cfi"</span>, <span class="st">"tli"</span>, <span class="st">"rmsea"</span>, <span class="st">"rmsea.ci.lower"</span>,</span>
+<span id="cb3-65"><a href="#cb3-65" aria-hidden="true" tabindex="-1"></a>    <span class="st">"rmsea.ci.upper"</span>, <span class="st">"srmr"</span></span>
+<span id="cb3-66"><a href="#cb3-66" aria-hidden="true" tabindex="-1"></a>)) <span class="sc">|&gt;</span></span>
+<span id="cb3-67"><a href="#cb3-67" aria-hidden="true" tabindex="-1"></a>    <span class="fu">round</span>(<span class="dv">3</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-68"><a href="#cb3-68" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as.list</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-69"><a href="#cb3-69" aria-hidden="true" tabindex="-1"></a>    <span class="fu">as_tibble</span>() <span class="sc">|&gt;</span></span>
+<span id="cb3-70"><a href="#cb3-70" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Hierarchical CFA (Big Five + higher-order Closed): global fit."</span>)</span>
+<span id="cb3-71"><a href="#cb3-71" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-72"><a href="#cb3-72" aria-hidden="true" tabindex="-1"></a><span class="fu">standardizedSolution</span>(cfa_fit) <span class="sc">|&gt;</span></span>
+<span id="cb3-73"><a href="#cb3-73" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"=~"</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-74"><a href="#cb3-74" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="at">factor =</span> lhs, <span class="at">item =</span> rhs, est.std, se, pvalue) <span class="sc">|&gt;</span></span>
+<span id="cb3-75"><a href="#cb3-75" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(est.std, se), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)),</span>
+<span id="cb3-76"><a href="#cb3-76" aria-hidden="true" tabindex="-1"></a>        <span class="at">pvalue =</span> <span class="fu">signif</span>(pvalue, <span class="dv">2</span>)</span>
+<span id="cb3-77"><a href="#cb3-77" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb3-78"><a href="#cb3-78" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Standardized loadings (each item on its expected factor)."</span>)</span>
+<span id="cb3-79"><a href="#cb3-79" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb3-80"><a href="#cb3-80" aria-hidden="true" tabindex="-1"></a><span class="fu">standardizedSolution</span>(cfa_fit) <span class="sc">|&gt;</span></span>
+<span id="cb3-81"><a href="#cb3-81" aria-hidden="true" tabindex="-1"></a>    <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"~~"</span>, lhs <span class="sc">!=</span> rhs,</span>
+<span id="cb3-82"><a href="#cb3-82" aria-hidden="true" tabindex="-1"></a>           lhs <span class="sc">%in%</span> <span class="fu">c</span>(<span class="fu">names</span>(big5_items), <span class="st">"Closed"</span>),</span>
+<span id="cb3-83"><a href="#cb3-83" aria-hidden="true" tabindex="-1"></a>           rhs <span class="sc">%in%</span> <span class="fu">c</span>(<span class="fu">names</span>(big5_items), <span class="st">"Closed"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb3-84"><a href="#cb3-84" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(<span class="at">factor1 =</span> lhs, <span class="at">factor2 =</span> rhs, est.std, se, pvalue) <span class="sc">|&gt;</span></span>
+<span id="cb3-85"><a href="#cb3-85" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">c</span>(est.std, se), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)),</span>
+<span id="cb3-86"><a href="#cb3-86" aria-hidden="true" tabindex="-1"></a>        <span class="at">pvalue =</span> <span class="fu">signif</span>(pvalue, <span class="dv">2</span>)</span>
+<span id="cb3-87"><a href="#cb3-87" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
+<span id="cb3-88"><a href="#cb3-88" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>(<span class="at">caption =</span> <span class="st">"Standardized factor correlations/covariances among latent factors."</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <section id="estimates-for-each-big-five-personality-trait" class="level3" data-number="8.7.1">
 <h3 data-number="8.7.1" class="anchored" data-anchor-id="estimates-for-each-big-five-personality-trait"><span class="header-section-number">8.7.1</span> Estimates for Each Big Five Personality Trait</h3>
@@ -1591,193 +1506,6 @@ Table&nbsp;8.3: Standardized cross-lagged estimates by estimator. Significance: 
 <section id="all-estimators-for-each-trait-political-item" class="level4" data-number="8.7.1.2">
 <h4 data-number="8.7.1.2" class="anchored" data-anchor-id="all-estimators-for-each-trait-political-item"><span class="header-section-number">8.7.1.2</span> All Estimators for Each Trait × Political Item</h4>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a><span class="do">## Per-trait analogue of build_wide(): swap closed-personality composite</span></span>
-<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a><span class="do">## for whichever Big Five trait composite we're testing.</span></span>
-<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>build_wide_trait <span class="ot">&lt;-</span> <span class="cf">function</span>(trait_var, pol_item) {</span>
-<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>    dat <span class="sc">|&gt;</span></span>
-<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>        <span class="fu">filter</span>(year <span class="sc">%in%</span> years_use) <span class="sc">|&gt;</span></span>
-<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>        <span class="fu">mutate</span>(<span class="at">wave =</span> <span class="fu">match</span>(year, years_use)) <span class="sc">|&gt;</span></span>
-<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>        <span class="fu">select</span>(case_id, wave,</span>
-<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>               <span class="at">x =</span> <span class="fu">all_of</span>(trait_var),</span>
-<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>               <span class="at">y =</span> <span class="fu">all_of</span>(pol_item)) <span class="sc">|&gt;</span></span>
-<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>        <span class="fu">pivot_wider</span>(</span>
-<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a>            <span class="at">id_cols    =</span> case_id,</span>
-<span id="cb9-12"><a href="#cb9-12" aria-hidden="true" tabindex="-1"></a>            <span class="at">names_from =</span> wave,</span>
-<span id="cb9-13"><a href="#cb9-13" aria-hidden="true" tabindex="-1"></a>            <span class="at">values_from =</span> <span class="fu">c</span>(x, y),</span>
-<span id="cb9-14"><a href="#cb9-14" aria-hidden="true" tabindex="-1"></a>            <span class="at">names_glue =</span> <span class="st">"{.value}{wave}"</span></span>
-<span id="cb9-15"><a href="#cb9-15" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">|&gt;</span></span>
-<span id="cb9-16"><a href="#cb9-16" aria-hidden="true" tabindex="-1"></a>        <span class="fu">select</span>(case_id, <span class="fu">all_of</span>(<span class="fu">c</span>(</span>
-<span id="cb9-17"><a href="#cb9-17" aria-hidden="true" tabindex="-1"></a>            <span class="fu">paste0</span>(<span class="st">"x"</span>, <span class="dv">1</span><span class="sc">:</span>n_waves),</span>
-<span id="cb9-18"><a href="#cb9-18" aria-hidden="true" tabindex="-1"></a>            <span class="fu">paste0</span>(<span class="st">"y"</span>, <span class="dv">1</span><span class="sc">:</span>n_waves)</span>
-<span id="cb9-19"><a href="#cb9-19" aria-hidden="true" tabindex="-1"></a>        )))</span>
-<span id="cb9-20"><a href="#cb9-20" aria-hidden="true" tabindex="-1"></a>}</span>
-<span id="cb9-21"><a href="#cb9-21" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-22"><a href="#cb9-22" aria-hidden="true" tabindex="-1"></a><span class="do">## Run CLPM, RI-CLPM, LChange, Bollen-Brand, and LCM-SR for each trait × politics combination</span></span>
-<span id="cb9-23"><a href="#cb9-23" aria-hidden="true" tabindex="-1"></a>trait_results <span class="ot">&lt;-</span> <span class="fu">map_dfr</span>(<span class="fu">names</span>(trait_items), <span class="cf">function</span>(tr) {</span>
-<span id="cb9-24"><a href="#cb9-24" aria-hidden="true" tabindex="-1"></a>    trait_var <span class="ot">&lt;-</span> <span class="fu">tolower</span>(tr)</span>
-<span id="cb9-25"><a href="#cb9-25" aria-hidden="true" tabindex="-1"></a>    <span class="fu">map_dfr</span>(politics, <span class="cf">function</span>(pol_item) {</span>
-<span id="cb9-26"><a href="#cb9-26" aria-hidden="true" tabindex="-1"></a>        wide <span class="ot">&lt;-</span> <span class="fu">build_wide_trait</span>(trait_var, pol_item)</span>
-<span id="cb9-27"><a href="#cb9-27" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-28"><a href="#cb9-28" aria-hidden="true" tabindex="-1"></a>        <span class="do">## Helper: extract cross-lagged rows from standardizedSolution</span></span>
-<span id="cb9-29"><a href="#cb9-29" aria-hidden="true" tabindex="-1"></a>        extract_cl <span class="ot">&lt;-</span> <span class="cf">function</span>(fit, mod) {</span>
-<span id="cb9-30"><a href="#cb9-30" aria-hidden="true" tabindex="-1"></a>            <span class="cf">if</span> (<span class="fu">is.null</span>(fit) <span class="sc">||</span> <span class="sc">!</span><span class="fu">lavInspect</span>(fit, <span class="st">"converged"</span>)) {</span>
-<span id="cb9-31"><a href="#cb9-31" aria-hidden="true" tabindex="-1"></a>                <span class="fu">return</span>(<span class="fu">tibble</span>())</span>
-<span id="cb9-32"><a href="#cb9-32" aria-hidden="true" tabindex="-1"></a>            }</span>
-<span id="cb9-33"><a href="#cb9-33" aria-hidden="true" tabindex="-1"></a>            <span class="fu">standardizedSolution</span>(fit) <span class="sc">|&gt;</span></span>
-<span id="cb9-34"><a href="#cb9-34" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"~"</span>, <span class="fu">grepl</span>(<span class="st">"^cl_"</span>, label)) <span class="sc">|&gt;</span></span>
-<span id="cb9-35"><a href="#cb9-35" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">model =</span> mod)</span>
-<span id="cb9-36"><a href="#cb9-36" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb9-37"><a href="#cb9-37" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-38"><a href="#cb9-38" aria-hidden="true" tabindex="-1"></a>        <span class="do">## ---- CLPM ----</span></span>
-<span id="cb9-39"><a href="#cb9-39" aria-hidden="true" tabindex="-1"></a>        fit_clpm <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
-<span id="cb9-40"><a href="#cb9-40" aria-hidden="true" tabindex="-1"></a>            <span class="fu">suppressWarnings</span>(<span class="fu">lavaan</span>(</span>
-<span id="cb9-41"><a href="#cb9-41" aria-hidden="true" tabindex="-1"></a>                <span class="fu">estimateCLPM</span>(</span>
-<span id="cb9-42"><a href="#cb9-42" aria-hidden="true" tabindex="-1"></a>                    <span class="at">waves =</span> n_waves,</span>
-<span id="cb9-43"><a href="#cb9-43" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_beta =</span> <span class="cn">FALSE</span>, <span class="at">constrain_omega =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb9-44"><a href="#cb9-44" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_residual_variances =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb9-45"><a href="#cb9-45" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_residual_covariances =</span> <span class="cn">FALSE</span></span>
-<span id="cb9-46"><a href="#cb9-46" aria-hidden="true" tabindex="-1"></a>                ),</span>
-<span id="cb9-47"><a href="#cb9-47" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> wide, <span class="at">missing =</span> <span class="st">"fiml"</span>,</span>
-<span id="cb9-48"><a href="#cb9-48" aria-hidden="true" tabindex="-1"></a>                <span class="at">meanstructure =</span> <span class="cn">TRUE</span>, <span class="at">int.ov.free =</span> <span class="cn">TRUE</span></span>
-<span id="cb9-49"><a href="#cb9-49" aria-hidden="true" tabindex="-1"></a>            )),</span>
-<span id="cb9-50"><a href="#cb9-50" aria-hidden="true" tabindex="-1"></a>            <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span></span>
-<span id="cb9-51"><a href="#cb9-51" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb9-52"><a href="#cb9-52" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-53"><a href="#cb9-53" aria-hidden="true" tabindex="-1"></a>        <span class="do">## ---- RI-CLPM ----</span></span>
-<span id="cb9-54"><a href="#cb9-54" aria-hidden="true" tabindex="-1"></a>        fit_ri <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
-<span id="cb9-55"><a href="#cb9-55" aria-hidden="true" tabindex="-1"></a>            <span class="fu">suppressWarnings</span>(<span class="fu">lavaan</span>(</span>
-<span id="cb9-56"><a href="#cb9-56" aria-hidden="true" tabindex="-1"></a>                <span class="fu">estimateRICLPM</span>(</span>
-<span id="cb9-57"><a href="#cb9-57" aria-hidden="true" tabindex="-1"></a>                    <span class="at">waves =</span> n_waves,</span>
-<span id="cb9-58"><a href="#cb9-58" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_beta =</span> <span class="cn">FALSE</span>, <span class="at">constrain_omega =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb9-59"><a href="#cb9-59" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_residual_variances =</span> <span class="cn">FALSE</span>,</span>
-<span id="cb9-60"><a href="#cb9-60" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_residual_covariances =</span> <span class="cn">FALSE</span></span>
-<span id="cb9-61"><a href="#cb9-61" aria-hidden="true" tabindex="-1"></a>                ),</span>
-<span id="cb9-62"><a href="#cb9-62" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> wide, <span class="at">missing =</span> <span class="st">"fiml"</span>,</span>
-<span id="cb9-63"><a href="#cb9-63" aria-hidden="true" tabindex="-1"></a>                <span class="at">meanstructure =</span> <span class="cn">TRUE</span>, <span class="at">int.ov.free =</span> <span class="cn">TRUE</span></span>
-<span id="cb9-64"><a href="#cb9-64" aria-hidden="true" tabindex="-1"></a>            )),</span>
-<span id="cb9-65"><a href="#cb9-65" aria-hidden="true" tabindex="-1"></a>            <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span></span>
-<span id="cb9-66"><a href="#cb9-66" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb9-67"><a href="#cb9-67" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-68"><a href="#cb9-68" aria-hidden="true" tabindex="-1"></a>        <span class="do">## ---- Latent Change Score ----</span></span>
-<span id="cb9-69"><a href="#cb9-69" aria-hidden="true" tabindex="-1"></a>        fit_lcs <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
-<span id="cb9-70"><a href="#cb9-70" aria-hidden="true" tabindex="-1"></a>            <span class="fu">suppressWarnings</span>(<span class="fu">lavaan</span>(</span>
-<span id="cb9-71"><a href="#cb9-71" aria-hidden="true" tabindex="-1"></a>                <span class="fu">estimateLChange</span>(</span>
-<span id="cb9-72"><a href="#cb9-72" aria-hidden="true" tabindex="-1"></a>                    <span class="at">waves =</span> n_waves,</span>
-<span id="cb9-73"><a href="#cb9-73" aria-hidden="true" tabindex="-1"></a>                    <span class="at">variable_type =</span> <span class="st">"bivariate"</span>,</span>
-<span id="cb9-74"><a href="#cb9-74" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_beta =</span> <span class="cn">TRUE</span>, <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb9-75"><a href="#cb9-75" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_indicator_variances =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb9-76"><a href="#cb9-76" aria-hidden="true" tabindex="-1"></a>                    <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span></span>
-<span id="cb9-77"><a href="#cb9-77" aria-hidden="true" tabindex="-1"></a>                ),</span>
-<span id="cb9-78"><a href="#cb9-78" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> wide, <span class="at">missing =</span> <span class="st">"fiml"</span>,</span>
-<span id="cb9-79"><a href="#cb9-79" aria-hidden="true" tabindex="-1"></a>                <span class="at">meanstructure =</span> <span class="cn">TRUE</span>, <span class="at">int.ov.free =</span> <span class="cn">TRUE</span></span>
-<span id="cb9-80"><a href="#cb9-80" aria-hidden="true" tabindex="-1"></a>            )),</span>
-<span id="cb9-81"><a href="#cb9-81" aria-hidden="true" tabindex="-1"></a>            <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span></span>
-<span id="cb9-82"><a href="#cb9-82" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb9-83"><a href="#cb9-83" aria-hidden="true" tabindex="-1"></a>        lcs_out <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(fit_lcs) <span class="sc">&amp;&amp;</span> <span class="fu">lavInspect</span>(fit_lcs, <span class="st">"converged"</span>)) {</span>
-<span id="cb9-84"><a href="#cb9-84" aria-hidden="true" tabindex="-1"></a>            <span class="fu">standardizedSolution</span>(fit_lcs) <span class="sc">|&gt;</span></span>
-<span id="cb9-85"><a href="#cb9-85" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"~"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-86"><a href="#cb9-86" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(</span>
-<span id="cb9-87"><a href="#cb9-87" aria-hidden="true" tabindex="-1"></a>                    (<span class="fu">grepl</span>(<span class="st">"^ld_x"</span>, lhs) <span class="sc">&amp;</span> <span class="fu">grepl</span>(<span class="st">"^cf_y"</span>, rhs)) <span class="sc">|</span></span>
-<span id="cb9-88"><a href="#cb9-88" aria-hidden="true" tabindex="-1"></a>                        (<span class="fu">grepl</span>(<span class="st">"^ld_y"</span>, lhs) <span class="sc">&amp;</span> <span class="fu">grepl</span>(<span class="st">"^cf_x"</span>, rhs))</span>
-<span id="cb9-89"><a href="#cb9-89" aria-hidden="true" tabindex="-1"></a>                ) <span class="sc">|&gt;</span></span>
-<span id="cb9-90"><a href="#cb9-90" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(</span>
-<span id="cb9-91"><a href="#cb9-91" aria-hidden="true" tabindex="-1"></a>                    <span class="at">model =</span> <span class="st">"LChange"</span>,</span>
-<span id="cb9-92"><a href="#cb9-92" aria-hidden="true" tabindex="-1"></a>                    <span class="at">label =</span> <span class="fu">if_else</span>(<span class="fu">grepl</span>(<span class="st">"^ld_y"</span>, lhs), <span class="st">"cl_xy"</span>, <span class="st">"cl_yx"</span>)</span>
-<span id="cb9-93"><a href="#cb9-93" aria-hidden="true" tabindex="-1"></a>                ) <span class="sc">|&gt;</span></span>
-<span id="cb9-94"><a href="#cb9-94" aria-hidden="true" tabindex="-1"></a>                <span class="fu">distinct</span>(label, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb9-95"><a href="#cb9-95" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
-<span id="cb9-96"><a href="#cb9-96" aria-hidden="true" tabindex="-1"></a>            <span class="fu">tibble</span>()</span>
-<span id="cb9-97"><a href="#cb9-97" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb9-98"><a href="#cb9-98" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-99"><a href="#cb9-99" aria-hidden="true" tabindex="-1"></a>        <span class="do">## ---- Bollen-Brand ----</span></span>
-<span id="cb9-100"><a href="#cb9-100" aria-hidden="true" tabindex="-1"></a>        fit_bb <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
-<span id="cb9-101"><a href="#cb9-101" aria-hidden="true" tabindex="-1"></a>            <span class="fu">suppressWarnings</span>(<span class="fu">lavaan</span>(</span>
-<span id="cb9-102"><a href="#cb9-102" aria-hidden="true" tabindex="-1"></a>                <span class="fu">estimateBollen_and_Brand</span>(</span>
-<span id="cb9-103"><a href="#cb9-103" aria-hidden="true" tabindex="-1"></a>                    <span class="at">waves =</span> n_waves,</span>
-<span id="cb9-104"><a href="#cb9-104" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_coefficients =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb9-105"><a href="#cb9-105" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_residual_variances =</span> <span class="cn">FALSE</span></span>
-<span id="cb9-106"><a href="#cb9-106" aria-hidden="true" tabindex="-1"></a>                ),</span>
-<span id="cb9-107"><a href="#cb9-107" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> wide, <span class="at">missing =</span> <span class="st">"fiml"</span>,</span>
-<span id="cb9-108"><a href="#cb9-108" aria-hidden="true" tabindex="-1"></a>                <span class="at">meanstructure =</span> <span class="cn">TRUE</span>, <span class="at">int.ov.free =</span> <span class="cn">TRUE</span></span>
-<span id="cb9-109"><a href="#cb9-109" aria-hidden="true" tabindex="-1"></a>            )),</span>
-<span id="cb9-110"><a href="#cb9-110" aria-hidden="true" tabindex="-1"></a>            <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span></span>
-<span id="cb9-111"><a href="#cb9-111" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb9-112"><a href="#cb9-112" aria-hidden="true" tabindex="-1"></a>        bb_out <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(fit_bb) <span class="sc">&amp;&amp;</span> <span class="fu">lavInspect</span>(fit_bb, <span class="st">"converged"</span>)) {</span>
-<span id="cb9-113"><a href="#cb9-113" aria-hidden="true" tabindex="-1"></a>            <span class="fu">standardizedSolution</span>(fit_bb) <span class="sc">|&gt;</span></span>
-<span id="cb9-114"><a href="#cb9-114" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"~"</span>, label <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"cl_xy"</span>, <span class="st">"cl_yx"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb9-115"><a href="#cb9-115" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"Bollen-Brand"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-116"><a href="#cb9-116" aria-hidden="true" tabindex="-1"></a>                <span class="fu">distinct</span>(label, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb9-117"><a href="#cb9-117" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
-<span id="cb9-118"><a href="#cb9-118" aria-hidden="true" tabindex="-1"></a>            <span class="fu">tibble</span>()</span>
-<span id="cb9-119"><a href="#cb9-119" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb9-120"><a href="#cb9-120" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-121"><a href="#cb9-121" aria-hidden="true" tabindex="-1"></a>        <span class="do">## ---- LCM-SR ----</span></span>
-<span id="cb9-122"><a href="#cb9-122" aria-hidden="true" tabindex="-1"></a>        fit_lcmsr <span class="ot">&lt;-</span> <span class="fu">tryCatch</span>(</span>
-<span id="cb9-123"><a href="#cb9-123" aria-hidden="true" tabindex="-1"></a>            <span class="fu">suppressWarnings</span>(<span class="fu">lavaan</span>(</span>
-<span id="cb9-124"><a href="#cb9-124" aria-hidden="true" tabindex="-1"></a>                <span class="fu">estimateLCMSR</span>(</span>
-<span id="cb9-125"><a href="#cb9-125" aria-hidden="true" tabindex="-1"></a>                    <span class="at">waves =</span> n_waves,</span>
-<span id="cb9-126"><a href="#cb9-126" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_beta =</span> <span class="cn">TRUE</span>, <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb9-127"><a href="#cb9-127" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_residual_variances =</span> <span class="cn">TRUE</span>,</span>
-<span id="cb9-128"><a href="#cb9-128" aria-hidden="true" tabindex="-1"></a>                    <span class="at">constrain_residual_covariances =</span> <span class="cn">TRUE</span></span>
-<span id="cb9-129"><a href="#cb9-129" aria-hidden="true" tabindex="-1"></a>                ),</span>
-<span id="cb9-130"><a href="#cb9-130" aria-hidden="true" tabindex="-1"></a>                <span class="at">data =</span> wide, <span class="at">missing =</span> <span class="st">"fiml"</span>,</span>
-<span id="cb9-131"><a href="#cb9-131" aria-hidden="true" tabindex="-1"></a>                <span class="at">meanstructure =</span> <span class="cn">TRUE</span>, <span class="at">int.ov.free =</span> <span class="cn">TRUE</span></span>
-<span id="cb9-132"><a href="#cb9-132" aria-hidden="true" tabindex="-1"></a>            )),</span>
-<span id="cb9-133"><a href="#cb9-133" aria-hidden="true" tabindex="-1"></a>            <span class="at">error =</span> <span class="cf">function</span>(e) <span class="cn">NULL</span></span>
-<span id="cb9-134"><a href="#cb9-134" aria-hidden="true" tabindex="-1"></a>        )</span>
-<span id="cb9-135"><a href="#cb9-135" aria-hidden="true" tabindex="-1"></a>        lcmsr_out <span class="ot">&lt;-</span> <span class="cf">if</span> (<span class="sc">!</span><span class="fu">is.null</span>(fit_lcmsr) <span class="sc">&amp;&amp;</span> <span class="fu">lavInspect</span>(fit_lcmsr, <span class="st">"converged"</span>)) {</span>
-<span id="cb9-136"><a href="#cb9-136" aria-hidden="true" tabindex="-1"></a>            <span class="fu">standardizedSolution</span>(fit_lcmsr) <span class="sc">|&gt;</span></span>
-<span id="cb9-137"><a href="#cb9-137" aria-hidden="true" tabindex="-1"></a>                <span class="fu">filter</span>(op <span class="sc">==</span> <span class="st">"~"</span>, label <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"cl_xy"</span>, <span class="st">"cl_yx"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb9-138"><a href="#cb9-138" aria-hidden="true" tabindex="-1"></a>                <span class="fu">mutate</span>(<span class="at">model =</span> <span class="st">"LCM-SR"</span>) <span class="sc">|&gt;</span></span>
-<span id="cb9-139"><a href="#cb9-139" aria-hidden="true" tabindex="-1"></a>                <span class="fu">distinct</span>(label, <span class="at">.keep_all =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb9-140"><a href="#cb9-140" aria-hidden="true" tabindex="-1"></a>        } <span class="cf">else</span> {</span>
-<span id="cb9-141"><a href="#cb9-141" aria-hidden="true" tabindex="-1"></a>            <span class="fu">tibble</span>()</span>
-<span id="cb9-142"><a href="#cb9-142" aria-hidden="true" tabindex="-1"></a>        }</span>
-<span id="cb9-143"><a href="#cb9-143" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb9-144"><a href="#cb9-144" aria-hidden="true" tabindex="-1"></a>        <span class="fu">bind_rows</span>(</span>
-<span id="cb9-145"><a href="#cb9-145" aria-hidden="true" tabindex="-1"></a>            <span class="fu">extract_cl</span>(fit_clpm, <span class="st">"CLPM"</span>),</span>
-<span id="cb9-146"><a href="#cb9-146" aria-hidden="true" tabindex="-1"></a>            <span class="fu">extract_cl</span>(fit_ri, <span class="st">"RI-CLPM"</span>),</span>
-<span id="cb9-147"><a href="#cb9-147" aria-hidden="true" tabindex="-1"></a>            lcs_out,</span>
-<span id="cb9-148"><a href="#cb9-148" aria-hidden="true" tabindex="-1"></a>            bb_out,</span>
-<span id="cb9-149"><a href="#cb9-149" aria-hidden="true" tabindex="-1"></a>            lcmsr_out</span>
-<span id="cb9-150"><a href="#cb9-150" aria-hidden="true" tabindex="-1"></a>        ) <span class="sc">|&gt;</span></span>
-<span id="cb9-151"><a href="#cb9-151" aria-hidden="true" tabindex="-1"></a>            <span class="fu">mutate</span>(</span>
-<span id="cb9-152"><a href="#cb9-152" aria-hidden="true" tabindex="-1"></a>                <span class="at">trait =</span> tr,</span>
-<span id="cb9-153"><a href="#cb9-153" aria-hidden="true" tabindex="-1"></a>                <span class="at">politics =</span> pol_item,</span>
-<span id="cb9-154"><a href="#cb9-154" aria-hidden="true" tabindex="-1"></a>                <span class="at">direction =</span> <span class="fu">if_else</span>(<span class="fu">grepl</span>(<span class="st">"cl_xy"</span>, label),</span>
-<span id="cb9-155"><a href="#cb9-155" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Personality \u2192 Politics"</span>,</span>
-<span id="cb9-156"><a href="#cb9-156" aria-hidden="true" tabindex="-1"></a>                    <span class="st">"Politics \u2192 Personality"</span></span>
-<span id="cb9-157"><a href="#cb9-157" aria-hidden="true" tabindex="-1"></a>                )</span>
-<span id="cb9-158"><a href="#cb9-158" aria-hidden="true" tabindex="-1"></a>            ) <span class="sc">|&gt;</span></span>
-<span id="cb9-159"><a href="#cb9-159" aria-hidden="true" tabindex="-1"></a>            <span class="fu">group_by</span>(trait, politics, model, direction) <span class="sc">|&gt;</span></span>
-<span id="cb9-160"><a href="#cb9-160" aria-hidden="true" tabindex="-1"></a>            <span class="fu">summarise</span>(</span>
-<span id="cb9-161"><a href="#cb9-161" aria-hidden="true" tabindex="-1"></a>                <span class="at">est.std =</span> <span class="fu">mean</span>(est.std),</span>
-<span id="cb9-162"><a href="#cb9-162" aria-hidden="true" tabindex="-1"></a>                <span class="at">pvalue =</span> <span class="fu">mean</span>(pvalue),</span>
-<span id="cb9-163"><a href="#cb9-163" aria-hidden="true" tabindex="-1"></a>                <span class="at">.groups =</span> <span class="st">"drop"</span></span>
-<span id="cb9-164"><a href="#cb9-164" aria-hidden="true" tabindex="-1"></a>            )</span>
-<span id="cb9-165"><a href="#cb9-165" aria-hidden="true" tabindex="-1"></a>    })</span>
-<span id="cb9-166"><a href="#cb9-166" aria-hidden="true" tabindex="-1"></a>})</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-</div>
-<div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a>trait_results <span class="sc">|&gt;</span></span>
-<span id="cb10-2"><a href="#cb10-2" aria-hidden="true" tabindex="-1"></a>    <span class="fu">mutate</span>(</span>
-<span id="cb10-3"><a href="#cb10-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">sig =</span> <span class="fu">case_when</span>(</span>
-<span id="cb10-4"><a href="#cb10-4" aria-hidden="true" tabindex="-1"></a>            pvalue <span class="sc">&lt;</span> <span class="fl">0.001</span> <span class="sc">~</span> <span class="st">"***"</span>,</span>
-<span id="cb10-5"><a href="#cb10-5" aria-hidden="true" tabindex="-1"></a>            pvalue <span class="sc">&lt;</span> <span class="fl">0.01</span> <span class="sc">~</span> <span class="st">"**"</span>,</span>
-<span id="cb10-6"><a href="#cb10-6" aria-hidden="true" tabindex="-1"></a>            pvalue <span class="sc">&lt;</span> <span class="fl">0.05</span> <span class="sc">~</span> <span class="st">"*"</span>,</span>
-<span id="cb10-7"><a href="#cb10-7" aria-hidden="true" tabindex="-1"></a>            pvalue <span class="sc">&lt;</span> <span class="fl">0.10</span> <span class="sc">~</span> <span class="st">"\u2020"</span>,</span>
-<span id="cb10-8"><a href="#cb10-8" aria-hidden="true" tabindex="-1"></a>            <span class="cn">TRUE</span> <span class="sc">~</span> <span class="st">""</span></span>
-<span id="cb10-9"><a href="#cb10-9" aria-hidden="true" tabindex="-1"></a>        ),</span>
-<span id="cb10-10"><a href="#cb10-10" aria-hidden="true" tabindex="-1"></a>        <span class="at">cell  =</span> <span class="fu">paste0</span>(<span class="fu">round</span>(est.std, <span class="dv">3</span>), sig),</span>
-<span id="cb10-11"><a href="#cb10-11" aria-hidden="true" tabindex="-1"></a>        <span class="at">model =</span> <span class="fu">factor</span>(model,</span>
-<span id="cb10-12"><a href="#cb10-12" aria-hidden="true" tabindex="-1"></a>                       <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"CLPM"</span>, <span class="st">"RI-CLPM"</span>, <span class="st">"LChange"</span>,</span>
-<span id="cb10-13"><a href="#cb10-13" aria-hidden="true" tabindex="-1"></a>                                  <span class="st">"Bollen-Brand"</span>, <span class="st">"LCM-SR"</span>))</span>
-<span id="cb10-14"><a href="#cb10-14" aria-hidden="true" tabindex="-1"></a>    ) <span class="sc">|&gt;</span></span>
-<span id="cb10-15"><a href="#cb10-15" aria-hidden="true" tabindex="-1"></a>    <span class="fu">select</span>(trait, politics, direction, model, cell) <span class="sc">|&gt;</span></span>
-<span id="cb10-16"><a href="#cb10-16" aria-hidden="true" tabindex="-1"></a>    <span class="fu">pivot_wider</span>(<span class="at">names_from =</span> model, <span class="at">values_from =</span> cell,</span>
-<span id="cb10-17"><a href="#cb10-17" aria-hidden="true" tabindex="-1"></a>                <span class="at">names_expand =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
-<span id="cb10-18"><a href="#cb10-18" aria-hidden="true" tabindex="-1"></a>    <span class="fu">arrange</span>(trait, politics, direction) <span class="sc">|&gt;</span></span>
-<span id="cb10-19"><a href="#cb10-19" aria-hidden="true" tabindex="-1"></a>    knitr<span class="sc">::</span><span class="fu">kable</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div id="tbl-traits-summary" class="cell quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-tbl figure">
 <figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl quarto-uncaptioned" id="tbl-traits-summary-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">

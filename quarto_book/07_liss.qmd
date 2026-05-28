@@ -10,7 +10,7 @@ This chapter forms a partial replication of @bakker_reconsidering_2021 LISS pane
 #| message: false
 #| warning: false
 #| cache: false
-#| echo: true
+#| echo: false
 library(tidyverse)
 library(lavaan)
 library(psych)
@@ -29,7 +29,7 @@ Here, we identify the LISS personality and political variables and calculate Cro
 There are so many variables used in the analysis (with just one *x* and *y*) that it's easier to list them together in a named list, and then just loop through all the names in the list to calculate the alphas. We follow the same approach throughout the analysis.
 
 ```{r alphas}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 scale_items <- list(
@@ -287,6 +287,7 @@ ggplot(plot_dat, aes(politics, est,
 
 ```{r table}
 #| label: tbl-coefs
+#| echo: false
 results |>
     select(politics, direction, transition, est, se, pvalue) |>
     mutate(across(c(est, se), \(x) round(x, 3)),
@@ -387,6 +388,7 @@ results_pkg <- map_dfr(politics, fit_one_pkg)
 
 ```{r table-package}
 #| label: tbl-coefs-package
+#| echo: false
 results_pkg |>
     select(politics, direction, transition, est.std, se, pvalue) |>
     mutate(across(c(est.std, se), \(x) round(x, 3)),
@@ -578,6 +580,7 @@ ggplot(sensitivity_plot_data,
 
 ```{r tbl-sensitivity}
 #| label: tbl-sensitivity
+#| echo: false
 #| message: false
 sensitivity_results |>
     mutate(sig = case_when(
@@ -793,6 +796,7 @@ icc_traits |>
 #### All Estimators for Each Trait × Political Item
 
 ```{r fit-traits}
+#| echo: false
 #| message: false
 #| warning: false
 
@@ -966,6 +970,7 @@ trait_results <- map_dfr(names(trait_items), function(tr) {
 
 ```{r table-traits}
 #| label: tbl-traits-summary
+#| echo: false
 trait_results |>
     mutate(
         sig = case_when(

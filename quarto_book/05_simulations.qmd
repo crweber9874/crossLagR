@@ -207,7 +207,7 @@ sim1 <- sim1 |>
 
 ```{r}
 #| label: fig-sim1-ridges
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 #| fig-cap: "Sampling distribution of AR/CL estimates under the RI-CLPM DGP, by between:within variance ratio. Columns are parameters, rows are estimators. The vertical dashed line marks the true value. Fill encodes mean |estimate − truth| for that cell: green = on target, red = far from truth."
@@ -359,6 +359,9 @@ sim1 |>
 One of the issues with the RI-CLPM is that it can be difficult to fit when there is a lot of trait variance. The Bayesian approach allows us to put informative priors on the parameters.
 
 ```{r}
+#| echo: false
+#| message: false
+#| warning: false
 make_riclpm_pop(8) |> head()
 ```
 

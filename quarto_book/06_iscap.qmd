@@ -130,7 +130,7 @@ cat("There are ", sum(!complete.cases(upenn)), "rows with missing data.\n")
 ```
 
 ```{r pivot-long}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 #| cache: false
@@ -149,7 +149,7 @@ head(upenn_long)
 ```
 
 ```{r legitimacy-data-prep}
-#| echo: true
+#| echo: false
 #| message: false
 legitimacy_data = upenn_long |>
   dplyr::select(identifier, wave,
@@ -162,13 +162,11 @@ legitimacy_data = upenn_long |>
 naniar::miss_var_summary(legitimacy_data |> select(-c(identifier, wave)))
 ```
 
-Below I display the missing data patterns across all variables and respondents in the dataset. Dark cells indicate missing values.
-
 
 ## Missing Data by Wave
 
 ```{r missing-by-wave}
- #| echo: true
+ #| echo: false
  #| message: false
  #| warning: false
  legitimacy_data %>%
@@ -182,7 +180,7 @@ Below I display the missing data patterns across all variables and respondents i
 Ignoring time dependence, and just fitting an OLS regression:
 
 ```{r ols-autocorr}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 lm(political_legitimacy ~ female + college + party_identification,
@@ -201,7 +199,7 @@ $$
 $$
 
 ```{r icc-models}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 library(lme4)
@@ -263,7 +261,7 @@ crossLagR::estimateTSO(waves = 4) |> cat()
 This produces identical ICC estimates.
 
 ```{r tso-fit}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 tso_syntax <- crossLagR::estimateTSO(waves = 4)
@@ -315,6 +313,10 @@ fitMeasures(tso_fit, c("chisq", "df", "pvalue", "cfi", "tli", "rmsea", "srmr")) 
 ```
 
 ```{r between-within-pie-helpers, include=FALSE}
+#| echo: false
+#| message: false
+#| warning: false
+
 between_color <- "#2b6cb0"
 within_total_color <- "#dc2626"
 within_palette <- c("#fca5a5", "#ef4444", "#b91c1c", "#7f1d1d")
@@ -494,10 +496,10 @@ plot_nested_pies(
 )
 ```
 
-The next chunk declares the benchmark trait-state results from the table so they can be plotted in the same format.
+From Stanley's estimates, here are the TSO values.
 
 ```{r benchmark-trait-data}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 benchmark_trait_data <- tibble::tribble(
@@ -520,7 +522,9 @@ benchmark_trait_data <- tibble::tribble(
 benchmark_trait_data
 ```
 
-Figure @fig-benchmark-trait-pies applies the same nested-pie logic to the benchmark table. Here the inner ring uses the average reported trait fraction across waves as the between-person share of total variance, and the outer ring allocates the within-person share across waves in proportion to each wave's residual state variance.
+Figure @fig-benchmark-trait-pies applies the same nested-pie logic to the benchmark table.
+
+Here the inner ring uses the average reported trait fraction across waves as the between-person share of total variance, and the outer ring allocates the within-person share across waves in proportion to each wave's residual state variance.
 
 ```{r fig-benchmark-trait-pies}
 #| echo: false
@@ -578,10 +582,13 @@ plot_nested_pies(
 
 ## Arellano-Bond Dynamic Panel Model
 
-The Arelleno-Bond estimator uses GMM on the first-differenced data -- to remove the unit effects -- with lagged variables serving as instruments for the lagged right-hand side differenced variables. 
+The Arelleno-Bond estimator uses GMM on the first-differenced data -- to remove the unit effects -- with lagged variables serving as instruments for the lagged 
+right-hand side differenced variables. 
 
-The code below fits two separate models:
+Now let's fit: 
+
 * Political legitimacy as the outcome and party identification as the predictor
+
 * Party identification as the outcome and political legitimacy as the predictor. Both models include a lag of the dependent variable on the right-hand side to capture autoregression. The instrument set includes lags 2 and 3 of the dependent variable, and lag 1 of the predictor variable. This is a strong assumption for party id -- typically the Arellano-Bond instrument matrix unfolds such that wave 1 of the predictor is used as an instrument for the change from wave 2 to wave 3,  wave 1 and 2 are used to instrument the change from wave 2 to 3, and wave 1, 2, and 3 are used to instrument the change from wave 3 to 4. Party ID is so stable that it is exogenous. The results show a strong autoregressive effect for both variables, but no evidence of cross-lagged effects. 
 
 
@@ -716,7 +723,7 @@ digraph BollenBrand {
 Because we freely estimate the AR and CL parameters, there are far more statistically significant coefficients -- they just change signs on occasion, which is why they were, on average, non-significant in the Arellano-Bond model. And lagged legitimacy never predicts PID -- which makes sense, because PID is stable, but its correlation with legitimacy is not. 
 
 ```{r bb-fit}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 # Ensure SEM-wide aliases exist even if chunks are re-ordered.
@@ -777,17 +784,12 @@ fitMeasures(bb_fit, c("chisq", "df", "pvalue", "cfi", "tli", "rmsea", "srmr")) |
 
 
 
-## What happens when these effects are ignored?
-### CLPM
-### Modeled Directly, RICLPM
-###
-
 ## CLPM, RICLPM, and Fixed Effects lavaan model
 
 The `crossLagR` package includes functions to generate lavaan syntax for the Cross-Lagged Panel Model (CLPM), the Random Intercept Cross-Lagged Panel Model (RICLPM), and the Allison-Chamberlain Fixed Effects model. Each function expects data with variables named `x1, x2, ...` and `y1, y2, ...`, so we first rename the wide-format variables.
 
 ```{r rename-wide-vars}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 
@@ -852,82 +854,14 @@ fitMeasures(clpm_fit, c("chisq", "df", "pvalue", "cfi", "tli", "rmsea", "srmr"))
   tab_header(title = "CLPM Fit Measures")
 ```
 
-## Models that Account for Unit Effects
 
-### Arellano-Bond Dynamic Panel Model
-
-
-
-## Bollen and Brand Dynamic Panel Model
-
-### RI-CLPM
-
-The RI-CLPM adds random intercepts to separate stable trait variance from within-person dynamics.
-
-```{r riclpm-fit}
-#| echo: true
-#| message: false
-#| warning: false
-riclpm_syntax <- estimateRICLPM(waves = 4)
-riclpm_fit <- lavaan::lavaan(riclpm_syntax, data = upenn_sem, missing = "ML")
-
-parameterEstimates(riclpm_fit, standardized = TRUE) |>
-  filter(op == "~") |>
-  mutate(lhs = rename_var(lhs), rhs = rename_var(rhs)) |>
-  select(lhs, op, rhs, est, se, z, pvalue, std.all) |>
-  gt() |>
-  cols_label(lhs = "Outcome", op = "", rhs = "Predictor",
-             est = "Estimate", se = "SE", z = "z", pvalue = "p", std.all = "Std. (all)") |>
-  fmt_number(columns = c(est, se, z, std.all), decimals = 3) |>
-  fmt_number(columns = pvalue, decimals = 4) |>
-  tab_header(title = "RI-CLPM Parameter Estimates")
-
-fitMeasures(riclpm_fit, c("chisq", "df", "pvalue", "cfi", "tli", "rmsea", "srmr")) |>
-  as.data.frame() |>
-  tibble::rownames_to_column("Measure") |>
-  rename(Value = 2) |>
-  gt() |>
-  fmt_number(columns = Value, decimals = 3) |>
-  tab_header(title = "RI-CLPM Fit Measures")
-```
-
-### ALT Model (Autoregressive Latent Trajectory)
-
-The ALT model combines latent growth curves with autoregressive and cross-lagged dynamics on the *scores themselves*. Unlike the LCM-SR, growth factors here accumulate through the AR process [@bollen_general_2010].
-
-```{r alt-fit}
-#| echo: true
-#| message: false
-#| warning: false
-alt_syntax <- estimateALT(waves = 4)
-alt_fit <- lavaan::lavaan(alt_syntax, data = upenn_sem, missing = "ML", meanstructure = TRUE)
-
-parameterEstimates(alt_fit, standardized = TRUE) |>
-  filter(op == "~") |>
-  mutate(lhs = rename_var(lhs), rhs = rename_var(rhs)) |>
-  select(lhs, op, rhs, est, se, z, pvalue, std.all) |>
-  gt() |>
-  cols_label(lhs = "Outcome", op = "", rhs = "Predictor",
-             est = "Estimate", se = "SE", z = "z", pvalue = "p", std.all = "Std. (all)") |>
-  fmt_number(columns = c(est, se, z, std.all), decimals = 3) |>
-  fmt_number(columns = pvalue, decimals = 4) |>
-  tab_header(title = "ALT Parameter Estimates")
-
-fitMeasures(alt_fit, c("chisq", "df", "pvalue", "cfi", "tli", "rmsea", "srmr")) |>
-  as.data.frame() |>
-  tibble::rownames_to_column("Measure") |>
-  rename(Value = 2) |>
-  gt() |>
-  fmt_number(columns = Value, decimals = 3) |>
-  tab_header(title = "ALT Fit Measures")
-```
 
 ### LCM-SR (Latent Curve Model with Structured Residuals)
 
 The LCM-SR first removes the growth trajectory, then models the deviations from those curves with AR/CL dynamics [@usami2019]. Growth factors have only direct effects on the observed scores.
 
 ```{r lcmsr-fit}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 lcmsr_syntax <- estimateLCMSR(waves = 4)
@@ -958,7 +892,7 @@ fitMeasures(lcmsr_fit, c("chisq", "df", "pvalue", "cfi", "tli", "rmsea", "srmr")
 The Latent Change Score model parameterizes wave-to-wave change as a latent variable, regressed on prior levels of both variables to capture coupled dynamics [@mcardle2009].
 
 ```{r lchange-fit}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 lchange_syntax <- estimateLChange(waves = 4, variable_type = "bivariate")
@@ -991,14 +925,12 @@ if (lchange_fit@Fit@converged) {
 ### Model Comparison
 
 ```{r model-comparison}
-#| echo: true
+#| echo: false
 #| message: false
 #| warning: false
 fit_models <- list(
   "CLPM" = clpm_fit,
-  "RI-CLPM" = riclpm_fit,
   "Bollen & Brand" = bb_fit,
-  "ALT" = alt_fit,
   "LCM-SR" = lcmsr_fit,
   "Latent Change" = lchange_fit,
   "TSO" = tso_fit

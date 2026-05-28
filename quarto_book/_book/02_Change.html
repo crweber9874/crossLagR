@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>3&nbsp; Latent Change Score Models – crossLagR: A User Guide to Cross-Lagged Panel Models in R</title>
+<title>3&nbsp; Latent Change Score Models – crossLagR</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -187,7 +187,7 @@ window.Quarto = {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">crossLagR: A User Guide to Cross-Lagged Panel Models in R</a> 
+      <a href="./">crossLagR</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -319,8 +319,8 @@ window.Quarto = {
 <div id="fig-lcm-simple" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-lcm-simple-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="grViz html-widget html-fill-item" id="htmlwidget-7152f0b4f925951a022a" style="width:80%;height:480px;"></div>
-<script type="application/json" data-for="htmlwidget-7152f0b4f925951a022a">{"x":{"diagram":"\ndigraph LCSM_simple {\n  graph [layout = neato, bgcolor = white, splines = line]\n  node [shape = plaintext, fontsize = 24]\n  edge [arrowsize = 0.6]\n\n  Xt1 [pos = \"-3.0,1.8!\", label = <X<sub>1<\/sub>>]\n  Xt2 [pos = \"-1.0,1.8!\", label = <X<sub>2<\/sub>>]\n  Xt3 [pos = \"1.0,1.8!\",  label = <X<sub>3<\/sub>>]\n  Xt4 [pos = \"3.0,1.8!\",  label = <X<sub>4<\/sub>>]\n\n  dX2 [pos = \"-1.0,0.6!\", label = <Δx<sub>2<\/sub>>]\n  dX3 [pos = \"1.0,0.6!\",  label = <Δx<sub>3<\/sub>>]\n  dX4 [pos = \"3.0,0.6!\",  label = <Δx<sub>4<\/sub>>]\n\n  dY2 [pos = \"-1.0,-0.6!\", label = <Δy<sub>2<\/sub>>]\n  dY3 [pos = \"1.0,-0.6!\",  label = <Δy<sub>3<\/sub>>]\n  dY4 [pos = \"3.0,-0.6!\",  label = <Δy<sub>4<\/sub>>]\n\n  Yt1 [pos = \"-3.0,-1.8!\", label = <Y<sub>1<\/sub>>]\n  Yt2 [pos = \"-1.0,-1.8!\", label = <Y<sub>2<\/sub>>]\n  Yt3 [pos = \"1.0,-1.8!\",  label = <Y<sub>3<\/sub>>]\n  Yt4 [pos = \"3.0,-1.8!\",  label = <Y<sub>4<\/sub>>]\n\n  Ax [pos = \"-4.5,1.2!\",  label = <Δ<sub>x<\/sub>>]\n  Ay [pos = \"-4.5,-1.2!\", label = <Δ<sub>y<\/sub>>]\n\n  # Identity: X_t = X_{t-1} + Δx_t\n  Xt1 -> Xt2 [label = \"1\", fontsize = 14]\n  Xt2 -> Xt3 [label = \"1\", fontsize = 14]\n  Xt3 -> Xt4 [label = \"1\", fontsize = 14]\n  Yt1 -> Yt2 [label = \"1\", fontsize = 14]\n  Yt2 -> Yt3 [label = \"1\", fontsize = 14]\n  Yt3 -> Yt4 [label = \"1\", fontsize = 14]\n  dX2 -> Xt2 [label = \"1\", fontsize = 14]\n  dX3 -> Xt3 [label = \"1\", fontsize = 14]\n  dX4 -> Xt4 [label = \"1\", fontsize = 14]\n  dY2 -> Yt2 [label = \"1\", fontsize = 14]\n  dY3 -> Yt3 [label = \"1\", fontsize = 14]\n  dY4 -> Yt4 [label = \"1\", fontsize = 14]\n\n  # Proportional change (β)\n  Xt1 -> dX2 [label = <β>, fontsize = 16]\n  Xt2 -> dX3 [label = <β>, fontsize = 16]\n  Xt3 -> dX4 [label = <β>, fontsize = 16]\n  Yt1 -> dY2 [label = <β>, fontsize = 16]\n  Yt2 -> dY3 [label = <β>, fontsize = 16]\n  Yt3 -> dY4 [label = <β>, fontsize = 16]\n\n  # Coupling (ω)\n  Yt1 -> dX2 [label = <ω>, fontsize = 16]\n  Yt2 -> dX3 [label = <ω>, fontsize = 16]\n  Yt3 -> dX4 [label = <ω>, fontsize = 16]\n  Xt1 -> dY2 [label = <ω>, fontsize = 16]\n  Xt2 -> dY3 [label = <ω>, fontsize = 16]\n  Xt3 -> dY4 [label = <ω>, fontsize = 16]\n\n  # Constant-change accumulating factors (left side)\n  Ax -> dX2 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ax -> dX3 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ax -> dX4 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ay -> dY2 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ay -> dY3 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ay -> dY4 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-8289aeabca024f005838" style="width:80%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-8289aeabca024f005838">{"x":{"diagram":"\ndigraph LCSM_simple {\n  graph [layout = neato, bgcolor = white, splines = line]\n  node [shape = plaintext, fontsize = 24]\n  edge [arrowsize = 0.6]\n\n  Xt1 [pos = \"-3.0,1.8!\", label = <X<sub>1<\/sub>>]\n  Xt2 [pos = \"-1.0,1.8!\", label = <X<sub>2<\/sub>>]\n  Xt3 [pos = \"1.0,1.8!\",  label = <X<sub>3<\/sub>>]\n  Xt4 [pos = \"3.0,1.8!\",  label = <X<sub>4<\/sub>>]\n\n  dX2 [pos = \"-1.0,0.6!\", label = <Δx<sub>2<\/sub>>]\n  dX3 [pos = \"1.0,0.6!\",  label = <Δx<sub>3<\/sub>>]\n  dX4 [pos = \"3.0,0.6!\",  label = <Δx<sub>4<\/sub>>]\n\n  dY2 [pos = \"-1.0,-0.6!\", label = <Δy<sub>2<\/sub>>]\n  dY3 [pos = \"1.0,-0.6!\",  label = <Δy<sub>3<\/sub>>]\n  dY4 [pos = \"3.0,-0.6!\",  label = <Δy<sub>4<\/sub>>]\n\n  Yt1 [pos = \"-3.0,-1.8!\", label = <Y<sub>1<\/sub>>]\n  Yt2 [pos = \"-1.0,-1.8!\", label = <Y<sub>2<\/sub>>]\n  Yt3 [pos = \"1.0,-1.8!\",  label = <Y<sub>3<\/sub>>]\n  Yt4 [pos = \"3.0,-1.8!\",  label = <Y<sub>4<\/sub>>]\n\n  Ax [pos = \"-4.5,1.2!\",  label = <Δ<sub>x<\/sub>>]\n  Ay [pos = \"-4.5,-1.2!\", label = <Δ<sub>y<\/sub>>]\n\n  # Identity: X_t = X_{t-1} + Δx_t\n  Xt1 -> Xt2 [label = \"1\", fontsize = 14]\n  Xt2 -> Xt3 [label = \"1\", fontsize = 14]\n  Xt3 -> Xt4 [label = \"1\", fontsize = 14]\n  Yt1 -> Yt2 [label = \"1\", fontsize = 14]\n  Yt2 -> Yt3 [label = \"1\", fontsize = 14]\n  Yt3 -> Yt4 [label = \"1\", fontsize = 14]\n  dX2 -> Xt2 [label = \"1\", fontsize = 14]\n  dX3 -> Xt3 [label = \"1\", fontsize = 14]\n  dX4 -> Xt4 [label = \"1\", fontsize = 14]\n  dY2 -> Yt2 [label = \"1\", fontsize = 14]\n  dY3 -> Yt3 [label = \"1\", fontsize = 14]\n  dY4 -> Yt4 [label = \"1\", fontsize = 14]\n\n  # Proportional change (β)\n  Xt1 -> dX2 [label = <β>, fontsize = 16]\n  Xt2 -> dX3 [label = <β>, fontsize = 16]\n  Xt3 -> dX4 [label = <β>, fontsize = 16]\n  Yt1 -> dY2 [label = <β>, fontsize = 16]\n  Yt2 -> dY3 [label = <β>, fontsize = 16]\n  Yt3 -> dY4 [label = <β>, fontsize = 16]\n\n  # Coupling (ω)\n  Yt1 -> dX2 [label = <ω>, fontsize = 16]\n  Yt2 -> dX3 [label = <ω>, fontsize = 16]\n  Yt3 -> dX4 [label = <ω>, fontsize = 16]\n  Xt1 -> dY2 [label = <ω>, fontsize = 16]\n  Xt2 -> dY3 [label = <ω>, fontsize = 16]\n  Xt3 -> dY4 [label = <ω>, fontsize = 16]\n\n  # Constant-change accumulating factors (left side)\n  Ax -> dX2 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ax -> dX3 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ax -> dX4 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ay -> dY2 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ay -> dY3 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ay -> dY4 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lcm-simple-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.1: Bivariate Latent Change Score Model. β = proportional change; ω = coupling. Δ_x, Δ_y are person-specific constant-change factors loading on each Δx_t and Δy_t.
@@ -717,12 +717,12 @@ Figure&nbsp;3.1: Bivariate Latent Change Score Model. β = proportional change; 
 <span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(sim<span class="sc">$</span>data, <span class="at">list.len =</span> <span class="dv">6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>'data.frame':   500 obs. of  10 variables:
- $ x1: num  1.602 0.13 -0.273 0.411 -1.329 ...
- $ x2: num  -0.843 1.374 0.988 0.706 -1.884 ...
- $ x3: num  -1.2519 0.4713 -0.0528 1.2318 1.1343 ...
- $ x4: num  0.439 -0.709 0.46 -0.554 -2.122 ...
- $ x5: num  0.4064 -1.2702 -0.4566 -0.2495 -0.0899 ...
- $ y1: num  -1.578 1.643 -0.204 -1.13 -0.963 ...
+ $ x1: num  0.6311 0.3937 0.2396 -0.0894 -0.2507 ...
+ $ x2: num  1.2528 0.265 -0.9541 -3.1215 0.0986 ...
+ $ x3: num  1.313 2.448 -0.386 -3.159 -1.164 ...
+ $ x4: num  2.315 0.905 -1.962 0.609 1.346 ...
+ $ x5: num  0.447 -1.158 -2.392 1.16 -0.316 ...
+ $ y1: num  0.403 0.233 -3.292 -1.775 -0.452 ...
   [list output truncated]</code></pre>
 </div>
 </div>
@@ -757,7 +757,7 @@ Expect AR_x ≈ AR_y ≈ 0.80, CL_yx ≈ 0.20, CL_xy ≈ 0.55.</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>), <span class="at">data =</span> clean<span class="sc">$</span>data),</span>
 <span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">standardized =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>lavaan 0.6-19 ended normally after 28 iterations
+<pre><code>lavaan 0.6-19 ended normally after 31 iterations
 
   Estimator                                         ML
   Optimization method                           NLMINB
@@ -768,9 +768,9 @@ Expect AR_x ≈ AR_y ≈ 0.80, CL_yx ≈ 0.20, CL_xy ≈ 0.55.</code></pre>
 
 Model Test User Model:
                                                       
-  Test statistic                                53.388
+  Test statistic                                56.671
   Degrees of freedom                                53
-  P-value (Chi-square)                           0.459
+  P-value (Chi-square)                           0.340
 
 Parameter Estimates:
 
@@ -781,70 +781,70 @@ Parameter Estimates:
 Latent Variables:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
   p1 =~                                                                 
-    y1                1.000                               0.996    1.000
+    y1                1.000                               0.994    1.000
   q1 =~                                                                 
-    x1                1.000                               1.018    1.000
+    x1                1.000                               0.994    1.000
   p2 =~                                                                 
-    y2                1.000                               1.325    1.000
+    y2                1.000                               1.302    1.000
   q2 =~                                                                 
-    x2                1.000                               1.157    1.000
+    x2                1.000                               1.111    1.000
   p3 =~                                                                 
-    y3                1.000                               1.732    1.000
+    y3                1.000                               1.693    1.000
   q3 =~                                                                 
-    x3                1.000                               1.351    1.000
+    x3                1.000                               1.286    1.000
   p4 =~                                                                 
-    y4                1.000                               2.162    1.000
+    y4                1.000                               2.106    1.000
   q4 =~                                                                 
-    x4                1.000                               1.575    1.000
+    x4                1.000                               1.486    1.000
   p5 =~                                                                 
-    y5                1.000                               2.619    1.000
+    y5                1.000                               2.543    1.000
   q5 =~                                                                 
-    x5                1.000                               1.827    1.000
+    x5                1.000                               1.712    1.000
 
 Regressions:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
   p2 ~                                                                  
-    p1      (ar_y)    0.788    0.011   73.112    0.000    0.593    0.593
-    q1      (cl_x)    0.565    0.013   41.934    0.000    0.434    0.434
+    p1      (ar_y)    0.812    0.011   77.245    0.000    0.619    0.619
+    q1      (cl_x)    0.544    0.013   40.436    0.000    0.416    0.416
   q2 ~                                                                  
-    q1      (ar_x)    0.814    0.013   61.071    0.000    0.716    0.716
-    p1      (cl_y)    0.205    0.011   19.221    0.000    0.177    0.177
+    q1      (ar_x)    0.775    0.013   57.744    0.000    0.694    0.694
+    p1      (cl_y)    0.214    0.010   20.397    0.000    0.191    0.191
   p3 ~                                                                  
-    p2      (ar_y)    0.788    0.011   73.112    0.000    0.603    0.603
-    q2      (cl_x)    0.565    0.013   41.934    0.000    0.377    0.377
+    p2      (ar_y)    0.812    0.011   77.245    0.000    0.624    0.624
+    q2      (cl_x)    0.544    0.013   40.436    0.000    0.357    0.357
   q3 ~                                                                  
-    q2      (ar_x)    0.814    0.013   61.071    0.000    0.697    0.697
-    p2      (cl_y)    0.205    0.011   19.221    0.000    0.201    0.201
+    q2      (ar_x)    0.775    0.013   57.744    0.000    0.670    0.670
+    p2      (cl_y)    0.214    0.010   20.397    0.000    0.216    0.216
   p4 ~                                                                  
-    p3      (ar_y)    0.788    0.011   73.112    0.000    0.632    0.632
-    q3      (cl_x)    0.565    0.013   41.934    0.000    0.353    0.353
+    p3      (ar_y)    0.812    0.011   77.245    0.000    0.653    0.653
+    q3      (cl_x)    0.544    0.013   40.436    0.000    0.332    0.332
   q4 ~                                                                  
-    q3      (ar_x)    0.814    0.013   61.071    0.000    0.699    0.699
-    p3      (cl_y)    0.205    0.011   19.221    0.000    0.226    0.226
+    q3      (ar_x)    0.775    0.013   57.744    0.000    0.670    0.670
+    p3      (cl_y)    0.214    0.010   20.397    0.000    0.244    0.244
   p5 ~                                                                  
-    p4      (ar_y)    0.788    0.011   73.112    0.000    0.650    0.650
-    q4      (cl_x)    0.565    0.013   41.934    0.000    0.339    0.339
+    p4      (ar_y)    0.812    0.011   77.245    0.000    0.672    0.672
+    q4      (cl_x)    0.544    0.013   40.436    0.000    0.318    0.318
   q5 ~                                                                  
-    q4      (ar_x)    0.814    0.013   61.071    0.000    0.702    0.702
-    p4      (cl_y)    0.205    0.011   19.221    0.000    0.243    0.243
+    q4      (ar_x)    0.775    0.013   57.744    0.000    0.673    0.673
+    p4      (cl_y)    0.214    0.010   20.397    0.000    0.263    0.263
 
 Covariances:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
   p1 ~~                                                                 
-    q1      (d__1)    0.341    0.034   10.078    0.000    0.336    0.336
+    q1      (d__1)    0.279    0.032    8.598    0.000    0.283    0.283
  .p2 ~~                                                                 
-   .q2      (d_c_)    0.203    0.009   23.720    0.000    0.405    0.405
+   .q2      (d_c_)    0.199    0.009   23.231    0.000    0.395    0.395
  .p3 ~~                                                                 
-   .q3      (d_c_)    0.203    0.009   23.720    0.000    0.405    0.405
+   .q3      (d_c_)    0.199    0.009   23.231    0.000    0.395    0.395
  .p4 ~~                                                                 
-   .q4      (d_c_)    0.203    0.009   23.720    0.000    0.405    0.405
+   .q4      (d_c_)    0.199    0.009   23.231    0.000    0.395    0.395
  .p5 ~~                                                                 
-   .q5      (d_c_)    0.203    0.009   23.720    0.000    0.405    0.405
+   .q5      (d_c_)    0.199    0.009   23.231    0.000    0.395    0.395
 
 Intercepts:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
-    p1               -0.005    0.032   -0.164    0.870   -0.005   -0.005
-    q1                0.010    0.032    0.323    0.746    0.010    0.010
+    p1               -0.021    0.031   -0.658    0.511   -0.021   -0.021
+    q1               -0.008    0.031   -0.262    0.793   -0.008   -0.008
    .p2                0.000                               0.000    0.000
    .q2                0.000                               0.000    0.000
    .p3                0.000                               0.000    0.000
@@ -866,16 +866,16 @@ Intercepts:
 
 Variances:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
-    p1   (d_vr_y1)    0.993    0.044   22.361    0.000    1.000    1.000
-    q1   (d_vr_x1)    1.036    0.046   22.361    0.000    1.000    1.000
-   .p2    (d_vr_y)    0.506    0.011   44.721    0.000    0.288    0.288
-   .q2    (d_vr_x)    0.496    0.011   44.721    0.000    0.371    0.371
-   .p3    (d_vr_y)    0.506    0.011   44.721    0.000    0.169    0.169
-   .q3    (d_vr_x)    0.496    0.011   44.721    0.000    0.272    0.272
-   .p4    (d_vr_y)    0.506    0.011   44.721    0.000    0.108    0.108
-   .q4    (d_vr_x)    0.496    0.011   44.721    0.000    0.200    0.200
-   .p5    (d_vr_y)    0.506    0.011   44.721    0.000    0.074    0.074
-   .q5    (d_vr_x)    0.496    0.011   44.721    0.000    0.149    0.149
+    p1   (d_vr_y1)    0.987    0.044   22.361    0.000    1.000    1.000
+    q1   (d_vr_x1)    0.988    0.044   22.361    0.000    1.000    1.000
+   .p2    (d_vr_y)    0.506    0.011   44.721    0.000    0.298    0.298
+   .q2    (d_vr_x)    0.503    0.011   44.721    0.000    0.408    0.408
+   .p3    (d_vr_y)    0.506    0.011   44.721    0.000    0.176    0.176
+   .q3    (d_vr_x)    0.503    0.011   44.721    0.000    0.305    0.305
+   .p4    (d_vr_y)    0.506    0.011   44.721    0.000    0.114    0.114
+   .q4    (d_vr_x)    0.503    0.011   44.721    0.000    0.228    0.228
+   .p5    (d_vr_y)    0.506    0.011   44.721    0.000    0.078    0.078
+   .q5    (d_vr_x)    0.503    0.011   44.721    0.000    0.172    0.172
    .y1                0.000                               0.000    0.000
    .x1                0.000                               0.000    0.000
    .y2                0.000                               0.000    0.000
@@ -916,7 +916,7 @@ Estimator: CLPM (does not absorb unit effects).</code></pre>
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>), <span class="at">data =</span> lcsm_data<span class="sc">$</span>data),</span>
 <span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">standardized =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>lavaan 0.6-19 ended normally after 29 iterations
+<pre><code>lavaan 0.6-19 ended normally after 28 iterations
 
   Estimator                                         ML
   Optimization method                           NLMINB
@@ -927,7 +927,7 @@ Estimator: CLPM (does not absorb unit effects).</code></pre>
 
 Model Test User Model:
                                                        
-  Test statistic                              17784.296
+  Test statistic                              17374.976
   Degrees of freedom                                 53
   P-value (Chi-square)                            0.000
 
@@ -940,70 +940,70 @@ Parameter Estimates:
 Latent Variables:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
   p1 =~                                                                 
-    y1                1.000                               1.042    1.000
+    y1                1.000                               1.009    1.000
   q1 =~                                                                 
-    x1                1.000                               0.968    1.000
+    x1                1.000                               1.029    1.000
   p2 =~                                                                 
-    y2                1.000                               1.429    1.000
+    y2                1.000                               1.426    1.000
   q2 =~                                                                 
-    x2                1.000                               1.297    1.000
+    x2                1.000                               1.329    1.000
   p3 =~                                                                 
-    y3                1.000                               1.918    1.000
+    y3                1.000                               1.931    1.000
   q3 =~                                                                 
-    x3                1.000                               1.657    1.000
+    x3                1.000                               1.659    1.000
   p4 =~                                                                 
-    y4                1.000                               2.536    1.000
+    y4                1.000                               2.550    1.000
   q4 =~                                                                 
-    x4                1.000                               2.078    1.000
+    x4                1.000                               2.046    1.000
   p5 =~                                                                 
-    y5                1.000                               3.313    1.000
+    y5                1.000                               3.309    1.000
   q5 =~                                                                 
-    x5                1.000                               2.592    1.000
+    x5                1.000                               2.513    1.000
 
 Regressions:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
   p2 ~                                                                  
-    p1      (ar_y)    0.999    0.009  105.596    0.000    0.728    0.728
-    q1      (cl_x)    0.384    0.011   34.717    0.000    0.260    0.260
+    p1      (ar_y)    0.986    0.010  101.812    0.000    0.698    0.698
+    q1      (cl_x)    0.394    0.011   34.881    0.000    0.284    0.284
   q2 ~                                                                  
-    q1      (ar_x)    1.051    0.011   99.934    0.000    0.784    0.784
-    p1      (cl_y)    0.140    0.009   15.571    0.000    0.113    0.113
+    q1      (ar_x)    1.037    0.011   98.495    0.000    0.803    0.803
+    p1      (cl_y)    0.132    0.009   14.591    0.000    0.100    0.100
   p3 ~                                                                  
-    p2      (ar_y)    0.999    0.009  105.596    0.000    0.744    0.744
-    q2      (cl_x)    0.384    0.011   34.717    0.000    0.260    0.260
+    p2      (ar_y)    0.986    0.010  101.812    0.000    0.728    0.728
+    q2      (cl_x)    0.394    0.011   34.881    0.000    0.271    0.271
   q3 ~                                                                  
-    q2      (ar_x)    1.051    0.011   99.934    0.000    0.823    0.823
-    p2      (cl_y)    0.140    0.009   15.571    0.000    0.121    0.121
+    q2      (ar_x)    1.037    0.011   98.495    0.000    0.830    0.830
+    p2      (cl_y)    0.132    0.009   14.591    0.000    0.113    0.113
   p4 ~                                                                  
-    p3      (ar_y)    0.999    0.009  105.596    0.000    0.755    0.755
-    q3      (cl_x)    0.384    0.011   34.717    0.000    0.251    0.251
+    p3      (ar_y)    0.986    0.010  101.812    0.000    0.747    0.747
+    q3      (cl_x)    0.394    0.011   34.881    0.000    0.256    0.256
   q4 ~                                                                  
-    q3      (ar_x)    1.051    0.011   99.934    0.000    0.838    0.838
-    p3      (cl_y)    0.140    0.009   15.571    0.000    0.129    0.129
+    q3      (ar_x)    1.037    0.011   98.495    0.000    0.841    0.841
+    p3      (cl_y)    0.132    0.009   14.591    0.000    0.124    0.124
   p5 ~                                                                  
-    p4      (ar_y)    0.999    0.009  105.596    0.000    0.764    0.764
-    q4      (cl_x)    0.384    0.011   34.717    0.000    0.241    0.241
+    p4      (ar_y)    0.986    0.010  101.812    0.000    0.760    0.760
+    q4      (cl_x)    0.394    0.011   34.881    0.000    0.243    0.243
   q5 ~                                                                  
-    q4      (ar_x)    1.051    0.011   99.934    0.000    0.843    0.843
-    p4      (cl_y)    0.140    0.009   15.571    0.000    0.137    0.137
+    q4      (ar_x)    1.037    0.011   98.495    0.000    0.844    0.844
+    p4      (cl_y)    0.132    0.009   14.591    0.000    0.134    0.134
 
 Covariances:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
   p1 ~~                                                                 
-    q1      (d__1)    0.291    0.033    8.770    0.000    0.289    0.289
+    q1      (d__1)    0.387    0.035   11.037    0.000    0.372    0.372
  .p2 ~~                                                                 
-   .q2      (d_c_)    0.188    0.009   19.877    0.000    0.331    0.331
+   .q2      (d_c_)    0.182    0.009   20.202    0.000    0.337    0.337
  .p3 ~~                                                                 
-   .q3      (d_c_)    0.188    0.009   19.877    0.000    0.331    0.331
+   .q3      (d_c_)    0.182    0.009   20.202    0.000    0.337    0.337
  .p4 ~~                                                                 
-   .q4      (d_c_)    0.188    0.009   19.877    0.000    0.331    0.331
+   .q4      (d_c_)    0.182    0.009   20.202    0.000    0.337    0.337
  .p5 ~~                                                                 
-   .q5      (d_c_)    0.188    0.009   19.877    0.000    0.331    0.331
+   .q5      (d_c_)    0.182    0.009   20.202    0.000    0.337    0.337
 
 Intercepts:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
-    p1                0.024    0.033    0.726    0.468    0.023    0.023
-    q1               -0.037    0.031   -1.211    0.226   -0.038   -0.038
+    p1                0.025    0.032    0.797    0.425    0.025    0.025
+    q1               -0.069    0.033   -2.114    0.034   -0.067   -0.067
    .p2                0.000                               0.000    0.000
    .q2                0.000                               0.000    0.000
    .p3                0.000                               0.000    0.000
@@ -1025,16 +1025,16 @@ Intercepts:
 
 Variances:
                    Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
-    p1   (d_vr_y1)    1.086    0.049   22.361    0.000    1.000    1.000
-    q1   (d_vr_x1)    0.938    0.042   22.361    0.000    1.000    1.000
-   .p2    (d_vr_y)    0.597    0.013   44.721    0.000    0.292    0.292
-   .q2    (d_vr_x)    0.540    0.012   44.721    0.000    0.321    0.321
-   .p3    (d_vr_y)    0.597    0.013   44.721    0.000    0.162    0.162
-   .q3    (d_vr_x)    0.540    0.012   44.721    0.000    0.197    0.197
-   .p4    (d_vr_y)    0.597    0.013   44.721    0.000    0.093    0.093
-   .q4    (d_vr_x)    0.540    0.012   44.721    0.000    0.125    0.125
-   .p5    (d_vr_y)    0.597    0.013   44.721    0.000    0.054    0.054
-   .q5    (d_vr_x)    0.540    0.012   44.721    0.000    0.080    0.080
+    p1   (d_vr_y1)    1.019    0.046   22.361    0.000    1.000    1.000
+    q1   (d_vr_x1)    1.060    0.047   22.361    0.000    1.000    1.000
+   .p2    (d_vr_y)    0.578    0.013   44.721    0.000    0.284    0.284
+   .q2    (d_vr_x)    0.503    0.011   44.721    0.000    0.285    0.285
+   .p3    (d_vr_y)    0.578    0.013   44.721    0.000    0.155    0.155
+   .q3    (d_vr_x)    0.503    0.011   44.721    0.000    0.183    0.183
+   .p4    (d_vr_y)    0.578    0.013   44.721    0.000    0.089    0.089
+   .q4    (d_vr_x)    0.503    0.011   44.721    0.000    0.120    0.120
+   .p5    (d_vr_y)    0.578    0.013   44.721    0.000    0.053    0.053
+   .q5    (d_vr_x)    0.503    0.011   44.721    0.000    0.080    0.080
    .y1                0.000                               0.000    0.000
    .x1                0.000                               0.000    0.000
    .y2                0.000                               0.000    0.000
@@ -1053,7 +1053,7 @@ Variances:
 <span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> lcsm_data<span class="sc">$</span>data),</span>
 <span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">standardized =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>lavaan 0.6-19 ended normally after 110 iterations
+<pre><code>lavaan 0.6-19 ended normally after 115 iterations
 
   Estimator                                         ML
   Optimization method                           NLMINB
@@ -1064,9 +1064,9 @@ Variances:
 
 Model Test User Model:
                                                       
-  Test statistic                                37.643
+  Test statistic                                40.170
   Degrees of freedom                                45
-  P-value (Chi-square)                           0.774
+  P-value (Chi-square)                           0.676
 
 Parameter Estimates:
 
@@ -1134,13 +1134,13 @@ Regressions:
   cf_x5 ~                                             
     cf_x4             1.000                           
   ld_x2 ~                                             
-    cf_x1   (ar_x)   -0.499    0.002 -217.223    0.000
+    cf_x1   (ar_x)   -0.497    0.002 -205.987    0.000
   ld_x3 ~                                             
-    cf_x2   (ar_x)   -0.499    0.002 -217.223    0.000
+    cf_x2   (ar_x)   -0.497    0.002 -205.987    0.000
   ld_x4 ~                                             
-    cf_x3   (ar_x)   -0.499    0.002 -217.223    0.000
+    cf_x3   (ar_x)   -0.497    0.002 -205.987    0.000
   ld_x5 ~                                             
-    cf_x4   (ar_x)   -0.499    0.002 -217.223    0.000
+    cf_x4   (ar_x)   -0.497    0.002 -205.987    0.000
   cf_y2 ~                                             
     cf_y1             1.000                           
   cf_y3 ~                                             
@@ -1150,47 +1150,47 @@ Regressions:
   cf_y5 ~                                             
     cf_y4             1.000                           
   ld_y2 ~                                             
-    cf_y1   (ar_y)   -0.498    0.002 -232.330    0.000
+    cf_y1   (ar_y)   -0.505    0.002 -226.486    0.000
   ld_y3 ~                                             
-    cf_y2   (ar_y)   -0.498    0.002 -232.330    0.000
+    cf_y2   (ar_y)   -0.505    0.002 -226.486    0.000
   ld_y4 ~                                             
-    cf_y3   (ar_y)   -0.498    0.002 -232.330    0.000
+    cf_y3   (ar_y)   -0.505    0.002 -226.486    0.000
   ld_y5 ~                                             
-    cf_y4   (ar_y)   -0.498    0.002 -232.330    0.000
+    cf_y4   (ar_y)   -0.505    0.002 -226.486    0.000
   ld_x2 ~                                             
-    cf_y1   (cl_y)    0.198    0.002  104.637    0.000
+    cf_y1   (cl_y)    0.198    0.002  101.613    0.000
   ld_y2 ~                                             
-    cf_x1   (cl_x)    0.548    0.003  210.020    0.000
+    cf_x1   (cl_x)    0.555    0.003  200.575    0.000
   ld_x3 ~                                             
-    cf_y2   (cl_y)    0.198    0.002  104.637    0.000
+    cf_y2   (cl_y)    0.198    0.002  101.613    0.000
   ld_y3 ~                                             
-    cf_x2   (cl_x)    0.548    0.003  210.020    0.000
+    cf_x2   (cl_x)    0.555    0.003  200.575    0.000
   ld_x4 ~                                             
-    cf_y3   (cl_y)    0.198    0.002  104.637    0.000
+    cf_y3   (cl_y)    0.198    0.002  101.613    0.000
   ld_y4 ~                                             
-    cf_x3   (cl_x)    0.548    0.003  210.020    0.000
+    cf_x3   (cl_x)    0.555    0.003  200.575    0.000
   ld_x5 ~                                             
-    cf_y4   (cl_y)    0.198    0.002  104.637    0.000
+    cf_y4   (cl_y)    0.198    0.002  101.613    0.000
   ld_y5 ~                                             
-    cf_x4   (cl_x)    0.548    0.003  210.020    0.000
+    cf_x4   (cl_x)    0.555    0.003  200.575    0.000
 
 Covariances:
                    Estimate  Std.Err  z-value  P(&gt;|z|)
   cf_x1 ~~                                            
-    A_x               0.000    0.031    0.015    0.988
+    A_x              -0.012    0.030   -0.394    0.694
   cf_y1 ~~                                            
-    A_y               0.068    0.033    2.040    0.041
+    A_y               0.027    0.032    0.860    0.390
   A_x ~~                                              
-    A_y               0.308    0.034    9.139    0.000
+    A_y               0.266    0.030    8.783    0.000
   cf_x1 ~~                                            
-    cf_y1             0.291    0.033    8.787    0.000
-    A_y               0.164    0.031    5.231    0.000
+    cf_y1             0.386    0.035   11.038    0.000
+    A_y               0.189    0.033    5.770    0.000
   A_x ~~                                              
-    cf_y1             0.270    0.034    7.901    0.000
+    cf_y1             0.182    0.030    6.034    0.000
 
 Intercepts:
                    Estimate  Std.Err  z-value  P(&gt;|z|)
-    cf_x1            -0.038    0.031   -1.244    0.213
+    cf_x1            -0.072    0.033   -2.208    0.027
    .cf_x2             0.000                           
    .cf_x3             0.000                           
    .cf_x4             0.000                           
@@ -1204,8 +1204,8 @@ Intercepts:
    .ld_x3             0.000                           
    .ld_x4             0.000                           
    .ld_x5             0.000                           
-    A_x               0.525    0.032   16.526    0.000
-    cf_y1             0.023    0.033    0.690    0.490
+    A_x               0.484    0.029   16.486    0.000
+    cf_y1             0.024    0.032    0.741    0.459
    .cf_y2             0.000                           
    .cf_y3             0.000                           
    .cf_y4             0.000                           
@@ -1219,40 +1219,40 @@ Intercepts:
    .ld_y3             0.000                           
    .ld_y4             0.000                           
    .ld_y5             0.000                           
-    A_y               0.528    0.032   16.456    0.000
+    A_y               0.496    0.031   15.870    0.000
 
 Variances:
                    Estimate  Std.Err  z-value  P(&gt;|z|)
-    cf_x1             0.927    0.042   22.165    0.000
+    cf_x1             1.050    0.047   22.183    0.000
    .cf_x2             0.000                           
    .cf_x3             0.000                           
    .cf_x4             0.000                           
    .cf_x5             0.000                           
-   .x1    (u_vr_x)    0.010    0.000   38.539    0.000
-   .x2    (u_vr_x)    0.010    0.000   38.539    0.000
-   .x3    (u_vr_x)    0.010    0.000   38.539    0.000
-   .x4    (u_vr_x)    0.010    0.000   38.539    0.000
-   .x5    (u_vr_x)    0.010    0.000   38.539    0.000
+   .x1    (u_vr_x)    0.010    0.000   38.530    0.000
+   .x2    (u_vr_x)    0.010    0.000   38.530    0.000
+   .x3    (u_vr_x)    0.010    0.000   38.530    0.000
+   .x4    (u_vr_x)    0.010    0.000   38.530    0.000
+   .x5    (u_vr_x)    0.010    0.000   38.530    0.000
    .ld_x2             0.000                           
    .ld_x3             0.000                           
    .ld_x4             0.000                           
    .ld_x5             0.000                           
-    A_x   (A_vr_x)    1.005    0.045   22.242    0.000
-    cf_y1             1.077    0.049   22.183    0.000
+    A_x   (A_vr_x)    0.859    0.039   22.226    0.000
+    cf_y1             1.007    0.045   22.164    0.000
    .cf_y2             0.000                           
    .cf_y3             0.000                           
    .cf_y4             0.000                           
    .cf_y5             0.000                           
-   .y1    (u_vr_y)    0.010    0.000   36.446    0.000
-   .y2    (u_vr_y)    0.010    0.000   36.446    0.000
-   .y3    (u_vr_y)    0.010    0.000   36.446    0.000
-   .y4    (u_vr_y)    0.010    0.000   36.446    0.000
-   .y5    (u_vr_y)    0.010    0.000   36.446    0.000
+   .y1    (u_vr_y)    0.010    0.000   36.442    0.000
+   .y2    (u_vr_y)    0.010    0.000   36.442    0.000
+   .y3    (u_vr_y)    0.010    0.000   36.442    0.000
+   .y4    (u_vr_y)    0.010    0.000   36.442    0.000
+   .y5    (u_vr_y)    0.010    0.000   36.442    0.000
    .ld_y2             0.000                           
    .ld_y3             0.000                           
    .ld_y4             0.000                           
    .ld_y5             0.000                           
-    A_y   (A_vr_y)    1.026    0.046   22.219    0.000</code></pre>
+    A_y   (A_vr_y)    0.975    0.044   22.206    0.000</code></pre>
 </div>
 </div>
 </section>
@@ -1268,8 +1268,8 @@ Variances:
 <div id="fig-lcm-full" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
 <div aria-describedby="fig-lcm-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
-<div class="grViz html-widget html-fill-item" id="htmlwidget-34141d8e0c66b562391a" style="width:100%;height:464px;"></div>
-<script type="application/json" data-for="htmlwidget-34141d8e0c66b562391a">{"x":{"diagram":"\ndigraph LCM {\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  A_X [pos = \"-2.5,1!\", shape = circle, fillcolor = white, label = <Δ<sub>x<\/sub>>,  width = 0.5, height = 0.5]\n  I [pos = \"-2.5,0!\", shape = triangle, fillcolor = white, label = \"I\",  width = 0.5, height = 0.5]\n  X1 [pos = \"-2,2.2!\", label = \"x1\", width = 0.6, height = 0.3]\n  X2 [pos = \"-1,2.2!\", label = \"x2\", width = 0.6, height = 0.3]\n  X3 [pos = \"0,2.2!\", label = \"x3\", width = 0.6, height = 0.3]\n  X4 [pos = \"1,2.2!\", label = \"x4\", width = 0.6, height = 0.3]\n  X5 [pos = \"2,2.2!\", label = \"x5\", width = 0.6, height = 0.3]\n\n  wX1 [pos = \"-2,1.35!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1,1.35!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0,1.35!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1,1.35!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"2,1.35!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  wY1 [pos = \"-2,-1.35!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1,-1.35!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0,-1.35!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1,-1.35!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"2,-1.35!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n  dX2 [pos = \"-1,0.5!\", shape = circle, fillcolor = white, label = \"Δx2\"]\n  dX3 [pos = \"0,0.5!\", shape = circle, fillcolor = white, label = \"Δx3\"]\n  dX4 [pos = \"1,0.5!\", shape = circle, fillcolor = white, label = \"Δx4\"]\n  dX5 [pos = \"2,0.5!\", shape = circle, fillcolor = white, label = \"Δx5\"]\n\n  dY2 [pos = \"-1,-0.5!\", shape = circle, fillcolor = white, label = \"Δy2\"]\n  dY3 [pos = \"0,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy3\"]\n  dY4 [pos = \"1,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy4\"]\n  dY5 [pos = \"2,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy5\"]\n\n  Y1 [pos = \"-2,-2.2!\", label = \"y1\", width = 0.6, height = 0.3]\n  Y2 [pos = \"-1,-2.2!\", label = \"y2\", width = 0.6, height = 0.3]\n  Y3 [pos = \"0,-2.2!\", label = \"y3\", width = 0.6, height = 0.3]\n  Y4 [pos = \"1,-2.2!\", label = \"y4\", width = 0.6, height = 0.3]\n  Y5 [pos = \"2,-2.2!\", label = \"y5\", width = 0.6, height = 0.3]\n  A_Y [pos = \"-2.5,-1!\", shape = circle, fillcolor = white, label = <Δ<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n  A_X -> dX2 [arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX3 [arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX4 [arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX5 [arrowsize = 0.5, tailport = e, headport = n]\n  A_Y -> dY2 [arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY3 [arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY4 [arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY5 [arrowsize = 0.5, tailport = e, headport = s]\n\n  I -> A_X [arrowsize = 0.5, tailport = n, headport = s]\n  I -> A_Y [arrowsize = 0.5, tailport = s, headport = n]\n  I -> wX1 [arrowsize = 0.5, tailport = n, headport = s]\n  I -> wY1 [arrowsize = 0.5, tailport = s, headport = n]\n\n  wX1 -> X1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> X2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> X3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> X4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX5 -> X5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> Y1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> Y2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> Y3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> Y4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY5 -> Y5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  wY1 -> dY2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dY3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dY4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dY5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX1 -> dX2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dX3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dX4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dX5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dY2 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dY3 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dY4 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dY5 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY1 -> dX2 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dX3 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dX4 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dX5 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> wX2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> wX3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> wX4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> wX5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> wY2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> wY3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> wY4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> wY5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  dX2 -> wX2 [arrowsize = 0.5]\n  dX3 -> wX3 [arrowsize = 0.5]\n  dX4 -> wX4 [arrowsize = 0.5]\n  dX5 -> wX5 [arrowsize = 0.5]\n  dY2 -> wY2 [arrowsize = 0.5]\n  dY3 -> wY3 [arrowsize = 0.5]\n  dY4 -> wY4 [arrowsize = 0.5]\n  dY5 -> wY5 [arrowsize = 0.5]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+<div class="grViz html-widget html-fill-item" id="htmlwidget-819e65728c4cd1c91a9b" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-819e65728c4cd1c91a9b">{"x":{"diagram":"\ndigraph LCM {\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  A_X [pos = \"-2.5,1!\", shape = circle, fillcolor = white, label = <Δ<sub>x<\/sub>>,  width = 0.5, height = 0.5]\n  I [pos = \"-2.5,0!\", shape = triangle, fillcolor = white, label = \"I\",  width = 0.5, height = 0.5]\n  X1 [pos = \"-2,2.2!\", label = \"x1\", width = 0.6, height = 0.3]\n  X2 [pos = \"-1,2.2!\", label = \"x2\", width = 0.6, height = 0.3]\n  X3 [pos = \"0,2.2!\", label = \"x3\", width = 0.6, height = 0.3]\n  X4 [pos = \"1,2.2!\", label = \"x4\", width = 0.6, height = 0.3]\n  X5 [pos = \"2,2.2!\", label = \"x5\", width = 0.6, height = 0.3]\n\n  wX1 [pos = \"-2,1.35!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1,1.35!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0,1.35!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1,1.35!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"2,1.35!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  wY1 [pos = \"-2,-1.35!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1,-1.35!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0,-1.35!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1,-1.35!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"2,-1.35!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n  dX2 [pos = \"-1,0.5!\", shape = circle, fillcolor = white, label = \"Δx2\"]\n  dX3 [pos = \"0,0.5!\", shape = circle, fillcolor = white, label = \"Δx3\"]\n  dX4 [pos = \"1,0.5!\", shape = circle, fillcolor = white, label = \"Δx4\"]\n  dX5 [pos = \"2,0.5!\", shape = circle, fillcolor = white, label = \"Δx5\"]\n\n  dY2 [pos = \"-1,-0.5!\", shape = circle, fillcolor = white, label = \"Δy2\"]\n  dY3 [pos = \"0,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy3\"]\n  dY4 [pos = \"1,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy4\"]\n  dY5 [pos = \"2,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy5\"]\n\n  Y1 [pos = \"-2,-2.2!\", label = \"y1\", width = 0.6, height = 0.3]\n  Y2 [pos = \"-1,-2.2!\", label = \"y2\", width = 0.6, height = 0.3]\n  Y3 [pos = \"0,-2.2!\", label = \"y3\", width = 0.6, height = 0.3]\n  Y4 [pos = \"1,-2.2!\", label = \"y4\", width = 0.6, height = 0.3]\n  Y5 [pos = \"2,-2.2!\", label = \"y5\", width = 0.6, height = 0.3]\n  A_Y [pos = \"-2.5,-1!\", shape = circle, fillcolor = white, label = <Δ<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n  A_X -> dX2 [arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX3 [arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX4 [arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX5 [arrowsize = 0.5, tailport = e, headport = n]\n  A_Y -> dY2 [arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY3 [arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY4 [arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY5 [arrowsize = 0.5, tailport = e, headport = s]\n\n  I -> A_X [arrowsize = 0.5, tailport = n, headport = s]\n  I -> A_Y [arrowsize = 0.5, tailport = s, headport = n]\n  I -> wX1 [arrowsize = 0.5, tailport = n, headport = s]\n  I -> wY1 [arrowsize = 0.5, tailport = s, headport = n]\n\n  wX1 -> X1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> X2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> X3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> X4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX5 -> X5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> Y1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> Y2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> Y3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> Y4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY5 -> Y5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  wY1 -> dY2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dY3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dY4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dY5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX1 -> dX2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dX3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dX4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dX5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dY2 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dY3 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dY4 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dY5 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY1 -> dX2 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dX3 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dX4 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dX5 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> wX2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> wX3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> wX4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> wX5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> wY2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> wY3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> wY4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> wY5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  dX2 -> wX2 [arrowsize = 0.5]\n  dX3 -> wX3 [arrowsize = 0.5]\n  dX4 -> wX4 [arrowsize = 0.5]\n  dX5 -> wX5 [arrowsize = 0.5]\n  dY2 -> wY2 [arrowsize = 0.5]\n  dY3 -> wY3 [arrowsize = 0.5]\n  dY4 -> wY4 [arrowsize = 0.5]\n  dY5 -> wY5 [arrowsize = 0.5]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
 </div>
 <figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lcm-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 Figure&nbsp;3.2: Bivariate Latent Change Score Model with constant-change factors. Full measurement model across five waves.

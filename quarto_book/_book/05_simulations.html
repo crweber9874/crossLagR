@@ -7,7 +7,7 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
 
 
-<title>6&nbsp; Simulations – crossLagR: A User Guide to Cross-Lagged Panel Models in R</title>
+<title>6&nbsp; Simulations – crossLagR</title>
 <style>
 code{white-space: pre-wrap;}
 span.smallcaps{font-variant: small-caps;}
@@ -19,41 +19,6 @@ ul.task-list li input[type="checkbox"] {
   width: 0.8em;
   margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
   vertical-align: middle;
-}
-/* CSS for syntax highlighting */
-html { -webkit-text-size-adjust: 100%; }
-pre > code.sourceCode { white-space: pre; position: relative; }
-pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
-pre > code.sourceCode > span:empty { height: 1.2em; }
-.sourceCode { overflow: visible; }
-code.sourceCode > span { color: inherit; text-decoration: inherit; }
-div.sourceCode { margin: 1em 0; }
-pre.sourceCode { margin: 0; }
-@media screen {
-div.sourceCode { overflow: auto; }
-}
-@media print {
-pre > code.sourceCode { white-space: pre-wrap; }
-pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
-}
-pre.numberSource code
-  { counter-reset: source-line 0; }
-pre.numberSource code > span
-  { position: relative; left: -4em; counter-increment: source-line; }
-pre.numberSource code > span > a:first-child::before
-  { content: counter(source-line);
-    position: relative; left: -1em; text-align: right; vertical-align: baseline;
-    border: none; display: inline-block;
-    -webkit-touch-callout: none; -webkit-user-select: none;
-    -khtml-user-select: none; -moz-user-select: none;
-    -ms-user-select: none; user-select: none;
-    padding: 0 4px; width: 4em;
-  }
-pre.numberSource { margin-left: 3em;  padding-left: 4px; }
-div.sourceCode
-  {   }
-@media screen {
-pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
 }
 </style>
 
@@ -162,7 +127,7 @@ window.Quarto = {
   <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
     <div class="pt-lg-2 mt-2 text-left sidebar-header">
     <div class="sidebar-title mb-0 py-0">
-      <a href="./">crossLagR: A User Guide to Cross-Lagged Panel Models in R</a> 
+      <a href="./">crossLagR</a> 
     </div>
       </div>
         <div class="mt-2 flex-shrink-0 align-items-center">
@@ -339,28 +304,6 @@ Table&nbsp;6.1: True AR/CL parameters shared across both simulations. Within-per
 <h3 data-number="6.3.1" class="anchored" data-anchor-id="distributions-of-estimates"><span class="header-section-number">6.3.1</span> Distributions of Estimates</h3>
 <p><a href="#fig-sim1-ridges" class="quarto-xref">Figure&nbsp;<span>6.1</span></a> shows the sampling distribution of each estimator’s recovery of the four AR/CL parameters. Vertical lines mark the true value; each ridge is colored by its mean absolute deviation from truth — the more green the closer to the truth, red ridges drift far from the true value. One important caveat: The LCGM autoregressive parameters drift far from true parameter values, but the AR parameter should be interpreted as <span class="math inline">\(1+\beta\)</span> where <span class="math inline">\(\beta\)</span> is the true slope generated from the RI-CLPM.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>truth_df <span class="ot">&lt;-</span> <span class="fu">tibble</span>(<span class="at">parameter =</span> <span class="fu">factor</span>(<span class="fu">names</span>(true_vals), <span class="at">levels =</span> <span class="fu">c</span>(<span class="st">"ar_x"</span>, <span class="st">"ar_y"</span>, <span class="st">"cl_xy"</span>, <span class="st">"cl_yx"</span>)),</span>
-<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                   <span class="at">truth     =</span> true_vals)</span>
-<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>sim1 <span class="sc">|&gt;</span></span>
-<span id="cb1-5"><a href="#cb1-5" aria-hidden="true" tabindex="-1"></a>  <span class="fu">filter</span>(converged, <span class="sc">!</span><span class="fu">is.na</span>(estimate)) <span class="sc">|&gt;</span></span>
-<span id="cb1-6"><a href="#cb1-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">group_by</span>(estimator, parameter, bw_ratio_f) <span class="sc">|&gt;</span></span>
-<span id="cb1-7"><a href="#cb1-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">mutate</span>(<span class="at">mean_abs_dev =</span> <span class="fu">mean</span>(<span class="fu">abs</span>(estimate <span class="sc">-</span> true), <span class="at">na.rm =</span> <span class="cn">TRUE</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb1-8"><a href="#cb1-8" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ungroup</span>() <span class="sc">|&gt;</span></span>
-<span id="cb1-9"><a href="#cb1-9" aria-hidden="true" tabindex="-1"></a>  <span class="fu">ggplot</span>(<span class="fu">aes</span>(<span class="at">x =</span> estimate, <span class="at">y =</span> bw_ratio_f, <span class="at">fill =</span> mean_abs_dev)) <span class="sc">+</span></span>
-<span id="cb1-10"><a href="#cb1-10" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_density_ridges</span>(<span class="at">scale =</span> <span class="fl">1.4</span>, <span class="at">rel_min_height =</span> <span class="fl">0.01</span>,</span>
-<span id="cb1-11"><a href="#cb1-11" aria-hidden="true" tabindex="-1"></a>                      <span class="at">color =</span> <span class="st">"white"</span>, <span class="at">linewidth =</span> <span class="fl">0.2</span>, <span class="at">alpha =</span> <span class="fl">0.9</span>) <span class="sc">+</span></span>
-<span id="cb1-12"><a href="#cb1-12" aria-hidden="true" tabindex="-1"></a>  <span class="fu">geom_vline</span>(<span class="at">data =</span> truth_df, <span class="fu">aes</span>(<span class="at">xintercept =</span> truth),</span>
-<span id="cb1-13"><a href="#cb1-13" aria-hidden="true" tabindex="-1"></a>             <span class="at">color =</span> <span class="st">"grey20"</span>, <span class="at">linetype =</span> <span class="st">"dashed"</span>, <span class="at">linewidth =</span> <span class="fl">0.4</span>) <span class="sc">+</span></span>
-<span id="cb1-14"><a href="#cb1-14" aria-hidden="true" tabindex="-1"></a>  <span class="fu">facet_grid</span>(estimator <span class="sc">~</span> parameter, <span class="at">scales =</span> <span class="st">"free_x"</span>, <span class="at">switch =</span> <span class="st">"y"</span>) <span class="sc">+</span></span>
-<span id="cb1-15"><a href="#cb1-15" aria-hidden="true" tabindex="-1"></a>  <span class="fu">scale_fill_gradient</span>(<span class="at">low =</span> <span class="st">"#2ecc71"</span>, <span class="at">high =</span> <span class="st">"#e74c3c"</span>,</span>
-<span id="cb1-16"><a href="#cb1-16" aria-hidden="true" tabindex="-1"></a>                      <span class="at">name =</span> <span class="st">"Mean</span><span class="sc">\n</span><span class="st">|estimate − truth|"</span>) <span class="sc">+</span></span>
-<span id="cb1-17"><a href="#cb1-17" aria-hidden="true" tabindex="-1"></a>  <span class="fu">labs</span>(<span class="at">x =</span> <span class="st">"Estimate"</span>, <span class="at">y =</span> <span class="st">"Between : within variance ratio"</span>,</span>
-<span id="cb1-18"><a href="#cb1-18" aria-hidden="true" tabindex="-1"></a>       <span class="at">title =</span> <span class="st">"Simulation 1: Varying Trait Variance under an RI-CLPM DGP"</span>,</span>
-<span id="cb1-19"><a href="#cb1-19" aria-hidden="true" tabindex="-1"></a>       <span class="at">subtitle =</span> <span class="fu">paste0</span>(trials, <span class="st">" replications per cell · n = "</span>, n_obs, <span class="st">" · "</span>, waves, <span class="st">" waves"</span>)) <span class="sc">+</span></span>
-<span id="cb1-20"><a href="#cb1-20" aria-hidden="true" tabindex="-1"></a>  theme_grand <span class="sc">+</span></span>
-<span id="cb1-21"><a href="#cb1-21" aria-hidden="true" tabindex="-1"></a>  <span class="fu">theme</span>(<span class="at">strip.placement =</span> <span class="st">"outside"</span>,</span>
-<span id="cb1-22"><a href="#cb1-22" aria-hidden="true" tabindex="-1"></a>        <span class="at">panel.spacing   =</span> <span class="fu">unit</span>(<span class="fl">0.4</span>, <span class="st">"lines"</span>))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output-display">
 <div id="fig-sim1-ridges" class="quarto-float quarto-figure quarto-figure-center anchored">
 <figure class="quarto-float quarto-float-fig figure">
@@ -420,23 +363,23 @@ Table&nbsp;6.2
 </figcaption>
 <div aria-describedby="tbl-sim1-convergence-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
 <div class="cell-output-display">
-<div id="usbkgwyuzb" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
-<style>#usbkgwyuzb table {
+<div id="gelexfwmkr" style="padding-left:0px;padding-right:0px;padding-top:10px;padding-bottom:10px;overflow-x:auto;overflow-y:auto;width:auto;height:auto;">
+<style>#gelexfwmkr table {
   font-family: system-ui, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji', 'Segoe UI Symbol', 'Noto Color Emoji';
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
-#usbkgwyuzb thead, #usbkgwyuzb tbody, #usbkgwyuzb tfoot, #usbkgwyuzb tr, #usbkgwyuzb td, #usbkgwyuzb th {
+#gelexfwmkr thead, #gelexfwmkr tbody, #gelexfwmkr tfoot, #gelexfwmkr tr, #gelexfwmkr td, #gelexfwmkr th {
   border-style: none;
 }
 
-#usbkgwyuzb p {
+#gelexfwmkr p {
   margin: 0;
   padding: 0;
 }
 
-#usbkgwyuzb .gt_table {
+#gelexfwmkr .gt_table {
   display: table;
   border-collapse: collapse;
   line-height: normal;
@@ -462,12 +405,12 @@ Table&nbsp;6.2
   border-left-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_caption {
+#gelexfwmkr .gt_caption {
   padding-top: 4px;
   padding-bottom: 4px;
 }
 
-#usbkgwyuzb .gt_title {
+#gelexfwmkr .gt_title {
   color: #333333;
   font-size: 125%;
   font-weight: initial;
@@ -479,7 +422,7 @@ Table&nbsp;6.2
   border-bottom-width: 0;
 }
 
-#usbkgwyuzb .gt_subtitle {
+#gelexfwmkr .gt_subtitle {
   color: #333333;
   font-size: 85%;
   font-weight: initial;
@@ -491,7 +434,7 @@ Table&nbsp;6.2
   border-top-width: 0;
 }
 
-#usbkgwyuzb .gt_heading {
+#gelexfwmkr .gt_heading {
   background-color: #FFFFFF;
   text-align: center;
   border-bottom-color: #FFFFFF;
@@ -503,13 +446,13 @@ Table&nbsp;6.2
   border-right-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_bottom_border {
+#gelexfwmkr .gt_bottom_border {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_col_headings {
+#gelexfwmkr .gt_col_headings {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -524,7 +467,7 @@ Table&nbsp;6.2
   border-right-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_col_heading {
+#gelexfwmkr .gt_col_heading {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -544,7 +487,7 @@ Table&nbsp;6.2
   overflow-x: hidden;
 }
 
-#usbkgwyuzb .gt_column_spanner_outer {
+#gelexfwmkr .gt_column_spanner_outer {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -556,15 +499,15 @@ Table&nbsp;6.2
   padding-right: 4px;
 }
 
-#usbkgwyuzb .gt_column_spanner_outer:first-child {
+#gelexfwmkr .gt_column_spanner_outer:first-child {
   padding-left: 0;
 }
 
-#usbkgwyuzb .gt_column_spanner_outer:last-child {
+#gelexfwmkr .gt_column_spanner_outer:last-child {
   padding-right: 0;
 }
 
-#usbkgwyuzb .gt_column_spanner {
+#gelexfwmkr .gt_column_spanner {
   border-bottom-style: solid;
   border-bottom-width: 2px;
   border-bottom-color: #D3D3D3;
@@ -576,11 +519,11 @@ Table&nbsp;6.2
   width: 100%;
 }
 
-#usbkgwyuzb .gt_spanner_row {
+#gelexfwmkr .gt_spanner_row {
   border-bottom-style: hidden;
 }
 
-#usbkgwyuzb .gt_group_heading {
+#gelexfwmkr .gt_group_heading {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -606,7 +549,7 @@ Table&nbsp;6.2
   text-align: left;
 }
 
-#usbkgwyuzb .gt_empty_group_heading {
+#gelexfwmkr .gt_empty_group_heading {
   padding: 0.5px;
   color: #333333;
   background-color: #FFFFFF;
@@ -621,15 +564,15 @@ Table&nbsp;6.2
   vertical-align: middle;
 }
 
-#usbkgwyuzb .gt_from_md > :first-child {
+#gelexfwmkr .gt_from_md > :first-child {
   margin-top: 0;
 }
 
-#usbkgwyuzb .gt_from_md > :last-child {
+#gelexfwmkr .gt_from_md > :last-child {
   margin-bottom: 0;
 }
 
-#usbkgwyuzb .gt_row {
+#gelexfwmkr .gt_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -648,7 +591,7 @@ Table&nbsp;6.2
   overflow-x: hidden;
 }
 
-#usbkgwyuzb .gt_stub {
+#gelexfwmkr .gt_stub {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -661,7 +604,7 @@ Table&nbsp;6.2
   padding-right: 5px;
 }
 
-#usbkgwyuzb .gt_stub_row_group {
+#gelexfwmkr .gt_stub_row_group {
   color: #333333;
   background-color: #FFFFFF;
   font-size: 100%;
@@ -675,15 +618,15 @@ Table&nbsp;6.2
   vertical-align: top;
 }
 
-#usbkgwyuzb .gt_row_group_first td {
+#gelexfwmkr .gt_row_group_first td {
   border-top-width: 2px;
 }
 
-#usbkgwyuzb .gt_row_group_first th {
+#gelexfwmkr .gt_row_group_first th {
   border-top-width: 2px;
 }
 
-#usbkgwyuzb .gt_summary_row {
+#gelexfwmkr .gt_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -693,16 +636,16 @@ Table&nbsp;6.2
   padding-right: 5px;
 }
 
-#usbkgwyuzb .gt_first_summary_row {
+#gelexfwmkr .gt_first_summary_row {
   border-top-style: solid;
   border-top-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_first_summary_row.thick {
+#gelexfwmkr .gt_first_summary_row.thick {
   border-top-width: 2px;
 }
 
-#usbkgwyuzb .gt_last_summary_row {
+#gelexfwmkr .gt_last_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -712,7 +655,7 @@ Table&nbsp;6.2
   border-bottom-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_grand_summary_row {
+#gelexfwmkr .gt_grand_summary_row {
   color: #333333;
   background-color: #FFFFFF;
   text-transform: inherit;
@@ -722,7 +665,7 @@ Table&nbsp;6.2
   padding-right: 5px;
 }
 
-#usbkgwyuzb .gt_first_grand_summary_row {
+#gelexfwmkr .gt_first_grand_summary_row {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -732,7 +675,7 @@ Table&nbsp;6.2
   border-top-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_last_grand_summary_row_top {
+#gelexfwmkr .gt_last_grand_summary_row_top {
   padding-top: 8px;
   padding-bottom: 8px;
   padding-left: 5px;
@@ -742,11 +685,11 @@ Table&nbsp;6.2
   border-bottom-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_striped {
+#gelexfwmkr .gt_striped {
   background-color: rgba(128, 128, 128, 0.05);
 }
 
-#usbkgwyuzb .gt_table_body {
+#gelexfwmkr .gt_table_body {
   border-top-style: solid;
   border-top-width: 2px;
   border-top-color: #D3D3D3;
@@ -755,7 +698,7 @@ Table&nbsp;6.2
   border-bottom-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_footnotes {
+#gelexfwmkr .gt_footnotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -769,7 +712,7 @@ Table&nbsp;6.2
   border-right-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_footnote {
+#gelexfwmkr .gt_footnote {
   margin: 0px;
   font-size: 90%;
   padding-top: 4px;
@@ -778,7 +721,7 @@ Table&nbsp;6.2
   padding-right: 5px;
 }
 
-#usbkgwyuzb .gt_sourcenotes {
+#gelexfwmkr .gt_sourcenotes {
   color: #333333;
   background-color: #FFFFFF;
   border-bottom-style: none;
@@ -792,7 +735,7 @@ Table&nbsp;6.2
   border-right-color: #D3D3D3;
 }
 
-#usbkgwyuzb .gt_sourcenote {
+#gelexfwmkr .gt_sourcenote {
   font-size: 90%;
   padding-top: 4px;
   padding-bottom: 4px;
@@ -800,72 +743,72 @@ Table&nbsp;6.2
   padding-right: 5px;
 }
 
-#usbkgwyuzb .gt_left {
+#gelexfwmkr .gt_left {
   text-align: left;
 }
 
-#usbkgwyuzb .gt_center {
+#gelexfwmkr .gt_center {
   text-align: center;
 }
 
-#usbkgwyuzb .gt_right {
+#gelexfwmkr .gt_right {
   text-align: right;
   font-variant-numeric: tabular-nums;
 }
 
-#usbkgwyuzb .gt_font_normal {
+#gelexfwmkr .gt_font_normal {
   font-weight: normal;
 }
 
-#usbkgwyuzb .gt_font_bold {
+#gelexfwmkr .gt_font_bold {
   font-weight: bold;
 }
 
-#usbkgwyuzb .gt_font_italic {
+#gelexfwmkr .gt_font_italic {
   font-style: italic;
 }
 
-#usbkgwyuzb .gt_super {
+#gelexfwmkr .gt_super {
   font-size: 65%;
 }
 
-#usbkgwyuzb .gt_footnote_marks {
+#gelexfwmkr .gt_footnote_marks {
   font-size: 75%;
   vertical-align: 0.4em;
   position: initial;
 }
 
-#usbkgwyuzb .gt_asterisk {
+#gelexfwmkr .gt_asterisk {
   font-size: 100%;
   vertical-align: 0;
 }
 
-#usbkgwyuzb .gt_indent_1 {
+#gelexfwmkr .gt_indent_1 {
   text-indent: 5px;
 }
 
-#usbkgwyuzb .gt_indent_2 {
+#gelexfwmkr .gt_indent_2 {
   text-indent: 10px;
 }
 
-#usbkgwyuzb .gt_indent_3 {
+#gelexfwmkr .gt_indent_3 {
   text-indent: 15px;
 }
 
-#usbkgwyuzb .gt_indent_4 {
+#gelexfwmkr .gt_indent_4 {
   text-indent: 20px;
 }
 
-#usbkgwyuzb .gt_indent_5 {
+#gelexfwmkr .gt_indent_5 {
   text-indent: 25px;
 }
 
-#usbkgwyuzb .katex-display {
+#gelexfwmkr .katex-display {
   display: inline-flex !important;
   margin-bottom: 0.75em !important;
 }
 
-#usbkgwyuzb div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
+#gelexfwmkr div.Reactable > div.rt-table > div.rt-thead > div.rt-tr.rt-tr-group-header > div.rt-th-group:after {
   height: 0px !important;
 }
 </style>
@@ -1000,7 +943,6 @@ Table&nbsp;6.2
 <h2 data-number="6.4" class="anchored" data-anchor-id="bayesian-ri-clpm-with-informative-priors"><span class="header-section-number">6.4</span> Bayesian RI-CLPM with Informative Priors</h2>
 <p>One of the issues with the RI-CLPM is that it can be difficult to fit when there is a lot of trait variance. The Bayesian approach allows us to put informative priors on the parameters.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">make_riclpm_pop</span>(<span class="dv">8</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>  id lhs op rhs user block group free ustart exo label plabel
 1  1 I_x =~  x1    1     1     1    0      1   0         .p1.

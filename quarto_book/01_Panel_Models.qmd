@@ -263,6 +263,7 @@ fit_one <- function(syntax, dat, est_name) {
 
 ```{r}
 #| label: fig-bias-by-bw-ratio
+#| echo: false
 #| message: false
 #| warning: false
 #| cache: true

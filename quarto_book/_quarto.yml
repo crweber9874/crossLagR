@@ -3,7 +3,9 @@ project:
   output-dir: _book
 
 book:
-  title: "crossLagR: A User Guide to Cross-Lagged Panel Models in R"
+  title: "crossLagR"
+  subtitle: "SEM Panel data models for the social sciences"
+
   author:
     - Christopher Weber
     - Adam Panish

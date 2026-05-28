@@ -122,7 +122,7 @@ str(sim$data, list.len = 6)
 
 The wide-format output is what every `estimate*()` expects when fed to `lavaan`. A long-format helper `reshape_long_sim_cr()` is available for plotting, but generally the convention here is to keep the data in wide format.
 
-## Quick Example
+## Quick 
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 set.seed(2026)
