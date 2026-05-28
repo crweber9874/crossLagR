@@ -35,6 +35,15 @@ jobs:
           extra-packages: |
             any::pkgdown
             any::devtools
+            any::DiagrammeR
+            any::brms
+            any::tidybayes
+            any::plm
+            any::naniar
+            any::psych
+            any::here
+            any::ggridges
+            any::blavaan
             local::.
           needs: website
 
