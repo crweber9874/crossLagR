@@ -1,0 +1,1407 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>5&nbsp; Extensions and Alternatives – crossLagR</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./05_simulations.html" rel="next">
+<link href="./03_RICLPM.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-48abc47ddc2cbc14860ddec9e9fdb395.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/viz-1.8.2/viz.js"></script>
+<link href="site_libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="site_libs/grViz-binding-1.0.11/grViz.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./04_Usami.html"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">crossLagR</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00_Install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installation and Package Syntax</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_Panel_Models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Revisiting the Cross-Lagged Panel Model</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_Change.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_RICLPM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_Usami.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_simulations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Simulations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applications</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_iscap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The ISCAP Panel</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_liss.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Replication: Bakker, Lelkes, &amp; Malka (2021)</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-unified-framework" id="toc-the-unified-framework" class="nav-link active" data-scroll-target="#the-unified-framework"><span class="header-section-number">5.1</span> The Unified Framework</a></li>
+  <li><a href="#the-latent-growth-model" id="toc-the-latent-growth-model" class="nav-link" data-scroll-target="#the-latent-growth-model"><span class="header-section-number">5.2</span> The Latent Growth Model</a></li>
+  <li><a href="#alt-autoregressive-latent-trajectory" id="toc-alt-autoregressive-latent-trajectory" class="nav-link" data-scroll-target="#alt-autoregressive-latent-trajectory"><span class="header-section-number">5.3</span> ALT: Autoregressive Latent Trajectory</a></li>
+  <li><a href="#gclm" id="toc-gclm" class="nav-link" data-scroll-target="#gclm"><span class="header-section-number">5.4</span> GCLM</a></li>
+  <li><a href="#bollen-brand-dynamic-panel-with-latent-fixed-effects" id="toc-bollen-brand-dynamic-panel-with-latent-fixed-effects" class="nav-link" data-scroll-target="#bollen-brand-dynamic-panel-with-latent-fixed-effects"><span class="header-section-number">5.5</span> Bollen &amp; Brand: Dynamic Panel with Latent Fixed Effects</a></li>
+  <li><a href="#comparing-on-one-dataset" id="toc-comparing-on-one-dataset" class="nav-link" data-scroll-target="#comparing-on-one-dataset"><span class="header-section-number">5.6</span> Comparing on One Dataset</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">5.7</span> Summary</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>The CLPM (Chapter 1), the LCSM (Chapter 2), and the RI-CLPM (Chapter 3) are special cases of a broader unified model, which <span class="citation" data-cites="usami2019">Usami et al. (<a href="#ref-usami2019" role="doc-biblioref">2019</a>)</span> organizes into two equations: a <strong>decomposition</strong> component. This is just the way that we can split the observed scores into stable and time-varying components. For instance, the RI-CLPM separates the stable trait from the time-varying deviations around that stable trait. The <strong>dynamic equation</strong> is typically what one is interested in with a panel dataset, a change process. In the RI-CLPM this is represented by the autoregressive and cross-lagged paths on the time-varying deviations. In the LCM, the dynamic equation is the proportional change specified by the latent change scores, what proportion of y changes for every unit change in x. <span class="citation" data-cites="usami2019">Usami et al. (<a href="#ref-usami2019" role="doc-biblioref">2019</a>)</span> shows that many models share common decomposition and dynamic equations, and these two components can be combined and modified to yield different families of models. This can be a useful exercise – there are a number of heavily used structural equation models that can be estimated with panel data, and it isn’t always clear how the parameters of models related to one another. One commonly estimated model is the <strong>Latent Growth Model</strong> (LGM), which capture each unit’s trajectory over time with a latent intercept and slope factor. The RI-CLPM is a special case of the LGM, where the stable factors are random intercepts and there are no slope factors and dynamic paths are specified on the time-varying deviations from those random intercepts. The <code>crossLagR</code> includes syntax and simulation functions for all the models in this chapter.</p>
+<section id="the-unified-framework" class="level2" data-number="5.1">
+<h2 data-number="5.1" class="anchored" data-anchor-id="the-unified-framework"><span class="header-section-number">5.1</span> The Unified Framework</h2>
+<p><span class="citation" data-cites="usami2019">Usami et al. (<a href="#ref-usami2019" role="doc-biblioref">2019</a>)</span> proposes couching these various models in an overarching framework. The notion is to start by acknowledging that observed scores are a combination of stable and time-varying components. This chapter implements this framework to develop several related SEM estimators for panel data, including the Latent Growth Model (LCM), Autoregressive Latent Trajectory (ALT) model, and the General Cross-Lagged Model (GCLM; also known as the Latent Growth Model with Structured Residuals). Under this framework, these models can also be compared to the CLPM, RI-CLPM, and LCSM, which are special cases of the more general framework.</p>
+<p><span class="math display">\[
+\begin{aligned}
+x_{it} &amp;= \mu_{xt} + \underbrace{F_{x,i}^\top \lambda_{xt}}_{\text{stable}} + x^*_{it}, \\
+y_{it} &amp;= \mu_{yt} + \underbrace{F_{y,i}^\top \lambda_{yt}}_{\text{stable}} + y^*_{it}.
+\end{aligned}
+\]</span></p>
+<p>Here <span class="math inline">\(F_{x,i}, F_{y,i}\)</span> captures an array of stable factors – these wouldn’t specify all at once, but the framework simply allows us to capture an array of things that show up in panel models, that all fall in this bucket: stable components. These are “random intercepts” in the RI-CLPM. They are “growth factors” in the ALT and LCM-SR; they represent the unit specific slope and intercept that capture each unit’s trajectory. These are “latent fixed effects” in Bollen &amp; Brand. Importantly, <em>the loadings <span class="math inline">\(\lambda_{xt}, \lambda_{yt}\)</span> define how these stable factors contribute to the observed scores at each wave</em>.</p>
+<p>The stable component is important in <strong>decomposition</strong>. It allows us to partition the observed scores into stable and time-varying components. The time-varying within-person component is <span class="math inline">\(x^*_{it}, y^*_{it}\)</span>. <span class="math display">\[
+\begin{aligned}
+x^*_{it} &amp;= \beta_x\,x^*_{i,t-1} + \omega_{yx}\,y^*_{i,t-1} + u_{x,it}, \\
+y^*_{it} &amp;= \beta_y\,y^*_{i,t-1} + \omega_{xy}\,x^*_{i,t-1} + u_{y,it}.
+\end{aligned}
+\]</span></p>
+<p>where <span class="math inline">\(\beta_x, \beta_y\)</span> are the autoregressive coefficients (lavaan labels <code>ar_x</code>, <code>ar_y</code>) and <span class="math inline">\(\omega_{xy}, \omega_{yx}\)</span> are the cross-lagged coefficients (lavaan labels <code>cl_xy</code>, <code>cl_yx</code>).<a href="#fn1" class="footnote-ref" id="fnref1" role="doc-noteref"><sup>1</sup></a></p>
+<p>Each estimator in <code>crossLagR</code> largely depend on the stable factor component. Let’s say that any model is defined by three broad categories of parameters: the stable factors <span class="math inline">\(F\)</span>, their loadings <span class="math inline">\(\lambda_t\)</span>, and the dynamic equation (what goes on in the time-varying component).</p>
+<ol type="1">
+<li><p><strong>What stable factors <span class="math inline">\(F\)</span>?</strong> In the CLPM, there are no stable factors – all variation is wave-specific. In the RI-CLPM, there are two stable factors – the random intercepts for x and y. In the ALT and LCM-SR, there are four stable factors – the intercept and slope for x and y. In Bollen &amp; Brand, there are two stable factors – the latent fixed effects for x and y.</p></li>
+<li><p><strong>The trait factors are <em>expressed</em> by the loadings <span class="math inline">\(\lambda_t\)</span></strong> This is particularly important in growth models, where the loadings determine how the stable factors contribute to the observed scores at each wave, for instance.</p></li>
+<li><p><strong>Dynamic Effects</strong> In the RI-CLPM the dynamic equations are estimated on <span class="math inline">\(x^*\)</span> or directly. In the Autoregressive Latent Trajectory (ALT) model, the AR and CL paths are specified directly the observed scores, which creates a compounding effect over time. And General Cross Cross-Lagged Model which is a growth model, where the residuals are then regressed in a cross lag structure. So, unlike the RI-CLPM the GCLM autoregressive and cross-lagged paths are deviations from a unit’s growth trajectory, not deviations from a unit’s trait.</p></li>
+</ol>
+<p>The <code>crossLagR</code> package uses identical parameter labels across models, <em>but the interpretation of these parameters differs by model.</em> <span class="quarto-unresolved-ref">?tbl-unified-labels-short</span> summarizes the unified parameter labels across models, their varying substantive interpretations.</p>
+<div id="tbl-unified-labels" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-tbl figure">
+<figcaption class="quarto-float-caption-top quarto-float-caption quarto-float-tbl" id="tbl-unified-labels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Table&nbsp;5.1: Unified parameter labels across estimators. All models share <code>ar_x</code>, <code>ar_y</code>, <code>cl_xy</code>, <code>cl_yx</code> labels; the substantive interpretation differs.
+</figcaption>
+<div aria-describedby="tbl-unified-labels-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<table class="caption-top table">
+<colgroup>
+<col style="width: 15%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+<col style="width: 12%">
+</colgroup>
+<thead>
+<tr class="header">
+<th style="text-align: center;">Unified Label</th>
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: left;">CLPM</th>
+<th style="text-align: left;">RI-CLPM</th>
+<th style="text-align: left;">Bollen &amp; Brand</th>
+<th style="text-align: left;">Latent Change</th>
+<th style="text-align: left;">ALT</th>
+<th style="text-align: left;">LCM-SR</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: center;"><code>ar_x</code></td>
+<td style="text-align: left;">Autoregressive (X)</td>
+<td style="text-align: left;">Rank-order</td>
+<td style="text-align: left;">Within-person carry-over</td>
+<td style="text-align: left;">AR with fixed effects</td>
+<td style="text-align: left;">Proportional change</td>
+<td style="text-align: left;">AR on scores (compounding)</td>
+<td style="text-align: left;">AR on residuals from growth</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code>ar_y</code></td>
+<td style="text-align: left;">Autoregressive (Y)</td>
+<td style="text-align: left;">Rank-order</td>
+<td style="text-align: left;">Within-person carry-over</td>
+<td style="text-align: left;">AR with fixed effects</td>
+<td style="text-align: left;">Proportional change</td>
+<td style="text-align: left;">AR on scores (compounding)</td>
+<td style="text-align: left;">AR on residuals from growth</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><code>cl_xy</code></td>
+<td style="text-align: left;">Cross-lag (X <span class="math inline">\(\to\)</span> Y)</td>
+<td style="text-align: left;">Granger-causal</td>
+<td style="text-align: left;">Within-person cross-lag</td>
+<td style="text-align: left;">Cross-lag with FE</td>
+<td style="text-align: left;">Coupling (X level <span class="math inline">\(\to\)</span> <span class="math inline">\(\Delta\)</span>Y)</td>
+<td style="text-align: left;">CL on scores</td>
+<td style="text-align: left;">CL on residuals from growth</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code>cl_yx</code></td>
+<td style="text-align: left;">Cross-lag (Y <span class="math inline">\(\to\)</span> X)</td>
+<td style="text-align: left;">Granger-causal</td>
+<td style="text-align: left;">Within-person cross-lag</td>
+<td style="text-align: left;">Cross-lag with FE</td>
+<td style="text-align: left;">Coupling (Y level <span class="math inline">\(\to\)</span> <span class="math inline">\(\Delta\)</span>X)</td>
+<td style="text-align: left;">CL on scores</td>
+<td style="text-align: left;">CL on residuals from growth</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><code>I_x</code>, <code>I_y</code></td>
+<td style="text-align: left;">Trait / intercept factors</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">Random intercepts</td>
+<td style="text-align: left;">Latent fixed effects</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">Growth intercept (accumulating)</td>
+<td style="text-align: left;">Growth intercept (direct only)</td>
+</tr>
+<tr class="even">
+<td style="text-align: center;"><code>S_x</code>, <code>S_y</code></td>
+<td style="text-align: left;">Slope factors</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">Growth slope (accumulating)</td>
+<td style="text-align: left;">Growth slope (direct only)</td>
+</tr>
+<tr class="odd">
+<td style="text-align: center;"><code>A_x</code>, <code>A_y</code></td>
+<td style="text-align: left;">Accumulating change factors</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">Constant-change factor</td>
+<td style="text-align: left;">—</td>
+<td style="text-align: left;">—</td>
+</tr>
+</tbody>
+</table>
+</div>
+</figure>
+</div>
+<p><span class="quarto-unresolved-ref">?tbl-unified-labels-short</span> briefly summarizes this varying interpretation. The CLPM, for instance, does not have a stable trait component, so the AR paths capture rank-order stability (if an individual scores higher than their own average at time 1, they also score higher than their own average at time 2?). The model generally will preserve the rank-order of individuals over time, in <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span>.</p>
+<div class="line-block">Label | By model, what it means…|<br>
+<code>ar_x</code>, <code>ar_y</code> | CLPM: rank-order stability • RI-CLPM: within-person carry-over • B&amp;B: AR + fixed effects • LCSM: proportional change • ALT: AR on scores (compounds with growth) • LCM-SR: AR on growth residuals |<br>
+<code>cl_xy</code>, <code>cl_yx</code> | CLPM: Granger-causal • RI-CLPM: within-person cross-lag • B&amp;B: CL + fixed effects • LCSM: level <span class="math inline">\(\to\)</span> <span class="math inline">\(\Delta\)</span> coupling • ALT: CL on scores • LCM-SR: CL on growth residuals |<br>
+<code>I_x</code>, <code>I_y</code> | RI-CLPM intercepts • B&amp;B fixed-effect latents • ALT/LCM-SR growth intercepts |<br>
+<code>S_x</code>, <code>S_y</code> | Growth slopes (ALT, LCM-SR only) |<br>
+<code>A_x</code>, <code>A_y</code> | Accumulating-change factor (LCSM only) |</div>
+<p>: Parameter interpretations by model. {#tbl-unified-labels-short}</p>
+</section>
+<section id="the-latent-growth-model" class="level2" data-number="5.2">
+<h2 data-number="5.2" class="anchored" data-anchor-id="the-latent-growth-model"><span class="header-section-number">5.2</span> The Latent Growth Model</h2>
+<p>The LGM is a different style of model, in that each unit has an intercept <span class="math inline">\(I\)</span> (initial level) and slope <span class="math inline">\(S\)</span> (linear rate of change).In the bivariate form, <span class="math inline">\((I_x, S_x)\)</span> and <span class="math inline">\((I_y, S_y)\)</span> covary across variables but no lagged paths connect <span class="math inline">\(x\)</span> to <span class="math inline">\(y\)</span>. This is the natural baseline for the ALT and LCM-SR, both of which add a dynamic equation on top of an LGM-style stable component.</p>
+<div class="cell">
+<div id="fig-lgm" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lgm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-941108da8380287c2f77" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-941108da8380287c2f77">{"x":{"diagram":"\ndigraph LGM {\n  graph [layout = neato, bgcolor = white]\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  I_X [pos = \"-4.5,2.6!\", shape = circle, label = <I<sub>x<\/sub>>, width = 0.5, height = 0.5]\n  S_X [pos = \"-3.0,3.6!\", shape = circle, label = <S<sub>x<\/sub>>, width = 0.5, height = 0.5]\n  X1 [pos = \"-1.5,1.8!\", label = \"x1\"]\n  X2 [pos = \"-0.5,1.8!\", label = \"x2\"]\n  X3 [pos = \"0.5,1.8!\",  label = \"x3\"]\n  X4 [pos = \"1.5,1.8!\",  label = \"x4\"]\n  Y1 [pos = \"-1.5,-1.8!\", label = \"y1\"]\n  Y2 [pos = \"-0.5,-1.8!\", label = \"y2\"]\n  Y3 [pos = \"0.5,-1.8!\",  label = \"y3\"]\n  Y4 [pos = \"1.5,-1.8!\",  label = \"y4\"]\n  I_Y [pos = \"-4.5,-2.6!\", shape = circle, label = <I<sub>y<\/sub>>, width = 0.5, height = 0.5]\n  S_Y [pos = \"-3.0,-3.6!\", shape = circle, label = <S<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n  I_X -> X1 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  I_X -> X2 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  I_X -> X3 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  I_X -> X4 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  S_X -> X1 [label = \"0\", arrowsize = 0.5, fontsize = 10]\n  S_X -> X2 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  S_X -> X3 [label = \"2\", arrowsize = 0.5, fontsize = 10]\n  S_X -> X4 [label = \"3\", arrowsize = 0.5, fontsize = 10]\n  I_Y -> Y1 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  I_Y -> Y2 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  I_Y -> Y3 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  I_Y -> Y4 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  S_Y -> Y1 [label = \"0\", arrowsize = 0.5, fontsize = 10]\n  S_Y -> Y2 [label = \"1\", arrowsize = 0.5, fontsize = 10]\n  S_Y -> Y3 [label = \"2\", arrowsize = 0.5, fontsize = 10]\n  S_Y -> Y4 [label = \"3\", arrowsize = 0.5, fontsize = 10]\n\n  I_X -> I_Y [dir = both, style = dashed, arrowsize = 0.4]\n  S_X -> S_Y [dir = both, style = dashed, arrowsize = 0.4]\n  I_X -> S_X [dir = both, style = dashed, arrowsize = 0.4]\n  I_Y -> S_Y [dir = both, style = dashed, arrowsize = 0.4]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lgm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.1: Bivariate Latent Growth Model. Growth factors (I, S) load directly on observed scores with fixed loadings (intercept = 1; slope = 0, 1, 2, 3); no autoregressive or cross-lagged paths.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="crossLagR syntax: `estimateLGM()`">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>crossLagR syntax: <code>estimateLGM()</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLGM</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">variable_type =</span> <span class="st">"bivariate"</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Latent Variables
+p1 =~ 1*x1
+q1 =~ 1*y1
+p2 =~ 1*x2
+q2 =~ 1*y2
+p3 =~ 1*x3
+q3 =~ 1*y3
+p4 =~ 1*x4
+q4 =~ 1*y4
+
+# Latent Growth Factors for X
+I_x =~ 1*p1 + 1*p2 + 1*p3 + 1*p4
+S_x =~ 0*p1 + 1*p2 + 2*p3 + 3*p4
+
+# Latent Growth Factors for Y
+I_y =~ 1*q1 + 1*q2 + 1*q3 + 1*q4
+S_y =~ 0*q1 + 1*q2 + 2*q3 + 3*q4
+
+# Growth Factor Means
+I_x ~ mean_I_x*1
+S_x ~ mean_S_x*1
+I_y ~ mean_I_y*1
+S_y ~ mean_S_y*1
+
+# Growth Factor Variances
+I_x ~~ var_I_x*I_x
+S_x ~~ var_S_x*S_x
+I_y ~~ var_I_y*I_y
+S_y ~~ var_S_y*S_y
+
+# Within-Variable Growth Factor Covariances
+I_x ~~ cov_IS_x*S_x
+I_y ~~ cov_IS_y*S_y
+
+# Between-Variable Growth Factor Covariances
+I_x ~~ cov_I_xy*I_y
+S_x ~~ cov_S_xy*S_y
+I_x ~~ cov_IS_xy*S_y
+I_y ~~ cov_IS_yx*S_x
+
+# Latent Variable Means (Fixed to 0)
+p1 ~ 0*1
+q1 ~ 0*1
+p2 ~ 0*1
+q2 ~ 0*1
+p3 ~ 0*1
+q3 ~ 0*1
+p4 ~ 0*1
+q4 ~ 0*1
+
+# Observed Variable Intercepts (Fixed to 0)
+x1 ~ 0*1
+y1 ~ 0*1
+x2 ~ 0*1
+y2 ~ 0*1
+x3 ~ 0*1
+y3 ~ 0*1
+x4 ~ 0*1
+y4 ~ 0*1
+
+# Latent Variable Variances
+p1 ~~ var_p*p1
+q1 ~~ var_q*q1
+p2 ~~ var_p*p2
+q2 ~~ var_q*q2
+p3 ~~ var_p*p3
+q3 ~~ var_q*q3
+p4 ~~ var_p*p4
+q4 ~~ var_q*q4
+
+# Latent Variable Covariances
+p1 ~~ cov_pq*q1
+p2 ~~ cov_pq*q2
+p3 ~~ cov_pq*q3
+p4 ~~ cov_pq*q4
+
+# Fix Observed Variable Residuals to Zero
+x1 ~~ 0*x1
+y1 ~~ 0*y1
+x2 ~~ 0*x2
+y2 ~~ 0*y2
+x3 ~~ 0*x3
+y3 ~~ 0*y3
+x4 ~~ 0*x4
+y4 ~~ 0*y4</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="alt-autoregressive-latent-trajectory" class="level2" data-number="5.3">
+<h2 data-number="5.3" class="anchored" data-anchor-id="alt-autoregressive-latent-trajectory"><span class="header-section-number">5.3</span> ALT: Autoregressive Latent Trajectory</h2>
+<p>The ALT is a combination of the LGM and the CLPM. Each wave score (x and y) is a combination of a growth trajectory (as in the LGM) and a dynamic process (as in the CLPM). The problem with the ALT is that the trajectories and dynamics are not cleanly separated, and the growth factors compound with the AR and CL paths (<span class="citation" data-cites="usami2021">Usami (<a href="#ref-usami2021" role="doc-biblioref">2021</a>)</span>, <span class="citation" data-cites="usami2022">(<a href="#ref-usami2022" role="doc-biblioref"><strong>usami2022?</strong></a>)</span>). The AR and CL parameters may thus be different from the CLPM or RI-CLPM.</p>
+<div class="cell">
+<div id="fig-alt" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-alt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-67b5ed96b53b4728f599" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-67b5ed96b53b4728f599">{"x":{"diagram":"\ndigraph ALT {\n  graph [layout = neato, bgcolor = white, splines = line]\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  I_X [pos = \"-3.5,2.4!\", shape = circle, label = <I<sub>x<\/sub>>, width = 0.5, height = 0.5]\n  S_X [pos = \"-3.5,1.4!\", shape = circle, label = <S<sub>x<\/sub>>, width = 0.5, height = 0.5]\n  X1 [pos = \"-1.5,2.0!\", label = \"x1\"]\n  X2 [pos = \"0.0,2.0!\",  label = \"x2\"]\n  X3 [pos = \"1.5,2.0!\",  label = \"x3\"]\n  X4 [pos = \"3.0,2.0!\",  label = \"x4\"]\n  Y1 [pos = \"-1.5,-2.0!\", label = \"y1\"]\n  Y2 [pos = \"0.0,-2.0!\",  label = \"y2\"]\n  Y3 [pos = \"1.5,-2.0!\",  label = \"y3\"]\n  Y4 [pos = \"3.0,-2.0!\",  label = \"y4\"]\n  I_Y [pos = \"-3.5,-1.4!\", shape = circle, label = <I<sub>y<\/sub>>, width = 0.5, height = 0.5]\n  S_Y [pos = \"-3.5,-2.4!\", shape = circle, label = <S<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n  I_X -> X1 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_X -> X2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_X -> X3 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_X -> X4 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  S_X -> X1 [label = \"0\", arrowsize = 0.4, fontsize = 9]\n  S_X -> X2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  S_X -> X3 [label = \"2\", arrowsize = 0.4, fontsize = 9]\n  S_X -> X4 [label = \"3\", arrowsize = 0.4, fontsize = 9]\n  I_Y -> Y1 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_Y -> Y2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_Y -> Y3 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_Y -> Y4 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  S_Y -> Y1 [label = \"0\", arrowsize = 0.4, fontsize = 9]\n  S_Y -> Y2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  S_Y -> Y3 [label = \"2\", arrowsize = 0.4, fontsize = 9]\n  S_Y -> Y4 [label = \"3\", arrowsize = 0.4, fontsize = 9]\n\n  X1 -> X2 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  X2 -> X3 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  X3 -> X4 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  Y1 -> Y2 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  Y2 -> Y3 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  Y3 -> Y4 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  X1 -> Y2 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  X2 -> Y3 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  X3 -> Y4 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  Y1 -> X2 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  Y2 -> X3 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  Y3 -> X4 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n\n  I_X -> I_Y [dir = both, style = dashed, arrowsize = 0.4]\n  S_X -> S_Y [dir = both, style = dashed, arrowsize = 0.4]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-alt-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.2: Bivariate ALT. Growth factors (I, S) load on observed scores; AR (β) and CL (ω) operate directly on the scores, so growth and dynamics compound.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="crossLagR syntax: `estimateALT()`">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>crossLagR syntax: <code>estimateALT()</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateALT</span>(<span class="at">waves           =</span> <span class="dv">4</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>            <span class="at">constrain_beta  =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>            <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Latent variables (perfect indicators)
+p1 =~ 1*x1
+q1 =~ 1*y1
+p2 =~ 1*x2
+q2 =~ 1*y2
+p3 =~ 1*x3
+q3 =~ 1*y3
+p4 =~ 1*x4
+q4 =~ 1*y4
+
+# Fix observed residuals to zero
+x1 ~~ 0*x1
+y1 ~~ 0*y1
+x2 ~~ 0*x2
+y2 ~~ 0*y2
+x3 ~~ 0*x3
+y3 ~~ 0*y3
+x4 ~~ 0*x4
+y4 ~~ 0*y4
+
+# Fix observed intercepts to zero
+x1 ~ 0*1
+y1 ~ 0*1
+x2 ~ 0*1
+y2 ~ 0*1
+x3 ~ 0*1
+y3 ~ 0*1
+x4 ~ 0*1
+y4 ~ 0*1
+
+# Growth factors (accumulating, load on waves 2:T)
+I_x =~ 1*p2 + 1*p3 + 1*p4
+S_x =~ 1*p2 + 2*p3 + 3*p4
+I_y =~ 1*q2 + 1*q3 + 1*q4
+S_y =~ 1*q2 + 2*q3 + 3*q4
+
+# Autoregressive and cross-lagged paths
+p2 ~ ar_x*p1 + cl_yx*q1
+q2 ~ ar_y*q1 + cl_xy*p1
+p3 ~ ar_x*p2 + cl_yx*q2
+q3 ~ ar_y*q2 + cl_xy*p2
+p4 ~ ar_x*p3 + cl_yx*q3
+q4 ~ ar_y*q3 + cl_xy*p3
+
+# Exogenous wave 1 variances, covariance, and means
+p1 ~~ p1
+q1 ~~ q1
+p1 ~~ q1
+p1 ~ 1
+q1 ~ 1
+
+# Dynamic residual variances and covariances
+p2 ~~ d_var_x*p2
+q2 ~~ d_var_y*q2
+p3 ~~ d_var_x*p3
+q3 ~~ d_var_y*q3
+p4 ~~ d_var_x*p4
+q4 ~~ d_var_y*q4
+p2 ~~ d_cov_xy*q2
+p3 ~~ d_cov_xy*q3
+p4 ~~ d_cov_xy*q4
+
+# Fix endogenous latent means to zero
+p2 ~ 0*1
+q2 ~ 0*1
+p3 ~ 0*1
+q3 ~ 0*1
+p4 ~ 0*1
+q4 ~ 0*1
+
+# Growth factor means
+I_x ~ 1
+S_x ~ 1
+I_y ~ 1
+S_y ~ 1
+
+# Growth factor variances
+I_x ~~ I_x
+S_x ~~ S_x
+I_y ~~ I_y
+S_y ~~ S_y
+
+# Growth factor covariances (within variable)
+I_x ~~ S_x
+I_y ~~ S_y
+
+# Growth factor covariances (between variable)
+I_x ~~ I_y
+S_x ~~ S_y
+I_x ~~ S_y
+I_y ~~ S_x
+
+# Exogenous wave 1 covariances with growth factors
+p1 ~~ I_x
+p1 ~~ S_x
+p1 ~~ I_y
+p1 ~~ S_y
+q1 ~~ I_x
+q1 ~~ S_x
+q1 ~~ I_y
+q1 ~~ S_y</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="gclm" class="level2" data-number="5.4">
+<h2 data-number="5.4" class="anchored" data-anchor-id="gclm"><span class="header-section-number">5.4</span> GCLM</h2>
+<p>The General Cross-Lagged Model (GCLM; also known as the Latent Growth Model with Structured Residuals) is similar to the ALT, in that it combines a growth model with a dynamic equation. However, in the GCLM, the growth factors have direct effects on the observed scores, and the AR and CL paths are specified on the residuals from that growth model. The AR and CL parameters capture the dynamic process in the deviations from each person’s trajectory, rather than deviations from a stable trait (as in the RI-CLPM).</p>
+<div class="cell">
+<div id="fig-gclm" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-gclm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-1c69bd47c83bb9379d82" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-1c69bd47c83bb9379d82">{"x":{"diagram":"\ndigraph GCLM {\n  graph [layout = neato, bgcolor = white, splines = line]\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  I_X [pos = \"-3.5,3.0!\", shape = circle, label = <I<sub>x<\/sub>>, width = 0.5, height = 0.5]\n  S_X [pos = \"-3.5,2.0!\", shape = circle, label = <S<sub>x<\/sub>>, width = 0.5, height = 0.5]\n  X1 [pos = \"-1.5,2.6!\", label = \"x1\"]\n  X2 [pos = \"0.0,2.6!\",  label = \"x2\"]\n  X3 [pos = \"1.5,2.6!\",  label = \"x3\"]\n  X4 [pos = \"3.0,2.6!\",  label = \"x4\"]\n\n  qX1 [pos = \"-1.5,1.0!\", shape = circle, label = \"q1\", width = 0.4, height = 0.4]\n  qX2 [pos = \"0.0,1.0!\",  shape = circle, label = \"q2\", width = 0.4, height = 0.4]\n  qX3 [pos = \"1.5,1.0!\",  shape = circle, label = \"q3\", width = 0.4, height = 0.4]\n  qX4 [pos = \"3.0,1.0!\",  shape = circle, label = \"q4\", width = 0.4, height = 0.4]\n\n  pY1 [pos = \"-1.5,-1.0!\", shape = circle, label = \"p1\", width = 0.4, height = 0.4]\n  pY2 [pos = \"0.0,-1.0!\",  shape = circle, label = \"p2\", width = 0.4, height = 0.4]\n  pY3 [pos = \"1.5,-1.0!\",  shape = circle, label = \"p3\", width = 0.4, height = 0.4]\n  pY4 [pos = \"3.0,-1.0!\",  shape = circle, label = \"p4\", width = 0.4, height = 0.4]\n\n  Y1 [pos = \"-1.5,-2.6!\", label = \"y1\"]\n  Y2 [pos = \"0.0,-2.6!\",  label = \"y2\"]\n  Y3 [pos = \"1.5,-2.6!\",  label = \"y3\"]\n  Y4 [pos = \"3.0,-2.6!\",  label = \"y4\"]\n  I_Y [pos = \"-3.5,-2.0!\", shape = circle, label = <I<sub>y<\/sub>>, width = 0.5, height = 0.5]\n  S_Y [pos = \"-3.5,-3.0!\", shape = circle, label = <S<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n  I_X -> X1 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_X -> X2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_X -> X3 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_X -> X4 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  S_X -> X1 [label = \"0\", arrowsize = 0.4, fontsize = 9]\n  S_X -> X2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  S_X -> X3 [label = \"2\", arrowsize = 0.4, fontsize = 9]\n  S_X -> X4 [label = \"3\", arrowsize = 0.4, fontsize = 9]\n  I_Y -> Y1 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_Y -> Y2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_Y -> Y3 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  I_Y -> Y4 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  S_Y -> Y1 [label = \"0\", arrowsize = 0.4, fontsize = 9]\n  S_Y -> Y2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  S_Y -> Y3 [label = \"2\", arrowsize = 0.4, fontsize = 9]\n  S_Y -> Y4 [label = \"3\", arrowsize = 0.4, fontsize = 9]\n\n  qX1 -> X1 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  qX2 -> X2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  qX3 -> X3 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  qX4 -> X4 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  pY1 -> Y1 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  pY2 -> Y2 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  pY3 -> Y3 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n  pY4 -> Y4 [label = \"1\", arrowsize = 0.4, fontsize = 9]\n\n  qX1 -> qX2 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  qX2 -> qX3 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  qX3 -> qX4 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  pY1 -> pY2 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  pY2 -> pY3 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  pY3 -> pY4 [label = <β>, arrowsize = 0.5, fontsize = 12]\n  qX1 -> pY2 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  qX2 -> pY3 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  qX3 -> pY4 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  pY1 -> qX2 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  pY2 -> qX3 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n  pY3 -> qX4 [label = <ω>, arrowsize = 0.5, fontsize = 12]\n\n  I_X -> I_Y [dir = both, style = dashed, arrowsize = 0.4]\n  S_X -> S_Y [dir = both, style = dashed, arrowsize = 0.4]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-gclm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;5.3: Bivariate LCM-SR / GCLM. Growth factors (I, S) have direct effects only on observed scores; AR (β) and CL (ω) act on the structured residuals (q, p) — deviations from each person’s trajectory.
+</figcaption>
+</figure>
+</div>
+</div>
+<div class="callout callout-style-default callout-note callout-titled" title="crossLagR syntax: `estimateLCMSR()`">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>crossLagR syntax: <code>estimateLCMSR()</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLCMSR</span>(<span class="at">waves           =</span> <span class="dv">4</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>              <span class="at">constrain_beta  =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>              <span class="at">constrain_omega =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Within-person latent deviations
+p1 =~ 1*x1
+q1 =~ 1*y1
+p2 =~ 1*x2
+q2 =~ 1*y2
+p3 =~ 1*x3
+q3 =~ 1*y3
+p4 =~ 1*x4
+q4 =~ 1*y4
+
+# Fix observed residuals to zero
+x1 ~~ 0*x1
+y1 ~~ 0*y1
+x2 ~~ 0*x2
+y2 ~~ 0*y2
+x3 ~~ 0*x3
+y3 ~~ 0*y3
+x4 ~~ 0*x4
+y4 ~~ 0*y4
+
+# Fix observed intercepts to zero
+x1 ~ 0*1
+y1 ~ 0*1
+x2 ~ 0*1
+y2 ~ 0*1
+x3 ~ 0*1
+y3 ~ 0*1
+x4 ~ 0*1
+y4 ~ 0*1
+
+# Growth factors (intercept and slope, direct effects on observed)
+I_x =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
+S_x =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
+I_y =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
+S_y =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
+
+# Autoregressive and cross-lagged paths (structured residuals)
+p2 ~ ar_x*p1 + cl_yx*q1
+q2 ~ ar_y*q1 + cl_xy*p1
+p3 ~ ar_x*p2 + cl_yx*q2
+q3 ~ ar_y*q2 + cl_xy*p2
+p4 ~ ar_x*p3 + cl_yx*q3
+q4 ~ ar_y*q3 + cl_xy*p3
+
+# Dynamic residual variances and covariances
+p1 ~~ p1
+q1 ~~ q1
+p1 ~~ q1
+p2 ~~ d_var_x*p2
+q2 ~~ d_var_y*q2
+p3 ~~ d_var_x*p3
+q3 ~~ d_var_y*q3
+p4 ~~ d_var_x*p4
+q4 ~~ d_var_y*q4
+p2 ~~ d_cov_xy*q2
+p3 ~~ d_cov_xy*q3
+p4 ~~ d_cov_xy*q4
+
+# Latent means fixed to zero
+p1 ~ 0*1
+q1 ~ 0*1
+p2 ~ 0*1
+q2 ~ 0*1
+p3 ~ 0*1
+q3 ~ 0*1
+p4 ~ 0*1
+q4 ~ 0*1
+
+# Growth factor means
+I_x ~ 1
+S_x ~ 1
+I_y ~ 1
+S_y ~ 1
+
+# Growth factor variances
+I_x ~~ I_x
+S_x ~~ S_x
+I_y ~~ I_y
+S_y ~~ S_y
+
+# Growth factor covariances (within variable)
+I_x ~~ S_x
+I_y ~~ S_y
+
+# Growth factor covariances (between variable)
+I_x ~~ I_y
+S_x ~~ S_y
+I_x ~~ S_y
+I_y ~~ S_x</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="bollen-brand-dynamic-panel-with-latent-fixed-effects" class="level2" data-number="5.5">
+<h2 data-number="5.5" class="anchored" data-anchor-id="bollen-brand-dynamic-panel-with-latent-fixed-effects"><span class="header-section-number">5.5</span> Bollen &amp; Brand: Dynamic Panel with Latent Fixed Effects</h2>
+<p><span class="citation" data-cites="bollen_general_2010">Bollen and Brand (<a href="#ref-bollen_general_2010" role="doc-biblioref">2010</a>)</span> propose a dynamic panel model in which a latent factor absorbs the unit-specific fixed effect — it forms an SEM analogue of Arellano-Bond <span class="citation" data-cites="dishop_tutorial_2018">(see also <a href="#ref-dishop_tutorial_2018" role="doc-biblioref">Dishop and DeShon 2018</a>, the practical tutorial implementation that <code>estimateBollen_and_Brand()</code> follows)</span>.</p>
+<p>The decomposition equation is important. In the RI-CLPM, the stable factor is a random intercept. Each unit is drawn from a distribution of units. The model captures unobserved heterogeneity across units. But a critical identifying assumption in the RI-CLPM is that the stable factors is uncorrelated with the time varying components. If this is violated, the RI-CLPM estimates are biased.</p>
+<p>A useful alternative — and one with the same spirit as the well-known Arellano-Bond GMM estimator, though here estimated by maximum likelihood <span class="citation" data-cites="bollen_general_2010 dishop_tutorial_2018">(<a href="#ref-bollen_general_2010" role="doc-biblioref">Bollen and Brand 2010</a>; <a href="#ref-dishop_tutorial_2018" role="doc-biblioref">Dishop and DeShon 2018</a>)</span> — is to specify the stable factor as a latent unit-effect that loads on every wave of the <em>observed</em> CLPM equation, while <strong>freely estimating its covariance with the lagged predictors</strong>. It’s this part that is critical: Letting that covariance be non-zero is the relaxes the orthogonality assumption that the RI-CLPM imposes, and it is exactly the source of the dynamic-panel bias identified by Nickell (1981) clearly elaborated upon in influential texbooks (<span class="citation" data-cites="hsiao2022">(<a href="#ref-hsiao2022" role="doc-biblioref">Hsiao 2022</a>)</span>) And <span class="citation" data-cites="ludtke2022">Lüdtke and Robitzsch (<a href="#ref-ludtke2022" role="doc-biblioref">2022</a>)</span> show empirically that this matters — the Bollen-Brand specification and the RI-CLPM can yield different cross-lag estimates on the same data because of the departures in how the dynamic equation is specified.</p>
+<p>The <code>crossLagR</code> function <code>estimateBollen_and_Brand()</code> implements the specification. Including all the covariances.</p>
+<div class="callout callout-style-default callout-note callout-titled" title="crossLagR syntax: `estimateBollen_and_Brand()`">
+<div class="callout-header d-flex align-content-center">
+<div class="callout-icon-container">
+<i class="callout-icon"></i>
+</div>
+<div class="callout-title-container flex-fill">
+<span class="screen-reader-only">Note</span>crossLagR syntax: <code>estimateBollen_and_Brand()</code>
+</div>
+</div>
+<div class="callout-body-container callout-body">
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateBollen_and_Brand</span>(<span class="at">waves =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Latent fixed effects (individual heterogeneity, accumulating factors)
+I_y =~ 1*y2 + 1*y3 + 1*y4
+I_x =~ 1*x2 + 1*x3 + 1*x4
+
+# Regression equations
+y2 ~ ar_y2*y1 + cl_xy2*x1
+y3 ~ ar_y3*y2 + cl_xy3*x2
+y4 ~ ar_y4*y3 + cl_xy4*x3
+x2 ~ ar_x2*x1 + cl_yx2*y1
+x3 ~ ar_x3*x2 + cl_yx3*y2
+x4 ~ ar_x4*x3 + cl_yx4*y3
+
+# Exogenous variable variances
+y1 ~~ y1
+x1 ~~ x1
+
+# Exogenous variable covariances
+y1 ~~ x1
+
+# Latent fixed effect (I) variances and covariances
+I_y ~~ I_y
+I_x ~~ I_x
+I_y ~~ I_x
+
+# Exogenous-I covariances
+y1 ~~ I_y
+y1 ~~ I_x
+x1 ~~ I_y
+x1 ~~ I_x
+
+# Dynamic residual variances
+y2 ~~ d_var_y*y2
+y3 ~~ d_var_y*y3
+y4 ~~ d_var_y*y4
+x2 ~~ d_var_x*x2
+x3 ~~ d_var_x*x3
+x4 ~~ d_var_x*x4</code></pre>
+</div>
+</div>
+</div>
+</div>
+</section>
+<section id="comparing-on-one-dataset" class="level2" data-number="5.6">
+<h2 data-number="5.6" class="anchored" data-anchor-id="comparing-on-one-dataset"><span class="header-section-number">5.6</span> Comparing on One Dataset</h2>
+<p>Fitting several estimators to one dataset is mechanical because the lavaan labels are unified: <code>ar_x</code>, <code>ar_y</code>, <code>cl_xy</code>, <code>cl_yx</code> mean <em>the AR/CL parameters of that particular model</em> and can be pulled directly from <code>parameterEstimates()</code>. The problem with this – of course, is that the estimates are not directly comparable across models, because they have different interpretations.</p>
+<p>Let’s simulate data from a RI-CLPM DGP, and fit all the models to it. So, RI-CLPM is will fit well, and the truth table is:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th style="text-align: left;">Parameter</th>
+<th style="text-align: center;">True value</th>
+<th style="text-align: left;">What it means in the DGP</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td style="text-align: left;"><code>ar_x</code></td>
+<td style="text-align: center;">0.30</td>
+<td style="text-align: left;">Within-person carry-over of <span class="math inline">\(x^*\)</span></td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>ar_y</code></td>
+<td style="text-align: center;">0.30</td>
+<td style="text-align: left;">Within-person carry-over of <span class="math inline">\(y^*\)</span></td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>cl_xy</code></td>
+<td style="text-align: center;">0.20</td>
+<td style="text-align: left;">Within-person cross-lag, X <span class="math inline">\(\to\)</span> Y</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>cl_yx</code></td>
+<td style="text-align: center;">0.10</td>
+<td style="text-align: left;">Within-person cross-lag, Y <span class="math inline">\(\to\)</span> X</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>var(I_x)</code></td>
+<td style="text-align: center;">1.00</td>
+<td style="text-align: left;">Trait variance for X</td>
+</tr>
+<tr class="even">
+<td style="text-align: left;"><code>var(I_y)</code></td>
+<td style="text-align: center;">1.00</td>
+<td style="text-align: left;">Trait variance for Y</td>
+</tr>
+<tr class="odd">
+<td style="text-align: left;"><code>var(p)</code>, <code>var(q)</code></td>
+<td style="text-align: center;">1.00</td>
+<td style="text-align: left;">Within-person dynamic-residual variance</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="cell-output cell-output-stdout">
+<pre><code># A tibble: 6 × 5
+  model         ar_x   ar_y cl_xy  cl_yx
+  &lt;chr&gt;        &lt;dbl&gt;  &lt;dbl&gt; &lt;dbl&gt;  &lt;dbl&gt;
+1 CLPM         0.586  0.58  0.188  0.147
+2 RI-CLPM      0.341  0.29  0.195  0.114
+3 LCSM         0.324 -0.831 0.742 -1.4  
+4 ALT          0.332  0.264 0.165  0.114
+5 LCM-SR       0.369  0.283 0.192  0.107
+6 Bollen-Brand 0.344  0.288 0.165  0.079</code></pre>
+</div>
+</div>
+<p>It’s useful to see the model similarities, but it’s also important to interpret the estimates with caution. The AR coefficient means <em>carry-over on observed scores</em> in the CLPM, <em>carry-over on within-person deviations</em> in the RI-CLPM, <em>proportional change</em> in the LCSM (effective AR is <span class="math inline">\(1 + \beta_x\)</span>), <em>compounding carry-over</em> in the ALT, <em>carry-over in residuals from growth</em> in the LCM-SR, and <em>carry-over net of a latent fixed effect</em> in Bollen &amp; Brand.</p>
+</section>
+<section id="summary" class="level2" data-number="5.7">
+<h2 data-number="5.7" class="anchored" data-anchor-id="summary"><span class="header-section-number">5.7</span> Summary</h2>
+<p><span class="citation" data-cites="usami2019">Usami et al. (<a href="#ref-usami2019" role="doc-biblioref">2019</a>)</span> introduce a useful framework for understanding the relationships between different panel data models. The framework follows from from two key equations, the <strong>decomposition equation</strong> of observed scores into stable and time-varying components, and the <strong>dynamic equation</strong> that captures how the time-varying components evolve over time. All models in this chapter can be expressed in the same framework, the differences between them are in how the stable component is defined, and how the dynamic equation is specified – e.g,, on the observed scores, or deviations from a stable trait or growth trajectory.</p>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-bollen_general_2010" class="csl-entry" role="listitem">
+Bollen, Kenneth A., and Jennie E. Brand. 2010. <span>“A General Panel Model with Random and Fixed Effects: A Structural Equations Approach.”</span> <em>Social Forces</em> 89 (1): 1–34.
+</div>
+<div id="ref-dishop_tutorial_2018" class="csl-entry" role="listitem">
+Dishop, Christopher R., and Richard P. DeShon. 2018. <span>“A Tutorial on <span>Bollen</span> and <span>Brand</span>’s Approach to Modeling Dynamics Using a System of Regression Equations.”</span> <em>Psychological Methods</em> 23 (4): 1089–112.
+</div>
+<div id="ref-hsiao2022" class="csl-entry" role="listitem">
+Hsiao, Cheng. 2022. <em>Analysis of Panel Data</em>. Cambridge university press.
+</div>
+<div id="ref-ludtke2022" class="csl-entry" role="listitem">
+Lüdtke, Oliver, and Alexander Robitzsch. 2022. <span>“A Comparison of Different Approaches for Estimating Cross-Lagged Effects from a Causal Inference Perspective.”</span> <em>Structural Equation Modeling: A Multidisciplinary Journal</em> 29 (6): 888–907.
+</div>
+<div id="ref-usami2021" class="csl-entry" role="listitem">
+Usami, Satoshi. 2021. <span>“On the Differences Between General Cross-Lagged Panel Model and Random-Intercept Cross-Lagged Panel Model: Interpretation of Cross-Lagged Parameters and Model Choice.”</span> <em>Structural Equation Modeling: A Multidisciplinary Journal</em> 28 (3): 331–44.
+</div>
+<div id="ref-usami2019" class="csl-entry" role="listitem">
+Usami, Satoshi, Kou Murayama, and Ellen L. Hamaker. 2019. <span>“A Unified Framework of Longitudinal Models to Examine Reciprocal Relations.”</span> <em>Psychological Methods</em> 24 (5): 637–57. <a href="https://doi.org/10.1037/met0000210">https://doi.org/10.1037/met0000210</a>.
+</div>
+</div>
+</section>
+<section id="footnotes" class="footnotes footnotes-end-of-document" role="doc-endnotes">
+<hr>
+<ol>
+<li id="fn1"><p>In the <code>estimateRICLPM()</code> lavaan syntax, the within-person deviations <span class="math inline">\(x^*_{it}\)</span> and <span class="math inline">\(y^*_{it}\)</span> are written as latent variables <code>p</code> and <code>q</code>, respectively (i.e., <code>p1, p2, ...</code> correspond to <span class="math inline">\(x^*_{i,1}, x^*_{i,2}, \ldots\)</span> and <code>q1, q2, ...</code> to <span class="math inline">\(y^*_{i,1}, y^*_{i,2}, \ldots\)</span>). The dynamic equation above is therefore implemented as <code>p ~ ar_x*p + cl_yx*q</code> and <code>q ~ ar_y*q + cl_xy*p</code>.<a href="#fnref1" class="footnote-back" role="doc-backlink">↩︎</a></p></li>
+</ol>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./03_RICLPM.html" class="pagination-link" aria-label="The Random-Intercept CLPM">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./05_simulations.html" class="pagination-link" aria-label="Simulations">
+        <span class="nav-page-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Simulations</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

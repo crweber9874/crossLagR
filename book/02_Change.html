@@ -1,0 +1,1711 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>3&nbsp; Latent Change Score Models – crossLagR</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./03_RICLPM.html" rel="next">
+<link href="./01_Panel_Models.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-48abc47ddc2cbc14860ddec9e9fdb395.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/viz-1.8.2/viz.js"></script>
+<link href="site_libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="site_libs/grViz-binding-1.0.11/grViz.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./02_Change.html"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">crossLagR</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00_Install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installation and Package Syntax</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_Panel_Models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Revisiting the Cross-Lagged Panel Model</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_Change.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_RICLPM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_Usami.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_simulations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Simulations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applications</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_iscap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The ISCAP Panel</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_liss.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Replication: Bakker, Lelkes, &amp; Malka (2021)</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-lcsm" id="toc-the-lcsm" class="nav-link active" data-scroll-target="#the-lcsm"><span class="header-section-number">3.1</span> The LCSM</a></li>
+  <li><a href="#estimatelchange-generated-lavaan-syntax" id="toc-estimatelchange-generated-lavaan-syntax" class="nav-link" data-scroll-target="#estimatelchange-generated-lavaan-syntax"><span class="header-section-number">3.2</span> <code>estimateLChange()</code>: Generated <code>lavaan</code> Syntax</a>
+  <ul class="collapse">
+  <li><a href="#univariate-lcsm-with-constant-change" id="toc-univariate-lcsm-with-constant-change" class="nav-link" data-scroll-target="#univariate-lcsm-with-constant-change"><span class="header-section-number">3.2.1</span> Univariate LCSM with constant change</a></li>
+  <li><a href="#bivariate-lcsm-with-constant-change" id="toc-bivariate-lcsm-with-constant-change" class="nav-link" data-scroll-target="#bivariate-lcsm-with-constant-change"><span class="header-section-number">3.2.2</span> Bivariate LCSM with constant change</a></li>
+  <li><a href="#bivariate-lcsm-without-constant-change" id="toc-bivariate-lcsm-without-constant-change" class="nav-link" data-scroll-target="#bivariate-lcsm-without-constant-change"><span class="header-section-number">3.2.3</span> Bivariate LCSM without constant change</a></li>
+  <li><a href="#bivariate-lcsm-with-change-to-change-effects" id="toc-bivariate-lcsm-with-change-to-change-effects" class="nav-link" data-scroll-target="#bivariate-lcsm-with-change-to-change-effects"><span class="header-section-number">3.2.4</span> Bivariate LCSM with change-to-change effects</a></li>
+  </ul></li>
+  <li><a href="#simlchange-simulating-from-the-lcsm" id="toc-simlchange-simulating-from-the-lcsm" class="nav-link" data-scroll-target="#simlchange-simulating-from-the-lcsm"><span class="header-section-number">3.3</span> <code>simLChange()</code>: Simulating from the LCSM</a></li>
+  <li><a href="#algebraic-equivalence-lcsm-clpm-in-change-form" id="toc-algebraic-equivalence-lcsm-clpm-in-change-form" class="nav-link" data-scroll-target="#algebraic-equivalence-lcsm-clpm-in-change-form"><span class="header-section-number">3.4</span> Algebraic Equivalence: LCSM = CLPM in Change Form</a></li>
+  <li><a href="#constant-change-and-unit-effects" id="toc-constant-change-and-unit-effects" class="nav-link" data-scroll-target="#constant-change-and-unit-effects"><span class="header-section-number">3.5</span> Constant Change and Unit Effects</a></li>
+  <li><a href="#summary" id="toc-summary" class="nav-link" data-scroll-target="#summary"><span class="header-section-number">3.6</span> Summary</a></li>
+  <li><a href="#appendix-detailed-lcsm-dag" id="toc-appendix-detailed-lcsm-dag" class="nav-link" data-scroll-target="#appendix-detailed-lcsm-dag"><span class="header-section-number">3.7</span> Appendix: Detailed LCSM DAG</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Whereas the previous chapter established dynamic lagged and cross lagged effects in <em>level</em> form (the CLPM and its bias under unit heterogeneity), this chapter turns to the <strong>change</strong> representation. By “differencing” the observed scores, this effectively absorbs all time-invariant heterogeneity, including stable between-person differences.</p>
+<p>The Latent Change Score Model (LCSM) parameterizes dynamics differently as <em>differences</em> across waves <span class="citation" data-cites="mcardle2009 kim_and_steiner2021">(<a href="#ref-mcardle2009" role="doc-biblioref">McArdle 2009</a>; <a href="#ref-kim_and_steiner2021" role="doc-biblioref">Kim and Steiner 2021</a>)</span>. The logic is to remove out any stable respondent effects by simply calculating the wave to wave difference. The LCSM uses a measurement equation that separates latent true scores from unique factors, and a dynamic equation that maps lagged true scores onto latent change scores via a proportional self-feedback parameter (<span class="math inline">\(\beta\)</span>, i.e.&nbsp;<code>ar_x</code>) and a coupling parameter (<span class="math inline">\(\omega\)</span>, i.e.&nbsp;<code>cl_xy</code>). Finally, a second-order <em>constant change</em> factor can be specified which accumulates over waves, though requires 4+ waves for identification. This term captures stable, person-specific trajectories that are not accounted for by differencing.</p>
+<section id="the-lcsm" class="level2" data-number="3.1">
+<h2 data-number="3.1" class="anchored" data-anchor-id="the-lcsm"><span class="header-section-number">3.1</span> The LCSM</h2>
+<p><a href="#fig-lcm-simple" class="quarto-xref">Figure&nbsp;<span>3.1</span></a> sketches the bivariate LCSM with a constant-change factor, in the same DAG style introduced in the previous chapter. Each observed score is decomposed as <span class="math inline">\(X_t = X_{t-1} + \Delta x_t\)</span>; each change score is regressed on prior levels via proportional change (<span class="math inline">\(\beta\)</span>) and coupling (<span class="math inline">\(\omega\)</span>), and accumulates a person-specific constant (<span class="math inline">\(\Delta_x\)</span>, <span class="math inline">\(\Delta_y\)</span>). The detailed measurement-model version with multiple indicators is reproduced in the appendix as <a href="#fig-lcm-full" class="quarto-xref">Figure&nbsp;<span>3.2</span></a>.</p>
+<div class="cell">
+<div id="fig-lcm-simple" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lcm-simple-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-12183fb17a630f51e50c" style="width:80%;height:480px;"></div>
+<script type="application/json" data-for="htmlwidget-12183fb17a630f51e50c">{"x":{"diagram":"\ndigraph LCSM_simple {\n  graph [layout = neato, bgcolor = white, splines = line]\n  node [shape = plaintext, fontsize = 24]\n  edge [arrowsize = 0.6]\n\n  Xt1 [pos = \"-3.0,1.8!\", label = <X<sub>1<\/sub>>]\n  Xt2 [pos = \"-1.0,1.8!\", label = <X<sub>2<\/sub>>]\n  Xt3 [pos = \"1.0,1.8!\",  label = <X<sub>3<\/sub>>]\n  Xt4 [pos = \"3.0,1.8!\",  label = <X<sub>4<\/sub>>]\n\n  dX2 [pos = \"-1.0,0.6!\", label = <Δx<sub>2<\/sub>>]\n  dX3 [pos = \"1.0,0.6!\",  label = <Δx<sub>3<\/sub>>]\n  dX4 [pos = \"3.0,0.6!\",  label = <Δx<sub>4<\/sub>>]\n\n  dY2 [pos = \"-1.0,-0.6!\", label = <Δy<sub>2<\/sub>>]\n  dY3 [pos = \"1.0,-0.6!\",  label = <Δy<sub>3<\/sub>>]\n  dY4 [pos = \"3.0,-0.6!\",  label = <Δy<sub>4<\/sub>>]\n\n  Yt1 [pos = \"-3.0,-1.8!\", label = <Y<sub>1<\/sub>>]\n  Yt2 [pos = \"-1.0,-1.8!\", label = <Y<sub>2<\/sub>>]\n  Yt3 [pos = \"1.0,-1.8!\",  label = <Y<sub>3<\/sub>>]\n  Yt4 [pos = \"3.0,-1.8!\",  label = <Y<sub>4<\/sub>>]\n\n  Ax [pos = \"-4.5,1.2!\",  label = <Δ<sub>x<\/sub>>]\n  Ay [pos = \"-4.5,-1.2!\", label = <Δ<sub>y<\/sub>>]\n\n  # Identity: X_t = X_{t-1} + Δx_t\n  Xt1 -> Xt2 [label = \"1\", fontsize = 14]\n  Xt2 -> Xt3 [label = \"1\", fontsize = 14]\n  Xt3 -> Xt4 [label = \"1\", fontsize = 14]\n  Yt1 -> Yt2 [label = \"1\", fontsize = 14]\n  Yt2 -> Yt3 [label = \"1\", fontsize = 14]\n  Yt3 -> Yt4 [label = \"1\", fontsize = 14]\n  dX2 -> Xt2 [label = \"1\", fontsize = 14]\n  dX3 -> Xt3 [label = \"1\", fontsize = 14]\n  dX4 -> Xt4 [label = \"1\", fontsize = 14]\n  dY2 -> Yt2 [label = \"1\", fontsize = 14]\n  dY3 -> Yt3 [label = \"1\", fontsize = 14]\n  dY4 -> Yt4 [label = \"1\", fontsize = 14]\n\n  # Proportional change (β)\n  Xt1 -> dX2 [label = <β>, fontsize = 16]\n  Xt2 -> dX3 [label = <β>, fontsize = 16]\n  Xt3 -> dX4 [label = <β>, fontsize = 16]\n  Yt1 -> dY2 [label = <β>, fontsize = 16]\n  Yt2 -> dY3 [label = <β>, fontsize = 16]\n  Yt3 -> dY4 [label = <β>, fontsize = 16]\n\n  # Coupling (ω)\n  Yt1 -> dX2 [label = <ω>, fontsize = 16]\n  Yt2 -> dX3 [label = <ω>, fontsize = 16]\n  Yt3 -> dX4 [label = <ω>, fontsize = 16]\n  Xt1 -> dY2 [label = <ω>, fontsize = 16]\n  Xt2 -> dY3 [label = <ω>, fontsize = 16]\n  Xt3 -> dY4 [label = <ω>, fontsize = 16]\n\n  # Constant-change accumulating factors (left side)\n  Ax -> dX2 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ax -> dX3 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ax -> dX4 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ay -> dY2 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ay -> dY3 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n  Ay -> dY4 [arrowsize = 0.5, label = \"1\", fontsize = 12]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lcm-simple-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.1: Bivariate Latent Change Score Model. β = proportional change; ω = coupling. Δ_x, Δ_y are person-specific constant-change factors loading on each Δx_t and Δy_t.
+</figcaption>
+</figure>
+</div>
+</div>
+</section>
+<section id="estimatelchange-generated-lavaan-syntax" class="level2" data-number="3.2">
+<h2 data-number="3.2" class="anchored" data-anchor-id="estimatelchange-generated-lavaan-syntax"><span class="header-section-number">3.2</span> <code>estimateLChange()</code>: Generated <code>lavaan</code> Syntax</h2>
+<p><code>estimateLChange()</code> returns a <code>lavaan</code> model string with the unified labels: <code>ar_x</code>, <code>ar_y</code> are proportional self-feedback (the effective autoregressive parameter is <span class="math inline">\(1+AR()\)</span>); <code>cl_xy</code>, <code>cl_yx</code> are coupling (cross-lagged) parameters; <code>A_x</code>, <code>A_y</code> are accumulating constant-change factors; <code>u_var_x</code>, <code>u_var_y</code> are unique-factor (measurement-error) variances. The function returns syntax that can be passed directly to <code>lavaan::lavaan()</code>.</p>
+<section id="univariate-lcsm-with-constant-change" class="level3" data-number="3.2.1">
+<h3 data-number="3.2.1" class="anchored" data-anchor-id="univariate-lcsm-with-constant-change"><span class="header-section-number">3.2.1</span> Univariate LCSM with constant change</h3>
+<p>The simplest specification: one variable, four waves, constant-change factor switched to <strong>on</strong>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves                    =</span> <span class="dv">4</span>,</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">variable_type            =</span> <span class="st">"univariate"</span>,</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb1-4"><a href="#cb1-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    cf1 =~ 1*x1
+    cf2 =~ 1*x2
+    cf3 =~ 1*x3
+    cf4 =~ 1*x4
+    cf1 ~ 1
+    cf2 ~ 0*1
+    cf3 ~ 0*1
+    cf4 ~ 0*1
+    cf1 ~~ cf1
+    cf2 ~~ 0*cf2
+    cf3 ~~ 0*cf3
+    cf4 ~~ 0*cf4
+    x1 ~ 0*1
+    x2 ~ 0*1
+    x3 ~ 0*1
+    x4 ~ 0*1
+    x1 ~~ u_var_x*x1
+    x2 ~~ u_var_x*x2
+    x3 ~~ u_var_x*x3
+    x4 ~~ u_var_x*x4
+    cf2 ~ 1*cf1
+    cf3 ~ 1*cf2
+    cf4 ~ 1*cf3
+    ld2 =~ 1*cf2
+    ld3 =~ 1*cf3
+    ld4 =~ 1*cf4
+    ld2 ~ 0*1
+    ld3 ~ 0*1
+    ld4 ~ 0*1
+    ld2 ~~ 0*ld2
+    ld3 ~~ 0*ld3
+    ld4 ~~ 0*ld4
+    A_x =~ 1*ld2
+          + 1*ld3
+          + 1*ld4
+    A_x ~ 1
+    A_x ~~ A_x
+    A_x ~~ cf1
+    ld2 ~ ar_x*cf1
+    ld3 ~ ar_x*cf2
+    ld4 ~ ar_x*cf3</code></pre>
+</div>
+</div>
+</section>
+<section id="bivariate-lcsm-with-constant-change" class="level3" data-number="3.2.2">
+<h3 data-number="3.2.2" class="anchored" data-anchor-id="bivariate-lcsm-with-constant-change"><span class="header-section-number">3.2.2</span> Bivariate LCSM with constant change</h3>
+<p>This adds the second process and the coupling parameters <code>cl_xy</code>, <code>cl_yx</code>. With <code>constrain_beta = TRUE</code> and <code>constrain_omega = TRUE</code> the proportional and coupling parameters are held equal across waves.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves                    =</span> <span class="dv">4</span>,</span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">variable_type            =</span> <span class="st">"bivariate"</span>,</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">constrain_beta           =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">constrain_omega          =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    cf_x1 =~ 1*x1
+    cf_x2 =~ 1*x2
+    cf_x3 =~ 1*x3
+    cf_x4 =~ 1*x4
+    cf_x1 ~ 1
+    cf_x2 ~ 0*1
+    cf_x3 ~ 0*1
+    cf_x4 ~ 0*1
+    cf_x1 ~~ start(15)*cf_x1
+    cf_x2 ~~ 0*cf_x2
+    cf_x3 ~~ 0*cf_x3
+    cf_x4 ~~ 0*cf_x4
+    x1 ~ 0*1
+    x2 ~ 0*1
+    x3 ~ 0*1
+    x4 ~ 0*1
+    x1 ~~ u_var_x*x1
+    x2 ~~ u_var_x*x2
+    x3 ~~ u_var_x*x3
+    x4 ~~ u_var_x*x4
+    cf_x2 ~ 1*cf_x1
+    cf_x3 ~ 1*cf_x2
+    cf_x4 ~ 1*cf_x3
+    ld_x2 =~ 1*cf_x2
+    ld_x3 =~ 1*cf_x3
+    ld_x4 =~ 1*cf_x4
+    ld_x2 ~ 0*1
+    ld_x3 ~ 0*1
+    ld_x4 ~ 0*1
+    ld_x2 ~~ 0*ld_x2
+    ld_x3 ~~ 0*ld_x3
+    ld_x4 ~~ 0*ld_x4
+    A_x =~ 1*ld_x2
+    + 1*ld_x3
+    + 1*ld_x4
+    A_x ~ 1
+    A_x ~~ A_var_x*A_x
+    A_x ~~ cf_x1
+    ld_x2 ~ start(-0.15)*ar_x*cf_x1
+    ld_x3 ~ start(-0.15)*ar_x*cf_x2
+    ld_x4 ~ start(-0.15)*ar_x*cf_x3
+    cf_y1 =~ 1*y1
+    cf_y2 =~ 1*y2
+    cf_y3 =~ 1*y3
+    cf_y4 =~ 1*y4
+    cf_y1 ~ 1
+    cf_y2 ~ 0*1
+    cf_y3 ~ 0*1
+    cf_y4 ~ 0*1
+    cf_y1 ~~ start(15)*cf_y1
+    cf_y2 ~~ 0*cf_y2
+    cf_y3 ~~ 0*cf_y3
+    cf_y4 ~~ 0*cf_y4
+    y1 ~ 0*1
+    y2 ~ 0*1
+    y3 ~ 0*1
+    y4 ~ 0*1
+    y1 ~~ u_var_y*y1
+    y2 ~~ u_var_y*y2
+    y3 ~~ u_var_y*y3
+    y4 ~~ u_var_y*y4
+    cf_y2 ~ 1*cf_y1
+    cf_y3 ~ 1*cf_y2
+    cf_y4 ~ 1*cf_y3
+    ld_y2 =~ 1*cf_y2
+    ld_y3 =~ 1*cf_y3
+    ld_y4 =~ 1*cf_y4
+    ld_y2 ~ 0*1
+    ld_y3 ~ 0*1
+    ld_y4 ~ 0*1
+    ld_y2 ~~ 0*ld_y2
+    ld_y3 ~~ 0*ld_y3
+    ld_y4 ~~ 0*ld_y4
+    A_y =~ 1*ld_y2
+          + 1*ld_y3
+          + 1*ld_y4
+    A_y ~ 1
+    A_y ~~ A_var_y*A_y
+    A_y ~~ cf_y1
+    ld_y2 ~ ar_y*cf_y1
+    ld_y3 ~ ar_y*cf_y2
+    ld_y4 ~ ar_y*cf_y3
+    ld_x2 ~ start(-0.2)*cl_yx*cf_y1
+    ld_y2 ~ start(-0.2)*cl_xy*cf_x1
+    ld_x3 ~ start(-0.2)*cl_yx*cf_y2
+    ld_y3 ~ start(-0.2)*cl_xy*cf_x2
+    ld_x4 ~ start(-0.2)*cl_yx*cf_y3
+    ld_y4 ~ start(-0.2)*cl_xy*cf_x3
+    A_x ~~ A_y
+    cf_x1 ~~ cf_y1
+    cf_x1 ~~ A_y
+    cf_y1 ~~ A_x</code></pre>
+</div>
+</div>
+</section>
+<section id="bivariate-lcsm-without-constant-change" class="level3" data-number="3.2.3">
+<h3 data-number="3.2.3" class="anchored" data-anchor-id="bivariate-lcsm-without-constant-change"><span class="header-section-number">3.2.3</span> Bivariate LCSM without constant change</h3>
+<p>Dropping the accumulating factor leaves only proportional change and coupling — the LCSM analogue of the CLPM in change form.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves                    =</span> <span class="dv">4</span>,</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">variable_type            =</span> <span class="st">"bivariate"</span>,</span>
+<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimate_constant_change =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    cf_x1 =~ 1*x1
+    cf_x2 =~ 1*x2
+    cf_x3 =~ 1*x3
+    cf_x4 =~ 1*x4
+    cf_x1 ~ 1
+    cf_x2 ~ 0*1
+    cf_x3 ~ 0*1
+    cf_x4 ~ 0*1
+    cf_x1 ~~ start(15)*cf_x1
+    cf_x2 ~~ 0*cf_x2
+    cf_x3 ~~ 0*cf_x3
+    cf_x4 ~~ 0*cf_x4
+    x1 ~ 0*1
+    x2 ~ 0*1
+    x3 ~ 0*1
+    x4 ~ 0*1
+    x1 ~~ u_var_x*x1
+    x2 ~~ u_var_x*x2
+    x3 ~~ u_var_x*x3
+    x4 ~~ u_var_x*x4
+    cf_x2 ~ 1*cf_x1
+    cf_x3 ~ 1*cf_x2
+    cf_x4 ~ 1*cf_x3
+    ld_x2 =~ 1*cf_x2
+    ld_x3 =~ 1*cf_x3
+    ld_x4 =~ 1*cf_x4
+    ld_x2 ~ 0*1
+    ld_x3 ~ 0*1
+    ld_x4 ~ 0*1
+    ld_x2 ~~ d_var_x*ld_x2
+    ld_x3 ~~ d_var_x*ld_x3
+    ld_x4 ~~ d_var_x*ld_x4
+    ld_x2 ~ start(-0.15)*ar_x*cf_x1
+    ld_x3 ~ start(-0.15)*ar_x*cf_x2
+    ld_x4 ~ start(-0.15)*ar_x*cf_x3
+    cf_y1 =~ 1*y1
+    cf_y2 =~ 1*y2
+    cf_y3 =~ 1*y3
+    cf_y4 =~ 1*y4
+    cf_y1 ~ 1
+    cf_y2 ~ 0*1
+    cf_y3 ~ 0*1
+    cf_y4 ~ 0*1
+    cf_y1 ~~ start(15)*cf_y1
+    cf_y2 ~~ 0*cf_y2
+    cf_y3 ~~ 0*cf_y3
+    cf_y4 ~~ 0*cf_y4
+    y1 ~ 0*1
+    y2 ~ 0*1
+    y3 ~ 0*1
+    y4 ~ 0*1
+    y1 ~~ u_var_y*y1
+    y2 ~~ u_var_y*y2
+    y3 ~~ u_var_y*y3
+    y4 ~~ u_var_y*y4
+    cf_y2 ~ 1*cf_y1
+    cf_y3 ~ 1*cf_y2
+    cf_y4 ~ 1*cf_y3
+    ld_y2 =~ 1*cf_y2
+    ld_y3 =~ 1*cf_y3
+    ld_y4 =~ 1*cf_y4
+    ld_y2 ~ 0*1
+    ld_y3 ~ 0*1
+    ld_y4 ~ 0*1
+    ld_y2 ~~ d_var_y*ld_y2
+    ld_y3 ~~ d_var_y*ld_y3
+    ld_y4 ~~ d_var_y*ld_y4
+    ld_y2 ~ ar_y*cf_y1
+    ld_y3 ~ ar_y*cf_y2
+    ld_y4 ~ ar_y*cf_y3
+    ld_x2 ~ start(-0.2)*cl_yx*cf_y1
+    ld_y2 ~ start(-0.2)*cl_xy*cf_x1
+    ld_x3 ~ start(-0.2)*cl_yx*cf_y2
+    ld_y3 ~ start(-0.2)*cl_xy*cf_x2
+    ld_x4 ~ start(-0.2)*cl_yx*cf_y3
+    ld_y4 ~ start(-0.2)*cl_xy*cf_x3
+    cf_x1 ~~ cf_y1
+    ld_x2 ~~ d_cov_xy*ld_y2
+    ld_x3 ~~ d_cov_xy*ld_y3
+    ld_x4 ~~ d_cov_xy*ld_y4</code></pre>
+</div>
+</div>
+</section>
+<section id="bivariate-lcsm-with-change-to-change-effects" class="level3" data-number="3.2.4">
+<h3 data-number="3.2.4" class="anchored" data-anchor-id="bivariate-lcsm-with-change-to-change-effects"><span class="header-section-number">3.2.4</span> Bivariate LCSM with change-to-change effects</h3>
+<p>Requires <span class="math inline">\(\geq 4\)</span> waves; adds parameters <code>phi_x</code>, <code>phi_y</code> (change AR) and <code>phi_cl_x</code>, <code>phi_cl_y</code> (change cross-lag).</p>
+<p>Unfortunately, there is not a “level” analogue to this specification. The change-to-change parameters capture change on change itself. In particular, <span class="math inline">\(\phi_x\)</span> is the effect of prior change in <span class="math inline">\(x\)</span> on subsequent change in <span class="math inline">\(x\)</span>, while <span class="math inline">\(\phi_{cl_x}\)</span> is the effect of prior change in <span class="math inline">\(y\)</span> on current/subsequent change in <span class="math inline">\(x\)</span>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves                     =</span> <span class="dv">4</span>,</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a>                <span class="at">constrain_beta           =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a>                <span class="at">constrain_omega          =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                <span class="at">variable_type             =</span> <span class="st">"bivariate"</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimate_change_to_change =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span></span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>  <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    cf_x1 =~ 1*x1
+    cf_x2 =~ 1*x2
+    cf_x3 =~ 1*x3
+    cf_x4 =~ 1*x4
+    cf_x1 ~ 1
+    cf_x2 ~ 0*1
+    cf_x3 ~ 0*1
+    cf_x4 ~ 0*1
+    cf_x1 ~~ start(15)*cf_x1
+    cf_x2 ~~ 0*cf_x2
+    cf_x3 ~~ 0*cf_x3
+    cf_x4 ~~ 0*cf_x4
+    x1 ~ 0*1
+    x2 ~ 0*1
+    x3 ~ 0*1
+    x4 ~ 0*1
+    x1 ~~ u_var_x*x1
+    x2 ~~ u_var_x*x2
+    x3 ~~ u_var_x*x3
+    x4 ~~ u_var_x*x4
+    cf_x2 ~ 1*cf_x1
+    cf_x3 ~ 1*cf_x2
+    cf_x4 ~ 1*cf_x3
+    ld_x2 =~ 1*cf_x2
+    ld_x3 =~ 1*cf_x3
+    ld_x4 =~ 1*cf_x4
+    ld_x2 ~ 0*1
+    ld_x3 ~ 0*1
+    ld_x4 ~ 0*1
+    ld_x2 ~~ 0*ld_x2
+    ld_x3 ~~ 0*ld_x3
+    ld_x4 ~~ 0*ld_x4
+    A_x =~ 1*ld_x2
+    + 1*ld_x3
+    + 1*ld_x4
+    A_x ~ 1
+    A_x ~~ A_var_x*A_x
+    A_x ~~ cf_x1
+    ld_x2 ~ start(-0.15)*ar_x*cf_x1
+    ld_x3 ~ start(-0.15)*ar_x*cf_x2
+    ld_x4 ~ start(-0.15)*ar_x*cf_x3
+    cf_y1 =~ 1*y1
+    cf_y2 =~ 1*y2
+    cf_y3 =~ 1*y3
+    cf_y4 =~ 1*y4
+    cf_y1 ~ 1
+    cf_y2 ~ 0*1
+    cf_y3 ~ 0*1
+    cf_y4 ~ 0*1
+    cf_y1 ~~ start(15)*cf_y1
+    cf_y2 ~~ 0*cf_y2
+    cf_y3 ~~ 0*cf_y3
+    cf_y4 ~~ 0*cf_y4
+    y1 ~ 0*1
+    y2 ~ 0*1
+    y3 ~ 0*1
+    y4 ~ 0*1
+    y1 ~~ u_var_y*y1
+    y2 ~~ u_var_y*y2
+    y3 ~~ u_var_y*y3
+    y4 ~~ u_var_y*y4
+    cf_y2 ~ 1*cf_y1
+    cf_y3 ~ 1*cf_y2
+    cf_y4 ~ 1*cf_y3
+    ld_y2 =~ 1*cf_y2
+    ld_y3 =~ 1*cf_y3
+    ld_y4 =~ 1*cf_y4
+    ld_y2 ~ 0*1
+    ld_y3 ~ 0*1
+    ld_y4 ~ 0*1
+    ld_y2 ~~ 0*ld_y2
+    ld_y3 ~~ 0*ld_y3
+    ld_y4 ~~ 0*ld_y4
+    A_y =~ 1*ld_y2
+          + 1*ld_y3
+          + 1*ld_y4
+    A_y ~ 1
+    A_y ~~ A_var_y*A_y
+    A_y ~~ cf_y1
+    ld_y2 ~ ar_y*cf_y1
+    ld_y3 ~ ar_y*cf_y2
+    ld_y4 ~ ar_y*cf_y3
+    ld_x2 ~ start(-0.2)*cl_yx*cf_y1
+    ld_y2 ~ start(-0.2)*cl_xy*cf_x1
+    ld_x3 ~ start(-0.2)*cl_yx*cf_y2
+    ld_y3 ~ start(-0.2)*cl_xy*cf_x2
+    ld_x4 ~ start(-0.2)*cl_yx*cf_y3
+    ld_y4 ~ start(-0.2)*cl_xy*cf_x3
+    ld_y3 ~ ld_y2
+    ld_x3 ~ ld_x2
+    ld_y4 ~ ld_y3
+    ld_x4 ~ ld_x3
+    ld_x3 ~ ld_y2
+    ld_y3 ~ ld_x2
+    ld_x4 ~ ld_y3
+    ld_y4 ~ ld_x3
+    A_x ~~ A_y
+    cf_x1 ~~ cf_y1
+    cf_x1 ~~ A_y
+    cf_y1 ~~ A_x</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="simlchange-simulating-from-the-lcsm" class="level2" data-number="3.3">
+<h2 data-number="3.3" class="anchored" data-anchor-id="simlchange-simulating-from-the-lcsm"><span class="header-section-number">3.3</span> <code>simLChange()</code>: Simulating from the LCSM</h2>
+<p><code>simLChange()</code> simulates data under user specified true values. Arguments mirror the estimator syntax: <code>beta_x</code>/<code>beta_y</code> (proportional change), <code>omega_x</code>/<code>omega_y</code> (coupling), <code>constant_mean_x</code>/<code>constant_mean_y</code> and <code>latent_variance_x</code>/<code>latent_variance_y</code> (constant-change factor mean and variance), and <code>estimate_constant_change</code> to toggle accumulating change.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">simLChange</span>(</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">waves                    =</span> <span class="dv">5</span>,</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable_type            =</span> <span class="st">"bivariate"</span>,</span>
+<span id="cb9-4"><a href="#cb9-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_x                   =</span> <span class="sc">-</span><span class="fl">0.7</span>,</span>
+<span id="cb9-5"><a href="#cb9-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_y                   =</span> <span class="sc">-</span><span class="fl">0.7</span>,</span>
+<span id="cb9-6"><a href="#cb9-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">omega_x                  =</span> <span class="fl">0.5</span>,</span>
+<span id="cb9-7"><a href="#cb9-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">omega_y                  =</span> <span class="fl">0.5</span>,</span>
+<span id="cb9-8"><a href="#cb9-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate_constant_change =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb9-9"><a href="#cb9-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample.nobs              =</span> <span class="dv">500</span></span>
+<span id="cb9-10"><a href="#cb9-10" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb9-11"><a href="#cb9-11" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(sim<span class="sc">$</span>data, <span class="at">list.len =</span> <span class="dv">6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>'data.frame':   500 obs. of  10 variables:
+ $ x1: num  1.867 1.832 -0.516 0.41 -0.491 ...
+ $ x2: num  -0.367 0.823 -0.951 -0.137 -0.362 ...
+ $ x3: num  -0.0669 1.7382 -1.7771 1.4708 -1.2709 ...
+ $ x4: num  -1.416 0.5442 -2.8127 -0.0905 -0.9371 ...
+ $ x5: num  -3.027 -1.439 -2.379 -0.545 -1.737 ...
+ $ y1: num  0.89 0.814 0.563 0.95 -0.394 ...
+  [list output truncated]</code></pre>
+</div>
+</div>
+</section>
+<section id="algebraic-equivalence-lcsm-clpm-in-change-form" class="level2" data-number="3.4">
+<h2 data-number="3.4" class="anchored" data-anchor-id="algebraic-equivalence-lcsm-clpm-in-change-form"><span class="header-section-number">3.4</span> Algebraic Equivalence: LCSM = CLPM in Change Form</h2>
+<p>Without a constant-change factor and without measurement error, the LCSM dynamic equation <span class="math inline">\(\Delta x_t = \beta_x x_{t-1} + \omega_x y_{t-1} + u\)</span> rearranges to <span class="math inline">\(x_t = (1+\beta_x) x_{t-1} + \omega_x y_{t-1} + u\)</span> — exactly the CLPM regression on the level scores. The CLPM should recover <span class="math inline">\(1+\beta\)</span> for autoregressives and <span class="math inline">\(\omega\)</span> for cross-lags. I do a lot of this throughout the document – it’s useful to see the equivalence across models</p>
+<ol type="1">
+<li><strong>Measurement error.</strong> <code>simLChange()</code> defaults <code>indicator_variance_x = indicator_variance_y = 0.5</code>, putting noise on the observed scores. The CLPM has no latent measurement model, so its coefficients are attenuated by errors-in-variables. The LCSM separates true scores from indicators and is immune.</li>
+<li><strong>Constant change.</strong> When the accumulating factor is on, each unit carries a stable trajectory; the CLPM treats this as wave-specific variation and biases AR up / CL down.</li>
+</ol>
+<p>The simulated data – under the latent change specification – leads to estimates for the CLPM which mirror the generating parameters.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb11"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb11-1"><a href="#cb11-1" aria-hidden="true" tabindex="-1"></a>clean <span class="ot">&lt;-</span> <span class="fu">simLChange</span>(</span>
+<span id="cb11-2"><a href="#cb11-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">waves                    =</span> <span class="dv">5</span>,</span>
+<span id="cb11-3"><a href="#cb11-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable_type            =</span> <span class="st">"bivariate"</span>,</span>
+<span id="cb11-4"><a href="#cb11-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_x                   =</span> <span class="sc">-</span><span class="fl">0.2</span>,</span>
+<span id="cb11-5"><a href="#cb11-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_y                   =</span> <span class="sc">-</span><span class="fl">0.2</span>,</span>
+<span id="cb11-6"><a href="#cb11-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">omega_x                  =</span> <span class="fl">0.20</span>,</span>
+<span id="cb11-7"><a href="#cb11-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">omega_y                  =</span> <span class="fl">0.55</span>,</span>
+<span id="cb11-8"><a href="#cb11-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">indicator_variance_x     =</span> <span class="fl">0.001</span>,</span>
+<span id="cb11-9"><a href="#cb11-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">indicator_variance_y     =</span> <span class="fl">0.001</span>,</span>
+<span id="cb11-10"><a href="#cb11-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate_constant_change =</span> <span class="cn">FALSE</span>,</span>
+<span id="cb11-11"><a href="#cb11-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample.nobs              =</span> <span class="dv">1000</span></span>
+<span id="cb11-12"><a href="#cb11-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb11-13"><a href="#cb11-13" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"DGP: LCSM, no constant change, near-zero measurement error.</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb11-14"><a href="#cb11-14" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Expect AR_x ≈ AR_y ≈ 0.80, CL_yx ≈ 0.20, CL_xy ≈ 0.55.</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>DGP: LCSM, no constant change, near-zero measurement error.
+Expect AR_x ≈ AR_y ≈ 0.80, CL_yx ≈ 0.20, CL_xy ≈ 0.55.</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb13"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb13-1"><a href="#cb13-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>), <span class="at">data =</span> clean<span class="sc">$</span>data),</span>
+<span id="cb13-2"><a href="#cb13-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">standardized =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.6-19 ended normally after 28 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        33
+  Number of equality constraints                    21
+
+  Number of observations                          1000
+
+Model Test User Model:
+                                                      
+  Test statistic                                36.688
+  Degrees of freedom                                53
+  P-value (Chi-square)                           0.957
+
+Parameter Estimates:
+
+  Standard errors                             Standard
+  Information                                 Expected
+  Information saturated (h1) model          Structured
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+  p1 =~                                                                 
+    y1                1.000                               1.009    1.000
+  q1 =~                                                                 
+    x1                1.000                               1.037    1.000
+  p2 =~                                                                 
+    y2                1.000                               1.322    1.000
+  q2 =~                                                                 
+    x2                1.000                               1.160    1.000
+  p3 =~                                                                 
+    y3                1.000                               1.719    1.000
+  q3 =~                                                                 
+    x3                1.000                               1.332    1.000
+  p4 =~                                                                 
+    y4                1.000                               2.134    1.000
+  q4 =~                                                                 
+    x4                1.000                               1.529    1.000
+  p5 =~                                                                 
+    y5                1.000                               2.569    1.000
+  q5 =~                                                                 
+    x5                1.000                               1.747    1.000
+
+Regressions:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+  p2 ~                                                                  
+    p1      (ar_y)    0.801    0.010   78.060    0.000    0.611    0.611
+    q1      (cl_x)    0.550    0.013   42.756    0.000    0.432    0.432
+  q2 ~                                                                  
+    q1      (ar_x)    0.807    0.013   60.982    0.000    0.721    0.721
+    p1      (cl_y)    0.188    0.011   17.838    0.000    0.164    0.164
+  p3 ~                                                                  
+    p2      (ar_y)    0.801    0.010   78.060    0.000    0.615    0.615
+    q2      (cl_x)    0.550    0.013   42.756    0.000    0.371    0.371
+  q3 ~                                                                  
+    q2      (ar_x)    0.807    0.013   60.982    0.000    0.703    0.703
+    p2      (cl_y)    0.188    0.011   17.838    0.000    0.187    0.187
+  p4 ~                                                                  
+    p3      (ar_y)    0.801    0.010   78.060    0.000    0.645    0.645
+    q3      (cl_x)    0.550    0.013   42.756    0.000    0.343    0.343
+  q4 ~                                                                  
+    q3      (ar_x)    0.807    0.013   60.982    0.000    0.703    0.703
+    p3      (cl_y)    0.188    0.011   17.838    0.000    0.212    0.212
+  p5 ~                                                                  
+    p4      (ar_y)    0.801    0.010   78.060    0.000    0.665    0.665
+    q4      (cl_x)    0.550    0.013   42.756    0.000    0.327    0.327
+  q5 ~                                                                  
+    q4      (ar_x)    0.807    0.013   60.982    0.000    0.706    0.706
+    p4      (cl_y)    0.188    0.011   17.838    0.000    0.230    0.230
+
+Covariances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+  p1 ~~                                                                 
+    q1      (d__1)    0.324    0.035    9.360    0.000    0.310    0.310
+ .p2 ~~                                                                 
+   .q2      (d_c_)    0.201    0.008   23.704    0.000    0.404    0.404
+ .p3 ~~                                                                 
+   .q3      (d_c_)    0.201    0.008   23.704    0.000    0.404    0.404
+ .p4 ~~                                                                 
+   .q4      (d_c_)    0.201    0.008   23.704    0.000    0.404    0.404
+ .p5 ~~                                                                 
+   .q5      (d_c_)    0.201    0.008   23.704    0.000    0.404    0.404
+
+Intercepts:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+    p1               -0.018    0.032   -0.565    0.572   -0.018   -0.018
+    q1                0.020    0.033    0.614    0.539    0.019    0.019
+   .p2                0.000                               0.000    0.000
+   .q2                0.000                               0.000    0.000
+   .p3                0.000                               0.000    0.000
+   .q3                0.000                               0.000    0.000
+   .p4                0.000                               0.000    0.000
+   .q4                0.000                               0.000    0.000
+   .p5                0.000                               0.000    0.000
+   .q5                0.000                               0.000    0.000
+   .y1                0.000                               0.000    0.000
+   .x1                0.000                               0.000    0.000
+   .y2                0.000                               0.000    0.000
+   .x2                0.000                               0.000    0.000
+   .y3                0.000                               0.000    0.000
+   .x3                0.000                               0.000    0.000
+   .y4                0.000                               0.000    0.000
+   .x4                0.000                               0.000    0.000
+   .y5                0.000                               0.000    0.000
+   .x5                0.000                               0.000    0.000
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+    p1   (d_vr_y1)    1.019    0.046   22.361    0.000    1.000    1.000
+    q1   (d_vr_x1)    1.076    0.048   22.361    0.000    1.000    1.000
+   .p2    (d_vr_y)    0.483    0.011   44.721    0.000    0.276    0.276
+   .q2    (d_vr_x)    0.511    0.011   44.721    0.000    0.379    0.379
+   .p3    (d_vr_y)    0.483    0.011   44.721    0.000    0.163    0.163
+   .q3    (d_vr_x)    0.511    0.011   44.721    0.000    0.288    0.288
+   .p4    (d_vr_y)    0.483    0.011   44.721    0.000    0.106    0.106
+   .q4    (d_vr_x)    0.511    0.011   44.721    0.000    0.219    0.219
+   .p5    (d_vr_y)    0.483    0.011   44.721    0.000    0.073    0.073
+   .q5    (d_vr_x)    0.511    0.011   44.721    0.000    0.167    0.167
+   .y1                0.000                               0.000    0.000
+   .x1                0.000                               0.000    0.000
+   .y2                0.000                               0.000    0.000
+   .x2                0.000                               0.000    0.000
+   .y3                0.000                               0.000    0.000
+   .x3                0.000                               0.000    0.000
+   .y4                0.000                               0.000    0.000
+   .x4                0.000                               0.000    0.000
+   .y5                0.000                               0.000    0.000
+   .x5                0.000                               0.000    0.000</code></pre>
+</div>
+</div>
+</section>
+<section id="constant-change-and-unit-effects" class="level2" data-number="3.5">
+<h2 data-number="3.5" class="anchored" data-anchor-id="constant-change-and-unit-effects"><span class="header-section-number">3.5</span> Constant Change and Unit Effects</h2>
+<p>Now turn the constant-change factor on, keeping measurement error off. This creates an upward bias for the AR parameter and a downward bias for the CL parameter in the CLPM.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb15"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb15-1"><a href="#cb15-1" aria-hidden="true" tabindex="-1"></a>lcsm_data <span class="ot">&lt;-</span> <span class="fu">simLChange</span>(</span>
+<span id="cb15-2"><a href="#cb15-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">waves                    =</span> <span class="dv">5</span>,</span>
+<span id="cb15-3"><a href="#cb15-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">variable_type            =</span> <span class="st">"bivariate"</span>,</span>
+<span id="cb15-4"><a href="#cb15-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_x                   =</span> <span class="sc">-</span><span class="fl">0.5</span>,</span>
+<span id="cb15-5"><a href="#cb15-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">beta_y                   =</span> <span class="sc">-</span><span class="fl">0.5</span>,</span>
+<span id="cb15-6"><a href="#cb15-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">omega_x                  =</span> <span class="fl">0.20</span>,</span>
+<span id="cb15-7"><a href="#cb15-7" aria-hidden="true" tabindex="-1"></a>  <span class="at">omega_y                  =</span> <span class="fl">0.55</span>,</span>
+<span id="cb15-8"><a href="#cb15-8" aria-hidden="true" tabindex="-1"></a>  <span class="at">indicator_variance_x     =</span> <span class="fl">0.01</span>,</span>
+<span id="cb15-9"><a href="#cb15-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">indicator_variance_y     =</span> <span class="fl">0.01</span>,</span>
+<span id="cb15-10"><a href="#cb15-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb15-11"><a href="#cb15-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">latent_variance_x        =</span> <span class="dv">1</span>,</span>
+<span id="cb15-12"><a href="#cb15-12" aria-hidden="true" tabindex="-1"></a>  <span class="at">latent_variance_y        =</span> <span class="dv">1</span>,</span>
+<span id="cb15-13"><a href="#cb15-13" aria-hidden="true" tabindex="-1"></a>  <span class="at">sample.nobs              =</span> <span class="dv">1000</span></span>
+<span id="cb15-14"><a href="#cb15-14" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb15-15"><a href="#cb15-15" aria-hidden="true" tabindex="-1"></a><span class="fu">cat</span>(<span class="st">"DGP: LCSM with constant change (near-zero measurement error).</span><span class="sc">\n</span><span class="st">"</span>,</span>
+<span id="cb15-16"><a href="#cb15-16" aria-hidden="true" tabindex="-1"></a>    <span class="st">"Estimator: CLPM (does not absorb unit effects).</span><span class="sc">\n</span><span class="st">"</span>, <span class="at">sep =</span> <span class="st">""</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>DGP: LCSM with constant change (near-zero measurement error).
+Estimator: CLPM (does not absorb unit effects).</code></pre>
+</div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb17"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb17-1"><a href="#cb17-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>), <span class="at">data =</span> lcsm_data<span class="sc">$</span>data),</span>
+<span id="cb17-2"><a href="#cb17-2" aria-hidden="true" tabindex="-1"></a>        <span class="at">standardized =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.6-19 ended normally after 26 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        33
+  Number of equality constraints                    21
+
+  Number of observations                          1000
+
+Model Test User Model:
+                                                       
+  Test statistic                              17716.914
+  Degrees of freedom                                 53
+  P-value (Chi-square)                            0.000
+
+Parameter Estimates:
+
+  Standard errors                             Standard
+  Information                                 Expected
+  Information saturated (h1) model          Structured
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+  p1 =~                                                                 
+    y1                1.000                               0.973    1.000
+  q1 =~                                                                 
+    x1                1.000                               1.005    1.000
+  p2 =~                                                                 
+    y2                1.000                               1.365    1.000
+  q2 =~                                                                 
+    x2                1.000                               1.324    1.000
+  p3 =~                                                                 
+    y3                1.000                               1.858    1.000
+  q3 =~                                                                 
+    x3                1.000                               1.675    1.000
+  p4 =~                                                                 
+    y4                1.000                               2.476    1.000
+  q4 =~                                                                 
+    x4                1.000                               2.089    1.000
+  p5 =~                                                                 
+    y5                1.000                               3.243    1.000
+  q5 =~                                                                 
+    x5                1.000                               2.592    1.000
+
+Regressions:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+  p2 ~                                                                  
+    p1      (ar_y)    0.974    0.010   99.746    0.000    0.694    0.694
+    q1      (cl_x)    0.405    0.011   37.170    0.000    0.299    0.299
+  q2 ~                                                                  
+    q1      (ar_x)    1.053    0.010  100.633    0.000    0.800    0.800
+    p1      (cl_y)    0.135    0.009   14.413    0.000    0.099    0.099
+  p3 ~                                                                  
+    p2      (ar_y)    0.974    0.010   99.746    0.000    0.715    0.715
+    q2      (cl_x)    0.405    0.011   37.170    0.000    0.289    0.289
+  q3 ~                                                                  
+    q2      (ar_x)    1.053    0.010  100.633    0.000    0.832    0.832
+    p2      (cl_y)    0.135    0.009   14.413    0.000    0.110    0.110
+  p4 ~                                                                  
+    p3      (ar_y)    0.974    0.010   99.746    0.000    0.731    0.731
+    q3      (cl_x)    0.405    0.011   37.170    0.000    0.274    0.274
+  q4 ~                                                                  
+    q3      (ar_x)    1.053    0.010  100.633    0.000    0.845    0.845
+    p3      (cl_y)    0.135    0.009   14.413    0.000    0.120    0.120
+  p5 ~                                                                  
+    p4      (ar_y)    0.974    0.010   99.746    0.000    0.743    0.743
+    q4      (cl_x)    0.405    0.011   37.170    0.000    0.261    0.261
+  q5 ~                                                                  
+    q4      (ar_x)    1.053    0.010  100.633    0.000    0.849    0.849
+    p4      (cl_y)    0.135    0.009   14.413    0.000    0.129    0.129
+
+Covariances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+  p1 ~~                                                                 
+    q1      (d__1)    0.277    0.032    8.612    0.000    0.283    0.283
+ .p2 ~~                                                                 
+   .q2      (d_c_)    0.181    0.009   19.520    0.000    0.324    0.324
+ .p3 ~~                                                                 
+   .q3      (d_c_)    0.181    0.009   19.520    0.000    0.324    0.324
+ .p4 ~~                                                                 
+   .q4      (d_c_)    0.181    0.009   19.520    0.000    0.324    0.324
+ .p5 ~~                                                                 
+   .q5      (d_c_)    0.181    0.009   19.520    0.000    0.324    0.324
+
+Intercepts:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+    p1               -0.052    0.031   -1.693    0.091   -0.054   -0.054
+    q1               -0.053    0.032   -1.657    0.097   -0.052   -0.052
+   .p2                0.000                               0.000    0.000
+   .q2                0.000                               0.000    0.000
+   .p3                0.000                               0.000    0.000
+   .q3                0.000                               0.000    0.000
+   .p4                0.000                               0.000    0.000
+   .q4                0.000                               0.000    0.000
+   .p5                0.000                               0.000    0.000
+   .q5                0.000                               0.000    0.000
+   .y1                0.000                               0.000    0.000
+   .x1                0.000                               0.000    0.000
+   .y2                0.000                               0.000    0.000
+   .x2                0.000                               0.000    0.000
+   .y3                0.000                               0.000    0.000
+   .x3                0.000                               0.000    0.000
+   .y4                0.000                               0.000    0.000
+   .x4                0.000                               0.000    0.000
+   .y5                0.000                               0.000    0.000
+   .x5                0.000                               0.000    0.000
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)   Std.lv  Std.all
+    p1   (d_vr_y1)    0.947    0.042   22.361    0.000    1.000    1.000
+    q1   (d_vr_x1)    1.011    0.045   22.361    0.000    1.000    1.000
+   .p2    (d_vr_y)    0.580    0.013   44.721    0.000    0.311    0.311
+   .q2    (d_vr_x)    0.534    0.012   44.721    0.000    0.305    0.305
+   .p3    (d_vr_y)    0.580    0.013   44.721    0.000    0.168    0.168
+   .q3    (d_vr_x)    0.534    0.012   44.721    0.000    0.190    0.190
+   .p4    (d_vr_y)    0.580    0.013   44.721    0.000    0.095    0.095
+   .q4    (d_vr_x)    0.534    0.012   44.721    0.000    0.122    0.122
+   .p5    (d_vr_y)    0.580    0.013   44.721    0.000    0.055    0.055
+   .q5    (d_vr_x)    0.534    0.012   44.721    0.000    0.080    0.080
+   .y1                0.000                               0.000    0.000
+   .x1                0.000                               0.000    0.000
+   .y2                0.000                               0.000    0.000
+   .x2                0.000                               0.000    0.000
+   .y3                0.000                               0.000    0.000
+   .x3                0.000                               0.000    0.000
+   .y4                0.000                               0.000    0.000
+   .x4                0.000                               0.000    0.000
+   .y5                0.000                               0.000    0.000
+   .x5                0.000                               0.000    0.000</code></pre>
+</div>
+</div>
+<p>The corresponding LCSM fit on the same data recovers the generating parameters:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb19"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb19-1"><a href="#cb19-1" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(<span class="fu">lavaan</span>(<span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">5</span>, <span class="at">variable_type =</span> <span class="st">"bivariate"</span>, <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>),</span>
+<span id="cb19-2"><a href="#cb19-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">data =</span> lcsm_data<span class="sc">$</span>data),</span>
+<span id="cb19-3"><a href="#cb19-3" aria-hidden="true" tabindex="-1"></a>        <span class="at">standardized =</span> <span class="cn">FALSE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>lavaan 0.6-19 ended normally after 122 iterations
+
+  Estimator                                         ML
+  Optimization method                           NLMINB
+  Number of model parameters                        40
+  Number of equality constraints                    20
+
+  Number of observations                          1000
+
+Model Test User Model:
+                                                      
+  Test statistic                                37.232
+  Degrees of freedom                                45
+  P-value (Chi-square)                           0.788
+
+Parameter Estimates:
+
+  Standard errors                             Standard
+  Information                                 Expected
+  Information saturated (h1) model          Structured
+
+Latent Variables:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  cf_x1 =~                                            
+    x1                1.000                           
+  cf_x2 =~                                            
+    x2                1.000                           
+  cf_x3 =~                                            
+    x3                1.000                           
+  cf_x4 =~                                            
+    x4                1.000                           
+  cf_x5 =~                                            
+    x5                1.000                           
+  ld_x2 =~                                            
+    cf_x2             1.000                           
+  ld_x3 =~                                            
+    cf_x3             1.000                           
+  ld_x4 =~                                            
+    cf_x4             1.000                           
+  ld_x5 =~                                            
+    cf_x5             1.000                           
+  A_x =~                                              
+    ld_x2             1.000                           
+    ld_x3             1.000                           
+    ld_x4             1.000                           
+    ld_x5             1.000                           
+  cf_y1 =~                                            
+    y1                1.000                           
+  cf_y2 =~                                            
+    y2                1.000                           
+  cf_y3 =~                                            
+    y3                1.000                           
+  cf_y4 =~                                            
+    y4                1.000                           
+  cf_y5 =~                                            
+    y5                1.000                           
+  ld_y2 =~                                            
+    cf_y2             1.000                           
+  ld_y3 =~                                            
+    cf_y3             1.000                           
+  ld_y4 =~                                            
+    cf_y4             1.000                           
+  ld_y5 =~                                            
+    cf_y5             1.000                           
+  A_y =~                                              
+    ld_y2             1.000                           
+    ld_y3             1.000                           
+    ld_y4             1.000                           
+    ld_y5             1.000                           
+
+Regressions:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  cf_x2 ~                                             
+    cf_x1             1.000                           
+  cf_x3 ~                                             
+    cf_x2             1.000                           
+  cf_x4 ~                                             
+    cf_x3             1.000                           
+  cf_x5 ~                                             
+    cf_x4             1.000                           
+  ld_x2 ~                                             
+    cf_x1   (ar_x)   -0.507    0.002 -221.464    0.000
+  ld_x3 ~                                             
+    cf_x2   (ar_x)   -0.507    0.002 -221.464    0.000
+  ld_x4 ~                                             
+    cf_x3   (ar_x)   -0.507    0.002 -221.464    0.000
+  ld_x5 ~                                             
+    cf_x4   (ar_x)   -0.507    0.002 -221.464    0.000
+  cf_y2 ~                                             
+    cf_y1             1.000                           
+  cf_y3 ~                                             
+    cf_y2             1.000                           
+  cf_y4 ~                                             
+    cf_y3             1.000                           
+  cf_y5 ~                                             
+    cf_y4             1.000                           
+  ld_y2 ~                                             
+    cf_y1   (ar_y)   -0.501    0.002 -229.841    0.000
+  ld_y3 ~                                             
+    cf_y2   (ar_y)   -0.501    0.002 -229.841    0.000
+  ld_y4 ~                                             
+    cf_y3   (ar_y)   -0.501    0.002 -229.841    0.000
+  ld_y5 ~                                             
+    cf_y4   (ar_y)   -0.501    0.002 -229.841    0.000
+  ld_x2 ~                                             
+    cf_y1   (cl_y)    0.203    0.002  107.978    0.000
+  ld_y2 ~                                             
+    cf_x1   (cl_x)    0.551    0.003  206.680    0.000
+  ld_x3 ~                                             
+    cf_y2   (cl_y)    0.203    0.002  107.978    0.000
+  ld_y3 ~                                             
+    cf_x2   (cl_x)    0.551    0.003  206.680    0.000
+  ld_x4 ~                                             
+    cf_y3   (cl_y)    0.203    0.002  107.978    0.000
+  ld_y4 ~                                             
+    cf_x3   (cl_x)    0.551    0.003  206.680    0.000
+  ld_x5 ~                                             
+    cf_y4   (cl_y)    0.203    0.002  107.978    0.000
+  ld_y5 ~                                             
+    cf_x4   (cl_x)    0.551    0.003  206.680    0.000
+
+Covariances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+  cf_x1 ~~                                            
+    A_x               0.033    0.032    1.010    0.313
+  cf_y1 ~~                                            
+    A_y               0.002    0.030    0.063    0.950
+  A_x ~~                                              
+    A_y               0.302    0.033    9.215    0.000
+  cf_x1 ~~                                            
+    cf_y1             0.276    0.032    8.612    0.000
+    A_y               0.184    0.031    5.857    0.000
+  A_x ~~                                              
+    cf_y1             0.240    0.032    7.478    0.000
+
+Intercepts:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+    cf_x1            -0.052    0.032   -1.648    0.099
+   .cf_x2             0.000                           
+   .cf_x3             0.000                           
+   .cf_x4             0.000                           
+   .cf_x5             0.000                           
+   .x1                0.000                           
+   .x2                0.000                           
+   .x3                0.000                           
+   .x4                0.000                           
+   .x5                0.000                           
+   .ld_x2             0.000                           
+   .ld_x3             0.000                           
+   .ld_x4             0.000                           
+   .ld_x5             0.000                           
+    A_x               0.503    0.032   15.673    0.000
+    cf_y1            -0.052    0.031   -1.688    0.091
+   .cf_y2             0.000                           
+   .cf_y3             0.000                           
+   .cf_y4             0.000                           
+   .cf_y5             0.000                           
+   .y1                0.000                           
+   .y2                0.000                           
+   .y3                0.000                           
+   .y4                0.000                           
+   .y5                0.000                           
+   .ld_y2             0.000                           
+   .ld_y3             0.000                           
+   .ld_y4             0.000                           
+   .ld_y5             0.000                           
+    A_y               0.486    0.031   15.809    0.000
+
+Variances:
+                   Estimate  Std.Err  z-value  P(&gt;|z|)
+    cf_x1             0.999    0.045   22.181    0.000
+   .cf_x2             0.000                           
+   .cf_x3             0.000                           
+   .cf_x4             0.000                           
+   .cf_x5             0.000                           
+   .x1    (u_vr_x)    0.010    0.000   38.478    0.000
+   .x2    (u_vr_x)    0.010    0.000   38.478    0.000
+   .x3    (u_vr_x)    0.010    0.000   38.478    0.000
+   .x4    (u_vr_x)    0.010    0.000   38.478    0.000
+   .x5    (u_vr_x)    0.010    0.000   38.478    0.000
+   .ld_x2             0.000                           
+   .ld_x3             0.000                           
+   .ld_x4             0.000                           
+   .ld_x5             0.000                           
+    A_x   (A_vr_x)    1.026    0.046   22.241    0.000
+    cf_y1             0.935    0.042   22.149    0.000
+   .cf_y2             0.000                           
+   .cf_y3             0.000                           
+   .cf_y4             0.000                           
+   .cf_y5             0.000                           
+   .y1    (u_vr_y)    0.010    0.000   36.544    0.000
+   .y2    (u_vr_y)    0.010    0.000   36.544    0.000
+   .y3    (u_vr_y)    0.010    0.000   36.544    0.000
+   .y4    (u_vr_y)    0.010    0.000   36.544    0.000
+   .y5    (u_vr_y)    0.010    0.000   36.544    0.000
+   .ld_y2             0.000                           
+   .ld_y3             0.000                           
+   .ld_y4             0.000                           
+   .ld_y5             0.000                           
+    A_y   (A_vr_y)    0.943    0.042   22.213    0.000</code></pre>
+</div>
+</div>
+</section>
+<section id="summary" class="level2" data-number="3.6">
+<h2 data-number="3.6" class="anchored" data-anchor-id="summary"><span class="header-section-number">3.6</span> Summary</h2>
+<p>The LCSM is a powerful framework for modeling dynamics in change form. By differencing observed scores, it effectively absorbs all time-invariant heterogeneity, including stable between-person differences. The <code>estimateLChange()</code> function generates <code>lavaan</code> syntax for a variety of LCSM specifications, while <code>simLChange()</code> simulates data.</p>
+<p>There is a clear algebraic equivalence between the LCSM without constant change and the CLPM in change form. However, the presence of measurement error and/or constant change leads to bias in the CLPM estimates, while the LCSM can recover the true parameters.</p>
+</section>
+<section id="appendix-detailed-lcsm-dag" class="level2" data-number="3.7">
+<h2 data-number="3.7" class="anchored" data-anchor-id="appendix-detailed-lcsm-dag"><span class="header-section-number">3.7</span> Appendix: Detailed LCSM DAG</h2>
+<p><a href="#fig-lcm-full" class="quarto-xref">Figure&nbsp;<span>3.2</span></a> shows the bivariate LCSM with its full measurement model: latent true scores <span class="math inline">\(q_t\)</span> (for <span class="math inline">\(X\)</span>) and <span class="math inline">\(p_t\)</span> (for <span class="math inline">\(Y\)</span>), constant-change factors <span class="math inline">\(\Delta_x, \Delta_y\)</span>, change scores <span class="math inline">\(\Delta x_t, \Delta y_t\)</span>, and observed indicators across five waves.</p>
+<div class="cell">
+<div id="fig-lcm-full" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-lcm-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-472b392bfd3968943086" style="width:100%;height:464px;"></div>
+<script type="application/json" data-for="htmlwidget-472b392bfd3968943086">{"x":{"diagram":"\ndigraph LCM {\n  graph [layout = neato, rankdir = TB, bgcolor = white]\n  node [shape = box, style = filled, fillcolor = white, fontsize = 11]\n\n  A_X [pos = \"-2.5,1!\", shape = circle, fillcolor = white, label = <Δ<sub>x<\/sub>>,  width = 0.5, height = 0.5]\n  I [pos = \"-2.5,0!\", shape = triangle, fillcolor = white, label = \"I\",  width = 0.5, height = 0.5]\n  X1 [pos = \"-2,2.2!\", label = \"x1\", width = 0.6, height = 0.3]\n  X2 [pos = \"-1,2.2!\", label = \"x2\", width = 0.6, height = 0.3]\n  X3 [pos = \"0,2.2!\", label = \"x3\", width = 0.6, height = 0.3]\n  X4 [pos = \"1,2.2!\", label = \"x4\", width = 0.6, height = 0.3]\n  X5 [pos = \"2,2.2!\", label = \"x5\", width = 0.6, height = 0.3]\n\n  wX1 [pos = \"-2,1.35!\", shape = circle, fillcolor = white, label = \"q1\"]\n  wX2 [pos = \"-1,1.35!\", shape = circle, fillcolor = white, label = \"q2\"]\n  wX3 [pos = \"0,1.35!\", shape = circle, fillcolor = white, label = \"q3\"]\n  wX4 [pos = \"1,1.35!\", shape = circle, fillcolor = white, label = \"q4\"]\n  wX5 [pos = \"2,1.35!\", shape = circle, fillcolor = white, label = \"q5\"]\n\n  wY1 [pos = \"-2,-1.35!\", shape = circle, fillcolor = white, label = \"p1\"]\n  wY2 [pos = \"-1,-1.35!\", shape = circle, fillcolor = white, label = \"p2\"]\n  wY3 [pos = \"0,-1.35!\", shape = circle, fillcolor = white, label = \"p3\"]\n  wY4 [pos = \"1,-1.35!\", shape = circle, fillcolor = white, label = \"p4\"]\n  wY5 [pos = \"2,-1.35!\", shape = circle, fillcolor = white, label = \"p5\"]\n\n  dX2 [pos = \"-1,0.5!\", shape = circle, fillcolor = white, label = \"Δx2\"]\n  dX3 [pos = \"0,0.5!\", shape = circle, fillcolor = white, label = \"Δx3\"]\n  dX4 [pos = \"1,0.5!\", shape = circle, fillcolor = white, label = \"Δx4\"]\n  dX5 [pos = \"2,0.5!\", shape = circle, fillcolor = white, label = \"Δx5\"]\n\n  dY2 [pos = \"-1,-0.5!\", shape = circle, fillcolor = white, label = \"Δy2\"]\n  dY3 [pos = \"0,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy3\"]\n  dY4 [pos = \"1,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy4\"]\n  dY5 [pos = \"2,-0.5!\",  shape = circle, fillcolor = white, label = \"Δy5\"]\n\n  Y1 [pos = \"-2,-2.2!\", label = \"y1\", width = 0.6, height = 0.3]\n  Y2 [pos = \"-1,-2.2!\", label = \"y2\", width = 0.6, height = 0.3]\n  Y3 [pos = \"0,-2.2!\", label = \"y3\", width = 0.6, height = 0.3]\n  Y4 [pos = \"1,-2.2!\", label = \"y4\", width = 0.6, height = 0.3]\n  Y5 [pos = \"2,-2.2!\", label = \"y5\", width = 0.6, height = 0.3]\n  A_Y [pos = \"-2.5,-1!\", shape = circle, fillcolor = white, label = <Δ<sub>y<\/sub>>, width = 0.5, height = 0.5]\n\n  A_X -> dX2 [arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX3 [arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX4 [arrowsize = 0.5, tailport = e, headport = n]\n  A_X -> dX5 [arrowsize = 0.5, tailport = e, headport = n]\n  A_Y -> dY2 [arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY3 [arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY4 [arrowsize = 0.5, tailport = e, headport = s]\n  A_Y -> dY5 [arrowsize = 0.5, tailport = e, headport = s]\n\n  I -> A_X [arrowsize = 0.5, tailport = n, headport = s]\n  I -> A_Y [arrowsize = 0.5, tailport = s, headport = n]\n  I -> wX1 [arrowsize = 0.5, tailport = n, headport = s]\n  I -> wY1 [arrowsize = 0.5, tailport = s, headport = n]\n\n  wX1 -> X1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> X2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> X3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> X4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX5 -> X5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> Y1 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> Y2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> Y3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> Y4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY5 -> Y5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  wY1 -> dY2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dY3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dY4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dY5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX1 -> dX2 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dX3 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dX4 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dX5 [label = \"β\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> dY2 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wX2 -> dY3 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wX3 -> dY4 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wX4 -> dY5 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY1 -> dX2 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY2 -> dX3 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY3 -> dX4 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n  wY4 -> dX5 [label = \"ω\", arrowsize = 0.5, fontsize = 10]\n\n  wX1 -> wX2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX2 -> wX3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX3 -> wX4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wX4 -> wX5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY1 -> wY2 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY2 -> wY3 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY3 -> wY4 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n  wY4 -> wY5 [label = \"1\", arrowsize = 0.5, fontsize = 11]\n\n  dX2 -> wX2 [arrowsize = 0.5]\n  dX3 -> wX3 [arrowsize = 0.5]\n  dX4 -> wX4 [arrowsize = 0.5]\n  dX5 -> wX5 [arrowsize = 0.5]\n  dY2 -> wY2 [arrowsize = 0.5]\n  dY3 -> wY3 [arrowsize = 0.5]\n  dY4 -> wY4 [arrowsize = 0.5]\n  dY5 -> wY5 [arrowsize = 0.5]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-lcm-full-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;3.2: Bivariate Latent Change Score Model with constant-change factors. Full measurement model across five waves.
+</figcaption>
+</figure>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-kim_and_steiner2021" class="csl-entry" role="listitem">
+Kim, Yongnam, and Peter M Steiner. 2021. <span>“Gain Scores Revisited: A Graphical Models Perspective.”</span> <em>Sociological Methods &amp; Research</em> 50 (3): 1353–75.
+</div>
+<div id="ref-mcardle2009" class="csl-entry" role="listitem">
+McArdle, John J. 2009. <span>“Latent Variable Modeling of Differences and Changes with Longitudinal Data.”</span> <em>Annual Review of Psychology</em> 60 (1): 577–605.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./01_Panel_Models.html" class="pagination-link" aria-label="Revisiting the Cross-Lagged Panel Model">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Revisiting the Cross-Lagged Panel Model</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./03_RICLPM.html" class="pagination-link" aria-label="The Random-Intercept CLPM">
+        <span class="nav-page-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

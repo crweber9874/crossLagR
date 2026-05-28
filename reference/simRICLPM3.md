@@ -1,0 +1,85 @@
+# simRICLPM
+
+Simulate data from an observed, random intercept cross-lagged regression
+(RI-CLR) model In particular, this creates a synthetic dataset of a
+cross-lagged model with a specified number of waves and structural
+parameters.
+
+## Usage
+
+``` r
+simRICLPM3(
+  waves = 10,
+  stability_p = 0.2,
+  stability_q = 0.2,
+  stability_r = 0.2,
+  cross_p = 0.1,
+  cross_q = 0.1,
+  cross_r = 0.1,
+  variance_p = 1,
+  variance_q = 1,
+  variance_r = 1,
+  cov_pq = 0.1,
+  cov_pr = 0.1,
+  cov_qr = 0.1,
+  variance_between_x = 1,
+  variance_between_y = 1,
+  variance_between_z = 1,
+  cov_between_xy = 0.5,
+  cov_between_xz = 0.5,
+  cov_between_yz = 0.5,
+  ...
+)
+```
+
+## Arguments
+
+- waves:
+
+  The number of waves (time points) in the model.
+
+- stability_p:
+
+  The stability parameter for the x variable (autoregressive effect).
+
+- stability_q:
+
+  The stability parameter for the y variable (autoregressive effect).
+
+- stability_r:
+
+  The stability parameter for the z variable (autoregressive effect).
+
+- cross_p:
+
+  The cross-lagged effect of y on x at the next time point.
+
+- cross_q:
+
+  The cross-lagged effect of x on y at the next time point.
+
+- cross_r:
+
+  The cross-lagged effect of z on x and y at the next time point.
+
+- cov_pq:
+
+  The covariance between x and y within the same time point.
+
+- cov_pr:
+
+  The covariance between x and z within the same time point.
+
+- cov_qr:
+
+  The covariance between y and z within the same time point.
+
+- ...:
+
+  Additional arguments to pass to the \`lavaan::simulateData\` function.
+
+## Value
+
+A list containing two elements: \* \`model\`: The Lavaan model syntax
+used for data simulation. \* \`data\`: The simulated data in a data
+frame format.

@@ -1,0 +1,236 @@
+# simLChange
+
+Simulate data from a Latent Change Score Model
+
+This function creates synthetic data for either a single-variable or
+dual-variable latent change score model with specified structural
+parameters that match the estimateLChange function schema.
+
+## Usage
+
+``` r
+simLChange(
+  waves = 10,
+  variable_type = c("univariate", "bivariate"),
+  initial_mean_x = 0,
+  initial_mean_y = 0,
+  initial_var_x = 1,
+  initial_var_y = 1,
+  constant_mean_x = 0.5,
+  constant_mean_y = 0.5,
+  latent_variance_x = 1,
+  latent_variance_y = 1,
+  beta_x = -0.2,
+  beta_y = -0.2,
+  omega_x = -0.1,
+  omega_y = -0.1,
+  cross_change_x = 0.1,
+  cross_change_y = 0.1,
+  phi_x = 0.1,
+  phi_y = 0.1,
+  indicator_variance_x = 0.5,
+  indicator_variance_y = 0.5,
+  var_ld_x = 0.5,
+  var_ld_y = 0.5,
+  cov_ld = 0.2,
+  cov_initial_xy = 0.3,
+  cov_constant_change_xy = 0.3,
+  cov_initial_x_constant_y = 0.2,
+  cov_initial_y_constant_x = 0.2,
+  estimate_change_to_change = FALSE,
+  estimate_constant_change = TRUE,
+  ...
+)
+```
+
+## Arguments
+
+- waves:
+
+  The number of waves (time points) in the model.
+
+- variable_type:
+
+  Type of latent change model: "univariate" (single variable) or
+  "bivariate" (dual variable).
+
+- initial_mean_x:
+
+  Mean of the initial true score for X.
+
+- initial_mean_y:
+
+  Mean of the initial true score for Y (for bivariate only).
+
+- initial_var_x:
+
+  Variance of the initial true score for X.
+
+- initial_var_y:
+
+  Variance of the initial true score for Y (for bivariate only).
+
+- constant_mean_x:
+
+  Mean of the constant change factor for X.
+
+- constant_mean_y:
+
+  Mean of the constant change factor for Y (for bivariate only).
+
+- latent_variance_x:
+
+  Variance of the constant change factor for X.
+
+- latent_variance_y:
+
+  Variance of the constant change factor for Y (for bivariate only).
+
+- beta_x:
+
+  Proportional effect for X - effect of X level on X change.
+
+- beta_y:
+
+  Proportional effect for Y - effect of Y level on Y change.
+
+- omega_x:
+
+  Coupling parameter - effect of Y level on X change.
+
+- omega_y:
+
+  Coupling parameter - effect of X level on Y change.
+
+- cross_change_x:
+
+  Change-to-change cross-lagged effect - effect of Y change on X change.
+
+- cross_change_y:
+
+  Change-to-change cross-lagged effect - effect of X change on Y change.
+
+- phi_x:
+
+  Change autoregression - effect of prior X change on current X change.
+
+- phi_y:
+
+  Change autoregression - effect of prior Y change on current Y change.
+
+- indicator_variance_x:
+
+  Measurement error variance for X indicators.
+
+- indicator_variance_y:
+
+  Measurement error variance for Y indicators.
+
+- var_ld_x:
+
+  Variance of latent change scores for X (when estimate_constant_change
+  = FALSE).
+
+- var_ld_y:
+
+  Variance of latent change scores for Y (when estimate_constant_change
+  = FALSE).
+
+- cov_ld:
+
+  Covariance between latent change scores (when estimate_constant_change
+  = FALSE).
+
+- cov_initial_xy:
+
+  Covariance between initial X and Y true scores.
+
+- cov_constant_change_xy:
+
+  Covariance between constant change factors for X and Y.
+
+- cov_initial_x_constant_y:
+
+  Covariance between initial X and constant change Y.
+
+- cov_initial_y_constant_x:
+
+  Covariance between initial Y and constant change X.
+
+- estimate_change_to_change:
+
+  Logical. Whether to include change-to-change effects.
+
+- estimate_constant_change:
+
+  Logical. Whether to include constant change factors. Default is TRUE.
+
+- ...:
+
+  Additional arguments to pass to the \`lavaan::simulateData\` function.
+
+## Value
+
+A list containing two elements: \* \`model\`: The Lavaan model syntax
+used for data simulation. \* \`data\`: The simulated data in a data
+frame format.
+
+## Details
+
+For the single variable latent change model (variable_type =
+"univariate"), only X-related parameters are used.
+
+For the dual change model (variable_type = "bivariate"), the model
+includes: - Latent true scores (cf_x, cf_y) at each wave - Latent change
+scores (ld_x, ld_y) from wave 2 onwards - Constant change factors
+(general_x, general_y) if estimate_constant_change = TRUE - Proportional
+effects (levels affecting own changes) - Coupling effects (levels
+affecting other variable's changes) - Change-to-change effects (lagged
+changes affecting current changes) if enabled
+
+When estimate_constant_change = FALSE: - No constant change factors are
+included - Latent change scores have their own variances (var_ld_x,
+var_ld_y) - Useful for avoiding positive definiteness issues when
+constant change variances are small - Only proportional and coupling
+effects drive systematic change
+
+## Examples
+
+``` r
+# Single variable latent change model
+single_change_data <- simLChange(
+  waves = 5,
+  variable_type = "univariate",
+  beta_x = -0.2,
+  constant_mean_x = 0.5,
+  sample.nobs = 1000
+)
+
+# Dual change model
+dual_change_data <- simLChange(
+  waves = 5,
+  variable_type = "bivariate",
+  beta_x = -0.2,
+  beta_y = -0.3,
+  omega_x = -0.15,
+  omega_y = -0.15,
+  cross_change_x = 0.1,
+  cross_change_y = 0.1,
+  sample.nobs = 1000
+)
+
+# Bivariate model without constant change factors
+no_constant_data <- simLChange(
+  waves = 5,
+  variable_type = "bivariate",
+  beta_x = -0.3,
+  beta_y = -0.3,
+  omega_x = 0.3,
+  omega_y = 0.3,
+  estimate_constant_change = FALSE,
+  var_ld_x = 0.5,
+  var_ld_y = 0.5,
+  cov_ld = 0.2,
+  sample.nobs = 5000
+)
+```

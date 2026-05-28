@@ -1,0 +1,290 @@
+# simLGM
+
+Simulate data from a Linear Latent Growth Model (LGM) with options for
+univariate and bivariate models.
+
+## Usage
+
+``` r
+simLGM(
+  waves = 5,
+  variable_type = c("univariate", "bivariate"),
+  time_scores = NULL,
+  mean_I_x = 10,
+  mean_S_x = 0.5,
+  mean_Q_x = 0,
+  mean_I_y = 10,
+  mean_S_y = 0.5,
+  mean_Q_y = 0,
+  var_I_x = 4,
+  var_S_x = 1,
+  var_Q_x = 0.01,
+  var_I_y = 4,
+  var_S_y = 1,
+  var_Q_y = 0.01,
+  cov_IS_x = 0,
+  cov_IQ_x = 0,
+  cov_SQ_x = 0,
+  cov_IS_y = 0,
+  cov_IQ_y = 0,
+  cov_SQ_y = 0,
+  cov_I_xy = 0,
+  cov_S_xy = 0,
+  cov_Q_xy = 0,
+  cov_IS_xy = 0,
+  cov_IS_yx = 0,
+  cov_IQ_xy = 0,
+  cov_IQ_yx = 0,
+  cov_SQ_xy = 0,
+  cov_SQ_yx = 0,
+  sigma2_x = 1,
+  sigma2_y = 1,
+  cov_res = 0,
+  estimate_quadratic = FALSE,
+  center_time = FALSE,
+  sample_size = 1000,
+  seed = NULL,
+  ...
+)
+```
+
+## Arguments
+
+- waves:
+
+  The number of waves (time points) in the model.
+
+- variable_type:
+
+  Type of latent growth model: "univariate" (single variable) or
+  "bivariate" (dual variable).
+
+- time_scores:
+
+  A numeric vector specifying the time scores for each wave. If NULL,
+  uses 0, 1, 2, ..., waves-1.
+
+- mean_I_x:
+
+  Mean of the intercept factor for X.
+
+- mean_S_x:
+
+  Mean of the slope factor for X.
+
+- mean_Q_x:
+
+  Mean of the quadratic factor for X (if estimate_quadratic = TRUE).
+
+- mean_I_y:
+
+  Mean of the intercept factor for Y (bivariate only).
+
+- mean_S_y:
+
+  Mean of the slope factor for Y (bivariate only).
+
+- mean_Q_y:
+
+  Mean of the quadratic factor for Y (bivariate only).
+
+- var_I_x:
+
+  Variance of the intercept factor for X.
+
+- var_S_x:
+
+  Variance of the slope factor for X.
+
+- var_Q_x:
+
+  Variance of the quadratic factor for X (if estimate_quadratic = TRUE).
+
+- var_I_y:
+
+  Variance of the intercept factor for Y (bivariate only).
+
+- var_S_y:
+
+  Variance of the slope factor for Y (bivariate only).
+
+- var_Q_y:
+
+  Variance of the quadratic factor for Y (bivariate only).
+
+- cov_IS_x:
+
+  Covariance between intercept and slope factors for X.
+
+- cov_IQ_x:
+
+  Covariance between intercept and quadratic factors for X (if
+  estimate_quadratic = TRUE).
+
+- cov_SQ_x:
+
+  Covariance between slope and quadratic factors for X (if
+  estimate_quadratic = TRUE).
+
+- cov_IS_y:
+
+  Covariance between intercept and slope factors for Y (bivariate only).
+
+- cov_IQ_y:
+
+  Covariance between intercept and quadratic factors for Y (bivariate
+  only).
+
+- cov_SQ_y:
+
+  Covariance between slope and quadratic factors for Y (bivariate only).
+
+- cov_I_xy:
+
+  Covariance between X and Y intercept factors (bivariate only).
+
+- cov_S_xy:
+
+  Covariance between X and Y slope factors (bivariate only).
+
+- cov_Q_xy:
+
+  Covariance between X and Y quadratic factors (bivariate only).
+
+- cov_IS_xy:
+
+  Covariance between X intercept and Y slope factors (bivariate only).
+
+- cov_IS_yx:
+
+  Covariance between Y intercept and X slope factors (bivariate only).
+
+- cov_IQ_xy:
+
+  Covariance between X intercept and Y quadratic factors (bivariate
+  only).
+
+- cov_IQ_yx:
+
+  Covariance between Y intercept and X quadratic factors (bivariate
+  only).
+
+- cov_SQ_xy:
+
+  Covariance between X slope and Y quadratic factors (bivariate only).
+
+- cov_SQ_yx:
+
+  Covariance between Y slope and X quadratic factors (bivariate only).
+
+- sigma2_x:
+
+  Unique variance for X latent variables (p factors).
+
+- sigma2_y:
+
+  Unique variance for Y latent variables (q factors, bivariate only).
+
+- cov_res:
+
+  Covariance between X and Y latent variables at each time point
+  (bivariate only).
+
+- estimate_quadratic:
+
+  Logical. If TRUE, includes quadratic growth factors in simulation.
+
+- center_time:
+
+  Logical. If TRUE, centers time scores around their mean.
+
+- sample_size:
+
+  The number of observations to simulate. Default is 1000.
+
+- seed:
+
+  Random seed for reproducibility. Default is NULL.
+
+- ...:
+
+  Additional arguments to pass to the \`lavaan::simulateData\` function.
+
+## Value
+
+A list containing two elements: \* \`model\`: The Lavaan model syntax
+used for data simulation. \* \`data\`: The simulated data in a data
+frame format.
+
+## Details
+
+This function simulates data from a Linear Latent Growth Model (LGM)
+where: - Growth is modeled using latent intercept, slope, and optional
+quadratic factors - Individual differences exist in growth parameters -
+Systematic change occurs over time according to specified growth
+functions
+
+For univariate models: - Single variable measured across time points -
+Intercept factor determines initial level - Slope factor determines rate
+of linear change - Optional quadratic factor for
+acceleration/deceleration
+
+For bivariate models: - Two variables measured across time points -
+Growth factors for both variables with correlations between them -
+Residual covariances between variables at each time point
+
+Parameter interpretation: - mean_I: Average initial level across
+individuals - mean_S: Average rate of linear change - mean_Q: Average
+acceleration/deceleration (quadratic models) - var_I: Individual
+differences in initial levels - var_S: Individual differences in rates
+of change - var_Q: Individual differences in acceleration - cov_IS:
+Relationship between initial level and rate of change - sigma2: Unique
+variance for latent variables (measurement precision) - cov_res:
+Covariance between latent variables (bivariate models)
+
+Time scoring options: - Default: 0, 1, 2, ..., waves-1 (intercept =
+initial observation) - Custom: User-specified time points for unequal
+spacing - Centered: Time scores centered around their mean
+
+## Examples
+
+``` r
+# Basic univariate LGM
+lgm_data <- simLGM(
+  waves = 5,
+  variable_type = "univariate",
+  mean_I_x = 10,
+  mean_S_x = 0.5,
+  var_I_x = 4,
+  var_S_x = 1,
+  cov_IS_x = -0.5,
+  sigma2_x = 2,
+  sample_size = 500
+)
+
+# Bivariate LGM with correlation between variables
+bivar_lgm <- simLGM(
+  waves = 4,
+  variable_type = "bivariate",
+  mean_I_x = 10, mean_I_y = 15,
+  mean_S_x = 0.3, mean_S_y = -0.2,
+  var_I_x = 2, var_I_y = 3,
+  var_S_x = 0.5, var_S_y = 0.8,
+  cov_I_xy = 1.2,
+  cov_S_xy = 0.3,
+  sample_size = 800
+)
+
+# Quadratic growth model
+quad_lgm <- simLGM(
+  waves = 6,
+  estimate_quadratic = TRUE,
+  mean_I_x = 20,
+  mean_S_x = 2,
+  mean_Q_x = -0.1,
+  var_I_x = 9,
+  var_S_x = 1,
+  var_Q_x = 0.01,
+  sample_size = 1200
+)
+```

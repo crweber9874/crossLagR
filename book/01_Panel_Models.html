@@ -1,0 +1,947 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.9.38">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>2&nbsp; Revisiting the Cross-Lagged Panel Model – crossLagR</title>
+<style>
+/* Default styles provided by pandoc.
+** See https://pandoc.org/MANUAL.html#variables-for-html for config info.
+*/
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./02_Change.html" rel="next">
+<link href="./00_Install.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-15634bcf2e68342d4ad2dfa704d543f6.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-48abc47ddc2cbc14860ddec9e9fdb395.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+<link href="site_libs/htmltools-fill-0.5.8.1/fill.css" rel="stylesheet">
+<script src="site_libs/htmlwidgets-1.6.4/htmlwidgets.js"></script>
+<script src="site_libs/viz-1.8.2/viz.js"></script>
+<link href="site_libs/DiagrammeR-styles-0.2/styles.css" rel="stylesheet">
+<script src="site_libs/grViz-binding-1.0.11/grViz.js"></script>
+
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script defer="" src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./01_Panel_Models.html"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Revisiting the Cross-Lagged Panel Model</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">crossLagR</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00_Install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installation and Package Syntax</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_Panel_Models.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Revisiting the Cross-Lagged Panel Model</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_Change.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_RICLPM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_Usami.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_simulations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Simulations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applications</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_iscap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The ISCAP Panel</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_liss.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Replication: Bakker, Lelkes, &amp; Malka (2021)</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#the-clpm-diagram" id="toc-the-clpm-diagram" class="nav-link active" data-scroll-target="#the-clpm-diagram"><span class="header-section-number">2.0.1</span> The CLPM Diagram</a></li>
+  <li><a href="#demonstration" id="toc-demonstration" class="nav-link" data-scroll-target="#demonstration"><span class="header-section-number">2.1</span> Demonstration</a></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default">
+<div class="quarto-title">
+<h1 class="title"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Revisiting the Cross-Lagged Panel Model</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>Social scientists often turn to panel data to diagnose causal effects when experiments are impractical <span class="citation" data-cites="chiu_causal_2025">(<a href="#ref-chiu_causal_2025" role="doc-biblioref">Chiu et al. 2025</a>)</span>. Whereas dozens of options exist for analyzing longer time series, researchers wishing to analyze cross-sectionally dominant panel structures – in which there are more units than time points – face a more limited set of choices. National surveys like found in the American National Election Studies (ANES) may consist of just a handful of waves, with many respondents interviewed only once or twice.</p>
+<p>We consider of the popular methods for analyzing panel data in political science. We start by focusing on a common approach to estimate dynamic processes in panel data (particularly public opinion panel data that are “cross section” dominant, with far more respondents than panel waves: the cross-lagged panel model (CLPM). The CLPM – introduced by <span class="citation" data-cites="stanley1963">Stanley and Campbell (<a href="#ref-stanley1963" role="doc-biblioref">1963</a>)</span> and extended on by <span class="citation" data-cites="kenny1975">Kenny (<a href="#ref-kenny1975" role="doc-biblioref">1975</a>)</span> – has been widely used to study reciprocal relationships between variables over time. These methods first appeared in the political science literature in the late 1970s <span class="citation" data-cites="abramowitz_impact_1978 campbell_style_1979 iyengar_testing_1978 jennings_effect_1977 markus_political_1979 markus_dynamic_1979">Meier and Campbell (<a href="#ref-meier_issue_1979" role="doc-biblioref">1979</a>)</span>. The availability of two large panel surveys with rich political content – Jennings and Niemi’s <span class="citation" data-cites="jennings_political_1974">Jennings and Niemi (<a href="#ref-jennings_political_1974" role="doc-biblioref">1974</a>)</span> socialization study and the ANES 1972-1974-1976 panel – likely promoted the CLPM’s adoption, as most of the cross-lagged analyses published in this era analyze these two datasets. Another factor leading to the widespread adoption of the CLPM was the availability of Jöreskog’s LISREL software, which allowed researchers to quickly and easily solve systems of equations using maximum likelihood <span class="citation" data-cites="markus_analyzing_1979 mccullough_effects_1978 shingles_causal_1976">(<a href="#ref-markus_analyzing_1979" role="doc-biblioref">Markus 1979a</a>; <a href="#ref-mccullough_effects_1978" role="doc-biblioref">McCullough 1978</a>; <a href="#ref-shingles_causal_1976" role="doc-biblioref">Shingles 1976</a>)</span>.</p>
+<p>Much of the CLPM’s appeal lies in its intuitive structure, flexibility, and ease of implementation. In the half century after its introduction, the CLPM has also been refined and extended, due to important limitations in its original formulation. For instance, the model can account for unobserved heterogeneity across individuals – stable characteristics of individuals that confound the “dynamic” estimates in the CLPM <span class="citation" data-cites="usami2015 usami2021 klopack_and_wickrama2020 kim_and_steiner2021 ludtke2022 mcardle2009">(<a href="#ref-usami2015" role="doc-biblioref">Usami et al. 2015</a>; <a href="#ref-usami2021" role="doc-biblioref">Usami 2021</a>; <a href="#ref-klopack_and_wickrama2020" role="doc-biblioref">Klopack and Wickrama 2020</a>; <a href="#ref-kim_and_steiner2021" role="doc-biblioref">Kim and Steiner 2021</a>; <a href="#ref-ludtke2022" role="doc-biblioref">Lüdtke and Robitzsch 2022</a>; <a href="#ref-mcardle2009" role="doc-biblioref">McArdle 2009</a>)</span>. Because the CLPM does not account for stable unit effects, the cross-lagged estimates will tend to be biased (upwards), as they conflate within-person dynamics with between-person differences. Though not directly referenced as a critique of the CLPM, <span class="citation" data-cites="hsiao2022">Hsiao (<a href="#ref-hsiao2022" role="doc-biblioref">2022</a>)</span> shows that including a lagged dependent variable will produce a biased estimate of the lagged effect, because the variable is correlated with the error term. The correlation arises from the failure to account for “between unit” heterogeneity (pp.&nbsp;64 -67). As a consequence, CLPM estimates may be biased, especially when the variables of interest exhibit high stability over time <span class="citation" data-cites="hamaker_critique_2015 usami2015 ludtke2022">(<a href="#ref-hamaker_critique_2015" role="doc-biblioref">Hamaker et al. 2015</a>; <a href="#ref-usami2015" role="doc-biblioref">Usami et al. 2015</a>; <a href="#ref-ludtke2022" role="doc-biblioref">Lüdtke and Robitzsch 2022</a>)</span>.</p>
+<p>This problem is elaborated on in <span class="citation" data-cites="hsiao2022">Hsiao (<a href="#ref-hsiao2022" role="doc-biblioref">2022</a>)</span>. Dynamic models – models that include lagged dependent variables – often result in correlations between the observed variables and the error terms, leading to biased estimates. <span class="citation" data-cites="hsiao2022">Hsiao (<a href="#ref-hsiao2022" role="doc-biblioref">2022</a>)</span> proposes and instrumental variable approach using lagged values of the dependent variable as instruments. When stable unit effects are ignored, the lagged dependent variable becomes correlated with the error term, violating the exogeneity assumption. This correlation leads to biased estimates of the lagged effect.</p>
+<p>Another popular extension to the CLPM is the random intercept cross-lagged panel model (RI-CLPM) proposed in <span class="citation" data-cites="hamaker_critique_2015">Hamaker et al. (<a href="#ref-hamaker_critique_2015" role="doc-biblioref">2015</a>)</span>, which separates within-person dynamics from between-person “trait” effects <span class="citation" data-cites="usami2015 ludtke2022">(<a href="#ref-usami2015" role="doc-biblioref">Usami et al. 2015</a>; <a href="#ref-ludtke2022" role="doc-biblioref">Lüdtke and Robitzsch 2022</a>)</span>. Another approach is the Latent Change Score Model (LSCM), which focuses more directly on estimating different change processes; the LCSM also accounts for stable unit effects, by accounting for unit averaged change <span class="citation" data-cites="usami2015 mcardle2009 kim_and_steiner2021">(<a href="#ref-usami2015" role="doc-biblioref">Usami et al. 2015</a>; <a href="#ref-mcardle2009" role="doc-biblioref">McArdle 2009</a>; <a href="#ref-kim_and_steiner2021" role="doc-biblioref">Kim and Steiner 2021</a>)</span>. Another alternative is the latent growth model (LGM), which models individual trajectories over time <span class="citation" data-cites="usami2015 mcardle2003">(<a href="#ref-usami2015" role="doc-biblioref">Usami et al. 2015</a>; <a href="#ref-mcardle2003" role="doc-biblioref">McArdle and Nesselroade 2003</a>)</span>.</p>
+<p>Ultimately,preference for one model over another is strongly tied to data access and availability. While the CLPM and a restrictive version of the LCSM can be estimated with as few as two waves of data, the RI-CLPM, the Latent Growth Model, and Latent Change Score Model require more panel waves to properly identify the models. Data with three or more waves of data afford more leverage to estimate dynamic relationships. In this project, we elaborate on these models, beginning with the CLPM and change score approach to modeling dynamic relationships.</p>
+<section id="the-clpm-diagram" class="level3" data-number="2.0.1">
+<h3 data-number="2.0.1" class="anchored" data-anchor-id="the-clpm-diagram"><span class="header-section-number">2.0.1</span> The CLPM Diagram</h3>
+<p>The CLPM can be represented as a Directed Acyclic Graph (DAG) <a href="#fig-clpm" class="quarto-xref">Figure&nbsp;<span>2.1</span></a>.</p>
+<div class="cell">
+<div id="fig-clpm" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-clpm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-9d20e530a02b754558ed" style="width:80%;height:80%;"></div>
+<script type="application/json" data-for="htmlwidget-9d20e530a02b754558ed">{"x":{"diagram":"\ndigraph CLPM_simple {\n  graph [layout = neato, bgcolor = white, splines = true]\n  node [shape = plaintext, fontsize = 24]\n\n  Xt1 [pos = \"-3.0,1.2!\", label = <X<sub>1<\/sub>>]\n  Xt2 [pos = \"0.0,1.2!\", label = <X<sub>2<\/sub>>]\n  Xt3 [pos = \"3.0,1.2!\", label = <X<sub>3<\/sub>>]\n  Yt1 [pos = \"-3.0,-1.2!\", label = <Y<sub>1<\/sub>>]\n  Yt2 [pos = \"0.0,-1.2!\", label = <Y<sub>2<\/sub>>]\n  Yt3 [pos = \"3.0,-1.2!\", label = <Y<sub>3<\/sub>>]\n\n  Xt1 -> Xt2 [arrowsize = 0.7]\n  Xt2 -> Xt3 [arrowsize = 0.7]\n  Yt1 -> Yt2 [arrowsize = 0.7]\n  Yt2 -> Yt3 [arrowsize = 0.7]\n\n  Xt1 -> Yt2 [arrowsize = 0.7]\n  Yt1 -> Xt2 [arrowsize = 0.7]\n  Xt2 -> Yt3 [arrowsize = 0.7]\n  Yt2 -> Xt3 [arrowsize = 0.7]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-clpm-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.1: The Cross-Lagged Panel Model. The DAG displays cross-lagged and autoregressive paths between two variables over three time points.
+</figcaption>
+</figure>
+</div>
+</div>
+<p>The CLPM – a dynamic panel model – leverages the temporal ordering of variables to estimate how one variable leads to change in another variable. Does the lagged effect of <span class="math inline">\(y\)</span> on <span class="math inline">\(x\)</span> exert a stronger influence than the lagged effect of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span>? Is one variable <em>causally dominant</em> (for a critique, see <span class="citation" data-cites="rogosa_critique_1980">(<a href="#ref-rogosa_critique_1980" role="doc-biblioref">Rogosa 1980</a>)</span>? Alternatively, contrasting the the cross-lagged effects is also critical to establishing <em>Granger Causality</em> <span class="citation" data-cites="granger_investigating_1969">(<a href="#ref-granger_investigating_1969" role="doc-biblioref">Granger 1969</a>)</span>.</p>
+<p>A crucial limitation of the CLPM is that it does not account for stable trait-like differences between individuals. Consider a simple example, the relationship between a personality characteristic, <em>openness versus closed psychological orientation</em>, and political attitudes, a <em>right-wing political orientation</em> <span class="citation" data-cites="bakker_reconsidering_2021">Luttig (<a href="#ref-luttig_reconsidering_2021" role="doc-biblioref">2021</a>)</span>. <span class="citation" data-cites="bakker_reconsidering_2021">Bakker et al. (<a href="#ref-bakker_reconsidering_2021" role="doc-biblioref">2021</a>)</span> for instance, examines whether a psychological disposition towards openness predicts a right-wing political orientation, or whether a right-wing political orientation predicts a psychological disposition towards openness.</p>
+<p>Political orientations are generally stable <span class="citation" data-cites="jennings_continuity_1975 goren_party_2005 ansolabehere_strength_2008">(<a href="#ref-jennings_continuity_1975" role="doc-biblioref">Jennings and Niemi 1975</a>; <a href="#ref-goren_party_2005" role="doc-biblioref">Goren 2005</a>; <a href="#ref-ansolabehere_strength_2008" role="doc-biblioref">Ansolabehere et al. 2008</a>)</span>. It is also well regarded that personality traits are stable over time, and partially heritable <span class="citation" data-cites="costa_personality_1988 roberts_patterns_2006 hatemi_political_2015">(<a href="#ref-costa_personality_1988" role="doc-biblioref">Costa and McCrae 1988</a>; <a href="#ref-roberts_patterns_2006" role="doc-biblioref">Roberts et al. 2006</a>; <a href="#ref-hatemi_political_2015" role="doc-biblioref">Hatemi and Verhulst 2015</a>)</span>.</p>
+<p>The CLPM does not account for this time-invariant stability. It implicitly assumes that all variation in the observed variables is time-varying, and that there are no stable, time-invariant components.</p>
+<p>Following <span class="citation" data-cites="hamaker_critique_2015">Hamaker et al. (<a href="#ref-hamaker_critique_2015" role="doc-biblioref">2015</a>)</span> and <span class="citation" data-cites="usami2021">Usami (<a href="#ref-usami2021" role="doc-biblioref">2021</a>)</span>, the observed variables might be further decomposed into a time-invariant trait component and a time-varying component.</p>
+<p><span class="math display">\[
+\begin{eqnarray}
+x_{it} = \mu_{xt} + I_{x,i} + x^*_{x,it} \\
+y_{it} = \mu_{yt} + I_{y,i} + y^*_{y,it}
+\end{eqnarray}
+\]</span></p>
+<p>where <span class="math inline">\(\mu_{xt}\)</span> and <span class="math inline">\(\mu_{yt}\)</span> are time-specific means, and <span class="math inline">\(x^*_{it}\)</span> and <span class="math inline">\(y^*_{it}\)</span> are person-specific deviations from those time-specific means <span class="citation" data-cites="usami2019 usami2015 usami2021">(<a href="#ref-usami2019" role="doc-biblioref">Usami et al. 2019</a>, <a href="#ref-usami2015" role="doc-biblioref">2015</a>; <a href="#ref-usami2021" role="doc-biblioref">Usami 2021</a>)</span>.</p>
+<p><a href="#fig-clpm-factors-minimal" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> provides a visual representation of a modified version of the CLPM with time-invariant trait components.</p>
+<div class="cell">
+<div id="fig-clpm-factors-minimal" class="cell-output-display quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-clpm-factors-minimal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<div class="grViz html-widget html-fill-item" id="htmlwidget-05f0aa1eb5377e95c861" style="width:80%;height:80%;"></div>
+<script type="application/json" data-for="htmlwidget-05f0aa1eb5377e95c861">{"x":{"diagram":"\ndigraph CLPM_simple_factors {\n  graph [layout = neato, bgcolor = white, splines = true]\n  node [shape = plaintext, fontsize = 24]\n\n  Xt1 [pos = \"-3.0,1.2!\", label = <X<sub>1<\/sub>>]\n  Xt2 [pos = \"0.0,1.2!\", label = <X<sub>2<\/sub>>]\n  Xt3 [pos = \"3.0,1.2!\", label = <X<sub>3<\/sub>>]\n  Yt1 [pos = \"-3.0,-1.2!\", label = <Y<sub>1<\/sub>>]\n  Yt2 [pos = \"0.0,-1.2!\", label = <Y<sub>2<\/sub>>]\n  Yt3 [pos = \"3.0,-1.2!\", label = <Y<sub>3<\/sub>>]\n\n  Ix [pos = \"0,2.4!\", label = <I<sub>x<\/sub>>]\n  Iy [pos = \"0,-2.4!\", label = <I<sub>y<\/sub>>]\n\n  Xt1 -> Xt2 [arrowsize = 0.7, label = <b<sub>xx<\/sub>>, fontsize = 14]\n  Xt2 -> Xt3 [arrowsize = 0.7, label = <b<sub>xx<\/sub>>, fontsize = 14]\n  Yt1 -> Yt2 [arrowsize = 0.7, label = <b<sub>yy<\/sub>>, fontsize = 14]\n  Yt2 -> Yt3 [arrowsize = 0.7, label = <b<sub>yy<\/sub>>, fontsize = 14]\n\n  Xt1 -> Yt2 [arrowsize = 0.7, label = <b<sub>xy<\/sub>>, fontsize = 14]\n  Yt1 -> Xt2 [arrowsize = 0.7, label = <b<sub>yx<\/sub>>, fontsize = 14]\n  Xt2 -> Yt3 [arrowsize = 0.7, label = <b<sub>xy<\/sub>>, fontsize = 14]\n  Yt2 -> Xt3 [arrowsize = 0.7, label = <b<sub>yx<\/sub>>, fontsize = 14]\n\n  Ix -> Xt1 [arrowsize = 0.6]\n  Ix -> Xt2 [arrowsize = 0.6]\n  Ix -> Xt3 [arrowsize = 0.6]\n  Iy -> Yt1 [arrowsize = 0.6]\n  Iy -> Yt2 [arrowsize = 0.6]\n  Iy -> Yt3 [arrowsize = 0.6]\n\n  Ix -> Iy [dir = both, style = dashed, color = gray40, constraint = false,\n            arrowsize = 0.5, tailport = sw, headport = nw, minlen = 12,\n            label = <σ<sub>I<sub>x<\/sub>I<sub>y<\/sub><\/sub>>, fontsize = 12, labeldistance = 2.0]\n}\n","config":{"engine":"dot","options":null}},"evals":[],"jsHooks":[]}</script>
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-clpm-factors-minimal-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.2: The Cross-Lagged Panel Model with Stable, Time-Invariant Unit Factors. The DAG displays cross-lagged and autoregressive paths between two variables over three time points. Intercepts, <span class="math inline">\(I\)</span> vary across respondents but not time.
+</figcaption>
+</figure>
+</div>
+</div>
+<p>It is useful to ask the question: What if one fits <a href="#fig-clpm" class="quarto-xref">Figure&nbsp;<span>2.1</span></a> but <a href="#fig-clpm-factors-minimal" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> is the true population model. Assume the following model is estimated.</p>
+<p><span class="math display">\[
+\begin{align}
+x_{it} &amp;=  b^{CLPM}_{xx}\,x_{i,t-1} + b^{CLPM}_{yx}\,y_{i,t-1} + e_{x,it} \\
+y_{it} &amp;=  b^{CLPM}_{yy}\,y_{i,t-1} + b^{CLPM}_{xy}\,x_{i,t-1} + e_{y,it}
+\end{align}
+\]</span></p>
+<p>The conventional interpretation of the CLPM coefficients are that <span class="math inline">\(\beta_{xx}\)</span>, captures the autoregressive effect of <span class="math inline">\(x\)</span> on itself, and <span class="math inline">\(\beta_{yy}\)</span> does the same for <span class="math inline">\(y\)</span>. On the other hand, <span class="math inline">\(\beta_{yx}\)</span> captures the cross-lagged effect of <span class="math inline">\(y\)</span> on <span class="math inline">\(x\)</span>, and <span class="math inline">\(\beta_{xy}\)</span> captures the cross-lagged effect of <span class="math inline">\(x\)</span> on <span class="math inline">\(y\)</span>.</p>
+<p>If <a href="#fig-clpm-factors-minimal" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> captures the true data-generating process, the above intepretation of the CLPM parameters is incorrect.The degree of bias in the parameters should be proportional to the size of the trait component. In <a href="#fig-clpm-factors-minimal" class="quarto-xref">Figure&nbsp;<span>2.2</span></a>, both <span class="math inline">\(I_x\)</span> and <span class="math inline">\(I_y\)</span> represent the time invariant trait components of the observed measures. The variance of <span class="math inline">\(x\)</span> and <span class="math inline">\(y\)</span> can be decomposed into a between-person component (the trait) and a within-person component (the deviation from the trait).</p>
+<p><span class="math display">\[
+\begin{aligned}
+  {Var}(x_{it}) &amp;= \text{Var}(I_{x,i}) + \text{Var}(x^*_{x,it})\\
+  {Var}(y_{it}) &amp;= \text{Var}(I_{y,i}) + \text{Var}(y^*_{y,it})
+\end{aligned}
+\]</span></p>
+<p><span class="math display">\[
+\begin{align}
+x^*_{it} &amp;=  b^{True}_{xx}\,x^*_{i,t-1} + b^{True}_{yx}\,y^*_{i,t-1} + e_{x,it} \\
+y^*_{it} &amp;=  b^{True}_{yy}\,y^*_{i,t-1} + b^{True}_{xy}\,x^*_{i,t-1} + e_{y,it}
+\end{align}
+\]</span></p>
+<p>Importantly, the percentage of the total variance attributable to the between-person component is the <strong>intraclass correlation</strong>: <span class="math inline">\(\text{ICC}_x \equiv \sigma^2_{I_x}/(\sigma^2_{I_x} + \sigma^2_{x^*})\)</span>, with <span class="math inline">\(\text{ICC}_y\)</span> defined analogously.</p>
+<p>The problem with fitting the CLPM to data generated by <a href="#fig-clpm-factors-minimal" class="quarto-xref">Figure&nbsp;<span>2.2</span></a> is that a non-zero covariance forms between the lagged regressors and the error terms. This is because the lagged regressor contains the trait component. The intuition is easiest to see through univariate estimates, estimating the cross-lagged and autoregressive effects individually — what one would estimate from <span class="math inline">\(x_t\)</span> on <span class="math inline">\(x_{t-1}\)</span> alone, or <span class="math inline">\(x_t\)</span> on <span class="math inline">\(y_{t-1}\)</span> alone..</p>
+<p><span class="math display">\[
+b_{xx}^{\text{univariate}}
+\equiv \frac{\text{Cov}(x_t, x_{t-1})}{\text{Var}(x_{t-1})}
+= \frac{\sigma^2_{I_x} + b^{\text{true}}_{xx}\,\sigma^2_{x^*}}{\sigma^2_{I_x} + \sigma^2_{x^*}}
+= \text{ICC}_x + (1-\text{ICC}_x)\,b^{\text{true}}_{xx},
+\]</span></p>
+<p><span class="math display">\[
+b_{yx}^{\text{univariate}}
+\equiv \frac{\text{Cov}(x_t, y_{t-1})}{\text{Var}(y_{t-1})}
+= \frac{\sigma_{I_xI_y} + b^{\text{true}}_{yx}\,\sigma^2_{y^*}}{\sigma^2_{I_y} + \sigma^2_{y^*}}
+= \frac{\sigma_{I_xI_y}}{\sigma^2_{I_y} + \sigma^2_{y^*}} + (1-\text{ICC}_y)\,b^{\text{true}}_{yx}.
+\]</span></p>
+<p>If the true autoregressive effect is zero (<span class="math inline">\(b^{\text{true}}_{xx}=0\)</span>), then <span class="math inline">\(b_{xx}^{\text{univariate}} = \text{ICC}_x\)</span> — the CLPM picks up a spurious AR equal to the ICC. If the true cross-lagged effect is zero (<span class="math inline">\(b^{\text{true}}_{yx}=0\)</span>), then <span class="math inline">\(b_{yx}^{\text{univariate}} = \sigma_{I_xI_y}/(\sigma^2_{I_y}+\sigma^2_{y^*})\)</span> — a spurious cross-lag driven entirely by the trait covariance. If the trait covariance is also zero (<span class="math inline">\(\sigma_{I_xI_y}=0\)</span>), then <span class="math inline">\(b_{yx}^{\text{univariate}} = (1-\text{ICC}_y)\,b^{\text{true}}_{yx}\)</span>, i.e.&nbsp;attenuated by the share of variance that is <em>between</em>-person.</p>
+<p>The <em>multivariate</em> CLPM includes both lags simultaneously, so its coefficients are partial slopes rather than these simple ratios. But the general intuition still holds. When <span class="math inline">\(\sigma^2_{I_x} &gt; 0\)</span>, the AR is inflated by the trait variance, and the CL is contaminated by the trait covariance. When <span class="math inline">\(\sigma^2_{I_x} = 0\)</span>, there is no bias in the AR, but the CL is still attenuated by the between-person variance in <span class="math inline">\(y\)</span>.</p>
+</section>
+<section id="demonstration" class="level2" data-number="2.1">
+<h2 data-number="2.1" class="anchored" data-anchor-id="demonstration"><span class="header-section-number">2.1</span> Demonstration</h2>
+<p>The bias is proportional to the size of the trait component – how much of the total variance is defined by the between-person trait. This can be demonstrated with the <code>crossLagR</code> package and a simple simulation. We simulate data from a four-wave panel with the following truth values.</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Quantity</th>
+<th style="text-align: right;">Value</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>waves</td>
+<td style="text-align: right;">4</td>
+</tr>
+<tr class="even">
+<td>n_obs</td>
+<td style="text-align: right;">3000</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\sigma_{x^*}\)</span></td>
+<td style="text-align: right;">0.5</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\sigma_{I_x}\)</span></td>
+<td style="text-align: right;">Varies</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(\sigma_{I_y}\)</span></td>
+<td style="text-align: right;">Varies</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(b^{True}_{xx}\)</span> (true)</td>
+<td style="text-align: right;">0.30</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(b^{True}_{yy}\)</span> (true)</td>
+<td style="text-align: right;">0.30</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(b^{True}_{yx}\)</span> (true)</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="odd">
+<td><span class="math inline">\(b^{True}_{xy}\)</span> (true)</td>
+<td style="text-align: right;">0.00</td>
+</tr>
+<tr class="even">
+<td><span class="math inline">\(\rho_I\)</span></td>
+<td style="text-align: right;">0.5</td>
+</tr>
+</tbody>
+</table>
+<div class="cell">
+<div class="cell-output-display">
+<div id="fig-bias-by-bw-ratio" class="quarto-float quarto-figure quarto-figure-center anchored">
+<figure class="quarto-float quarto-float-fig figure">
+<div aria-describedby="fig-bias-by-bw-ratio-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+<img src="01_Panel_Models_files/figure-html/fig-bias-by-bw-ratio-1.png" class="img-fluid figure-img" width="672">
+</div>
+<figcaption class="quarto-float-caption-bottom quarto-float-caption quarto-float-fig" id="fig-bias-by-bw-ratio-caption-0ceaefa1-69ba-4598-a22c-09a6ac19f8ca">
+Figure&nbsp;2.3: Monte Carlo mean bias (estimate − truth) for the four AR/CL parameters as the between-to-within variance ratio increases. Bands are 5th-95th percentiles across replications.
+</figcaption>
+</figure>
+</div>
+</div>
+</div>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" role="list">
+<div id="ref-abramowitz_impact_1978" class="csl-entry" role="listitem">
+Abramowitz, Alan I. 1978. <span>“The <span>Impact</span> of a <span>Presidential</span> <span>Debate</span> on <span>Voter</span> <span>Rationality</span>.”</span> <em>American Journal of Political Science</em> 22 (3): 680–90. <a href="https://doi.org/10.2307/2110467">https://doi.org/10.2307/2110467</a>.
+</div>
+<div id="ref-ansolabehere_strength_2008" class="csl-entry" role="listitem">
+Ansolabehere, Stephen, Jonathan Rodden, and James M. Snyder. 2008. <span>“The <span>Strength</span> of <span>Issues</span>: <span>Using</span> <span>Multiple</span> <span>Measures</span> to <span>Gauge</span> <span>Preference</span> <span>Stability</span>, <span>Ideological</span> <span>Constraint</span>, and <span>Issue</span> <span>Voting</span>.”</span> <em>American Political Science Review</em> 102 (2): 215–32. <a href="https://doi.org/10.1017/S0003055408080210">https://doi.org/10.1017/S0003055408080210</a>.
+</div>
+<div id="ref-bakker_reconsidering_2021" class="csl-entry" role="listitem">
+Bakker, Bert N., Yphtach Lelkes, and Ariel Malka. 2021. <span>“Reconsidering the <span>Link</span> <span>Between</span> <span>Self</span>-<span>Reported</span> <span>Personality</span> <span>Traits</span> and <span>Political</span> <span>Preferences</span>.”</span> <em>American Political Science Review</em> 115 (4): 1482–98. <a href="https://doi.org/10.1017/S0003055421000605">https://doi.org/10.1017/S0003055421000605</a>.
+</div>
+<div id="ref-campbell_style_1979" class="csl-entry" role="listitem">
+Campbell, James E., and Kenneth John Meier. 1979. <span>“Style Issues and Vote Choice.”</span> <em>Political Behavior</em> 1 (3): 203–15. <a href="https://doi.org/10.1007/BF00990588">https://doi.org/10.1007/BF00990588</a>.
+</div>
+<div id="ref-chiu_causal_2025" class="csl-entry" role="listitem">
+Chiu, Albert, Xingchen Lan, Ziyi Liu, and Yiqing Xu. 2025. <span>“Causal <span>Panel</span> <span>Analysis</span> Under <span>Parallel</span> <span>Trends</span>: <span>Lessons</span> from <span>A</span> <span>Large</span> <span>Reanalysis</span> <span>Study</span>.”</span> <em>American Political Science Review</em>, ahead of print. <a href="https://doi.org/10.48550/arXiv.2309.15983">https://doi.org/10.48550/arXiv.2309.15983</a>.
+</div>
+<div id="ref-costa_personality_1988" class="csl-entry" role="listitem">
+Costa, Paul T., and Robert R. McCrae. 1988. <span>“Personality in Adulthood: A Six-Year Longitudinal Study of Self-Reports and Spouse Ratings on the <span>NEO</span> <span>Personality</span> <span>Inventory</span>.”</span> <em>Journal of Personality and Social Psychology</em> 54 (5): 853–63. <a href="https://doi.org/10.1037/0022-3514.54.5.853">https://doi.org/10.1037/0022-3514.54.5.853</a>.
+</div>
+<div id="ref-goren_party_2005" class="csl-entry" role="listitem">
+Goren, Paul. 2005. <span>“Party <span>Identification</span> and <span>Core</span> <span>Political</span> <span>Values</span>.”</span> <em>American Journal of Political Science</em> 49 (4): 881–96. <a href="https://doi.org/10.1111/j.1540-5907.2005.00161.x">https://doi.org/10.1111/j.1540-5907.2005.00161.x</a>.
+</div>
+<div id="ref-granger_investigating_1969" class="csl-entry" role="listitem">
+Granger, C. W. J. 1969. <span>“Investigating <span>Causal</span> <span>Relations</span> by <span>Econometric</span> <span>Models</span> and <span>Cross</span>-Spectral <span>Methods</span>.”</span> <em>Econometrica</em> 37 (3): 424–38. <a href="https://doi.org/10.2307/1912791">https://doi.org/10.2307/1912791</a>.
+</div>
+<div id="ref-hamaker_critique_2015" class="csl-entry" role="listitem">
+Hamaker, Ellen L., Rebecca M. Kuiper, and Raoul P. P. P. Grasman. 2015. <span>“A Critique of the Cross-Lagged Panel Model.”</span> <em>Psychological Methods</em> 20 (1): 102–16. <a href="https://doi.org/10.1037/a0038889">https://doi.org/10.1037/a0038889</a>.
+</div>
+<div id="ref-hatemi_political_2015" class="csl-entry" role="listitem">
+Hatemi, Peter K., and Brad Verhulst. 2015. <span>“Political <span>Attitudes</span> <span>Develop</span> <span>Independently</span> of <span>Personality</span> <span>Traits</span>.”</span> <em>PLOS ONE</em> 10 (3): e0118106. <a href="https://doi.org/10.1371/journal.pone.0118106">https://doi.org/10.1371/journal.pone.0118106</a>.
+</div>
+<div id="ref-hsiao2022" class="csl-entry" role="listitem">
+Hsiao, Cheng. 2022. <em>Analysis of Panel Data</em>. Cambridge university press.
+</div>
+<div id="ref-iyengar_testing_1978" class="csl-entry" role="listitem">
+Iyengar, Shanto. 1978. <span>“Testing the <span>Transfer</span> of <span>Affect</span> <span>Hypothesis</span> in a <span>New</span> <span>Nation</span> <span>Using</span> <span>Panel</span> <span>Data</span>.”</span> <em>American Journal of Political Science</em> 22 (4): 905–16. <a href="https://doi.org/10.2307/2110598">https://doi.org/10.2307/2110598</a>.
+</div>
+<div id="ref-jennings_effect_1977" class="csl-entry" role="listitem">
+Jennings, M. Kent, and Gregory B. Markus. 1977. <span>“The <span>Effect</span> of <span>Military</span> <span>Service</span> on <span>Political</span> <span>Attitudes</span>: <span>A</span> <span>Panel</span> <span>Study</span>.”</span> <em>American Political Science Review</em> 71 (1): 131–47. <a href="https://doi.org/10.2307/1956958">https://doi.org/10.2307/1956958</a>.
+</div>
+<div id="ref-jennings_political_1974" class="csl-entry" role="listitem">
+Jennings, M. Kent, and Richard G. Niemi. 1974. <em>Political <span>Character</span> of <span>Adolescence</span>: <span>The</span> <span>Influence</span> of <span>Families</span> and <span>Schools</span></em>. Princeton University Press.
+</div>
+<div id="ref-jennings_continuity_1975" class="csl-entry" role="listitem">
+Jennings, M. Kent, and Richard G. Niemi. 1975. <span>“Continuity and <span>Change</span> in <span>Political</span> <span>Orientations</span>: <span>A</span> <span>Longitudinal</span> <span>Study</span> of <span>Two</span> <span>Generations</span>.”</span> <em>American Political Science Review</em> 69 (4): 1316–35. <a href="https://doi.org/10.2307/1955291">https://doi.org/10.2307/1955291</a>.
+</div>
+<div id="ref-kenny1975" class="csl-entry" role="listitem">
+Kenny, David A. 1975. <span>“Cross-Lagged Panel Correlation: A Test for Spuriousness.”</span> <em>Psychological Bulletin</em> 82 (6): 887.
+</div>
+<div id="ref-kim_and_steiner2021" class="csl-entry" role="listitem">
+Kim, Yongnam, and Peter M Steiner. 2021. <span>“Gain Scores Revisited: A Graphical Models Perspective.”</span> <em>Sociological Methods &amp; Research</em> 50 (3): 1353–75.
+</div>
+<div id="ref-klopack_and_wickrama2020" class="csl-entry" role="listitem">
+Klopack, Eric T, and Kandauda Wickrama. 2020. <span>“Modeling Latent Change Score Analysis and Extensions in Mplus: A Practical Guide for Researchers.”</span> <em>Structural Equation Modeling: A Multidisciplinary Journal</em> 27 (1): 97–110.
+</div>
+<div id="ref-ludtke2022" class="csl-entry" role="listitem">
+Lüdtke, Oliver, and Alexander Robitzsch. 2022. <span>“A Comparison of Different Approaches for Estimating Cross-Lagged Effects from a Causal Inference Perspective.”</span> <em>Structural Equation Modeling: A Multidisciplinary Journal</em> 29 (6): 888–907.
+</div>
+<div id="ref-luttig_reconsidering_2021" class="csl-entry" role="listitem">
+Luttig, Matthew D. 2021. <span>“Reconsidering the <span>Relationship</span> Between <span>Authoritarianism</span> and <span>Republican</span> <span>Support</span> in 2016 and <span>Beyond</span>.”</span> <em>The Journal of Politics</em> 83 (2): 783–87. <a href="https://doi.org/10.1086/710145">https://doi.org/10.1086/710145</a>.
+</div>
+<div id="ref-markus_analyzing_1979" class="csl-entry" role="listitem">
+Markus, Gregory B. 1979a. <em>Analyzing <span>Panel</span> <span>Data</span>: <span>An</span> <span>Introduction</span></em>. Edited by Michael S. Lewis-Beck. Quantitative <span>Applications</span> in the <span>Social</span> <span>Sciences</span> 18. Sage Publications.
+</div>
+<div id="ref-markus_political_1979" class="csl-entry" role="listitem">
+Markus, Gregory B. 1979b. <span>“The <span>Political</span> <span>Environment</span> and the <span>Dynamics</span> of <span>Public</span> <span>Attitudes</span>: <span>A</span> <span>Panel</span> <span>Study</span>.”</span> <em>American Journal of Political Science</em> 23 (2): 338–59. <a href="https://doi.org/10.2307/2111006">https://doi.org/10.2307/2111006</a>.
+</div>
+<div id="ref-markus_dynamic_1979" class="csl-entry" role="listitem">
+Markus, Gregory B., and Philip E. Converse. 1979. <span>“A <span>Dynamic</span> <span>Simultaneous</span> <span>Equation</span> <span>Model</span> of <span>Electoral</span> <span>Choice</span>.”</span> <em>American Political Science Review</em> 73 (4): 1055–70. <a href="https://doi.org/10.2307/1953989">https://doi.org/10.2307/1953989</a>.
+</div>
+<div id="ref-mcardle2009" class="csl-entry" role="listitem">
+McArdle, John J. 2009. <span>“Latent Variable Modeling of Differences and Changes with Longitudinal Data.”</span> <em>Annual Review of Psychology</em> 60 (1): 577–605.
+</div>
+<div id="ref-mcardle2003" class="csl-entry" role="listitem">
+McArdle, John J, and John R Nesselroade. 2003. <span>“Growth Curve Analysis in Contemporary Psychological Research.”</span> <em>Handbook of Psychology</em>, 447–80.
+</div>
+<div id="ref-mccullough_effects_1978" class="csl-entry" role="listitem">
+McCullough, B. Claire. 1978. <span>“Effects of <span>Variables</span> <span>Using</span> <span>Panel</span> <span>Data</span>: <span>A</span> <span>Review</span> of <span>Techniques</span>.”</span> <em>The Public Opinion Quarterly</em> 42 (2): 199–220.
+</div>
+<div id="ref-meier_issue_1979" class="csl-entry" role="listitem">
+Meier, Kenneth J., and James E. Campbell. 1979. <span>“Issue <span>Voting</span>: <span>An</span> <span>Empirical</span> <span>Examination</span> of <span>Individually</span> <span>Necessary</span> and <span>Jointly</span> <span>Sufficient</span> <span>Conditions</span>.”</span> <em>American Politics Quarterly</em> 7 (1): 21–50. <a href="https://doi.org/10.1177/1532673X7900700102">https://doi.org/10.1177/1532673X7900700102</a>.
+</div>
+<div id="ref-roberts_patterns_2006" class="csl-entry" role="listitem">
+Roberts, Brent W., Kate E. Walton, and Wolfgang Viechtbauer. 2006. <span>“Patterns of Mean-Level Change in Personality Traits Across the Life Course: A Meta-Analysis of Longitudinal Studies.”</span> <em>Psychological Bulletin</em> 132 (1): 1–25. <a href="https://doi.org/10.1037/0033-2909.132.1.1">https://doi.org/10.1037/0033-2909.132.1.1</a>.
+</div>
+<div id="ref-rogosa_critique_1980" class="csl-entry" role="listitem">
+Rogosa, David. 1980. <span>“A Critique of Cross-Lagged Correlation.”</span> <em>Psychological Bulletin</em> 88 (2): 245–58. <a href="https://doi.org/10.1037/0033-2909.88.2.245">https://doi.org/10.1037/0033-2909.88.2.245</a>.
+</div>
+<div id="ref-shingles_causal_1976" class="csl-entry" role="listitem">
+Shingles, Richard D. 1976. <span>“Causal <span>Inference</span> in <span>Cross</span>-<span>Lagged</span> <span>Panel</span> <span>Analysis</span>.”</span> <em>Political Methodology</em> 3 (1): 95–133.
+</div>
+<div id="ref-stanley1963" class="csl-entry" role="listitem">
+Stanley, Julian C, and Donald T Campbell. 1963. <em>Experimental and Quasi-Experimental Designs for Research</em>. Chicago: R. McNally.
+</div>
+<div id="ref-usami2021" class="csl-entry" role="listitem">
+Usami, Satoshi. 2021. <span>“On the Differences Between General Cross-Lagged Panel Model and Random-Intercept Cross-Lagged Panel Model: Interpretation of Cross-Lagged Parameters and Model Choice.”</span> <em>Structural Equation Modeling: A Multidisciplinary Journal</em> 28 (3): 331–44.
+</div>
+<div id="ref-usami2015" class="csl-entry" role="listitem">
+Usami, Satoshi, Timothy Hayes, and John J McArdle. 2015. <span>“On the Mathematical Relationship Between Latent Change Score and Autoregressive Cross-Lagged Factor Approaches: Cautions for Inferring Causal Relationship Between Variables.”</span> <em>Multivariate Behavioral Research</em> 50 (6): 676–87.
+</div>
+<div id="ref-usami2019" class="csl-entry" role="listitem">
+Usami, Satoshi, Kou Murayama, and Ellen L. Hamaker. 2019. <span>“A Unified Framework of Longitudinal Models to Examine Reciprocal Relations.”</span> <em>Psychological Methods</em> 24 (5): 637–57. <a href="https://doi.org/10.1037/met0000210">https://doi.org/10.1037/met0000210</a>.
+</div>
+</div>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./00_Install.html" class="pagination-link" aria-label="Installation and Package Syntax">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installation and Package Syntax</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+      <a href="./02_Change.html" class="pagination-link" aria-label="Latent Change Score Models">
+        <span class="nav-page-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span> <i class="bi bi-arrow-right-short"></i>
+      </a>
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>
