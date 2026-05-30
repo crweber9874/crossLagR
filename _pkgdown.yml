@@ -2,6 +2,39 @@ url: https://crweber9874.github.io/crossLagR/
 
 template:
   bootstrap: 5
+  bslib:
+    bg: "#0a0a0a"
+    fg: "#e5e5e5"
+    primary: "#a1a1aa"
+    secondary: "#71717a"
+    base_font: {google: "Inter"}
+    heading_font: {google: "Inter"}
+    code_font: {google: "JetBrains Mono"}
+    "font-size-base": "0.95rem"
+    "headings-font-weight": "600"
+    "border-color": "#27272a"
+    "navbar-bg": "#0a0a0a"
+    "code-bg": "#18181b"
+    "code-color": "#e4e4e7"
+    "link-color": "#d4d4d8"
+    "link-decoration": "none"
+  includes:
+    in_header: |
+      <style>
+        body { -webkit-font-smoothing: antialiased; -moz-osx-font-smoothing: grayscale; }
+        h1, h2, h3, h4 { letter-spacing: -0.015em; color: #fafafa; }
+        h2 { padding-bottom: .4rem; border-bottom: 1px solid #1f1f23; }
+        .navbar { backdrop-filter: blur(12px); background-color: rgba(10,10,10,.85) !important;
+                  border-bottom: 1px solid #18181b; }
+        pre, .sourceCode { background-color: #111113 !important; border: 1px solid #1f1f23;
+                           border-radius: 6px; }
+        a { transition: color .15s ease; }
+        a:hover { color: #ffffff; }
+        ::-webkit-scrollbar { width: 8px; height: 8px; }
+        ::-webkit-scrollbar-track { background: #0a0a0a; }
+        ::-webkit-scrollbar-thumb { background: #3f3f46; border-radius: 4px; }
+        ::-webkit-scrollbar-thumb:hover { background: #52525b; }
+      </style>
 
 navbar:
   structure:
