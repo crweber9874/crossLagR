@@ -1,18 +1,20 @@
 library(DiagrammeR)
 library(DiagrammeRsvg)
 library(rsvg)
-library(hexSticker)
-library(showtext)
 library(magick)
+library(ggplot2)
+library(cowplot)
+library(showtext)
 
 font_add_google("Inter", "inter")
 showtext_auto()
 
+# 1. Render the CLPM diagram as a transparent PNG.
 clpm <- grViz("
 digraph CLPM {
   graph [layout = neato, bgcolor = transparent, splines = true, margin = 0.15]
-  node [shape = plaintext, fontsize = 28, fontcolor = '#fafafa', fontname = 'Helvetica-Bold']
-  edge [color = '#d4d4d8', penwidth = 1.6, arrowsize = 0.7]
+  node [shape = plaintext, fontsize = 18, fontcolor = '#fafafa', fontname = 'Helvetica-Bold']
+  edge [color = '#d4d4d8', penwidth = 0.9, arrowsize = 0.4]
 
   Xt1 [pos = '-1.0,0.7!', label = <X<sub>1</sub>>]
   Xt2 [pos = '1.0,0.7!',  label = <X<sub>2</sub>>]
@@ -30,42 +32,55 @@ svg_path <- tempfile(fileext = ".svg")
 png_path <- tempfile(fileext = ".png")
 writeLines(export_svg(clpm), svg_path)
 rsvg_png(svg_path, png_path, width = 800)
+diagram_img <- image_read(png_path) |> image_trim()
 
-# Trim then pad into a square canvas so hexSticker's subplot scaling
-# is predictable. Width = max(w,h)*1.15.
-img    <- image_read(png_path) |> image_trim()
-info   <- image_info(img)
-canvas <- round(max(info$width, info$height) * 1.45)
-img    <- image_extent(img, geometry = sprintf("%dx%d", canvas, canvas),
-                       color = "transparent", gravity = "center")
-trimmed_png <- tempfile(fileext = ".png")
-image_write(img, trimmed_png)
-
-out_dir <- "man/figures"
-if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
-
-sticker(
-  subplot   = trimmed_png,
-  package   = "crossLagR",
-  s_x       = 1,
-  s_y       = 0.82,
-  s_width   = 0.90,
-  s_height  = 0.90,
-  p_x       = 1,
-  p_y       = 1.50,
-  p_size    = 26,
-  p_color   = "#fafafa",
-  p_family  = "inter",
-  h_fill    = "#0a0a0a",
-  h_color   = "#a1a1aa",
-  h_size    = 1.4,
-  url       = "crweber9874.github.io/crossLagR",
-  u_color   = "#71717a",
-  u_size    = 4.5,
-  u_family  = "inter",
-  white_around_sticker = FALSE,
-  filename  = file.path(out_dir, "logo.png"),
-  dpi       = 600
+# 2. Build the hex sticker entirely in ggplot2.
+# Pointy-top hex: width = sqrt(3), height = 2. Center at (0,0).
+hex_pts <- data.frame(
+  x = c(0, sqrt(3)/2, sqrt(3)/2, 0, -sqrt(3)/2, -sqrt(3)/2),
+  y = c(1, 0.5,        -0.5,      -1, -0.5,        0.5)
 )
 
-cat("Saved:", file.path(out_dir, "logo.png"), "\n")
+# Light grey band across the upper portion, clipped to hex shape.
+band_y <- 0.42
+band_pts <- data.frame(
+  x = c(0, sqrt(3)/2, sqrt(3)/2, -sqrt(3)/2, -sqrt(3)/2),
+  y = c(1, 0.5,        band_y,    band_y,     0.5)
+)
+
+p <- ggplot() +
+  geom_polygon(data = hex_pts,  aes(x, y), fill = "#0a0a0a") +
+  geom_polygon(data = band_pts, aes(x, y), fill = "#d4d4d8") +
+  geom_polygon(data = hex_pts,  aes(x, y),
+               fill = NA, color = "#a1a1aa", linewidth = 1.6) +
+  annotate("text", x = 0, y = 0.78, label = "crossLagR",
+           family = "inter", fontface = "bold",
+           size = 38, color = "#0a0a0a") +
+  annotate("text", x = 0, y = 0.52,
+           label = "Panel Based Structural Equation Models in R",
+           family = "inter", size = 13, color = "#27272a") +
+  annotate("text", x = 0, y = -0.92,
+           label = "crweber9874.github.io/crossLagR",
+           family = "inter", size = 10, color = "#71717a") +
+  coord_fixed(xlim = c(-sqrt(3)/2 - 0.03, sqrt(3)/2 + 0.03),
+              ylim = c(-1.03, 1.03), expand = FALSE) +
+  theme_void() +
+  theme(plot.background = element_rect(fill = "transparent", color = NA),
+        panel.background = element_rect(fill = "transparent", color = NA))
+
+# Composite the CLPM diagram in the lower (dark) section.
+final <- ggdraw(p) +
+  draw_image(diagram_img,
+             x = 0.5, y = 0.32,
+             width = 0.55,
+             hjust = 0.5, vjust = 0.5)
+
+out_dir  <- "man/figures"
+if (!dir.exists(out_dir)) dir.create(out_dir, recursive = TRUE)
+out_path <- file.path(out_dir, "logo.png")
+
+ggsave(out_path, final,
+       width = 4, height = 4.62, units = "in",
+       dpi = 600, bg = "transparent")
+
+cat("Saved:", out_path, "\n")
