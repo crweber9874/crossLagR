@@ -28,7 +28,17 @@ Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    blavaan
+    blavaan,
+    shiny,
+    bslib,
+    shinyWidgets,
+    DT,
+    plotly,
+    DiagrammeR,
+    digest,
+    callr,
+    ggridges,
+    devtools
 VignetteBuilder: knitr
 URL: https://crweber9874.github.io/crossLagR/
 Config/testthat/edition: 3

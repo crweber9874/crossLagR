@@ -13,7 +13,8 @@ run_mc_sims(
   waves = 3,
   sample_size = 1000,
   verbose = TRUE,
-  data_generation = "riclpm"
+  data_generation = "riclpm",
+  estimator_args = list()
 )
 }
 \arguments{
