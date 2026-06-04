@@ -1,0 +1,230 @@
+---
+title: "Contributing to crossLagR (internal)"
+output: rmarkdown::html_vignette
+vignette: >
+  %\VignetteIndexEntry{Contributing to crossLagR (internal)}
+  %\VignetteEngine{knitr::knitr}
+  %\VignetteEncoding{UTF-8}
+---
+
+```{r, include = FALSE}
+knitr::opts_chunk$set(
+  collapse = TRUE,
+  comment  = "#>",
+  eval     = FALSE
+)
+```
+
+> **This document is for contributors, not end users.** It is excluded from
+> the built package via `.Rbuildignore`, so it does not appear in
+> `vignette()` or on CRAN. Read this on GitHub before you open a PR.
+
+## What this package is
+
+`crossLagR` is a set of lavaan-style wrappers for panel-data SEM. Every
+estimator emits lavaan syntax with **unified labels** (`ar_x`, `ar_y`,
+`cl_xy`, `cl_yx`, ...) following Usami, Murayama & Hamaker (2019). The
+diagnostic stack (`lavaanDiagnose`, `crossLagRSummary`, `diagnoseFit`,
+`iccReport`) is built around those labels.
+
+Treat unified labels as a contract --- if you add an estimator, it must
+emit `ar_x`/`ar_y`/`cl_xy`/`cl_yx` wherever those concepts exist, or
+nothing downstream (`crossLagRSummary`, `monteCarloLavaan`,
+`simFromSyntax`) will work for it.
+
+## Repository layout
+
+```
+crossLagR/
+├── R/              # package source. Each estimator in its own file.
+├── tests/testthat/ # unit + integration tests. One file per public fn.
+├── man/            # roxygen-generated .Rd (don't edit by hand).
+├── NAMESPACE       # hand-maintained; uses exportPattern.
+├── DESCRIPTION     # package metadata, dependencies.
+├── inst/shinySim/  # bundled Shiny simulator (launch_shiny_sim()).
+├── vignettes/      # user-facing vignettes (Rmd).
+├── quarto_book/    # user guide, rendered to GitHub Pages.
+└── .github/        # CI workflows (test, pkgdown + Quarto deploy).
+```
+
+`R/zzz.R` holds the `.onAttach()` BETA-status startup message. Bump or
+remove when promoting beyond BETA.
+
+## First-time setup
+
+Clone and open in RStudio:
+
+```{bash, eval = FALSE}
+git clone https://github.com/crweber9874/crossLagR.git
+cd crossLagR
+```
+
+The project uses **renv** for dependency pinning. From R:
+
+```r
+install.packages("renv")
+renv::restore()       # installs the exact deps from renv.lock
+```
+
+If you don't want renv, install the development tools by hand:
+
+```r
+install.packages(c("devtools", "testthat", "roxygen2",
+                   "lavaan", "dplyr", "tidyr", "ggplot2"))
+```
+
+Load the package without installing:
+
+```r
+devtools::load_all()
+```
+
+You should see the BETA startup banner. If you don't, you are looking at an
+installed copy instead of the source tree.
+
+## Run a simple model
+
+The whole package fits in three steps:
+
+```r
+library(crossLagR)
+
+# 1. Simulate data from a known DGP
+dat <- simCLPM(waves = 4, sample_size = 500, seed = 1)$data
+
+# 2. Build syntax + fit with full diagnostics
+out <- lavaanDiagnose(
+  estimateCLPM(waves = 4),
+  data         = dat,
+  meanstructure = TRUE,
+  icc_vars     = c("x", "y")
+)
+
+# 3. Inspect
+out                  # full bundled report (summary + diagnosis + ICC)
+out$summary          # just the labelled parameter table
+out$diagnosis        # just Heywood-case diagnostics
+out$icc              # just the ICC report
+```
+
+For a Monte Carlo sweep:
+
+```r
+grid <- data.frame(
+  stability_p = 0.3, stability_q = 0.3,
+  cross_p = 0.1,   cross_q = 0.15,
+  variance_p = 0.5, variance_q = 0.5,
+  variance_between_x = 0.5, variance_between_y = 0.5,
+  cov_pq = 0
+)
+mc <- monteCarloLavaan(estimator = "CLPM", dgp = "RICLPM",
+                       trials = 50, waves = 4, sample_size = 500,
+                       param_grid = grid)
+```
+
+## Run the tests
+
+After any change to `R/`:
+
+```r
+devtools::test()             # full suite
+devtools::test_active_file() # just the test file currently open
+```
+
+Conventions:
+
+- Every new public function gets a `tests/testthat/test-<fn>.R`.
+- Tests that fit lavaan use `skip_on_cran()` and `skip_if_not_installed("lavaan")`.
+- Always assert `n_obs` / `n_miss` are reported (CLAUDE.md preference).
+- Don't assert exact parameter recovery --- use tolerances (`expect_lt(abs(est - truth), 0.15)`).
+- For new sim/estimator combos, use small N and few trials so the suite stays CI-friendly.
+
+## Document new code
+
+Roxygen comments above the function:
+
+```r
+#' @title myFunction
+#' @description One-line summary.
+#' @param x Numeric.
+#' @return A data.frame.
+#' @export
+myFunction <- function(x) { ... }
+```
+
+Then regenerate the `.Rd` files:
+
+```r
+devtools::document()
+```
+
+**Do not hand-edit anything in `man/`.** `NAMESPACE` is hand-maintained
+(uses `exportPattern("^[[:alpha:]]+")`) so new exported functions don't
+require a NAMESPACE edit --- but check that your function name starts with
+a letter.
+
+## Add a new estimator
+
+If your estimator follows the Usami et al. (2019) unified framework, it
+must:
+
+1. Emit lavaan syntax with the standard labels: `ar_x`, `ar_y`, `cl_xy`,
+   `cl_yx` on the dynamic equation; `d_var_x`, `d_var_y`, `d_cov_xy` on
+   dynamic residuals. Model-specific labels (`I_x`, `S_x`, etc.) should
+   match the table in `unifiedLabels()`.
+2. Take `waves` as its first argument.
+3. Return a character string (not a fitted object).
+4. Have tests in `tests/testthat/test-estimateMyModel.R` covering:
+   syntax contents, lavaan parsing (`lavaan::lavaanify()`), and a small
+   end-to-end fit on simulated data.
+
+If your estimator introduces a new unified label, add it to
+`.UNIFIED_LABEL_TABLE` in `R/crossLagRSummary.R` with a one-line
+description and a group.
+
+## Build the book
+
+```bash
+cd quarto_book
+quarto render            # full book
+quarto render A_package_reference.qmd --to html   # single chapter
+```
+
+Output lands in `quarto_book/_book/`. The GitHub Action in
+`.github/workflows/pages.yaml` rebuilds and deploys on every push to
+`master`.
+
+## Commit conventions
+
+- Imperative subject lines: "Add X", "Fix Y", "Refactor Z" --- not "Added"
+  or "Fixing".
+- Keep subject under ~70 characters; expand in the body.
+- Group related changes into one commit. Don't bundle unrelated work.
+- Never commit `.rda` files (CLAUDE.md rule).
+- Never push without explicit authorization on this repo.
+
+## Reporting bugs
+
+Open an issue at
+<https://github.com/crweber9874/crossLagR/issues> with:
+
+- the function call that triggered the problem,
+- `sessionInfo()`,
+- a minimal reproducible example (small N, few waves, fixed seed),
+- the actual vs expected behavior.
+
+For Heywood-case questions, run `heywoodHelp()` first --- the catalog may
+already explain what you are seeing.
+
+## Style
+
+- tidyverse-flavored R (`dplyr`, `tidyr`, pipes), but the package keeps
+  dependencies thin --- prefer base R if a tidyverse import would be the
+  only use.
+- Minimal commenting (CLAUDE.md). Comment the *why*, not the *what*.
+- Prefer Bayesian / `brms` / `blavaan` over frequentist where it doesn't
+  fight existing code.
+- Report `n_obs` and `n_miss` alongside any estimate (see how
+  `crossLagRSummary` does it).
+- Cite sources when claiming a fact about a dataset (codebook, paper,
+  README). The book bibliography lives at `quarto_book/book.bib`.
