@@ -207,23 +207,8 @@ var_BY <- if (icc == 0) 0 else icc / (1 - icc) * d_var_y
 ### Why `d_var_x` is a proxy, not the exact within-person variance
 
 The function uses the CLPM's estimated residual variance `d_var_x` for
-$\sigma^2_{WX}$. This is an approximation. The true stationary
-within-person variance under the bivariate VAR(1) dynamic in
-@eq-clpm-dynamics solves the discrete Lyapunov equation
+$\sigma^2_{WX}$. This is an approximation. We should look up the exact.
 
-$$
-\boldsymbol\Sigma \;=\;
-\boldsymbol{B}\,\boldsymbol\Sigma\,\boldsymbol{B}^\top
-\;+\; \boldsymbol\Psi,
-\quad
-\boldsymbol{B} = \begin{bmatrix} \beta_x & \omega_{xy} \\ \omega_{yx} & \beta_y \end{bmatrix},
-\quad
-\boldsymbol\Psi = \begin{bmatrix} \sigma^2_p & \sigma_{pq} \\ \sigma_{pq} & \sigma^2_q \end{bmatrix},
-$$ {#eq-lyapunov}
-
-so $\sigma^2_{WX} = \boldsymbol\Sigma_{22}$, which is strictly larger
-than $\sigma^2_q$ whenever any element of $\boldsymbol{B}$ is non-zero.
-For the univariate AR(1) special case ($\omega_{xy} = \omega_{yx} = 0$),
 
 $$
 \sigma^2_{WX,\text{stationary}}
