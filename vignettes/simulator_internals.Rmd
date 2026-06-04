@@ -15,6 +15,14 @@ knitr::opts_chunk$set(collapse = TRUE, comment = "#>", eval = FALSE)
 > `.Rbuildignore`. Read this on GitHub before changing anything in
 > `simCLPM`, `simRICLPM`, `simFromSyntax`, `populate_unified_labels`, or
 > `sensitivityCLPM`.
+>
+> **Authorship.** Authored by Claude (Anthropic) under the prompt:
+> *"now create a simple internal document that describes how to use the
+> simulator. I've generally worked out the math correctly, but include a
+> detailed (though concise and straightforward) well explained walkthrough
+> of why the variance is this, and the characteristics of these new
+> sensitivity functions. It can be a quarto in vignettes."*
+> Maintainer review by C. Weber.
 
 This vignette explains *why* each simulator does what it does --- the
 variance accounting, the parameterization choices, and the assumptions
