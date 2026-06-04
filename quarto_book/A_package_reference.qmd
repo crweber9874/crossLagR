@@ -1,0 +1,334 @@
+# Package Reference {#sec-package-reference}
+
+This appendix is a compact tour of every user-facing function in `crossLagR`. Each estimator section shows the generated lavaan syntax, fits the model to simulated data, and prints a `crossLagRSummary()` so you can see what an actual call returns. The final section documents the four S3 output classes the package exposes.
+
+```{r}
+#| label: setup-appendix
+#| message: false
+#| warning: false
+#| echo: false
+suppressPackageStartupMessages({
+  library(crossLagR)
+  library(lavaan)
+})
+devtools::load_all(quiet = TRUE)
+set.seed(1234)
+```
+
+## Quick start
+
+The intended user workflow is three lines: build syntax, fit + diagnose, inspect.
+
+```{r}
+#| eval: false
+syntax <- estimateCLPM(waves = 4)
+out    <- lavaanDiagnose(syntax, data = my_data, icc_vars = c("x", "y"))
+out                                         # full bundled report
+```
+
+`lavaanDiagnose()` returns a `crossLagR_fit` object that bundles the lavaan fit, a labelled parameter summary, a Heywood-case diagnosis, and (optionally) an ICC report.
+
+## Estimators
+
+Every estimator function returns a character string of lavaan syntax. Parameter labels follow the unified scheme from @usami2019: `ar_x, ar_y, cl_xy, cl_yx` on the dynamic equation, `d_var_x, d_var_y, d_cov_xy` on dynamic residuals, plus model-specific labels for random intercepts (`I_x`), growth factors (`S_x, Q_x`), trait/state decompositions (`T_var_x, s_var_x`), etc. Run `unifiedLabels()` for the full catalog with plain-language descriptions.
+
+### CLPM --- `estimateCLPM()`
+
+Standard cross-lagged panel model. All observed variance is treated as within-person; no between-person random intercept.
+
+```{r}
+#| label: ref-clpm
+estimateCLPM(waves = 4) |> cat()
+```
+
+```{r}
+#| label: ref-clpm-fit
+dat_clpm <- simCLPM(waves = 4, sample_size = 500, seed = 1)$data
+fit_clpm <- lavaan(estimateCLPM(waves = 4), data = dat_clpm,
+                   meanstructure = TRUE)
+crossLagRSummary(fit_clpm)
+```
+
+### RI-CLPM --- `estimateRICLPM()`
+
+Random-Intercept CLPM [@hamaker_critique_2015]. Decomposes each observation into a stable trait (`I_x, I_y`) plus a within-person deviation, with the dynamic equation on the deviations.
+
+```{r}
+#| label: ref-riclpm
+estimateRICLPM(waves = 4) |> cat()
+```
+
+```{r}
+#| label: ref-riclpm-fit
+#| warning: false
+dat_riclpm <- simRICLPM(waves = 4, sample.nobs = 500)$data
+fit_riclpm <- lavaan(estimateRICLPM(waves = 4), data = dat_riclpm,
+                     meanstructure = TRUE)
+crossLagRSummary(fit_riclpm)
+```
+
+### ALT --- `estimateALT()`
+
+Autoregressive Latent Trajectory model. AR/CL paths run on the observed scores directly, on top of an intercept (`I_x`) and slope (`S_x`) growth factor.
+
+```{r}
+#| label: ref-alt
+estimateALT(waves = 4) |> cat()
+```
+
+### LCM-SR --- `estimateLCMSR()`
+
+Latent Curve Model with Structured Residuals. Linear growth (`I, S`) absorbs the trajectory, and AR/CL paths are estimated on the growth residuals.
+
+```{r}
+#| label: ref-lcmsr
+estimateLCMSR(waves = 4) |> cat()
+```
+
+### LGM --- `estimateLGM()`
+
+Linear (or quadratic) Latent Growth Model. Univariate by default; pass `variable_type = "bivariate"` for a parallel-process LGM.
+
+```{r}
+#| label: ref-lgm
+estimateLGM(waves = 4, variable_type = "bivariate") |> cat()
+```
+
+### Latent Change --- `estimateLChange()`
+
+Latent change score (McArdle) parameterization. Set `estimate_constant_change = TRUE` to add an accumulating-change factor (`A_x`).
+
+```{r}
+#| label: ref-lchange
+estimateLChange(waves = 4, variable_type = "bivariate") |> cat()
+```
+
+### Bollen & Brand --- `estimateBollen_and_Brand()`
+
+Dynamic-panel SEM with a latent unit-effect that loads on every wave of the *observed* CLPM equation, with the lagged predictor allowed to covary with that effect [@bollen_general_2010]. SEM analogue of Arellano-Bond.
+
+```{r}
+#| label: ref-bb
+estimateBollen_and_Brand(waves = 4,
+                        x_effect         = "lagged",
+                        x_autoregression = TRUE,
+                        y_effect_on_x    = TRUE) |> cat()
+```
+
+### TSO --- `estimateTSO()`
+
+Bivariate Trait-State-Occasion variance decomposition (random-intercept-only special case of the RI-CLPM with no lagged dynamics). Use this when the question is "how much of the variance is between vs within."
+
+```{r}
+#| label: ref-tso
+estimateTSO(waves = 4) |> cat()
+```
+
+## Simulation
+
+### `simCLPM()` / `simRICLPM()` / `simCLPMu()`
+
+Direct simulators for specific data-generating processes. Each returns a `list(model, data)`; `simCLPMu()` adds a time-varying unmeasured confounder for sensitivity studies.
+
+```{r}
+#| label: ref-sim-direct
+sim <- simCLPM(waves = 4, beta_x = 0.4, beta_y = 0.4,
+               omega_xy = 0.15, omega_yx = 0.10,
+               sample_size = 200, seed = 1)
+head(sim$data, 3)
+```
+
+### `simFromSyntax()` --- generic
+
+The general path. Pass an estimator name and concrete numeric values for the unified labels; the function builds that estimator's lavaan syntax, substitutes the numeric values via `populate_unified_labels()`, and calls `lavaan::simulateData()`. Works for any of the unified-label estimators.
+
+```{r}
+#| label: ref-sim-syntax
+dat <- simFromSyntax(estimator = "RICLPM", waves = 4, sample_size = 300,
+                     ar_x = 0.3, ar_y = 0.3, cl_xy = 0.15, cl_yx = 0.10,
+                     d_var_x = 0.5, d_var_y = 0.5, seed = 2)
+dim(dat); head(names(dat))
+```
+
+## Monte Carlo
+
+### `monteCarloLavaan()`
+
+Generic Monte Carlo wrapper: pick an estimator, pick a DGP, supply a parameter grid, get one row per trial with unified-label estimates, SEs, fit indices, n_obs / n_miss (per @hamaker_critique_2015 reporting norms), Heywood diagnostics, and ICCs.
+
+```{r}
+#| label: ref-mc
+#| warning: false
+grid <- data.frame(
+  stability_p = 0.3, stability_q = 0.3,
+  cross_p = 0.10, cross_q = 0.15,
+  variance_p = 0.5, variance_q = 0.5,
+  variance_between_x = 0.5, variance_between_y = 0.5,
+  cov_pq = 0
+)
+mc <- monteCarloLavaan(
+  estimator = "RICLPM", dgp = "CLPM",
+  trials = 3, waves = 4, sample_size = 300,
+  param_grid = grid
+)
+mc[, c("trial", "ar_x", "cl_xy", "cl_yx", "cfi", "rmsea",
+       "n_obs", "heywood_n_issues", "icc_x", "icc_y")]
+```
+
+`run_mc_sims()` is a convenience wrapper around `monteCarloLavaan()` that takes a `data_generation` argument in place of `dgp` for backwards compatibility with older scripts.
+
+## Diagnostics
+
+The diagnostic system answers three questions: *did the fit succeed*, *do the estimates make sense*, and *does the data warrant this model*.
+
+### `lavaanDiagnose()` --- bundled fit
+
+One-call wrapper. Fits the lavaan model, captures warnings that lavaan otherwise emits in places hard to intercept (NPD covariance, vcov singular), runs `crossLagRSummary()`, `diagnoseFit()`, and optionally `iccReport()`. Returns everything bundled in a `crossLagR_fit` object.
+
+```{r}
+#| label: ref-diagnose-bundle
+#| warning: false
+out <- lavaanDiagnose(
+  estimateCLPM(waves = 4),
+  data          = dat_clpm,
+  meanstructure = TRUE,
+  icc_vars      = c("x", "y")
+)
+names(out)
+```
+
+### `crossLagRSummary()` --- labelled estimates + fit
+
+```{r}
+#| label: ref-summary
+out$summary
+```
+
+The parameter table joins each estimated unified label to a plain-language description, attaches CI / sig-stars, and reports standardized estimates. The fit block prints chi-square, CFI/TLI, RMSEA + 90% CI, SRMR, AIC, BIC.
+
+### `diagnoseFit()` --- Heywood detection
+
+Scans the lavaan fit for boundary conditions (negative variances, standardized loadings > 1, latent correlations > 1, NPD covariances, vcov singular, non-convergence, iteration-limit hits) and pairs each with an explanation and concrete remedies.
+
+```{r}
+#| label: ref-diagnose-fit
+out$diagnosis
+```
+
+Call `heywoodHelp()` without a fit to browse the full catalog of detectable codes; `heywoodHelp("negative_variance")` prints just one entry.
+
+### `iccReport()` --- between vs within
+
+Computes the empirical ICC for each construct directly from data --- no model fit required. When any ICC exceeds the threshold (default 0.65), a single warning fires recommending sensitivity analysis with the bundled Shiny simulator (`launch_shiny_sim()`), because CLPM vs RI-CLPM estimates can diverge substantially in high-ICC regimes [@hamaker_critique_2015].
+
+```{r}
+#| label: ref-icc
+out$icc
+```
+
+`withinBetween()` is the underlying decomposition; it accepts long-format data and supports both an empirical (`method = "dplyr"`) and a TSO-based (`method = "tso"`) split.
+
+### `unifiedLabels()` --- label catalog
+
+Browse every unified label and its description, grouped by `dynamics / dynamic_residuals / random_intercepts / growth / trait_state / residuals / change`.
+
+```{r}
+#| label: ref-unified
+unifiedLabels(print = FALSE) |> head(10)
+```
+
+### Shiny simulator --- `launch_shiny_sim()`
+
+Interactive simulator for visualising bias and recovery across estimator / DGP combinations. Useful when an ICC warning fires and you want to see how the choice of model bites on your data:
+
+```{r}
+#| eval: false
+launch_shiny_sim()
+```
+
+## Output object reference {#sec-output-objects}
+
+The package returns S3 objects so users get pretty-printed summaries by default while retaining access to the raw fields.
+
+### `crossLagR_fit`
+
+Returned by `lavaanDiagnose()`. A list with class `crossLagR_fit` and elements:
+
+| Field | Class | Contents |
+|---|---|---|
+| `$fit` | `lavaan` (S4) | The raw lavaan fit. Use for anything not exposed in the summary. |
+| `$summary` | `crossLagR_summary` | Labelled parameter table + fit indices. |
+| `$diagnosis` | `crossLagR_diagnosis` | Heywood-case detection result. |
+| `$icc` | `crossLagR_icc` or NULL | ICC report (only if `icc_vars` was supplied). |
+| `$warnings` | character | All lavaan warning messages captured during the fit. |
+
+`print()` and `summary()` walk all three diagnostic sub-objects in order.
+
+### `crossLagR_summary`
+
+Returned by `crossLagRSummary()` (and stored at `out$summary`).
+
+| Field | Class | Contents |
+|---|---|---|
+| `$parameters` | data.frame | One row per recognized unified label: `label, description, est, se, z, p, ci.lower, ci.upper, std.all`. |
+| `$other` | data.frame | Estimated parameters whose label was *not* in the unified catalog (`label, est, se, z, p`). |
+| `$fit` | named numeric | `chisq, df, pvalue, cfi, tli, rmsea, rmsea.ci.lower, rmsea.ci.upper, srmr, aic, bic`. |
+| `$n_obs`, `$n_miss` | integer | Sample-size bookkeeping (always reported alongside estimates). |
+| `$converged` | logical | From `lavInspect(fit, "converged")`. |
+| `$ci_level`, `$digits` | numeric / int | Stored for the print method. |
+
+### `crossLagR_diagnosis`
+
+Returned by `diagnoseFit()` (and stored at `out$diagnosis`).
+
+| Field | Class | Contents |
+|---|---|---|
+| `$issues` | list | One entry per detected issue: `code, severity, parameters, message, explanation, remedies`. |
+| `$n_issues` | integer | Number of detected issues. |
+| `$codes` | character | Detected issue codes (also semicolon-joined in MC output's `heywood_codes` column). |
+| `$summary` | character | One-line summary string. |
+
+Detected codes:
+
+| Code | Severity | Trigger |
+|---|---|---|
+| `non_convergence` | high | `lavInspect(fit, "converged")` is `FALSE` |
+| `negative_variance` | high | any `~~` variance row with `est < tol_negative` |
+| `std_loading_gt_one` | medium | `=~` row with `|std.all| > 1` |
+| `std_correlation_gt_one` | high | latent `~~` row with `|std.all| > 1` |
+| `npd_covariance` | high | warning text matches non-positive-definite |
+| `vcov_not_pd` | medium | warning text matches vcov singular |
+| `iter_limit` | high | warning text matches iteration limit reached |
+
+### `crossLagR_icc`
+
+Returned by `iccReport()` (and stored at `out$icc`). A data.frame with class `crossLagR_icc`, one row per construct, columns:
+
+| Column | Meaning |
+|---|---|
+| `variable` | Construct name (stem or column). |
+| `between_var` | Var of person means. |
+| `within_var` | Var of within-person deviations. |
+| `total_var` | Sum of the two. |
+| `icc` | `between_var / total_var`. |
+| `n_obs` | Complete cases used. |
+| `n_waves` | Number of wave columns matched. |
+| `exceeds_threshold` | TRUE if `icc > threshold` (default 0.65). |
+
+The threshold is stored as `attr(x, "threshold")`. The print method repeats the Shiny-sensitivity recommendation for any flagged variable.
+
+### Monte Carlo output
+
+`monteCarloLavaan()` returns a plain `data.frame` (one row per trial) with the following column groups:
+
+| Group | Columns |
+|---|---|
+| Bookkeeping | `trial, param_combo, estimator, dgp` |
+| Estimates | `ar_x, ar_y, cl_xy, cl_yx` (+ `se_*`, `std_*`) |
+| Truth | `true_ar_x, true_ar_y, true_cl_xy, true_cl_yx` |
+| Fit | `chisq, df, pvalue, cfi, tli, rmsea, srmr, aic, bic` |
+| Sample | `n_obs, n_miss, converged` |
+| Warnings | `warning_count, warn_npd, warn_heywood, warn_iter` |
+| Heywood diag. | `heywood_n_issues, heywood_codes` |
+| ICC | `icc_x, icc_y, icc_exceeds` |
+| Errors | `error_occurred, error_message` |

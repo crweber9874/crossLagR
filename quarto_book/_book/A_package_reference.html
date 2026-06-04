@@ -1,0 +1,2021 @@
+<!DOCTYPE html>
+<html xmlns="http://www.w3.org/1999/xhtml" lang="en" xml:lang="en"><head>
+
+<meta charset="utf-8">
+<meta name="generator" content="quarto-1.8.27">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+
+
+<title>Appendix A — Package Reference – crossLagR</title>
+<style>
+code{white-space: pre-wrap;}
+span.smallcaps{font-variant: small-caps;}
+div.columns{display: flex; gap: min(4vw, 1.5em);}
+div.column{flex: auto; overflow-x: auto;}
+div.hanging-indent{margin-left: 1.5em; text-indent: -1.5em;}
+ul.task-list{list-style: none;}
+ul.task-list li input[type="checkbox"] {
+  width: 0.8em;
+  margin: 0 0.8em 0.2em -1em; /* quarto-specific, see https://github.com/quarto-dev/quarto-cli/issues/4556 */ 
+  vertical-align: middle;
+}
+/* CSS for syntax highlighting */
+html { -webkit-text-size-adjust: 100%; }
+pre > code.sourceCode { white-space: pre; position: relative; }
+pre > code.sourceCode > span { display: inline-block; line-height: 1.25; }
+pre > code.sourceCode > span:empty { height: 1.2em; }
+.sourceCode { overflow: visible; }
+code.sourceCode > span { color: inherit; text-decoration: inherit; }
+div.sourceCode { margin: 1em 0; }
+pre.sourceCode { margin: 0; }
+@media screen {
+div.sourceCode { overflow: auto; }
+}
+@media print {
+pre > code.sourceCode { white-space: pre-wrap; }
+pre > code.sourceCode > span { text-indent: -5em; padding-left: 5em; }
+}
+pre.numberSource code
+  { counter-reset: source-line 0; }
+pre.numberSource code > span
+  { position: relative; left: -4em; counter-increment: source-line; }
+pre.numberSource code > span > a:first-child::before
+  { content: counter(source-line);
+    position: relative; left: -1em; text-align: right; vertical-align: baseline;
+    border: none; display: inline-block;
+    -webkit-touch-callout: none; -webkit-user-select: none;
+    -khtml-user-select: none; -moz-user-select: none;
+    -ms-user-select: none; user-select: none;
+    padding: 0 4px; width: 4em;
+  }
+pre.numberSource { margin-left: 3em;  padding-left: 4px; }
+div.sourceCode
+  {   }
+@media screen {
+pre > code.sourceCode > span > a:first-child::before { text-decoration: underline; }
+}
+/* CSS for citations */
+div.csl-bib-body { }
+div.csl-entry {
+  clear: both;
+  margin-bottom: 0em;
+}
+.hanging-indent div.csl-entry {
+  margin-left:2em;
+  text-indent:-2em;
+}
+div.csl-left-margin {
+  min-width:2em;
+  float:left;
+}
+div.csl-right-inline {
+  margin-left:2em;
+  padding-left:1em;
+}
+div.csl-indent {
+  margin-left: 2em;
+}</style>
+
+
+<script src="site_libs/quarto-nav/quarto-nav.js"></script>
+<script src="site_libs/quarto-nav/headroom.min.js"></script>
+<script src="site_libs/clipboard/clipboard.min.js"></script>
+<script src="site_libs/quarto-search/autocomplete.umd.js"></script>
+<script src="site_libs/quarto-search/fuse.min.js"></script>
+<script src="site_libs/quarto-search/quarto-search.js"></script>
+<meta name="quarto:offset" content="./">
+<link href="./07_liss.html" rel="prev">
+<script src="site_libs/quarto-html/quarto.js" type="module"></script>
+<script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
+<script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
+<script src="site_libs/quarto-html/popper.min.js"></script>
+<script src="site_libs/quarto-html/tippy.umd.min.js"></script>
+<script src="site_libs/quarto-html/anchor.min.js"></script>
+<link href="site_libs/quarto-html/tippy.css" rel="stylesheet">
+<link href="site_libs/quarto-html/quarto-syntax-highlighting-ed96de9b727972fe78a7b5d16c58bf87.css" rel="stylesheet" id="quarto-text-highlighting-styles">
+<script src="site_libs/bootstrap/bootstrap.min.js"></script>
+<link href="site_libs/bootstrap/bootstrap-icons.css" rel="stylesheet">
+<link href="site_libs/bootstrap/bootstrap-27c261d06b905028a18691de25d09dde.min.css" rel="stylesheet" append-hash="true" id="quarto-bootstrap" data-mode="light">
+<script id="quarto-search-options" type="application/json">{
+  "location": "sidebar",
+  "copy-button": false,
+  "collapse-after": 3,
+  "panel-placement": "start",
+  "type": "textbox",
+  "limit": 50,
+  "keyboard-shortcut": [
+    "f",
+    "/",
+    "s"
+  ],
+  "show-item-context": false,
+  "language": {
+    "search-no-results-text": "No results",
+    "search-matching-documents-text": "matching documents",
+    "search-copy-link-title": "Copy link to search",
+    "search-hide-matches-text": "Hide additional matches",
+    "search-more-match-text": "more match in this document",
+    "search-more-matches-text": "more matches in this document",
+    "search-clear-button-title": "Clear",
+    "search-text-placeholder": "",
+    "search-detached-cancel-button-title": "Cancel",
+    "search-submit-button-title": "Submit",
+    "search-label": "Search"
+  }
+}</script>
+
+
+</head>
+
+<body class="nav-sidebar floating quarto-light">
+
+<div id="quarto-search-results"></div>
+  <header id="quarto-header" class="headroom fixed-top">
+  <nav class="quarto-secondary-nav">
+    <div class="container-fluid d-flex">
+      <button type="button" class="quarto-btn-toggle btn" data-bs-toggle="collapse" role="button" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">
+        <i class="bi bi-layout-text-sidebar-reverse"></i>
+      </button>
+        <nav class="quarto-page-breadcrumbs" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./A_package_reference.html">Appendices</a></li><li class="breadcrumb-item"><a href="./A_package_reference.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Package Reference</span></a></li></ol></nav>
+        <a class="flex-grow-1" role="navigation" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item" aria-controls="quarto-sidebar" aria-expanded="false" aria-label="Toggle sidebar navigation" onclick="if (window.quartoToggleHeadroom) { window.quartoToggleHeadroom(); }">      
+        </a>
+      <button type="button" class="btn quarto-search-button" aria-label="Search" onclick="window.quartoOpenSearch();">
+        <i class="bi bi-search"></i>
+      </button>
+    </div>
+  </nav>
+</header>
+<!-- content -->
+<div id="quarto-content" class="quarto-container page-columns page-rows-contents page-layout-article">
+<!-- sidebar -->
+  <nav id="quarto-sidebar" class="sidebar collapse collapse-horizontal quarto-sidebar-collapse-item sidebar-navigation floating overflow-auto">
+    <div class="pt-lg-2 mt-2 text-left sidebar-header">
+    <div class="sidebar-title mb-0 py-0">
+      <a href="./">crossLagR</a> 
+    </div>
+      </div>
+        <div class="mt-2 flex-shrink-0 align-items-center">
+        <div class="sidebar-search">
+        <div id="quarto-search" class="" title="Search"></div>
+        </div>
+        </div>
+    <div class="sidebar-menu-container"> 
+    <ul class="list-unstyled mt-1">
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./index.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text">Preface</span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./00_Install.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">1</span>&nbsp; <span class="chapter-title">Installation and Package Syntax</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./01_Panel_Models.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">2</span>&nbsp; <span class="chapter-title">Revisiting the Cross-Lagged Panel Model</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./02_Change.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./03_RICLPM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./04_Usami.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./05_simulations.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Simulations</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
+ <span class="menu-text">Applications</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_iscap.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The ISCAP Panel</span></span></a>
+  </div>
+</li>
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./07_liss.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Replication: Bakker, Lelkes, &amp; Malka (2021)</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./A_package_reference.html" class="sidebar-item-text sidebar-link active">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Package Reference</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
+    </ul>
+    </div>
+</nav>
+<div id="quarto-sidebar-glass" class="quarto-sidebar-collapse-item" data-bs-toggle="collapse" data-bs-target=".quarto-sidebar-collapse-item"></div>
+<!-- margin-sidebar -->
+    <div id="quarto-margin-sidebar" class="sidebar margin-sidebar">
+        <nav id="TOC" role="doc-toc" class="toc-active">
+    <h2 id="toc-title">Table of contents</h2>
+   
+  <ul>
+  <li><a href="#quick-start" id="toc-quick-start" class="nav-link active" data-scroll-target="#quick-start"><span class="header-section-number">A.1</span> Quick start</a></li>
+  <li><a href="#estimators" id="toc-estimators" class="nav-link" data-scroll-target="#estimators"><span class="header-section-number">A.2</span> Estimators</a>
+  <ul class="collapse">
+  <li><a href="#clpm-estimateclpm" id="toc-clpm-estimateclpm" class="nav-link" data-scroll-target="#clpm-estimateclpm"><span class="header-section-number">A.2.1</span> CLPM — <code>estimateCLPM()</code></a></li>
+  <li><a href="#ri-clpm-estimatericlpm" id="toc-ri-clpm-estimatericlpm" class="nav-link" data-scroll-target="#ri-clpm-estimatericlpm"><span class="header-section-number">A.2.2</span> RI-CLPM — <code>estimateRICLPM()</code></a></li>
+  <li><a href="#alt-estimatealt" id="toc-alt-estimatealt" class="nav-link" data-scroll-target="#alt-estimatealt"><span class="header-section-number">A.2.3</span> ALT — <code>estimateALT()</code></a></li>
+  <li><a href="#lcm-sr-estimatelcmsr" id="toc-lcm-sr-estimatelcmsr" class="nav-link" data-scroll-target="#lcm-sr-estimatelcmsr"><span class="header-section-number">A.2.4</span> LCM-SR — <code>estimateLCMSR()</code></a></li>
+  <li><a href="#lgm-estimatelgm" id="toc-lgm-estimatelgm" class="nav-link" data-scroll-target="#lgm-estimatelgm"><span class="header-section-number">A.2.5</span> LGM — <code>estimateLGM()</code></a></li>
+  <li><a href="#latent-change-estimatelchange" id="toc-latent-change-estimatelchange" class="nav-link" data-scroll-target="#latent-change-estimatelchange"><span class="header-section-number">A.2.6</span> Latent Change — <code>estimateLChange()</code></a></li>
+  <li><a href="#bollen-brand-estimatebollen_and_brand" id="toc-bollen-brand-estimatebollen_and_brand" class="nav-link" data-scroll-target="#bollen-brand-estimatebollen_and_brand"><span class="header-section-number">A.2.7</span> Bollen &amp; Brand — <code>estimateBollen_and_Brand()</code></a></li>
+  <li><a href="#tso-estimatetso" id="toc-tso-estimatetso" class="nav-link" data-scroll-target="#tso-estimatetso"><span class="header-section-number">A.2.8</span> TSO — <code>estimateTSO()</code></a></li>
+  </ul></li>
+  <li><a href="#simulation" id="toc-simulation" class="nav-link" data-scroll-target="#simulation"><span class="header-section-number">A.3</span> Simulation</a>
+  <ul class="collapse">
+  <li><a href="#simclpm-simriclpm-simclpmu" id="toc-simclpm-simriclpm-simclpmu" class="nav-link" data-scroll-target="#simclpm-simriclpm-simclpmu"><span class="header-section-number">A.3.1</span> <code>simCLPM()</code> / <code>simRICLPM()</code> / <code>simCLPMu()</code></a></li>
+  <li><a href="#simfromsyntax-generic" id="toc-simfromsyntax-generic" class="nav-link" data-scroll-target="#simfromsyntax-generic"><span class="header-section-number">A.3.2</span> <code>simFromSyntax()</code> — generic</a></li>
+  </ul></li>
+  <li><a href="#monte-carlo" id="toc-monte-carlo" class="nav-link" data-scroll-target="#monte-carlo"><span class="header-section-number">A.4</span> Monte Carlo</a>
+  <ul class="collapse">
+  <li><a href="#montecarlolavaan" id="toc-montecarlolavaan" class="nav-link" data-scroll-target="#montecarlolavaan"><span class="header-section-number">A.4.1</span> <code>monteCarloLavaan()</code></a></li>
+  </ul></li>
+  <li><a href="#diagnostics" id="toc-diagnostics" class="nav-link" data-scroll-target="#diagnostics"><span class="header-section-number">A.5</span> Diagnostics</a>
+  <ul class="collapse">
+  <li><a href="#lavaandiagnose-bundled-fit" id="toc-lavaandiagnose-bundled-fit" class="nav-link" data-scroll-target="#lavaandiagnose-bundled-fit"><span class="header-section-number">A.5.1</span> <code>lavaanDiagnose()</code> — bundled fit</a></li>
+  <li><a href="#crosslagrsummary-labelled-estimates-fit" id="toc-crosslagrsummary-labelled-estimates-fit" class="nav-link" data-scroll-target="#crosslagrsummary-labelled-estimates-fit"><span class="header-section-number">A.5.2</span> <code>crossLagRSummary()</code> — labelled estimates + fit</a></li>
+  <li><a href="#diagnosefit-heywood-detection" id="toc-diagnosefit-heywood-detection" class="nav-link" data-scroll-target="#diagnosefit-heywood-detection"><span class="header-section-number">A.5.3</span> <code>diagnoseFit()</code> — Heywood detection</a></li>
+  <li><a href="#iccreport-between-vs-within" id="toc-iccreport-between-vs-within" class="nav-link" data-scroll-target="#iccreport-between-vs-within"><span class="header-section-number">A.5.4</span> <code>iccReport()</code> — between vs within</a></li>
+  <li><a href="#unifiedlabels-label-catalog" id="toc-unifiedlabels-label-catalog" class="nav-link" data-scroll-target="#unifiedlabels-label-catalog"><span class="header-section-number">A.5.5</span> <code>unifiedLabels()</code> — label catalog</a></li>
+  <li><a href="#shiny-simulator-launch_shiny_sim" id="toc-shiny-simulator-launch_shiny_sim" class="nav-link" data-scroll-target="#shiny-simulator-launch_shiny_sim"><span class="header-section-number">A.5.6</span> Shiny simulator — <code>launch_shiny_sim()</code></a></li>
+  </ul></li>
+  <li><a href="#sec-output-objects" id="toc-sec-output-objects" class="nav-link" data-scroll-target="#sec-output-objects"><span class="header-section-number">A.6</span> Output object reference</a>
+  <ul class="collapse">
+  <li><a href="#crosslagr_fit" id="toc-crosslagr_fit" class="nav-link" data-scroll-target="#crosslagr_fit"><span class="header-section-number">A.6.1</span> <code>crossLagR_fit</code></a></li>
+  <li><a href="#crosslagr_summary" id="toc-crosslagr_summary" class="nav-link" data-scroll-target="#crosslagr_summary"><span class="header-section-number">A.6.2</span> <code>crossLagR_summary</code></a></li>
+  <li><a href="#crosslagr_diagnosis" id="toc-crosslagr_diagnosis" class="nav-link" data-scroll-target="#crosslagr_diagnosis"><span class="header-section-number">A.6.3</span> <code>crossLagR_diagnosis</code></a></li>
+  <li><a href="#crosslagr_icc" id="toc-crosslagr_icc" class="nav-link" data-scroll-target="#crosslagr_icc"><span class="header-section-number">A.6.4</span> <code>crossLagR_icc</code></a></li>
+  <li><a href="#monte-carlo-output" id="toc-monte-carlo-output" class="nav-link" data-scroll-target="#monte-carlo-output"><span class="header-section-number">A.6.5</span> Monte Carlo output</a></li>
+  </ul></li>
+  </ul>
+</nav>
+    </div>
+<!-- main -->
+<main class="content" id="quarto-document-content">
+
+<header id="title-block-header" class="quarto-title-block default"><nav class="quarto-page-breadcrumbs quarto-title-breadcrumbs d-none d-lg-block" aria-label="breadcrumb"><ol class="breadcrumb"><li class="breadcrumb-item"><a href="./A_package_reference.html">Appendices</a></li><li class="breadcrumb-item"><a href="./A_package_reference.html"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Package Reference</span></a></li></ol></nav>
+<div class="quarto-title">
+<h1 class="title"><span id="sec-package-reference" class="quarto-section-identifier">Appendix A — Package Reference</span></h1>
+</div>
+
+
+
+<div class="quarto-title-meta">
+
+    
+  
+    
+  </div>
+  
+
+
+</header>
+
+
+<p>This appendix is a compact tour of every user-facing function in <code>crossLagR</code>. Each estimator section shows the generated lavaan syntax, fits the model to simulated data, and prints a <code>crossLagRSummary()</code> so you can see what an actual call returns. The final section documents the four S3 output classes the package exposes.</p>
+<section id="quick-start" class="level2" data-number="A.1">
+<h2 data-number="A.1" class="anchored" data-anchor-id="quick-start"><span class="header-section-number">A.1</span> Quick start</h2>
+<p>The intended user workflow is three lines: build syntax, fit + diagnose, inspect.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>syntax <span class="ot">&lt;-</span> <span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
+<span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>out    <span class="ot">&lt;-</span> <span class="fu">lavaanDiagnose</span>(syntax, <span class="at">data =</span> my_data, <span class="at">icc_vars =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>))</span>
+<span id="cb1-3"><a href="#cb1-3" aria-hidden="true" tabindex="-1"></a>out                                         <span class="co"># full bundled report</span></span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+<p><code>lavaanDiagnose()</code> returns a <code>crossLagR_fit</code> object that bundles the lavaan fit, a labelled parameter summary, a Heywood-case diagnosis, and (optionally) an ICC report.</p>
+</section>
+<section id="estimators" class="level2" data-number="A.2">
+<h2 data-number="A.2" class="anchored" data-anchor-id="estimators"><span class="header-section-number">A.2</span> Estimators</h2>
+<p>Every estimator function returns a character string of lavaan syntax. Parameter labels follow the unified scheme from <span class="citation" data-cites="usami2019">Usami, Murayama, and Hamaker (<a href="#ref-usami2019" role="doc-biblioref">2019</a>)</span>: <code>ar_x, ar_y, cl_xy, cl_yx</code> on the dynamic equation, <code>d_var_x, d_var_y, d_cov_xy</code> on dynamic residuals, plus model-specific labels for random intercepts (<code>I_x</code>), growth factors (<code>S_x, Q_x</code>), trait/state decompositions (<code>T_var_x, s_var_x</code>), etc. Run <code>unifiedLabels()</code> for the full catalog with plain-language descriptions.</p>
+<section id="clpm-estimateclpm" class="level3" data-number="A.2.1">
+<h3 data-number="A.2.1" class="anchored" data-anchor-id="clpm-estimateclpm"><span class="header-section-number">A.2.1</span> CLPM — <code>estimateCLPM()</code></h3>
+<p>Standard cross-lagged panel model. All observed variance is treated as within-person; no between-person random intercept.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    p1 =~ 1*y1
+    q1 =~ 1*x1
+    p2 =~ 1*y2
+    q2 =~ 1*x2
+    p3 =~ 1*y3
+    q3 =~ 1*x3
+    p4 =~ 1*y4
+    q4 =~ 1*x4
+    p1 ~ 1
+    q1 ~ 1
+    p2 ~ 0*1
+    q2 ~ 0*1
+    p3 ~ 0*1
+    q3 ~ 0*1
+    p4 ~ 0*1
+    q4 ~ 0*1
+    y1 ~ 0*1
+    x1  ~0*1
+    y2 ~ 0*1
+    x2  ~0*1
+    y3 ~ 0*1
+    x3  ~0*1
+    y4 ~ 0*1
+    x4  ~0*1
+    p2 ~ ar_y*p1 + cl_xy*q1
+    q2 ~ ar_x*q1 + cl_yx*p1
+    p3 ~ ar_y*p2 + cl_xy*q2
+    q3 ~ ar_x*q2 + cl_yx*p2
+    p4 ~ ar_y*p3 + cl_xy*q3
+    q4 ~ ar_x*q3 + cl_yx*p3
+    p1 ~~ d_var_y1*p1
+    q1 ~~ d_var_x1*q1
+    p2 ~~ d_var_y*p2
+    q2 ~~ d_var_x*q2
+    p3 ~~ d_var_y*p3
+    q3 ~~ d_var_x*q3
+    p4 ~~ d_var_y*p4
+    q4 ~~ d_var_x*q4
+    p1 ~~ d_cov_xy1*q1
+    p2 ~~ d_cov_xy*q2
+    p3 ~~ d_cov_xy*q3
+    p4 ~~ d_cov_xy*q4
+    y1 ~~ 0*y1
+    x1 ~~ 0*x1
+    y2 ~~ 0*y2
+    x2 ~~ 0*x2
+    y3 ~~ 0*y3
+    x3 ~~ 0*x3
+    y4 ~~ 0*y4
+    x4 ~~ 0*x4</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>dat_clpm <span class="ot">&lt;-</span> <span class="fu">simCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">sample_size =</span> <span class="dv">500</span>, <span class="at">seed =</span> <span class="dv">1</span>)<span class="sc">$</span>data</span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a>fit_clpm <span class="ot">&lt;-</span> <span class="fu">lavaan</span>(<span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>), <span class="at">data =</span> dat_clpm,</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">meanstructure =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">crossLagRSummary</span>(fit_clpm)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$parameters
+       label                                    description       est
+1       ar_y    Autoregressive effect of Y (Y(t-1) -&gt; Y(t)) 0.4037582
+2      cl_xy Cross-lagged effect of X on Y (X(t-1) -&gt; Y(t)) 0.1431229
+3       ar_x    Autoregressive effect of X (X(t-1) -&gt; X(t)) 0.3659829
+4      cl_yx Cross-lagged effect of Y on X (Y(t-1) -&gt; X(t)) 0.2285630
+5   d_var_y1           Within-person residual variance of Y 1.0130378
+6   d_var_x1           Within-person residual variance of X 1.0736095
+7    d_var_y           Within-person residual variance of Y 1.0662739
+8    d_var_x           Within-person residual variance of X 1.1191022
+9  d_cov_xy1        Within-person residual covariance X&lt;-&gt;Y 0.2653547
+10  d_cov_xy        Within-person residual covariance X&lt;-&gt;Y 0.3825343
+           se         z            p   ci.lower  ci.upper   std.all
+1  0.02634132 15.327942 0.000000e+00 0.35213014 0.4553862 0.3586230
+2  0.02554031  5.603803 2.096986e-08 0.09306478 0.1931809 0.1308688
+3  0.02616535 13.987309 0.000000e+00 0.31469975 0.4172661 0.3251466
+4  0.02698597  8.469700 0.000000e+00 0.17567152 0.2814546 0.1972486
+5  0.06407013 15.811388 0.000000e+00 0.88746260 1.1386129 1.0000000
+6  0.06790103 15.811388 0.000000e+00 0.94052595 1.2066931 1.0000000
+7  0.03893482 27.386128 0.000000e+00 0.98996302 1.1425847 0.8303796
+8  0.04086383 27.386128 0.000000e+00 1.03901053 1.1991938 0.8227354
+9  0.04812525  5.513834 3.510992e-08 0.17103091 0.3596784 0.2544431
+10 0.02988424 12.800537 0.000000e+00 0.32396230 0.4411064 0.3501879
+
+$other
+[1] label est   se    z     p    
+&lt;0 rows&gt; (or 0-length row.names)
+
+$fit
+         chisq             df         pvalue            cfi            tli 
+  1.622595e+01   3.200000e+01   9.906977e-01   1.000000e+00   1.014592e+00 
+         rmsea rmsea.ci.lower rmsea.ci.upper           srmr            aic 
+  0.000000e+00   0.000000e+00   0.000000e+00   2.360260e-02   1.145284e+04 
+           bic 
+  1.150341e+04 
+
+$n_obs
+[1] 500
+
+$n_miss
+[1] 0
+
+$converged
+[1] TRUE
+
+$ci_level
+[1] 0.95
+
+$digits
+[1] 3
+
+attr(,"class")
+[1] "crossLagR_summary"</code></pre>
+</div>
+</div>
+</section>
+<section id="ri-clpm-estimatericlpm" class="level3" data-number="A.2.2">
+<h3 data-number="A.2.2" class="anchored" data-anchor-id="ri-clpm-estimatericlpm"><span class="header-section-number">A.2.2</span> RI-CLPM — <code>estimateRICLPM()</code></h3>
+<p>Random-Intercept CLPM <span class="citation" data-cites="hamaker_critique_2015">(<a href="#ref-hamaker_critique_2015" role="doc-biblioref">Hamaker, Kuiper, and Grasman 2015</a>)</span>. Decomposes each observation into a stable trait (<code>I_x, I_y</code>) plus a within-person deviation, with the dynamic equation on the deviations.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>
+# Random Intercepts (Trait Factors I)
+I_x =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
+I_y =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
+
+# Within-Person Latent Variables
+p1 =~ 1*x1
+q1 =~ 1*y1
+p2 =~ 1*x2
+q2 =~ 1*y2
+p3 =~ 1*x3
+q3 =~ 1*y3
+p4 =~ 1*x4
+q4 =~ 1*y4
+
+# Within-person factor means (fixed to 0)
+p1 ~ 0*1
+q1 ~ 0*1
+p2 ~ 0*1
+q2 ~ 0*1
+p3 ~ 0*1
+q3 ~ 0*1
+p4 ~ 0*1
+q4 ~ 0*1
+
+# Trait factor means (free)
+I_x ~ 1
+I_y ~ 1
+
+# Observed intercepts (fixed to 0)
+x1 ~ 0*1
+y1 ~ 0*1
+x2 ~ 0*1
+y2 ~ 0*1
+x3 ~ 0*1
+y3 ~ 0*1
+x4 ~ 0*1
+y4 ~ 0*1
+
+# Autoregressive and Cross-lagged Effects
+p2 ~ ar_x*p1 + cl_yx*q1
+q2 ~ ar_y*q1 + cl_xy*p1
+p3 ~ ar_x*p2 + cl_yx*q2
+q3 ~ ar_y*q2 + cl_xy*p2
+p4 ~ ar_x*p3 + cl_yx*q3
+q4 ~ ar_y*q3 + cl_xy*p3
+
+# Dynamic Residual Variances
+p1 ~~ d_var_x*p1
+q1 ~~ d_var_y*q1
+p2 ~~ d_var_x*p2
+q2 ~~ d_var_y*q2
+p3 ~~ d_var_x*p3
+q3 ~~ d_var_y*q3
+p4 ~~ d_var_x*p4
+q4 ~~ d_var_y*q4
+
+# Dynamic Residual Covariances
+p1 ~~ d_cov_xy*q1
+p2 ~~ d_cov_xy*q2
+p3 ~~ d_cov_xy*q3
+p4 ~~ d_cov_xy*q4
+
+# Trait Factor (I) Variances and Covariances
+I_x ~~ I_x
+I_y ~~ I_y
+I_x ~~ I_y
+
+# Fix Observed Variable Residuals to Zero
+x1 ~~ 0*x1
+y1 ~~ 0*y1
+x2 ~~ 0*x2
+y2 ~~ 0*y2
+x3 ~~ 0*x3
+y3 ~~ 0*y3
+x4 ~~ 0*x4
+y4 ~~ 0*y4</code></pre>
+</div>
+</div>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>dat_riclpm <span class="ot">&lt;-</span> <span class="fu">simRICLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">sample.nobs =</span> <span class="dv">500</span>)<span class="sc">$</span>data</span>
+<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>fit_riclpm <span class="ot">&lt;-</span> <span class="fu">lavaan</span>(<span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>), <span class="at">data =</span> dat_riclpm,</span>
+<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">meanstructure =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">crossLagRSummary</span>(fit_riclpm)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$parameters
+     label                                    description        est         se
+1     ar_x    Autoregressive effect of X (X(t-1) -&gt; X(t)) 0.21471946 0.04622063
+2    cl_yx Cross-lagged effect of Y on X (Y(t-1) -&gt; X(t)) 0.04433770 0.03844137
+3     ar_y    Autoregressive effect of Y (Y(t-1) -&gt; Y(t)) 0.32859727 0.04959852
+4    cl_xy Cross-lagged effect of X on Y (X(t-1) -&gt; Y(t)) 0.01847169 0.04038426
+5  d_var_x           Within-person residual variance of X 0.94731963 0.04220229
+6  d_var_y           Within-person residual variance of Y 1.03611307 0.04790884
+7 d_cov_xy        Within-person residual covariance X&lt;-&gt;Y 0.06700508 0.03198046
+           z            p     ci.lower   ci.upper    std.all
+1  4.6455328 3.391999e-06  0.124128687 0.30531024 0.20958453
+2  1.1533848 2.487525e-01 -0.031006011 0.11968140 0.04526018
+3  6.6251430 3.469114e-11  0.231385962 0.42580858 0.31202102
+4  0.4573983 6.473848e-01 -0.060680003 0.09762338 0.01677147
+5 22.4471117 0.000000e+00  0.864604650 1.03003461 1.00000000
+6 21.6267602 0.000000e+00  0.942213464 1.13001268 1.00000000
+7  2.0951880 3.615429e-02  0.004324526 0.12968563 0.06763257
+
+$other
+[1] label est   se    z     p    
+&lt;0 rows&gt; (or 0-length row.names)
+
+$fit
+         chisq             df         pvalue            cfi            tli 
+  3.638935e+01   3.200000e+01   2.716060e-01   9.980334e-01   9.982792e-01 
+         rmsea rmsea.ci.lower rmsea.ci.upper           srmr            aic 
+  1.656305e-02   0.000000e+00   3.830842e-02   3.067961e-02   1.286424e+04 
+           bic 
+  1.291481e+04 
+
+$n_obs
+[1] 500
+
+$n_miss
+[1] 0
+
+$converged
+[1] TRUE
+
+$ci_level
+[1] 0.95
+
+$digits
+[1] 3
+
+attr(,"class")
+[1] "crossLagR_summary"</code></pre>
+</div>
+</div>
+</section>
+<section id="alt-estimatealt" class="level3" data-number="A.2.3">
+<h3 data-number="A.2.3" class="anchored" data-anchor-id="alt-estimatealt"><span class="header-section-number">A.2.3</span> ALT — <code>estimateALT()</code></h3>
+<p>Autoregressive Latent Trajectory model. AR/CL paths run on the observed scores directly, on top of an intercept (<code>I_x</code>) and slope (<code>S_x</code>) growth factor.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb10"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb10-1"><a href="#cb10-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateALT</span>(<span class="at">waves =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Latent variables (perfect indicators)
+p1 =~ 1*x1
+q1 =~ 1*y1
+p2 =~ 1*x2
+q2 =~ 1*y2
+p3 =~ 1*x3
+q3 =~ 1*y3
+p4 =~ 1*x4
+q4 =~ 1*y4
+
+# Fix observed residuals to zero
+x1 ~~ 0*x1
+y1 ~~ 0*y1
+x2 ~~ 0*x2
+y2 ~~ 0*y2
+x3 ~~ 0*x3
+y3 ~~ 0*y3
+x4 ~~ 0*x4
+y4 ~~ 0*y4
+
+# Fix observed intercepts to zero
+x1 ~ 0*1
+y1 ~ 0*1
+x2 ~ 0*1
+y2 ~ 0*1
+x3 ~ 0*1
+y3 ~ 0*1
+x4 ~ 0*1
+y4 ~ 0*1
+
+# Growth factors (accumulating, load on waves 2:T)
+I_x =~ 1*p2 + 1*p3 + 1*p4
+S_x =~ 1*p2 + 2*p3 + 3*p4
+I_y =~ 1*q2 + 1*q3 + 1*q4
+S_y =~ 1*q2 + 2*q3 + 3*q4
+
+# Autoregressive and cross-lagged paths
+p2 ~ ar_x*p1 + cl_yx*q1
+q2 ~ ar_y*q1 + cl_xy*p1
+p3 ~ ar_x*p2 + cl_yx*q2
+q3 ~ ar_y*q2 + cl_xy*p2
+p4 ~ ar_x*p3 + cl_yx*q3
+q4 ~ ar_y*q3 + cl_xy*p3
+
+# Exogenous wave 1 variances, covariance, and means
+p1 ~~ p1
+q1 ~~ q1
+p1 ~~ q1
+p1 ~ 1
+q1 ~ 1
+
+# Dynamic residual variances and covariances
+p2 ~~ d_var_x*p2
+q2 ~~ d_var_y*q2
+p3 ~~ d_var_x*p3
+q3 ~~ d_var_y*q3
+p4 ~~ d_var_x*p4
+q4 ~~ d_var_y*q4
+p2 ~~ d_cov_xy*q2
+p3 ~~ d_cov_xy*q3
+p4 ~~ d_cov_xy*q4
+
+# Fix endogenous latent means to zero
+p2 ~ 0*1
+q2 ~ 0*1
+p3 ~ 0*1
+q3 ~ 0*1
+p4 ~ 0*1
+q4 ~ 0*1
+
+# Growth factor means
+I_x ~ 1
+S_x ~ 1
+I_y ~ 1
+S_y ~ 1
+
+# Growth factor variances
+I_x ~~ I_x
+S_x ~~ S_x
+I_y ~~ I_y
+S_y ~~ S_y
+
+# Growth factor covariances (within variable)
+I_x ~~ S_x
+I_y ~~ S_y
+
+# Growth factor covariances (between variable)
+I_x ~~ I_y
+S_x ~~ S_y
+I_x ~~ S_y
+I_y ~~ S_x
+
+# Exogenous wave 1 covariances with growth factors
+p1 ~~ I_x
+p1 ~~ S_x
+p1 ~~ I_y
+p1 ~~ S_y
+q1 ~~ I_x
+q1 ~~ S_x
+q1 ~~ I_y
+q1 ~~ S_y</code></pre>
+</div>
+</div>
+</section>
+<section id="lcm-sr-estimatelcmsr" class="level3" data-number="A.2.4">
+<h3 data-number="A.2.4" class="anchored" data-anchor-id="lcm-sr-estimatelcmsr"><span class="header-section-number">A.2.4</span> LCM-SR — <code>estimateLCMSR()</code></h3>
+<p>Latent Curve Model with Structured Residuals. Linear growth (<code>I, S</code>) absorbs the trajectory, and AR/CL paths are estimated on the growth residuals.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb12"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb12-1"><a href="#cb12-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLCMSR</span>(<span class="at">waves =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Within-person latent deviations
+p1 =~ 1*x1
+q1 =~ 1*y1
+p2 =~ 1*x2
+q2 =~ 1*y2
+p3 =~ 1*x3
+q3 =~ 1*y3
+p4 =~ 1*x4
+q4 =~ 1*y4
+
+# Fix observed residuals to zero
+x1 ~~ 0*x1
+y1 ~~ 0*y1
+x2 ~~ 0*x2
+y2 ~~ 0*y2
+x3 ~~ 0*x3
+y3 ~~ 0*y3
+x4 ~~ 0*x4
+y4 ~~ 0*y4
+
+# Fix observed intercepts to zero
+x1 ~ 0*1
+y1 ~ 0*1
+x2 ~ 0*1
+y2 ~ 0*1
+x3 ~ 0*1
+y3 ~ 0*1
+x4 ~ 0*1
+y4 ~ 0*1
+
+# Growth factors (intercept and slope, direct effects on observed)
+I_x =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
+S_x =~ 0*x1 + 1*x2 + 2*x3 + 3*x4
+I_y =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
+S_y =~ 0*y1 + 1*y2 + 2*y3 + 3*y4
+
+# Autoregressive and cross-lagged paths (structured residuals)
+p2 ~ ar_x*p1 + cl_yx*q1
+q2 ~ ar_y*q1 + cl_xy*p1
+p3 ~ ar_x*p2 + cl_yx*q2
+q3 ~ ar_y*q2 + cl_xy*p2
+p4 ~ ar_x*p3 + cl_yx*q3
+q4 ~ ar_y*q3 + cl_xy*p3
+
+# Dynamic residual variances and covariances
+p1 ~~ p1
+q1 ~~ q1
+p1 ~~ q1
+p2 ~~ d_var_x*p2
+q2 ~~ d_var_y*q2
+p3 ~~ d_var_x*p3
+q3 ~~ d_var_y*q3
+p4 ~~ d_var_x*p4
+q4 ~~ d_var_y*q4
+p2 ~~ d_cov_xy*q2
+p3 ~~ d_cov_xy*q3
+p4 ~~ d_cov_xy*q4
+
+# Latent means fixed to zero
+p1 ~ 0*1
+q1 ~ 0*1
+p2 ~ 0*1
+q2 ~ 0*1
+p3 ~ 0*1
+q3 ~ 0*1
+p4 ~ 0*1
+q4 ~ 0*1
+
+# Growth factor means
+I_x ~ 1
+S_x ~ 1
+I_y ~ 1
+S_y ~ 1
+
+# Growth factor variances
+I_x ~~ I_x
+S_x ~~ S_x
+I_y ~~ I_y
+S_y ~~ S_y
+
+# Growth factor covariances (within variable)
+I_x ~~ S_x
+I_y ~~ S_y
+
+# Growth factor covariances (between variable)
+I_x ~~ I_y
+S_x ~~ S_y
+I_x ~~ S_y
+I_y ~~ S_x</code></pre>
+</div>
+</div>
+</section>
+<section id="lgm-estimatelgm" class="level3" data-number="A.2.5">
+<h3 data-number="A.2.5" class="anchored" data-anchor-id="lgm-estimatelgm"><span class="header-section-number">A.2.5</span> LGM — <code>estimateLGM()</code></h3>
+<p>Linear (or quadratic) Latent Growth Model. Univariate by default; pass <code>variable_type = "bivariate"</code> for a parallel-process LGM.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb14"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb14-1"><a href="#cb14-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLGM</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">variable_type =</span> <span class="st">"bivariate"</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Latent Variables
+p1 =~ 1*x1
+q1 =~ 1*y1
+p2 =~ 1*x2
+q2 =~ 1*y2
+p3 =~ 1*x3
+q3 =~ 1*y3
+p4 =~ 1*x4
+q4 =~ 1*y4
+
+# Latent Growth Factors for X
+I_x =~ 1*p1 + 1*p2 + 1*p3 + 1*p4
+S_x =~ 0*p1 + 1*p2 + 2*p3 + 3*p4
+
+# Latent Growth Factors for Y
+I_y =~ 1*q1 + 1*q2 + 1*q3 + 1*q4
+S_y =~ 0*q1 + 1*q2 + 2*q3 + 3*q4
+
+# Growth Factor Means
+I_x ~ mean_I_x*1
+S_x ~ mean_S_x*1
+I_y ~ mean_I_y*1
+S_y ~ mean_S_y*1
+
+# Growth Factor Variances
+I_x ~~ var_I_x*I_x
+S_x ~~ var_S_x*S_x
+I_y ~~ var_I_y*I_y
+S_y ~~ var_S_y*S_y
+
+# Within-Variable Growth Factor Covariances
+I_x ~~ cov_IS_x*S_x
+I_y ~~ cov_IS_y*S_y
+
+# Between-Variable Growth Factor Covariances
+I_x ~~ cov_I_xy*I_y
+S_x ~~ cov_S_xy*S_y
+I_x ~~ cov_IS_xy*S_y
+I_y ~~ cov_IS_yx*S_x
+
+# Latent Variable Means (Fixed to 0)
+p1 ~ 0*1
+q1 ~ 0*1
+p2 ~ 0*1
+q2 ~ 0*1
+p3 ~ 0*1
+q3 ~ 0*1
+p4 ~ 0*1
+q4 ~ 0*1
+
+# Observed Variable Intercepts (Fixed to 0)
+x1 ~ 0*1
+y1 ~ 0*1
+x2 ~ 0*1
+y2 ~ 0*1
+x3 ~ 0*1
+y3 ~ 0*1
+x4 ~ 0*1
+y4 ~ 0*1
+
+# Latent Variable Variances
+p1 ~~ var_p*p1
+q1 ~~ var_q*q1
+p2 ~~ var_p*p2
+q2 ~~ var_q*q2
+p3 ~~ var_p*p3
+q3 ~~ var_q*q3
+p4 ~~ var_p*p4
+q4 ~~ var_q*q4
+
+# Latent Variable Covariances
+p1 ~~ cov_pq*q1
+p2 ~~ cov_pq*q2
+p3 ~~ cov_pq*q3
+p4 ~~ cov_pq*q4
+
+# Fix Observed Variable Residuals to Zero
+x1 ~~ 0*x1
+y1 ~~ 0*y1
+x2 ~~ 0*x2
+y2 ~~ 0*y2
+x3 ~~ 0*x3
+y3 ~~ 0*y3
+x4 ~~ 0*x4
+y4 ~~ 0*y4</code></pre>
+</div>
+</div>
+</section>
+<section id="latent-change-estimatelchange" class="level3" data-number="A.2.6">
+<h3 data-number="A.2.6" class="anchored" data-anchor-id="latent-change-estimatelchange"><span class="header-section-number">A.2.6</span> Latent Change — <code>estimateLChange()</code></h3>
+<p>Latent change score (McArdle) parameterization. Set <code>estimate_constant_change = TRUE</code> to add an accumulating-change factor (<code>A_x</code>).</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb16"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb16-1"><a href="#cb16-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">variable_type =</span> <span class="st">"bivariate"</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>    cf_x1 =~ 1*x1
+    cf_x2 =~ 1*x2
+    cf_x3 =~ 1*x3
+    cf_x4 =~ 1*x4
+    cf_x1 ~ 1
+    cf_x2 ~ 0*1
+    cf_x3 ~ 0*1
+    cf_x4 ~ 0*1
+    cf_x1 ~~ start(15)*cf_x1
+    cf_x2 ~~ 0*cf_x2
+    cf_x3 ~~ 0*cf_x3
+    cf_x4 ~~ 0*cf_x4
+    x1 ~ 0*1
+    x2 ~ 0*1
+    x3 ~ 0*1
+    x4 ~ 0*1
+    x1 ~~ u_var_x*x1
+    x2 ~~ u_var_x*x2
+    x3 ~~ u_var_x*x3
+    x4 ~~ u_var_x*x4
+    cf_x2 ~ 1*cf_x1
+    cf_x3 ~ 1*cf_x2
+    cf_x4 ~ 1*cf_x3
+    ld_x2 =~ 1*cf_x2
+    ld_x3 =~ 1*cf_x3
+    ld_x4 =~ 1*cf_x4
+    ld_x2 ~ 0*1
+    ld_x3 ~ 0*1
+    ld_x4 ~ 0*1
+    ld_x2 ~~ 0*ld_x2
+    ld_x3 ~~ 0*ld_x3
+    ld_x4 ~~ 0*ld_x4
+    A_x =~ 1*ld_x2
+    + 1*ld_x3
+    + 1*ld_x4
+    A_x ~ 1
+    A_x ~~ A_var_x*A_x
+    A_x ~~ cf_x1
+    ld_x2 ~ start(-0.15)*ar_x*cf_x1
+    ld_x3 ~ start(-0.15)*ar_x*cf_x2
+    ld_x4 ~ start(-0.15)*ar_x*cf_x3
+    cf_y1 =~ 1*y1
+    cf_y2 =~ 1*y2
+    cf_y3 =~ 1*y3
+    cf_y4 =~ 1*y4
+    cf_y1 ~ 1
+    cf_y2 ~ 0*1
+    cf_y3 ~ 0*1
+    cf_y4 ~ 0*1
+    cf_y1 ~~ start(15)*cf_y1
+    cf_y2 ~~ 0*cf_y2
+    cf_y3 ~~ 0*cf_y3
+    cf_y4 ~~ 0*cf_y4
+    y1 ~ 0*1
+    y2 ~ 0*1
+    y3 ~ 0*1
+    y4 ~ 0*1
+    y1 ~~ u_var_y*y1
+    y2 ~~ u_var_y*y2
+    y3 ~~ u_var_y*y3
+    y4 ~~ u_var_y*y4
+    cf_y2 ~ 1*cf_y1
+    cf_y3 ~ 1*cf_y2
+    cf_y4 ~ 1*cf_y3
+    ld_y2 =~ 1*cf_y2
+    ld_y3 =~ 1*cf_y3
+    ld_y4 =~ 1*cf_y4
+    ld_y2 ~ 0*1
+    ld_y3 ~ 0*1
+    ld_y4 ~ 0*1
+    ld_y2 ~~ 0*ld_y2
+    ld_y3 ~~ 0*ld_y3
+    ld_y4 ~~ 0*ld_y4
+    A_y =~ 1*ld_y2
+          + 1*ld_y3
+          + 1*ld_y4
+    A_y ~ 1
+    A_y ~~ A_var_y*A_y
+    A_y ~~ cf_y1
+    ld_y2 ~ ar_y*cf_y1
+    ld_y3 ~ ar_y*cf_y2
+    ld_y4 ~ ar_y*cf_y3
+    ld_x2 ~ start(-0.2)*cl_yx*cf_y1
+    ld_y2 ~ start(-0.2)*cl_xy*cf_x1
+    ld_x3 ~ start(-0.2)*cl_yx*cf_y2
+    ld_y3 ~ start(-0.2)*cl_xy*cf_x2
+    ld_x4 ~ start(-0.2)*cl_yx*cf_y3
+    ld_y4 ~ start(-0.2)*cl_xy*cf_x3
+    A_x ~~ A_y
+    cf_x1 ~~ cf_y1
+    cf_x1 ~~ A_y
+    cf_y1 ~~ A_x</code></pre>
+</div>
+</div>
+</section>
+<section id="bollen-brand-estimatebollen_and_brand" class="level3" data-number="A.2.7">
+<h3 data-number="A.2.7" class="anchored" data-anchor-id="bollen-brand-estimatebollen_and_brand"><span class="header-section-number">A.2.7</span> Bollen &amp; Brand — <code>estimateBollen_and_Brand()</code></h3>
+<p>Dynamic-panel SEM with a latent unit-effect that loads on every wave of the <em>observed</em> CLPM equation, with the lagged predictor allowed to covary with that effect <span class="citation" data-cites="bollen_general_2010">(<a href="#ref-bollen_general_2010" role="doc-biblioref">Bollen and Brand 2010</a>)</span>. SEM analogue of Arellano-Bond.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb18"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb18-1"><a href="#cb18-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateBollen_and_Brand</span>(<span class="at">waves =</span> <span class="dv">4</span>,</span>
+<span id="cb18-2"><a href="#cb18-2" aria-hidden="true" tabindex="-1"></a>                        <span class="at">x_effect         =</span> <span class="st">"lagged"</span>,</span>
+<span id="cb18-3"><a href="#cb18-3" aria-hidden="true" tabindex="-1"></a>                        <span class="at">x_autoregression =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb18-4"><a href="#cb18-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">y_effect_on_x    =</span> <span class="cn">TRUE</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Latent fixed effects (individual heterogeneity, accumulating factors)
+I_y =~ 1*y2 + 1*y3 + 1*y4
+I_x =~ 1*x2 + 1*x3 + 1*x4
+
+# Regression equations
+y2 ~ ar_y2*y1 + cl_xy2*x1
+y3 ~ ar_y3*y2 + cl_xy3*x2
+y4 ~ ar_y4*y3 + cl_xy4*x3
+x2 ~ ar_x2*x1 + cl_yx2*y1
+x3 ~ ar_x3*x2 + cl_yx3*y2
+x4 ~ ar_x4*x3 + cl_yx4*y3
+
+# Exogenous variable variances
+y1 ~~ y1
+x1 ~~ x1
+
+# Exogenous variable covariances
+y1 ~~ x1
+
+# Latent fixed effect (I) variances and covariances
+I_y ~~ I_y
+I_x ~~ I_x
+I_y ~~ I_x
+
+# Exogenous-I covariances
+y1 ~~ I_y
+y1 ~~ I_x
+x1 ~~ I_y
+x1 ~~ I_x
+
+# Dynamic residual variances
+y2 ~~ d_var_y*y2
+y3 ~~ d_var_y*y3
+y4 ~~ d_var_y*y4
+x2 ~~ d_var_x*x2
+x3 ~~ d_var_x*x3
+x4 ~~ d_var_x*x4</code></pre>
+</div>
+</div>
+</section>
+<section id="tso-estimatetso" class="level3" data-number="A.2.8">
+<h3 data-number="A.2.8" class="anchored" data-anchor-id="tso-estimatetso"><span class="header-section-number">A.2.8</span> TSO — <code>estimateTSO()</code></h3>
+<p>Bivariate Trait-State-Occasion variance decomposition (random-intercept-only special case of the RI-CLPM with no lagged dynamics). Use this when the question is “how much of the variance is between vs within.”</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb20"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb20-1"><a href="#cb20-1" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateTSO</span>(<span class="at">waves =</span> <span class="dv">4</span>) <span class="sc">|&gt;</span> <span class="fu">cat</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code># Trait factors (between-person)
+T_x =~ 1*x1 + 1*x2 + 1*x3 + 1*x4
+T_y =~ 1*y1 + 1*y2 + 1*y3 + 1*y4
+
+# Trait variances and covariance
+T_x ~~ T_var_x*T_x
+T_y ~~ T_var_y*T_y
+T_x ~~ T_cov_xy*T_y
+
+# State variances (within-person)
+x1 ~~ s_var_x*x1
+y1 ~~ s_var_y*y1
+x2 ~~ s_var_x*x2
+y2 ~~ s_var_y*y2
+x3 ~~ s_var_x*x3
+y3 ~~ s_var_y*y3
+x4 ~~ s_var_x*x4
+y4 ~~ s_var_y*y4
+
+# Within-time state covariances
+x1 ~~ s_cov_xy*y1
+x2 ~~ s_cov_xy*y2
+x3 ~~ s_cov_xy*y3
+x4 ~~ s_cov_xy*y4</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="simulation" class="level2" data-number="A.3">
+<h2 data-number="A.3" class="anchored" data-anchor-id="simulation"><span class="header-section-number">A.3</span> Simulation</h2>
+<section id="simclpm-simriclpm-simclpmu" class="level3" data-number="A.3.1">
+<h3 data-number="A.3.1" class="anchored" data-anchor-id="simclpm-simriclpm-simclpmu"><span class="header-section-number">A.3.1</span> <code>simCLPM()</code> / <code>simRICLPM()</code> / <code>simCLPMu()</code></h3>
+<p>Direct simulators for specific data-generating processes. Each returns a <code>list(model, data)</code>; <code>simCLPMu()</code> adds a time-varying unmeasured confounder for sensitivity studies.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb22"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb22-1"><a href="#cb22-1" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">simCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">beta_x =</span> <span class="fl">0.4</span>, <span class="at">beta_y =</span> <span class="fl">0.4</span>,</span>
+<span id="cb22-2"><a href="#cb22-2" aria-hidden="true" tabindex="-1"></a>               <span class="at">omega_xy =</span> <span class="fl">0.15</span>, <span class="at">omega_yx =</span> <span class="fl">0.10</span>,</span>
+<span id="cb22-3"><a href="#cb22-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">sample_size =</span> <span class="dv">200</span>, <span class="at">seed =</span> <span class="dv">1</span>)</span>
+<span id="cb22-4"><a href="#cb22-4" aria-hidden="true" tabindex="-1"></a><span class="fu">head</span>(sim<span class="sc">$</span>data, <span class="dv">3</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>          y1         x1        y2         x2         y3         x3        y4
+1 -0.7868291  0.3438103  0.273138  1.3889387 -0.9632882  1.1107797 1.5328569
+2 -1.9395991  1.5016984 -1.661089 -0.0655145 -1.0869576 -0.4759141 0.7326041
+3  0.9798968 -1.4956957 -0.279182 -0.3453447  0.6185015  1.4557052 1.7387776
+          x4
+1 0.06617798
+2 2.31346140
+3 1.14994806</code></pre>
+</div>
+</div>
+</section>
+<section id="simfromsyntax-generic" class="level3" data-number="A.3.2">
+<h3 data-number="A.3.2" class="anchored" data-anchor-id="simfromsyntax-generic"><span class="header-section-number">A.3.2</span> <code>simFromSyntax()</code> — generic</h3>
+<p>The general path. Pass an estimator name and concrete numeric values for the unified labels; the function builds that estimator’s lavaan syntax, substitutes the numeric values via <code>populate_unified_labels()</code>, and calls <code>lavaan::simulateData()</code>. Works for any of the unified-label estimators.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb24"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb24-1"><a href="#cb24-1" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">simFromSyntax</span>(<span class="at">estimator =</span> <span class="st">"RICLPM"</span>, <span class="at">waves =</span> <span class="dv">4</span>, <span class="at">sample_size =</span> <span class="dv">300</span>,</span>
+<span id="cb24-2"><a href="#cb24-2" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ar_x =</span> <span class="fl">0.3</span>, <span class="at">ar_y =</span> <span class="fl">0.3</span>, <span class="at">cl_xy =</span> <span class="fl">0.15</span>, <span class="at">cl_yx =</span> <span class="fl">0.10</span>,</span>
+<span id="cb24-3"><a href="#cb24-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">d_var_x =</span> <span class="fl">0.5</span>, <span class="at">d_var_y =</span> <span class="fl">0.5</span>, <span class="at">seed =</span> <span class="dv">2</span>)</span>
+<span id="cb24-4"><a href="#cb24-4" aria-hidden="true" tabindex="-1"></a><span class="fu">dim</span>(dat); <span class="fu">head</span>(<span class="fu">names</span>(dat))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] 300   8</code></pre>
+</div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "x1" "x2" "x3" "x4" "y1" "y2"</code></pre>
+</div>
+</div>
+</section>
+</section>
+<section id="monte-carlo" class="level2" data-number="A.4">
+<h2 data-number="A.4" class="anchored" data-anchor-id="monte-carlo"><span class="header-section-number">A.4</span> Monte Carlo</h2>
+<section id="montecarlolavaan" class="level3" data-number="A.4.1">
+<h3 data-number="A.4.1" class="anchored" data-anchor-id="montecarlolavaan"><span class="header-section-number">A.4.1</span> <code>monteCarloLavaan()</code></h3>
+<p>Generic Monte Carlo wrapper: pick an estimator, pick a DGP, supply a parameter grid, get one row per trial with unified-label estimates, SEs, fit indices, n_obs / n_miss (per <span class="citation" data-cites="hamaker_critique_2015">Hamaker, Kuiper, and Grasman (<a href="#ref-hamaker_critique_2015" role="doc-biblioref">2015</a>)</span> reporting norms), Heywood diagnostics, and ICCs.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb27"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb27-1"><a href="#cb27-1" aria-hidden="true" tabindex="-1"></a>grid <span class="ot">&lt;-</span> <span class="fu">data.frame</span>(</span>
+<span id="cb27-2"><a href="#cb27-2" aria-hidden="true" tabindex="-1"></a>  <span class="at">stability_p =</span> <span class="fl">0.3</span>, <span class="at">stability_q =</span> <span class="fl">0.3</span>,</span>
+<span id="cb27-3"><a href="#cb27-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">cross_p =</span> <span class="fl">0.10</span>, <span class="at">cross_q =</span> <span class="fl">0.15</span>,</span>
+<span id="cb27-4"><a href="#cb27-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">variance_p =</span> <span class="fl">0.5</span>, <span class="at">variance_q =</span> <span class="fl">0.5</span>,</span>
+<span id="cb27-5"><a href="#cb27-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">variance_between_x =</span> <span class="fl">0.5</span>, <span class="at">variance_between_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb27-6"><a href="#cb27-6" aria-hidden="true" tabindex="-1"></a>  <span class="at">cov_pq =</span> <span class="dv">0</span></span>
+<span id="cb27-7"><a href="#cb27-7" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-8"><a href="#cb27-8" aria-hidden="true" tabindex="-1"></a>mc <span class="ot">&lt;-</span> <span class="fu">monteCarloLavaan</span>(</span>
+<span id="cb27-9"><a href="#cb27-9" aria-hidden="true" tabindex="-1"></a>  <span class="at">estimator =</span> <span class="st">"RICLPM"</span>, <span class="at">dgp =</span> <span class="st">"CLPM"</span>,</span>
+<span id="cb27-10"><a href="#cb27-10" aria-hidden="true" tabindex="-1"></a>  <span class="at">trials =</span> <span class="dv">3</span>, <span class="at">waves =</span> <span class="dv">4</span>, <span class="at">sample_size =</span> <span class="dv">300</span>,</span>
+<span id="cb27-11"><a href="#cb27-11" aria-hidden="true" tabindex="-1"></a>  <span class="at">param_grid =</span> grid</span>
+<span id="cb27-12"><a href="#cb27-12" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb27-13"><a href="#cb27-13" aria-hidden="true" tabindex="-1"></a>mc[, <span class="fu">c</span>(<span class="st">"trial"</span>, <span class="st">"ar_x"</span>, <span class="st">"cl_xy"</span>, <span class="st">"cl_yx"</span>, <span class="st">"cfi"</span>, <span class="st">"rmsea"</span>,</span>
+<span id="cb27-14"><a href="#cb27-14" aria-hidden="true" tabindex="-1"></a>       <span class="st">"n_obs"</span>, <span class="st">"heywood_n_issues"</span>, <span class="st">"icc_x"</span>, <span class="st">"icc_y"</span>)]</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  trial      ar_x      cl_xy      cl_yx       cfi      rmsea n_obs
+1     1 0.1976186 0.09352165 0.02748713 0.4654405 0.12074887   300
+2     2 0.2362457 0.13141748 0.14674358 0.6422439 0.08810517   300
+3     3 0.2046319 0.10201542 0.09191021 0.6452602 0.09374276   300
+  heywood_n_issues     icc_x     icc_y
+1                0 0.4393463 0.3946707
+2                0 0.3794685 0.3793091
+3                0 0.4126455 0.4117835</code></pre>
+</div>
+</div>
+<p><code>run_mc_sims()</code> is a convenience wrapper around <code>monteCarloLavaan()</code> that takes a <code>data_generation</code> argument in place of <code>dgp</code> for backwards compatibility with older scripts.</p>
+</section>
+</section>
+<section id="diagnostics" class="level2" data-number="A.5">
+<h2 data-number="A.5" class="anchored" data-anchor-id="diagnostics"><span class="header-section-number">A.5</span> Diagnostics</h2>
+<p>The diagnostic system answers three questions: <em>did the fit succeed</em>, <em>do the estimates make sense</em>, and <em>does the data warrant this model</em>.</p>
+<section id="lavaandiagnose-bundled-fit" class="level3" data-number="A.5.1">
+<h3 data-number="A.5.1" class="anchored" data-anchor-id="lavaandiagnose-bundled-fit"><span class="header-section-number">A.5.1</span> <code>lavaanDiagnose()</code> — bundled fit</h3>
+<p>One-call wrapper. Fits the lavaan model, captures warnings that lavaan otherwise emits in places hard to intercept (NPD covariance, vcov singular), runs <code>crossLagRSummary()</code>, <code>diagnoseFit()</code>, and optionally <code>iccReport()</code>. Returns everything bundled in a <code>crossLagR_fit</code> object.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb29"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb29-1"><a href="#cb29-1" aria-hidden="true" tabindex="-1"></a>out <span class="ot">&lt;-</span> <span class="fu">lavaanDiagnose</span>(</span>
+<span id="cb29-2"><a href="#cb29-2" aria-hidden="true" tabindex="-1"></a>  <span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>),</span>
+<span id="cb29-3"><a href="#cb29-3" aria-hidden="true" tabindex="-1"></a>  <span class="at">data          =</span> dat_clpm,</span>
+<span id="cb29-4"><a href="#cb29-4" aria-hidden="true" tabindex="-1"></a>  <span class="at">meanstructure =</span> <span class="cn">TRUE</span>,</span>
+<span id="cb29-5"><a href="#cb29-5" aria-hidden="true" tabindex="-1"></a>  <span class="at">icc_vars      =</span> <span class="fu">c</span>(<span class="st">"x"</span>, <span class="st">"y"</span>)</span>
+<span id="cb29-6"><a href="#cb29-6" aria-hidden="true" tabindex="-1"></a>)</span>
+<span id="cb29-7"><a href="#cb29-7" aria-hidden="true" tabindex="-1"></a><span class="fu">names</span>(out)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>[1] "fit"       "summary"   "diagnosis" "icc"       "warnings" </code></pre>
+</div>
+</div>
+</section>
+<section id="crosslagrsummary-labelled-estimates-fit" class="level3" data-number="A.5.2">
+<h3 data-number="A.5.2" class="anchored" data-anchor-id="crosslagrsummary-labelled-estimates-fit"><span class="header-section-number">A.5.2</span> <code>crossLagRSummary()</code> — labelled estimates + fit</h3>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$parameters
+       label                                    description       est
+1       ar_y    Autoregressive effect of Y (Y(t-1) -&gt; Y(t)) 0.4037582
+2      cl_xy Cross-lagged effect of X on Y (X(t-1) -&gt; Y(t)) 0.1431229
+3       ar_x    Autoregressive effect of X (X(t-1) -&gt; X(t)) 0.3659829
+4      cl_yx Cross-lagged effect of Y on X (Y(t-1) -&gt; X(t)) 0.2285630
+5   d_var_y1           Within-person residual variance of Y 1.0130378
+6   d_var_x1           Within-person residual variance of X 1.0736095
+7    d_var_y           Within-person residual variance of Y 1.0662739
+8    d_var_x           Within-person residual variance of X 1.1191022
+9  d_cov_xy1        Within-person residual covariance X&lt;-&gt;Y 0.2653547
+10  d_cov_xy        Within-person residual covariance X&lt;-&gt;Y 0.3825343
+           se         z            p   ci.lower  ci.upper   std.all
+1  0.02634132 15.327942 0.000000e+00 0.35213014 0.4553862 0.3586230
+2  0.02554031  5.603803 2.096986e-08 0.09306478 0.1931809 0.1308688
+3  0.02616535 13.987309 0.000000e+00 0.31469975 0.4172661 0.3251466
+4  0.02698597  8.469700 0.000000e+00 0.17567152 0.2814546 0.1972486
+5  0.06407013 15.811388 0.000000e+00 0.88746260 1.1386129 1.0000000
+6  0.06790103 15.811388 0.000000e+00 0.94052595 1.2066931 1.0000000
+7  0.03893482 27.386128 0.000000e+00 0.98996302 1.1425847 0.8303796
+8  0.04086383 27.386128 0.000000e+00 1.03901053 1.1991938 0.8227354
+9  0.04812525  5.513834 3.510992e-08 0.17103091 0.3596784 0.2544431
+10 0.02988424 12.800537 0.000000e+00 0.32396230 0.4411064 0.3501879
+
+$other
+[1] label est   se    z     p    
+&lt;0 rows&gt; (or 0-length row.names)
+
+$fit
+         chisq             df         pvalue            cfi            tli 
+  1.622595e+01   3.200000e+01   9.906977e-01   1.000000e+00   1.014592e+00 
+         rmsea rmsea.ci.lower rmsea.ci.upper           srmr            aic 
+  0.000000e+00   0.000000e+00   0.000000e+00   2.360260e-02   1.145284e+04 
+           bic 
+  1.150341e+04 
+
+$n_obs
+[1] 500
+
+$n_miss
+[1] 0
+
+$converged
+[1] TRUE
+
+$ci_level
+[1] 0.95
+
+$digits
+[1] 3
+
+attr(,"class")
+[1] "crossLagR_summary"</code></pre>
+</div>
+</div>
+<p>The parameter table joins each estimated unified label to a plain-language description, attaches CI / sig-stars, and reports standardized estimates. The fit block prints chi-square, CFI/TLI, RMSEA + 90% CI, SRMR, AIC, BIC.</p>
+</section>
+<section id="diagnosefit-heywood-detection" class="level3" data-number="A.5.3">
+<h3 data-number="A.5.3" class="anchored" data-anchor-id="diagnosefit-heywood-detection"><span class="header-section-number">A.5.3</span> <code>diagnoseFit()</code> — Heywood detection</h3>
+<p>Scans the lavaan fit for boundary conditions (negative variances, standardized loadings &gt; 1, latent correlations &gt; 1, NPD covariances, vcov singular, non-convergence, iteration-limit hits) and pairs each with an explanation and concrete remedies.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>diagnosis</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>$issues
+list()
+
+$n_issues
+[1] 0
+
+$codes
+character(0)
+
+$summary
+[1] "No Heywood-class issues detected."
+
+attr(,"class")
+[1] "crossLagR_diagnosis"</code></pre>
+</div>
+</div>
+<p>Call <code>heywoodHelp()</code> without a fit to browse the full catalog of detectable codes; <code>heywoodHelp("negative_variance")</code> prints just one entry.</p>
+</section>
+<section id="iccreport-between-vs-within" class="level3" data-number="A.5.4">
+<h3 data-number="A.5.4" class="anchored" data-anchor-id="iccreport-between-vs-within"><span class="header-section-number">A.5.4</span> <code>iccReport()</code> — between vs within</h3>
+<p>Computes the empirical ICC for each construct directly from data — no model fit required. When any ICC exceeds the threshold (default 0.65), a single warning fires recommending sensitivity analysis with the bundled Shiny simulator (<code>launch_shiny_sim()</code>), because CLPM vs RI-CLPM estimates can diverge substantially in high-ICC regimes <span class="citation" data-cites="hamaker_critique_2015">(<a href="#ref-hamaker_critique_2015" role="doc-biblioref">Hamaker, Kuiper, and Grasman 2015</a>)</span>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>icc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>  variable between_var within_var total_var       icc n_obs n_waves
+1        x   0.6437712  0.7073987  1.351170 0.4764547   500       4
+2        y   0.6016553  0.6672289  1.268884 0.4741609   500       4
+  exceeds_threshold
+1             FALSE
+2             FALSE</code></pre>
+</div>
+</div>
+<p><code>withinBetween()</code> is the underlying decomposition; it accepts long-format data and supports both an empirical (<code>method = "dplyr"</code>) and a TSO-based (<code>method = "tso"</code>) split.</p>
+</section>
+<section id="unifiedlabels-label-catalog" class="level3" data-number="A.5.5">
+<h3 data-number="A.5.5" class="anchored" data-anchor-id="unifiedlabels-label-catalog"><span class="header-section-number">A.5.5</span> <code>unifiedLabels()</code> — label catalog</h3>
+<p>Browse every unified label and its description, grouped by <code>dynamics / dynamic_residuals / random_intercepts / growth / trait_state / residuals / change</code>.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unifiedLabels</span>(<span class="at">print =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output cell-output-stdout">
+<pre><code>     label                                    description             group
+1     ar_x    Autoregressive effect of X (X(t-1) -&gt; X(t))          dynamics
+2     ar_y    Autoregressive effect of Y (Y(t-1) -&gt; Y(t))          dynamics
+3     ar_z    Autoregressive effect of Z (Z(t-1) -&gt; Z(t))          dynamics
+4    cl_xy Cross-lagged effect of X on Y (X(t-1) -&gt; Y(t))          dynamics
+5    cl_yx Cross-lagged effect of Y on X (Y(t-1) -&gt; X(t))          dynamics
+6    cl_xz Cross-lagged effect of X on Z (X(t-1) -&gt; Z(t))          dynamics
+7    cl_yz Cross-lagged effect of Y on Z (Y(t-1) -&gt; Z(t))          dynamics
+8    cl_zx Cross-lagged effect of Z on X (Z(t-1) -&gt; X(t))          dynamics
+9    cl_zy Cross-lagged effect of Z on Y (Z(t-1) -&gt; Y(t))          dynamics
+10 d_var_x           Within-person residual variance of X dynamic_residuals</code></pre>
+</div>
+</div>
+</section>
+<section id="shiny-simulator-launch_shiny_sim" class="level3" data-number="A.5.6">
+<h3 data-number="A.5.6" class="anchored" data-anchor-id="shiny-simulator-launch_shiny_sim"><span class="header-section-number">A.5.6</span> Shiny simulator — <code>launch_shiny_sim()</code></h3>
+<p>Interactive simulator for visualising bias and recovery across estimator / DGP combinations. Useful when an ICC warning fires and you want to see how the choice of model bites on your data:</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">launch_shiny_sim</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+</div>
+</section>
+</section>
+<section id="sec-output-objects" class="level2" data-number="A.6">
+<h2 data-number="A.6" class="anchored" data-anchor-id="sec-output-objects"><span class="header-section-number">A.6</span> Output object reference</h2>
+<p>The package returns S3 objects so users get pretty-printed summaries by default while retaining access to the raw fields.</p>
+<section id="crosslagr_fit" class="level3" data-number="A.6.1">
+<h3 data-number="A.6.1" class="anchored" data-anchor-id="crosslagr_fit"><span class="header-section-number">A.6.1</span> <code>crossLagR_fit</code></h3>
+<p>Returned by <code>lavaanDiagnose()</code>. A list with class <code>crossLagR_fit</code> and elements:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Class</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$fit</code></td>
+<td><code>lavaan</code> (S4)</td>
+<td>The raw lavaan fit. Use for anything not exposed in the summary.</td>
+</tr>
+<tr class="even">
+<td><code>$summary</code></td>
+<td><code>crossLagR_summary</code></td>
+<td>Labelled parameter table + fit indices.</td>
+</tr>
+<tr class="odd">
+<td><code>$diagnosis</code></td>
+<td><code>crossLagR_diagnosis</code></td>
+<td>Heywood-case detection result.</td>
+</tr>
+<tr class="even">
+<td><code>$icc</code></td>
+<td><code>crossLagR_icc</code> or NULL</td>
+<td>ICC report (only if <code>icc_vars</code> was supplied).</td>
+</tr>
+<tr class="odd">
+<td><code>$warnings</code></td>
+<td>character</td>
+<td>All lavaan warning messages captured during the fit.</td>
+</tr>
+</tbody>
+</table>
+<p><code>print()</code> and <code>summary()</code> walk all three diagnostic sub-objects in order.</p>
+</section>
+<section id="crosslagr_summary" class="level3" data-number="A.6.2">
+<h3 data-number="A.6.2" class="anchored" data-anchor-id="crosslagr_summary"><span class="header-section-number">A.6.2</span> <code>crossLagR_summary</code></h3>
+<p>Returned by <code>crossLagRSummary()</code> (and stored at <code>out$summary</code>).</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Class</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$parameters</code></td>
+<td>data.frame</td>
+<td>One row per recognized unified label: <code>label, description, est, se, z, p, ci.lower, ci.upper, std.all</code>.</td>
+</tr>
+<tr class="even">
+<td><code>$other</code></td>
+<td>data.frame</td>
+<td>Estimated parameters whose label was <em>not</em> in the unified catalog (<code>label, est, se, z, p</code>).</td>
+</tr>
+<tr class="odd">
+<td><code>$fit</code></td>
+<td>named numeric</td>
+<td><code>chisq, df, pvalue, cfi, tli, rmsea, rmsea.ci.lower, rmsea.ci.upper, srmr, aic, bic</code>.</td>
+</tr>
+<tr class="even">
+<td><code>$n_obs</code>, <code>$n_miss</code></td>
+<td>integer</td>
+<td>Sample-size bookkeeping (always reported alongside estimates).</td>
+</tr>
+<tr class="odd">
+<td><code>$converged</code></td>
+<td>logical</td>
+<td>From <code>lavInspect(fit, "converged")</code>.</td>
+</tr>
+<tr class="even">
+<td><code>$ci_level</code>, <code>$digits</code></td>
+<td>numeric / int</td>
+<td>Stored for the print method.</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="crosslagr_diagnosis" class="level3" data-number="A.6.3">
+<h3 data-number="A.6.3" class="anchored" data-anchor-id="crosslagr_diagnosis"><span class="header-section-number">A.6.3</span> <code>crossLagR_diagnosis</code></h3>
+<p>Returned by <code>diagnoseFit()</code> (and stored at <code>out$diagnosis</code>).</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Field</th>
+<th>Class</th>
+<th>Contents</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>$issues</code></td>
+<td>list</td>
+<td>One entry per detected issue: <code>code, severity, parameters, message, explanation, remedies</code>.</td>
+</tr>
+<tr class="even">
+<td><code>$n_issues</code></td>
+<td>integer</td>
+<td>Number of detected issues.</td>
+</tr>
+<tr class="odd">
+<td><code>$codes</code></td>
+<td>character</td>
+<td>Detected issue codes (also semicolon-joined in MC output’s <code>heywood_codes</code> column).</td>
+</tr>
+<tr class="even">
+<td><code>$summary</code></td>
+<td>character</td>
+<td>One-line summary string.</td>
+</tr>
+</tbody>
+</table>
+<p>Detected codes:</p>
+<table class="caption-top table">
+<colgroup>
+<col style="width: 33%">
+<col style="width: 33%">
+<col style="width: 33%">
+</colgroup>
+<thead>
+<tr class="header">
+<th>Code</th>
+<th>Severity</th>
+<th>Trigger</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>non_convergence</code></td>
+<td>high</td>
+<td><code>lavInspect(fit, "converged")</code> is <code>FALSE</code></td>
+</tr>
+<tr class="even">
+<td><code>negative_variance</code></td>
+<td>high</td>
+<td>any <code>~~</code> variance row with <code>est &lt; tol_negative</code></td>
+</tr>
+<tr class="odd">
+<td><code>std_loading_gt_one</code></td>
+<td>medium</td>
+<td><code>=~</code> row with <code>|std.all| &gt; 1</code></td>
+</tr>
+<tr class="even">
+<td><code>std_correlation_gt_one</code></td>
+<td>high</td>
+<td>latent <code>~~</code> row with <code>|std.all| &gt; 1</code></td>
+</tr>
+<tr class="odd">
+<td><code>npd_covariance</code></td>
+<td>high</td>
+<td>warning text matches non-positive-definite</td>
+</tr>
+<tr class="even">
+<td><code>vcov_not_pd</code></td>
+<td>medium</td>
+<td>warning text matches vcov singular</td>
+</tr>
+<tr class="odd">
+<td><code>iter_limit</code></td>
+<td>high</td>
+<td>warning text matches iteration limit reached</td>
+</tr>
+</tbody>
+</table>
+</section>
+<section id="crosslagr_icc" class="level3" data-number="A.6.4">
+<h3 data-number="A.6.4" class="anchored" data-anchor-id="crosslagr_icc"><span class="header-section-number">A.6.4</span> <code>crossLagR_icc</code></h3>
+<p>Returned by <code>iccReport()</code> (and stored at <code>out$icc</code>). A data.frame with class <code>crossLagR_icc</code>, one row per construct, columns:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Column</th>
+<th>Meaning</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td><code>variable</code></td>
+<td>Construct name (stem or column).</td>
+</tr>
+<tr class="even">
+<td><code>between_var</code></td>
+<td>Var of person means.</td>
+</tr>
+<tr class="odd">
+<td><code>within_var</code></td>
+<td>Var of within-person deviations.</td>
+</tr>
+<tr class="even">
+<td><code>total_var</code></td>
+<td>Sum of the two.</td>
+</tr>
+<tr class="odd">
+<td><code>icc</code></td>
+<td><code>between_var / total_var</code>.</td>
+</tr>
+<tr class="even">
+<td><code>n_obs</code></td>
+<td>Complete cases used.</td>
+</tr>
+<tr class="odd">
+<td><code>n_waves</code></td>
+<td>Number of wave columns matched.</td>
+</tr>
+<tr class="even">
+<td><code>exceeds_threshold</code></td>
+<td>TRUE if <code>icc &gt; threshold</code> (default 0.65).</td>
+</tr>
+</tbody>
+</table>
+<p>The threshold is stored as <code>attr(x, "threshold")</code>. The print method repeats the Shiny-sensitivity recommendation for any flagged variable.</p>
+</section>
+<section id="monte-carlo-output" class="level3" data-number="A.6.5">
+<h3 data-number="A.6.5" class="anchored" data-anchor-id="monte-carlo-output"><span class="header-section-number">A.6.5</span> Monte Carlo output</h3>
+<p><code>monteCarloLavaan()</code> returns a plain <code>data.frame</code> (one row per trial) with the following column groups:</p>
+<table class="caption-top table">
+<thead>
+<tr class="header">
+<th>Group</th>
+<th>Columns</th>
+</tr>
+</thead>
+<tbody>
+<tr class="odd">
+<td>Bookkeeping</td>
+<td><code>trial, param_combo, estimator, dgp</code></td>
+</tr>
+<tr class="even">
+<td>Estimates</td>
+<td><code>ar_x, ar_y, cl_xy, cl_yx</code> (+ <code>se_*</code>, <code>std_*</code>)</td>
+</tr>
+<tr class="odd">
+<td>Truth</td>
+<td><code>true_ar_x, true_ar_y, true_cl_xy, true_cl_yx</code></td>
+</tr>
+<tr class="even">
+<td>Fit</td>
+<td><code>chisq, df, pvalue, cfi, tli, rmsea, srmr, aic, bic</code></td>
+</tr>
+<tr class="odd">
+<td>Sample</td>
+<td><code>n_obs, n_miss, converged</code></td>
+</tr>
+<tr class="even">
+<td>Warnings</td>
+<td><code>warning_count, warn_npd, warn_heywood, warn_iter</code></td>
+</tr>
+<tr class="odd">
+<td>Heywood diag.</td>
+<td><code>heywood_n_issues, heywood_codes</code></td>
+</tr>
+<tr class="even">
+<td>ICC</td>
+<td><code>icc_x, icc_y, icc_exceeds</code></td>
+</tr>
+<tr class="odd">
+<td>Errors</td>
+<td><code>error_occurred, error_message</code></td>
+</tr>
+</tbody>
+</table>
+
+
+<div id="refs" class="references csl-bib-body hanging-indent" data-entry-spacing="0" role="list">
+<div id="ref-bollen_general_2010" class="csl-entry" role="listitem">
+Bollen, Kenneth A., and Jennie E. Brand. 2010. <span>“A General Panel Model with Random and Fixed Effects: A Structural Equations Approach.”</span> <em>Social Forces</em> 89 (1): 1–34.
+</div>
+<div id="ref-hamaker_critique_2015" class="csl-entry" role="listitem">
+Hamaker, Ellen L., Rebecca M. Kuiper, and Raoul P. P. P. Grasman. 2015. <span>“A Critique of the Cross-Lagged Panel Model.”</span> <em>Psychological Methods</em> 20 (1): 102–16. <a href="https://doi.org/10.1037/a0038889">https://doi.org/10.1037/a0038889</a>.
+</div>
+<div id="ref-usami2019" class="csl-entry" role="listitem">
+Usami, Satoshi, Kou Murayama, and Ellen L. Hamaker. 2019. <span>“A Unified Framework of Longitudinal Models to Examine Reciprocal Relations.”</span> <em>Psychological Methods</em> 24 (5): 637–57. <a href="https://doi.org/10.1037/met0000210">https://doi.org/10.1037/met0000210</a>.
+</div>
+</div>
+</section>
+</section>
+
+</main> <!-- /main -->
+<script id="quarto-html-after-body" type="application/javascript">
+  window.document.addEventListener("DOMContentLoaded", function (event) {
+    const icon = "";
+    const anchorJS = new window.AnchorJS();
+    anchorJS.options = {
+      placement: 'right',
+      icon: icon
+    };
+    anchorJS.add('.anchored');
+    const isCodeAnnotation = (el) => {
+      for (const clz of el.classList) {
+        if (clz.startsWith('code-annotation-')) {                     
+          return true;
+        }
+      }
+      return false;
+    }
+    const onCopySuccess = function(e) {
+      // button target
+      const button = e.trigger;
+      // don't keep focus
+      button.blur();
+      // flash "checked"
+      button.classList.add('code-copy-button-checked');
+      var currentTitle = button.getAttribute("title");
+      button.setAttribute("title", "Copied!");
+      let tooltip;
+      if (window.bootstrap) {
+        button.setAttribute("data-bs-toggle", "tooltip");
+        button.setAttribute("data-bs-placement", "left");
+        button.setAttribute("data-bs-title", "Copied!");
+        tooltip = new bootstrap.Tooltip(button, 
+          { trigger: "manual", 
+            customClass: "code-copy-button-tooltip",
+            offset: [0, -8]});
+        tooltip.show();    
+      }
+      setTimeout(function() {
+        if (tooltip) {
+          tooltip.hide();
+          button.removeAttribute("data-bs-title");
+          button.removeAttribute("data-bs-toggle");
+          button.removeAttribute("data-bs-placement");
+        }
+        button.setAttribute("title", currentTitle);
+        button.classList.remove('code-copy-button-checked');
+      }, 1000);
+      // clear code selection
+      e.clearSelection();
+    }
+    const getTextToCopy = function(trigger) {
+      const outerScaffold = trigger.parentElement.cloneNode(true);
+      const codeEl = outerScaffold.querySelector('code');
+      for (const childEl of codeEl.children) {
+        if (isCodeAnnotation(childEl)) {
+          childEl.remove();
+        }
+      }
+      return codeEl.innerText;
+    }
+    const clipboard = new window.ClipboardJS('.code-copy-button:not([data-in-quarto-modal])', {
+      text: getTextToCopy
+    });
+    clipboard.on('success', onCopySuccess);
+    if (window.document.getElementById('quarto-embedded-source-code-modal')) {
+      const clipboardModal = new window.ClipboardJS('.code-copy-button[data-in-quarto-modal]', {
+        text: getTextToCopy,
+        container: window.document.getElementById('quarto-embedded-source-code-modal')
+      });
+      clipboardModal.on('success', onCopySuccess);
+    }
+      var localhostRegex = new RegExp(/^(?:http|https):\/\/localhost\:?[0-9]*\//);
+      var mailtoRegex = new RegExp(/^mailto:/);
+        var filterRegex = new RegExp('/' + window.location.host + '/');
+      var isInternal = (href) => {
+          return filterRegex.test(href) || localhostRegex.test(href) || mailtoRegex.test(href);
+      }
+      // Inspect non-navigation links and adorn them if external
+     var links = window.document.querySelectorAll('a[href]:not(.nav-link):not(.navbar-brand):not(.toc-action):not(.sidebar-link):not(.sidebar-item-toggle):not(.pagination-link):not(.no-external):not([aria-hidden]):not(.dropdown-item):not(.quarto-navigation-tool):not(.about-link)');
+      for (var i=0; i<links.length; i++) {
+        const link = links[i];
+        if (!isInternal(link.href)) {
+          // undo the damage that might have been done by quarto-nav.js in the case of
+          // links that we want to consider external
+          if (link.dataset.originalHref !== undefined) {
+            link.href = link.dataset.originalHref;
+          }
+        }
+      }
+    function tippyHover(el, contentFn, onTriggerFn, onUntriggerFn) {
+      const config = {
+        allowHTML: true,
+        maxWidth: 500,
+        delay: 100,
+        arrow: false,
+        appendTo: function(el) {
+            return el.parentElement;
+        },
+        interactive: true,
+        interactiveBorder: 10,
+        theme: 'quarto',
+        placement: 'bottom-start',
+      };
+      if (contentFn) {
+        config.content = contentFn;
+      }
+      if (onTriggerFn) {
+        config.onTrigger = onTriggerFn;
+      }
+      if (onUntriggerFn) {
+        config.onUntrigger = onUntriggerFn;
+      }
+      window.tippy(el, config); 
+    }
+    const noterefs = window.document.querySelectorAll('a[role="doc-noteref"]');
+    for (var i=0; i<noterefs.length; i++) {
+      const ref = noterefs[i];
+      tippyHover(ref, function() {
+        // use id or data attribute instead here
+        let href = ref.getAttribute('data-footnote-href') || ref.getAttribute('href');
+        try { href = new URL(href).hash; } catch {}
+        const id = href.replace(/^#\/?/, "");
+        const note = window.document.getElementById(id);
+        if (note) {
+          return note.innerHTML;
+        } else {
+          return "";
+        }
+      });
+    }
+    const xrefs = window.document.querySelectorAll('a.quarto-xref');
+    const processXRef = (id, note) => {
+      // Strip column container classes
+      const stripColumnClz = (el) => {
+        el.classList.remove("page-full", "page-columns");
+        if (el.children) {
+          for (const child of el.children) {
+            stripColumnClz(child);
+          }
+        }
+      }
+      stripColumnClz(note)
+      if (id === null || id.startsWith('sec-')) {
+        // Special case sections, only their first couple elements
+        const container = document.createElement("div");
+        if (note.children && note.children.length > 2) {
+          container.appendChild(note.children[0].cloneNode(true));
+          for (let i = 1; i < note.children.length; i++) {
+            const child = note.children[i];
+            if (child.tagName === "P" && child.innerText === "") {
+              continue;
+            } else {
+              container.appendChild(child.cloneNode(true));
+              break;
+            }
+          }
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(container);
+          }
+          return container.innerHTML
+        } else {
+          if (window.Quarto?.typesetMath) {
+            window.Quarto.typesetMath(note);
+          }
+          return note.innerHTML;
+        }
+      } else {
+        // Remove any anchor links if they are present
+        const anchorLink = note.querySelector('a.anchorjs-link');
+        if (anchorLink) {
+          anchorLink.remove();
+        }
+        if (window.Quarto?.typesetMath) {
+          window.Quarto.typesetMath(note);
+        }
+        if (note.classList.contains("callout")) {
+          return note.outerHTML;
+        } else {
+          return note.innerHTML;
+        }
+      }
+    }
+    for (var i=0; i<xrefs.length; i++) {
+      const xref = xrefs[i];
+      tippyHover(xref, undefined, function(instance) {
+        instance.disable();
+        let url = xref.getAttribute('href');
+        let hash = undefined; 
+        if (url.startsWith('#')) {
+          hash = url;
+        } else {
+          try { hash = new URL(url).hash; } catch {}
+        }
+        if (hash) {
+          const id = hash.replace(/^#\/?/, "");
+          const note = window.document.getElementById(id);
+          if (note !== null) {
+            try {
+              const html = processXRef(id, note.cloneNode(true));
+              instance.setContent(html);
+            } finally {
+              instance.enable();
+              instance.show();
+            }
+          } else {
+            // See if we can fetch this
+            fetch(url.split('#')[0])
+            .then(res => res.text())
+            .then(html => {
+              const parser = new DOMParser();
+              const htmlDoc = parser.parseFromString(html, "text/html");
+              const note = htmlDoc.getElementById(id);
+              if (note !== null) {
+                const html = processXRef(id, note);
+                instance.setContent(html);
+              } 
+            }).finally(() => {
+              instance.enable();
+              instance.show();
+            });
+          }
+        } else {
+          // See if we can fetch a full url (with no hash to target)
+          // This is a special case and we should probably do some content thinning / targeting
+          fetch(url)
+          .then(res => res.text())
+          .then(html => {
+            const parser = new DOMParser();
+            const htmlDoc = parser.parseFromString(html, "text/html");
+            const note = htmlDoc.querySelector('main.content');
+            if (note !== null) {
+              // This should only happen for chapter cross references
+              // (since there is no id in the URL)
+              // remove the first header
+              if (note.children.length > 0 && note.children[0].tagName === "HEADER") {
+                note.children[0].remove();
+              }
+              const html = processXRef(null, note);
+              instance.setContent(html);
+            } 
+          }).finally(() => {
+            instance.enable();
+            instance.show();
+          });
+        }
+      }, function(instance) {
+      });
+    }
+        let selectedAnnoteEl;
+        const selectorForAnnotation = ( cell, annotation) => {
+          let cellAttr = 'data-code-cell="' + cell + '"';
+          let lineAttr = 'data-code-annotation="' +  annotation + '"';
+          const selector = 'span[' + cellAttr + '][' + lineAttr + ']';
+          return selector;
+        }
+        const selectCodeLines = (annoteEl) => {
+          const doc = window.document;
+          const targetCell = annoteEl.getAttribute("data-target-cell");
+          const targetAnnotation = annoteEl.getAttribute("data-target-annotation");
+          const annoteSpan = window.document.querySelector(selectorForAnnotation(targetCell, targetAnnotation));
+          const lines = annoteSpan.getAttribute("data-code-lines").split(",");
+          const lineIds = lines.map((line) => {
+            return targetCell + "-" + line;
+          })
+          let top = null;
+          let height = null;
+          let parent = null;
+          if (lineIds.length > 0) {
+              //compute the position of the single el (top and bottom and make a div)
+              const el = window.document.getElementById(lineIds[0]);
+              top = el.offsetTop;
+              height = el.offsetHeight;
+              parent = el.parentElement.parentElement;
+            if (lineIds.length > 1) {
+              const lastEl = window.document.getElementById(lineIds[lineIds.length - 1]);
+              const bottom = lastEl.offsetTop + lastEl.offsetHeight;
+              height = bottom - top;
+            }
+            if (top !== null && height !== null && parent !== null) {
+              // cook up a div (if necessary) and position it 
+              let div = window.document.getElementById("code-annotation-line-highlight");
+              if (div === null) {
+                div = window.document.createElement("div");
+                div.setAttribute("id", "code-annotation-line-highlight");
+                div.style.position = 'absolute';
+                parent.appendChild(div);
+              }
+              div.style.top = top - 2 + "px";
+              div.style.height = height + 4 + "px";
+              div.style.left = 0;
+              let gutterDiv = window.document.getElementById("code-annotation-line-highlight-gutter");
+              if (gutterDiv === null) {
+                gutterDiv = window.document.createElement("div");
+                gutterDiv.setAttribute("id", "code-annotation-line-highlight-gutter");
+                gutterDiv.style.position = 'absolute';
+                const codeCell = window.document.getElementById(targetCell);
+                const gutter = codeCell.querySelector('.code-annotation-gutter');
+                gutter.appendChild(gutterDiv);
+              }
+              gutterDiv.style.top = top - 2 + "px";
+              gutterDiv.style.height = height + 4 + "px";
+            }
+            selectedAnnoteEl = annoteEl;
+          }
+        };
+        const unselectCodeLines = () => {
+          const elementsIds = ["code-annotation-line-highlight", "code-annotation-line-highlight-gutter"];
+          elementsIds.forEach((elId) => {
+            const div = window.document.getElementById(elId);
+            if (div) {
+              div.remove();
+            }
+          });
+          selectedAnnoteEl = undefined;
+        };
+          // Handle positioning of the toggle
+      window.addEventListener(
+        "resize",
+        throttle(() => {
+          elRect = undefined;
+          if (selectedAnnoteEl) {
+            selectCodeLines(selectedAnnoteEl);
+          }
+        }, 10)
+      );
+      function throttle(fn, ms) {
+      let throttle = false;
+      let timer;
+        return (...args) => {
+          if(!throttle) { // first call gets through
+              fn.apply(this, args);
+              throttle = true;
+          } else { // all the others get throttled
+              if(timer) clearTimeout(timer); // cancel #2
+              timer = setTimeout(() => {
+                fn.apply(this, args);
+                timer = throttle = false;
+              }, ms);
+          }
+        };
+      }
+        // Attach click handler to the DT
+        const annoteDls = window.document.querySelectorAll('dt[data-target-cell]');
+        for (const annoteDlNode of annoteDls) {
+          annoteDlNode.addEventListener('click', (event) => {
+            const clickedEl = event.target;
+            if (clickedEl !== selectedAnnoteEl) {
+              unselectCodeLines();
+              const activeEl = window.document.querySelector('dt[data-target-cell].code-annotation-active');
+              if (activeEl) {
+                activeEl.classList.remove('code-annotation-active');
+              }
+              selectCodeLines(clickedEl);
+              clickedEl.classList.add('code-annotation-active');
+            } else {
+              // Unselect the line
+              unselectCodeLines();
+              clickedEl.classList.remove('code-annotation-active');
+            }
+          });
+        }
+    const findCites = (el) => {
+      const parentEl = el.parentElement;
+      if (parentEl) {
+        const cites = parentEl.dataset.cites;
+        if (cites) {
+          return {
+            el,
+            cites: cites.split(' ')
+          };
+        } else {
+          return findCites(el.parentElement)
+        }
+      } else {
+        return undefined;
+      }
+    };
+    var bibliorefs = window.document.querySelectorAll('a[role="doc-biblioref"]');
+    for (var i=0; i<bibliorefs.length; i++) {
+      const ref = bibliorefs[i];
+      const citeInfo = findCites(ref);
+      if (citeInfo) {
+        tippyHover(citeInfo.el, function() {
+          var popup = window.document.createElement('div');
+          citeInfo.cites.forEach(function(cite) {
+            var citeDiv = window.document.createElement('div');
+            citeDiv.classList.add('hanging-indent');
+            citeDiv.classList.add('csl-entry');
+            var biblioDiv = window.document.getElementById('ref-' + cite);
+            if (biblioDiv) {
+              citeDiv.innerHTML = biblioDiv.innerHTML;
+            }
+            popup.appendChild(citeDiv);
+          });
+          return popup.innerHTML;
+        });
+      }
+    }
+  });
+  </script>
+<nav class="page-navigation">
+  <div class="nav-page nav-page-previous">
+      <a href="./07_liss.html" class="pagination-link" aria-label="Replication: Bakker, Lelkes, &amp; Malka (2021)">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Replication: Bakker, Lelkes, &amp; Malka (2021)</span></span>
+      </a>          
+  </div>
+  <div class="nav-page nav-page-next">
+  </div>
+</nav>
+</div> <!-- /content -->
+
+
+
+
+</body></html>

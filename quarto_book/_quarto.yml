@@ -23,6 +23,8 @@ book:
       chapters:
         - 06_iscap.qmd
         - 07_liss.qmd
+  appendices:
+    - A_package_reference.qmd
 #
 bibliography:
   - book.bib

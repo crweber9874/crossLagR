@@ -9,7 +9,7 @@
 <meta name="author" content="Christopher Weber">
 <meta name="author" content="Adam Panish">
 <meta name="author" content="Bang Zheng">
-<meta name="dcterms.date" content="2026-05-28">
+<meta name="dcterms.date" content="2026-06-04">
 
 <title>crossLagR</title>
 <style>
@@ -231,6 +231,23 @@ div.csl-indent {
 </li>
       </ul>
   </li>
+        <li class="sidebar-item sidebar-item-section">
+      <div class="sidebar-item-container"> 
+            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
+ <span class="menu-text">Appendices</span></a>
+          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
+            <i class="bi bi-chevron-right ms-2"></i>
+          </a> 
+      </div>
+      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
+          <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./A_package_reference.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">A</span>&nbsp; <span class="chapter-title">Package Reference</span></span></a>
+  </div>
+</li>
+      </ul>
+  </li>
     </ul>
     </div>
 </nav>
@@ -274,7 +291,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">May 28, 2026</p>
+      <p class="date">June 4, 2026</p>
     </div>
   </div>
   
@@ -288,6 +305,11 @@ div.csl-indent {
 
 <section id="preface" class="level1 unnumbered">
 <h1 class="unnumbered">Preface</h1>
+<div class="quarto-figure quarto-figure-center">
+<figure class="figure">
+<p><img src="../man/figures/logo.png" class="img-fluid quarto-figure quarto-figure-center figure-img" width="180"></p>
+</figure>
+</div>
 <p>The <code>crossLagR</code> package provides tools for estimating, simulating, and evaluating cross-lagged panel models in R. It supports a range of structural equation models for panel data, including the standard Cross-Lagged Panel Model (CLPM), the Random Intercept CLPM (RI-CLPM), the Bollen and Brand dynamic panel model, latent change score models, and latent growth models.</p>
 <p>The package is available on GitHub:</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"crweber9874/crossLagR"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
@@ -302,7 +324,7 @@ div.csl-indent {
 <li><strong>Theoretical Background.</strong> An overview of the CLPM, RI-CLPM, LCM, LGM, and related models, including their mathematical formulations and the sources of bias in the standard CLPM. The chapter concludes with a unified framework <span class="citation" data-cites="usami2019">(<a href="#ref-usami2019" role="doc-biblioref">Usami, Murayama, and Hamaker 2019</a>)</span> that organizes all models as special cases sharing common parameter types (<code>ar_x</code>, <code>ar_y</code>, <code>cl_xy</code>, <code>cl_yx</code>, etc.).</li>
 <li><strong>Using <code>crossLagR</code>.</strong> A walkthrough of the package’s estimation, simulation, and Monte Carlo functions, with path diagrams and worked examples using simulated data. All estimation functions use the unified labeling convention.</li>
 <li><strong>Monte Carlo Simulations.</strong> Compares estimator performance (CLPM, RI-CLPM, Bollen &amp; Brand, Latent Change) under varying degrees of unobserved heterogeneity using 4-wave panel data.</li>
-<li><strong>Applied Example.</strong> An empirical application using the Institute for the Study of Citizens and Politics (ISCAP) Panel, examining the relationship between political legitimacy and partisanship from 2012–2020.</li>
+<li><strong>Applied Example.</strong> An empirical application using the Institute for the Study of Citizens and Politics (ISCAP) Panel, examining the relationship between political legitimacy and partisanship from 2012–2020, as well as the Dutch LISS data.</li>
 </ol>
 
 
