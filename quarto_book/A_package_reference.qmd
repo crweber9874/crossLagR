@@ -217,6 +217,28 @@ out$diagnosis
 
 Call `heywoodHelp()` without a fit to browse the full catalog of detectable codes; `heywoodHelp("negative_variance")` prints just one entry.
 
+### `sensitivityCLPM()` --- "what would my CLPM look like under trait variance?"
+
+The CLPM's AR and CL estimates are biased when the data carry stable trait variance (between-person ICC > 0), because the lagged predictors then correlate with the residual --- the classic Hamaker, Kuiper & Grasman [-@hamaker_critique_2015] critique, formalized analytically in the CLPM chapter (univariate case: $b^{\text{CLPM}}_{xx} \approx \text{ICC}_x + (1 - \text{ICC}_x)\,b^{\text{true}}_{xx}$).
+
+`sensitivityCLPM()` operationalizes that critique. It takes a fitted CLPM, treats its AR/CL estimates as the (hypothetical) within-person truth, injects between-person trait variance at a grid of ICC levels, simulates from the resulting RI-CLPM, then refits **both** a CLPM and an RI-CLPM on the simulated data. The RI-CLPM curve should stay flat near the baseline (it recovers the within-person truth); the CLPM curve drifts away as ICC grows --- the bias made visible.
+
+```{r}
+#| label: ref-sens
+#| warning: false
+#| fig-width: 9
+#| fig-height: 5.5
+fit_for_sens <- lavaan(estimateCLPM(waves = 4),
+                       data = dat_clpm, meanstructure = TRUE)
+sens <- sensitivityCLPM(fit_for_sens,
+                        icc_grid = c(0, 0.2, 0.4, 0.6),
+                        n_sims   = 15,
+                        seed     = 7)
+plot(sens)
+```
+
+**Important caveat** built into the docs: this is a *what-if*, not a calibration. The supplied CLPM estimates already embed any bias present in the original data; treating them as the within-person truth is a sensitivity device. To get the actually-implied within-person dynamics on your data, just fit an RI-CLPM directly with `estimateRICLPM()`.
+
 ### `iccReport()` --- between vs within
 
 Computes the empirical ICC for each construct directly from data --- no model fit required. When any ICC exceeds the threshold (default 0.65), a single warning fires recommending sensitivity analysis with the bundled Shiny simulator (`launch_shiny_sim()`), because CLPM vs RI-CLPM estimates can diverge substantially in high-ICC regimes [@hamaker_critique_2015].

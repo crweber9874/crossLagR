@@ -1,2 +1,12 @@
 exportPattern("^[[:alpha:]]+")
 
+S3method(print,   crossLagR_diagnosis)
+S3method(summary, crossLagR_diagnosis)
+S3method(print,   crossLagR_summary)
+S3method(summary, crossLagR_summary)
+S3method(print,   crossLagR_icc)
+S3method(print,   crossLagR_fit)
+S3method(summary, crossLagR_fit)
+S3method(print,   crossLagR_sensitivity)
+S3method(plot,    crossLagR_sensitivity)
+

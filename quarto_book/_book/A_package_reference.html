@@ -125,6 +125,35 @@ div.csl-indent {
   }
 }</script>
 
+  <script src="https://cdnjs.cloudflare.com/polyfill/v3/polyfill.min.js?features=es6"></script>
+  <script src="https://cdn.jsdelivr.net/npm/mathjax@3/es5/tex-chtml-full.js" type="text/javascript"></script>
+
+<script type="text/javascript">
+const typesetMath = (el) => {
+  if (window.MathJax) {
+    // MathJax Typeset
+    window.MathJax.typeset([el]);
+  } else if (window.katex) {
+    // KaTeX Render
+    var mathElements = el.getElementsByClassName("math");
+    var macros = [];
+    for (var i = 0; i < mathElements.length; i++) {
+      var texText = mathElements[i].firstChild;
+      if (mathElements[i].tagName == "SPAN" && texText && texText.data) {
+        window.katex.render(texText.data, mathElements[i], {
+          displayMode: mathElements[i].classList.contains('display'),
+          throwOnError: false,
+          macros: macros,
+          fleqn: false
+        });
+      }
+    }
+  }
+}
+window.Quarto = {
+  typesetMath
+};
+</script>
 
 </head>
 
@@ -280,9 +309,10 @@ div.csl-indent {
   <li><a href="#lavaandiagnose-bundled-fit" id="toc-lavaandiagnose-bundled-fit" class="nav-link" data-scroll-target="#lavaandiagnose-bundled-fit"><span class="header-section-number">A.5.1</span> <code>lavaanDiagnose()</code> — bundled fit</a></li>
   <li><a href="#crosslagrsummary-labelled-estimates-fit" id="toc-crosslagrsummary-labelled-estimates-fit" class="nav-link" data-scroll-target="#crosslagrsummary-labelled-estimates-fit"><span class="header-section-number">A.5.2</span> <code>crossLagRSummary()</code> — labelled estimates + fit</a></li>
   <li><a href="#diagnosefit-heywood-detection" id="toc-diagnosefit-heywood-detection" class="nav-link" data-scroll-target="#diagnosefit-heywood-detection"><span class="header-section-number">A.5.3</span> <code>diagnoseFit()</code> — Heywood detection</a></li>
-  <li><a href="#iccreport-between-vs-within" id="toc-iccreport-between-vs-within" class="nav-link" data-scroll-target="#iccreport-between-vs-within"><span class="header-section-number">A.5.4</span> <code>iccReport()</code> — between vs within</a></li>
-  <li><a href="#unifiedlabels-label-catalog" id="toc-unifiedlabels-label-catalog" class="nav-link" data-scroll-target="#unifiedlabels-label-catalog"><span class="header-section-number">A.5.5</span> <code>unifiedLabels()</code> — label catalog</a></li>
-  <li><a href="#shiny-simulator-launch_shiny_sim" id="toc-shiny-simulator-launch_shiny_sim" class="nav-link" data-scroll-target="#shiny-simulator-launch_shiny_sim"><span class="header-section-number">A.5.6</span> Shiny simulator — <code>launch_shiny_sim()</code></a></li>
+  <li><a href="#sensitivityclpm-what-would-my-clpm-look-like-under-trait-variance" id="toc-sensitivityclpm-what-would-my-clpm-look-like-under-trait-variance" class="nav-link" data-scroll-target="#sensitivityclpm-what-would-my-clpm-look-like-under-trait-variance"><span class="header-section-number">A.5.4</span> <code>sensitivityCLPM()</code> — “what would my CLPM look like under trait variance?”</a></li>
+  <li><a href="#iccreport-between-vs-within" id="toc-iccreport-between-vs-within" class="nav-link" data-scroll-target="#iccreport-between-vs-within"><span class="header-section-number">A.5.5</span> <code>iccReport()</code> — between vs within</a></li>
+  <li><a href="#unifiedlabels-label-catalog" id="toc-unifiedlabels-label-catalog" class="nav-link" data-scroll-target="#unifiedlabels-label-catalog"><span class="header-section-number">A.5.6</span> <code>unifiedLabels()</code> — label catalog</a></li>
+  <li><a href="#shiny-simulator-launch_shiny_sim" id="toc-shiny-simulator-launch_shiny_sim" class="nav-link" data-scroll-target="#shiny-simulator-launch_shiny_sim"><span class="header-section-number">A.5.7</span> Shiny simulator — <code>launch_shiny_sim()</code></a></li>
   </ul></li>
   <li><a href="#sec-output-objects" id="toc-sec-output-objects" class="nav-link" data-scroll-target="#sec-output-objects"><span class="header-section-number">A.6</span> Output object reference</a>
   <ul class="collapse">
@@ -395,59 +425,44 @@ div.csl-indent {
 <span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a>                   <span class="at">meanstructure =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="fu">crossLagRSummary</span>(fit_clpm)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>$parameters
-       label                                    description       est
-1       ar_y    Autoregressive effect of Y (Y(t-1) -&gt; Y(t)) 0.4037582
-2      cl_xy Cross-lagged effect of X on Y (X(t-1) -&gt; Y(t)) 0.1431229
-3       ar_x    Autoregressive effect of X (X(t-1) -&gt; X(t)) 0.3659829
-4      cl_yx Cross-lagged effect of Y on X (Y(t-1) -&gt; X(t)) 0.2285630
-5   d_var_y1           Within-person residual variance of Y 1.0130378
-6   d_var_x1           Within-person residual variance of X 1.0736095
-7    d_var_y           Within-person residual variance of Y 1.0662739
-8    d_var_x           Within-person residual variance of X 1.1191022
-9  d_cov_xy1        Within-person residual covariance X&lt;-&gt;Y 0.2653547
-10  d_cov_xy        Within-person residual covariance X&lt;-&gt;Y 0.3825343
-           se         z            p   ci.lower  ci.upper   std.all
-1  0.02634132 15.327942 0.000000e+00 0.35213014 0.4553862 0.3586230
-2  0.02554031  5.603803 2.096986e-08 0.09306478 0.1931809 0.1308688
-3  0.02616535 13.987309 0.000000e+00 0.31469975 0.4172661 0.3251466
-4  0.02698597  8.469700 0.000000e+00 0.17567152 0.2814546 0.1972486
-5  0.06407013 15.811388 0.000000e+00 0.88746260 1.1386129 1.0000000
-6  0.06790103 15.811388 0.000000e+00 0.94052595 1.2066931 1.0000000
-7  0.03893482 27.386128 0.000000e+00 0.98996302 1.1425847 0.8303796
-8  0.04086383 27.386128 0.000000e+00 1.03901053 1.1991938 0.8227354
-9  0.04812525  5.513834 3.510992e-08 0.17103091 0.3596784 0.2544431
-10 0.02988424 12.800537 0.000000e+00 0.32396230 0.4411064 0.3501879
+<pre><code>crossLagR model summary  (CI: 95%)
+==================================================
+Converged: TRUE    N obs: 500    N missing: 0
 
-$other
-[1] label est   se    z     p    
-&lt;0 rows&gt; (or 0-length row.names)
+Parameters (unified labels)
+--------------------------------------------------
+ label     description                                est   se    z      p    
+ ar_y      Autoregressive effect of Y (Y(t-1) -&gt; Y... 0.404 0.026 15.328 0.000
+ cl_xy     Cross-lagged effect of X on Y (X(t-1) -... 0.143 0.026 5.604  0.000
+ ar_x      Autoregressive effect of X (X(t-1) -&gt; X... 0.366 0.026 13.987 0.000
+ cl_yx     Cross-lagged effect of Y on X (Y(t-1) -... 0.229 0.027 8.470  0.000
+ d_var_y1  Within-person residual variance of Y       1.013 0.064 15.811 0.000
+ d_var_x1  Within-person residual variance of X       1.074 0.068 15.811 0.000
+ d_var_y   Within-person residual variance of Y       1.066 0.039 27.386 0.000
+ d_var_x   Within-person residual variance of X       1.119 0.041 27.386 0.000
+ d_cov_xy1 Within-person residual covariance X&lt;-&gt;Y    0.265 0.048 5.514  0.000
+ d_cov_xy  Within-person residual covariance X&lt;-&gt;Y    0.383 0.030 12.801 0.000
+ 95% CI         sig std  
+ [0.352, 0.455] *** 0.359
+ [0.093, 0.193] *** 0.131
+ [0.315, 0.417] *** 0.325
+ [0.176, 0.281] *** 0.197
+ [0.887, 1.139] *** 1.000
+ [0.941, 1.207] *** 1.000
+ [0.990, 1.143] *** 0.830
+ [1.039, 1.199] *** 0.823
+ [0.171, 0.360] *** 0.254
+ [0.324, 0.441] *** 0.350
+---
+Significance: '***' p&lt;.001  '**' p&lt;.01  '*' p&lt;.05  '.' p&lt;.10
 
-$fit
-         chisq             df         pvalue            cfi            tli 
-  1.622595e+01   3.200000e+01   9.906977e-01   1.000000e+00   1.014592e+00 
-         rmsea rmsea.ci.lower rmsea.ci.upper           srmr            aic 
-  0.000000e+00   0.000000e+00   0.000000e+00   2.360260e-02   1.145284e+04 
-           bic 
-  1.150341e+04 
-
-$n_obs
-[1] 500
-
-$n_miss
-[1] 0
-
-$converged
-[1] TRUE
-
-$ci_level
-[1] 0.95
-
-$digits
-[1] 3
-
-attr(,"class")
-[1] "crossLagR_summary"</code></pre>
+Fit statistics
+--------------------------------------------------
+  chi-square = 16.226   df = 32   p = 0.991
+  CFI = 1.000   TLI = 1.015
+  RMSEA = 0.000   [0.000, 0.000]
+  SRMR = 0.024
+  AIC = 11452.836   BIC = 11503.411</code></pre>
 </div>
 </div>
 </section>
@@ -542,53 +557,38 @@ y4 ~~ 0*y4</code></pre>
 <span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">meanstructure =</span> <span class="cn">TRUE</span>)</span>
 <span id="cb8-4"><a href="#cb8-4" aria-hidden="true" tabindex="-1"></a><span class="fu">crossLagRSummary</span>(fit_riclpm)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>$parameters
-     label                                    description        est         se
-1     ar_x    Autoregressive effect of X (X(t-1) -&gt; X(t)) 0.21471946 0.04622063
-2    cl_yx Cross-lagged effect of Y on X (Y(t-1) -&gt; X(t)) 0.04433770 0.03844137
-3     ar_y    Autoregressive effect of Y (Y(t-1) -&gt; Y(t)) 0.32859727 0.04959852
-4    cl_xy Cross-lagged effect of X on Y (X(t-1) -&gt; Y(t)) 0.01847169 0.04038426
-5  d_var_x           Within-person residual variance of X 0.94731963 0.04220229
-6  d_var_y           Within-person residual variance of Y 1.03611307 0.04790884
-7 d_cov_xy        Within-person residual covariance X&lt;-&gt;Y 0.06700508 0.03198046
-           z            p     ci.lower   ci.upper    std.all
-1  4.6455328 3.391999e-06  0.124128687 0.30531024 0.20958453
-2  1.1533848 2.487525e-01 -0.031006011 0.11968140 0.04526018
-3  6.6251430 3.469114e-11  0.231385962 0.42580858 0.31202102
-4  0.4573983 6.473848e-01 -0.060680003 0.09762338 0.01677147
-5 22.4471117 0.000000e+00  0.864604650 1.03003461 1.00000000
-6 21.6267602 0.000000e+00  0.942213464 1.13001268 1.00000000
-7  2.0951880 3.615429e-02  0.004324526 0.12968563 0.06763257
+<pre><code>crossLagR model summary  (CI: 95%)
+==================================================
+Converged: TRUE    N obs: 500    N missing: 0
 
-$other
-[1] label est   se    z     p    
-&lt;0 rows&gt; (or 0-length row.names)
+Parameters (unified labels)
+--------------------------------------------------
+ label    description                                est   se    z      p    
+ ar_x     Autoregressive effect of X (X(t-1) -&gt; X... 0.215 0.046 4.646  0.000
+ cl_yx    Cross-lagged effect of Y on X (Y(t-1) -... 0.044 0.038 1.153  0.249
+ ar_y     Autoregressive effect of Y (Y(t-1) -&gt; Y... 0.329 0.050 6.625  0.000
+ cl_xy    Cross-lagged effect of X on Y (X(t-1) -... 0.018 0.040 0.457  0.647
+ d_var_x  Within-person residual variance of X       0.947 0.042 22.447 0.000
+ d_var_y  Within-person residual variance of Y       1.036 0.048 21.627 0.000
+ d_cov_xy Within-person residual covariance X&lt;-&gt;Y    0.067 0.032 2.095  0.036
+ 95% CI          sig std  
+ [0.124, 0.305]  *** 0.210
+ [-0.031, 0.120]     0.045
+ [0.231, 0.426]  *** 0.312
+ [-0.061, 0.098]     0.017
+ [0.865, 1.030]  *** 1.000
+ [0.942, 1.130]  *** 1.000
+ [0.004, 0.130]  *   0.068
+---
+Significance: '***' p&lt;.001  '**' p&lt;.01  '*' p&lt;.05  '.' p&lt;.10
 
-$fit
-         chisq             df         pvalue            cfi            tli 
-  3.638935e+01   3.200000e+01   2.716060e-01   9.980334e-01   9.982792e-01 
-         rmsea rmsea.ci.lower rmsea.ci.upper           srmr            aic 
-  1.656305e-02   0.000000e+00   3.830842e-02   3.067961e-02   1.286424e+04 
-           bic 
-  1.291481e+04 
-
-$n_obs
-[1] 500
-
-$n_miss
-[1] 0
-
-$converged
-[1] TRUE
-
-$ci_level
-[1] 0.95
-
-$digits
-[1] 3
-
-attr(,"class")
-[1] "crossLagR_summary"</code></pre>
+Fit statistics
+--------------------------------------------------
+  chi-square = 36.389   df = 32   p = 0.272
+  CFI = 0.998   TLI = 0.998
+  RMSEA = 0.017   [0.000, 0.038]
+  SRMR = 0.031
+  AIC = 12864.238   BIC = 12914.813</code></pre>
 </div>
 </div>
 </section>
@@ -1175,59 +1175,44 @@ x4 ~~ s_cov_xy*y4</code></pre>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb31"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb31-1"><a href="#cb31-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>summary</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>$parameters
-       label                                    description       est
-1       ar_y    Autoregressive effect of Y (Y(t-1) -&gt; Y(t)) 0.4037582
-2      cl_xy Cross-lagged effect of X on Y (X(t-1) -&gt; Y(t)) 0.1431229
-3       ar_x    Autoregressive effect of X (X(t-1) -&gt; X(t)) 0.3659829
-4      cl_yx Cross-lagged effect of Y on X (Y(t-1) -&gt; X(t)) 0.2285630
-5   d_var_y1           Within-person residual variance of Y 1.0130378
-6   d_var_x1           Within-person residual variance of X 1.0736095
-7    d_var_y           Within-person residual variance of Y 1.0662739
-8    d_var_x           Within-person residual variance of X 1.1191022
-9  d_cov_xy1        Within-person residual covariance X&lt;-&gt;Y 0.2653547
-10  d_cov_xy        Within-person residual covariance X&lt;-&gt;Y 0.3825343
-           se         z            p   ci.lower  ci.upper   std.all
-1  0.02634132 15.327942 0.000000e+00 0.35213014 0.4553862 0.3586230
-2  0.02554031  5.603803 2.096986e-08 0.09306478 0.1931809 0.1308688
-3  0.02616535 13.987309 0.000000e+00 0.31469975 0.4172661 0.3251466
-4  0.02698597  8.469700 0.000000e+00 0.17567152 0.2814546 0.1972486
-5  0.06407013 15.811388 0.000000e+00 0.88746260 1.1386129 1.0000000
-6  0.06790103 15.811388 0.000000e+00 0.94052595 1.2066931 1.0000000
-7  0.03893482 27.386128 0.000000e+00 0.98996302 1.1425847 0.8303796
-8  0.04086383 27.386128 0.000000e+00 1.03901053 1.1991938 0.8227354
-9  0.04812525  5.513834 3.510992e-08 0.17103091 0.3596784 0.2544431
-10 0.02988424 12.800537 0.000000e+00 0.32396230 0.4411064 0.3501879
+<pre><code>crossLagR model summary  (CI: 95%)
+==================================================
+Converged: TRUE    N obs: 500    N missing: 0
 
-$other
-[1] label est   se    z     p    
-&lt;0 rows&gt; (or 0-length row.names)
+Parameters (unified labels)
+--------------------------------------------------
+ label     description                                est   se    z      p    
+ ar_y      Autoregressive effect of Y (Y(t-1) -&gt; Y... 0.404 0.026 15.328 0.000
+ cl_xy     Cross-lagged effect of X on Y (X(t-1) -... 0.143 0.026 5.604  0.000
+ ar_x      Autoregressive effect of X (X(t-1) -&gt; X... 0.366 0.026 13.987 0.000
+ cl_yx     Cross-lagged effect of Y on X (Y(t-1) -... 0.229 0.027 8.470  0.000
+ d_var_y1  Within-person residual variance of Y       1.013 0.064 15.811 0.000
+ d_var_x1  Within-person residual variance of X       1.074 0.068 15.811 0.000
+ d_var_y   Within-person residual variance of Y       1.066 0.039 27.386 0.000
+ d_var_x   Within-person residual variance of X       1.119 0.041 27.386 0.000
+ d_cov_xy1 Within-person residual covariance X&lt;-&gt;Y    0.265 0.048 5.514  0.000
+ d_cov_xy  Within-person residual covariance X&lt;-&gt;Y    0.383 0.030 12.801 0.000
+ 95% CI         sig std  
+ [0.352, 0.455] *** 0.359
+ [0.093, 0.193] *** 0.131
+ [0.315, 0.417] *** 0.325
+ [0.176, 0.281] *** 0.197
+ [0.887, 1.139] *** 1.000
+ [0.941, 1.207] *** 1.000
+ [0.990, 1.143] *** 0.830
+ [1.039, 1.199] *** 0.823
+ [0.171, 0.360] *** 0.254
+ [0.324, 0.441] *** 0.350
+---
+Significance: '***' p&lt;.001  '**' p&lt;.01  '*' p&lt;.05  '.' p&lt;.10
 
-$fit
-         chisq             df         pvalue            cfi            tli 
-  1.622595e+01   3.200000e+01   9.906977e-01   1.000000e+00   1.014592e+00 
-         rmsea rmsea.ci.lower rmsea.ci.upper           srmr            aic 
-  0.000000e+00   0.000000e+00   0.000000e+00   2.360260e-02   1.145284e+04 
-           bic 
-  1.150341e+04 
-
-$n_obs
-[1] 500
-
-$n_miss
-[1] 0
-
-$converged
-[1] TRUE
-
-$ci_level
-[1] 0.95
-
-$digits
-[1] 3
-
-attr(,"class")
-[1] "crossLagR_summary"</code></pre>
+Fit statistics
+--------------------------------------------------
+  chi-square = 16.226   df = 32   p = 0.991
+  CFI = 1.000   TLI = 1.015
+  RMSEA = 0.000   [0.000, 0.000]
+  SRMR = 0.024
+  AIC = 11452.836   BIC = 11503.411</code></pre>
 </div>
 </div>
 <p>The parameter table joins each estimated unified label to a plain-language description, attaches CI / sig-stars, and reports standardized estimates. The fit block prints chi-square, CFI/TLI, RMSEA + 90% CI, SRMR, AIC, BIC.</p>
@@ -1238,45 +1223,56 @@ attr(,"class")
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb33"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb33-1"><a href="#cb33-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>diagnosis</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>$issues
-list()
-
-$n_issues
-[1] 0
-
-$codes
-character(0)
-
-$summary
-[1] "No Heywood-class issues detected."
-
-attr(,"class")
-[1] "crossLagR_diagnosis"</code></pre>
+<pre><code>No Heywood-class issues detected.</code></pre>
 </div>
 </div>
 <p>Call <code>heywoodHelp()</code> without a fit to browse the full catalog of detectable codes; <code>heywoodHelp("negative_variance")</code> prints just one entry.</p>
 </section>
-<section id="iccreport-between-vs-within" class="level3" data-number="A.5.4">
-<h3 data-number="A.5.4" class="anchored" data-anchor-id="iccreport-between-vs-within"><span class="header-section-number">A.5.4</span> <code>iccReport()</code> — between vs within</h3>
+<section id="sensitivityclpm-what-would-my-clpm-look-like-under-trait-variance" class="level3" data-number="A.5.4">
+<h3 data-number="A.5.4" class="anchored" data-anchor-id="sensitivityclpm-what-would-my-clpm-look-like-under-trait-variance"><span class="header-section-number">A.5.4</span> <code>sensitivityCLPM()</code> — “what would my CLPM look like under trait variance?”</h3>
+<p>The CLPM’s AR and CL estimates are biased when the data carry stable trait variance (between-person ICC &gt; 0), because the lagged predictors then correlate with the residual — the classic Hamaker, Kuiper &amp; Grasman <span class="citation" data-cites="hamaker_critique_2015">(<a href="#ref-hamaker_critique_2015" role="doc-biblioref">2015</a>)</span> critique, formalized analytically in the CLPM chapter (univariate case: <span class="math inline">\(b^{\text{CLPM}}_{xx} \approx \text{ICC}_x + (1 - \text{ICC}_x)\,b^{\text{true}}_{xx}\)</span>).</p>
+<p><code>sensitivityCLPM()</code> operationalizes that critique. It takes a fitted CLPM, treats its AR/CL estimates as the (hypothetical) within-person truth, injects between-person trait variance at a grid of ICC levels, simulates from the resulting RI-CLPM, then refits <strong>both</strong> a CLPM and an RI-CLPM on the simulated data. The RI-CLPM curve should stay flat near the baseline (it recovers the within-person truth); the CLPM curve drifts away as ICC grows — the bias made visible.</p>
+<div class="cell">
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>fit_for_sens <span class="ot">&lt;-</span> <span class="fu">lavaan</span>(<span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>),</span>
+<span id="cb35-2"><a href="#cb35-2" aria-hidden="true" tabindex="-1"></a>                       <span class="at">data =</span> dat_clpm, <span class="at">meanstructure =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb35-3"><a href="#cb35-3" aria-hidden="true" tabindex="-1"></a>sens <span class="ot">&lt;-</span> <span class="fu">sensitivityCLPM</span>(fit_for_sens,</span>
+<span id="cb35-4"><a href="#cb35-4" aria-hidden="true" tabindex="-1"></a>                        <span class="at">icc_grid =</span> <span class="fu">c</span>(<span class="dv">0</span>, <span class="fl">0.2</span>, <span class="fl">0.4</span>, <span class="fl">0.6</span>),</span>
+<span id="cb35-5"><a href="#cb35-5" aria-hidden="true" tabindex="-1"></a>                        <span class="at">n_sims   =</span> <span class="dv">15</span>,</span>
+<span id="cb35-6"><a href="#cb35-6" aria-hidden="true" tabindex="-1"></a>                        <span class="at">seed     =</span> <span class="dv">7</span>)</span>
+<span id="cb35-7"><a href="#cb35-7" aria-hidden="true" tabindex="-1"></a><span class="fu">plot</span>(sens)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="cell-output-display">
+<div>
+<figure class="figure">
+<p><img src="A_package_reference_files/figure-html/ref-sens-1.png" class="img-fluid figure-img" width="864"></p>
+</figure>
+</div>
+</div>
+</div>
+<p><strong>Important caveat</strong> built into the docs: this is a <em>what-if</em>, not a calibration. The supplied CLPM estimates already embed any bias present in the original data; treating them as the within-person truth is a sensitivity device. To get the actually-implied within-person dynamics on your data, just fit an RI-CLPM directly with <code>estimateRICLPM()</code>.</p>
+</section>
+<section id="iccreport-between-vs-within" class="level3" data-number="A.5.5">
+<h3 data-number="A.5.5" class="anchored" data-anchor-id="iccreport-between-vs-within"><span class="header-section-number">A.5.5</span> <code>iccReport()</code> — between vs within</h3>
 <p>Computes the empirical ICC for each construct directly from data — no model fit required. When any ICC exceeds the threshold (default 0.65), a single warning fires recommending sensitivity analysis with the bundled Shiny simulator (<code>launch_shiny_sim()</code>), because CLPM vs RI-CLPM estimates can diverge substantially in high-ICC regimes <span class="citation" data-cites="hamaker_critique_2015">(<a href="#ref-hamaker_critique_2015" role="doc-biblioref">Hamaker, Kuiper, and Grasman 2015</a>)</span>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb35"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb35-1"><a href="#cb35-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>icc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb36"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb36-1"><a href="#cb36-1" aria-hidden="true" tabindex="-1"></a>out<span class="sc">$</span>icc</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
-<pre><code>  variable between_var within_var total_var       icc n_obs n_waves
-1        x   0.6437712  0.7073987  1.351170 0.4764547   500       4
-2        y   0.6016553  0.6672289  1.268884 0.4741609   500       4
-  exceeds_threshold
-1             FALSE
-2             FALSE</code></pre>
+<pre><code>crossLagR ICC report  (threshold = 0.65)
+-----------------------------------------
+ variable between_var within_var total_var   icc n_obs n_waves
+        x       0.644      0.707     1.351 0.476   500       4
+        y       0.602      0.667     1.269 0.474   500       4
+ exceeds_threshold
+             FALSE
+             FALSE</code></pre>
 </div>
 </div>
 <p><code>withinBetween()</code> is the underlying decomposition; it accepts long-format data and supports both an empirical (<code>method = "dplyr"</code>) and a TSO-based (<code>method = "tso"</code>) split.</p>
 </section>
-<section id="unifiedlabels-label-catalog" class="level3" data-number="A.5.5">
-<h3 data-number="A.5.5" class="anchored" data-anchor-id="unifiedlabels-label-catalog"><span class="header-section-number">A.5.5</span> <code>unifiedLabels()</code> — label catalog</h3>
+<section id="unifiedlabels-label-catalog" class="level3" data-number="A.5.6">
+<h3 data-number="A.5.6" class="anchored" data-anchor-id="unifiedlabels-label-catalog"><span class="header-section-number">A.5.6</span> <code>unifiedLabels()</code> — label catalog</h3>
 <p>Browse every unified label and its description, grouped by <code>dynamics / dynamic_residuals / random_intercepts / growth / trait_state / residuals / change</code>.</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb37"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb37-1"><a href="#cb37-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unifiedLabels</span>(<span class="at">print =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb38"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb38-1"><a href="#cb38-1" aria-hidden="true" tabindex="-1"></a><span class="fu">unifiedLabels</span>(<span class="at">print =</span> <span class="cn">FALSE</span>) <span class="sc">|&gt;</span> <span class="fu">head</span>(<span class="dv">10</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>     label                                    description             group
 1     ar_x    Autoregressive effect of X (X(t-1) -&gt; X(t))          dynamics
@@ -1292,11 +1288,11 @@ attr(,"class")
 </div>
 </div>
 </section>
-<section id="shiny-simulator-launch_shiny_sim" class="level3" data-number="A.5.6">
-<h3 data-number="A.5.6" class="anchored" data-anchor-id="shiny-simulator-launch_shiny_sim"><span class="header-section-number">A.5.6</span> Shiny simulator — <code>launch_shiny_sim()</code></h3>
+<section id="shiny-simulator-launch_shiny_sim" class="level3" data-number="A.5.7">
+<h3 data-number="A.5.7" class="anchored" data-anchor-id="shiny-simulator-launch_shiny_sim"><span class="header-section-number">A.5.7</span> Shiny simulator — <code>launch_shiny_sim()</code></h3>
 <p>Interactive simulator for visualising bias and recovery across estimator / DGP combinations. Useful when an ICC warning fires and you want to see how the choice of model bites on your data:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb39"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb39-1"><a href="#cb39-1" aria-hidden="true" tabindex="-1"></a><span class="fu">launch_shiny_sim</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb40"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb40-1"><a href="#cb40-1" aria-hidden="true" tabindex="-1"></a><span class="fu">launch_shiny_sim</span>()</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 </section>
