@@ -27,3 +27,5 @@ archive/
 agent_workflow/
 
 
+vignettes/simulator_internals.html
+vignettes/simulator_internals_files/

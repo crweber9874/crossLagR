@@ -1,0 +1,401 @@
+---
+title: "Simulator and sensitivity internals"
+subtitle: "Contributor notes for `crossLagR`"
+author: "Authored by Claude (Anthropic); maintainer review by C. Weber"
+date: today
+format:
+  html:
+    toc: true
+    toc-depth: 3
+    theme: cosmo
+    html-math-method: mathjax
+execute:
+  eval: false
+---
+
+::: {.callout-note title="Scope"}
+**Internal contributor doc.** Excluded from the built package via
+`.Rbuildignore`. Read this on GitHub before changing anything in
+`simCLPM`, `simRICLPM`, `simFromSyntax`, `populate_unified_labels`, or
+`sensitivityCLPM`. The substantive motivation lives in the [CLPM chapter
+of the user guide](https://crweber9874.github.io/crossLagR/book/01_Panel_Models.html);
+this is the implementation-level companion.
+:::
+
+::: {.callout-tip title="Authorship"}
+Authored by Claude (Anthropic) under the prompt:
+> *"now create a simple internal document that describes how to use the
+> simulator. I've generally worked out the math correctly, but include a
+> detailed (though concise and straightforward) well explained walkthrough
+> of why the variance is this, and the characteristics of these new
+> sensitivity functions. It can be a quarto in vignettes."*
+
+Then converted to Quarto with formulas elaborated, per follow-up prompt
+*"make quarto and include formula."* Maintainer review by C. Weber.
+:::
+
+## Two routes to a simulated dataset
+
+There are two ways to manufacture data in `crossLagR`:
+
+1. **Direct simulators** (`simCLPM`, `simRICLPM`, `simCLPMu`) hard-code a
+   specific lavaan population model. Each takes substantive arguments
+   (`beta_x`, `omega_xy`, `var_p`, `var_BX`, ...) and emits a
+   `list(model, data)` where `model` is the lavaan syntax used and `data`
+   is the simulated wide-format data frame.
+2. **The generic path** (`simFromSyntax` + `populate_unified_labels`)
+   takes any estimator-syntax function (e.g. `estimateRICLPM`),
+   substitutes user-supplied numeric values into the unified labels
+   ($ar\_x$, $cl\_xy$, $d\_var\_x$, ...), and calls
+   `lavaan::simulateData()` on the populated syntax.
+
+Use a direct simulator when you need control over a specific DGP
+(particularly `simCLPMu`, the only one that injects a time-varying
+confounder). Use the generic path when you want to simulate from an
+arbitrary unified-label estimator's own implied population.
+
+## Direct simulators
+
+### `simCLPM`
+
+The CLPM population at the latent level is
+
+$$
+\begin{aligned}
+p_t &= \beta_x\, p_{t-1} + \omega_{xy}\, q_{t-1} + \zeta^p_t, \\
+q_t &= \beta_y\, q_{t-1} + \omega_{yx}\, p_{t-1} + \zeta^q_t,
+\end{aligned}
+$$ {#eq-clpm-dynamics}
+
+with observed indicators $y_t = p_t$ and $x_t = q_t$ (perfect indicators,
+residual variance fixed at zero) and residuals
+$\zeta^p_t \sim \mathcal{N}(0, \sigma^2_p)$,
+$\zeta^q_t \sim \mathcal{N}(0, \sigma^2_q)$, with within-time
+covariance $\mathrm{Cov}(\zeta^p_t, \zeta^q_t) = \sigma_{pq}$.
+
+```r
+sim <- simCLPM(waves    = 4,
+               beta_x   = 0.4, beta_y = 0.4,
+               omega_xy = 0.2, omega_yx = 0.2,
+               var_x    = 1,   var_y    = 1,
+               cov_xy   = 0.3,
+               sample_size = 500, seed = 1)
+```
+
+Wave-1 variance can be set independently (`var_y1`, `var_x1`,
+`cov_xy1`); subsequent waves share the residual variance defined by
+`var_x` and `var_y`.
+
+### `simRICLPM`
+
+The RI-CLPM augments the CLPM with a between-person random intercept on
+each construct:
+
+$$
+\begin{aligned}
+y_{it} &= \mu_y + I_{y,i} + p_{it}, \\
+x_{it} &= \mu_x + I_{x,i} + q_{it},
+\end{aligned}
+$$ {#eq-riclpm-decomp}
+
+where the trait factors are
+
+$$
+\begin{bmatrix} I_{y,i} \\ I_{x,i} \end{bmatrix}
+\sim
+\mathcal{N}\!\left(
+\begin{bmatrix} \mu_{BY} \\ \mu_{BX} \end{bmatrix},
+\begin{bmatrix} \sigma^2_{BY} & \sigma_{BXBY} \\
+                 \sigma_{BXBY} & \sigma^2_{BX} \end{bmatrix}
+\right),
+$$
+
+and within-person factors $(p_{it}, q_{it})$ follow the dynamic
+equations (@eq-clpm-dynamics). The signature mirrors that
+decomposition: `beta_x` / `omega_xy` are within-person dynamics on $p$
+and $q$; `var_p` / `var_q` are dynamic residual variances; `var_BX` /
+`var_BY` / `cov_BXBY` parameterize the trait factors.
+
+::: {.callout-important title="Identifiability constraints"}
+The trait factors are allowed to covary with each other
+($\sigma_{BXBY}$) but are constrained to be **uncorrelated with the
+wave-1 within-person factors** $p_{i1}, q_{i1}$. This is the standard
+RI-CLPM identification (Hamaker, Kuiper & Grasman, 2015) and is what
+makes the trait/within decomposition unique.
+:::
+
+### `simCLPMu`
+
+Same dynamic equation as `simCLPM`, but each wave includes an additive
+shock from a separate AR(1) confounder $u_t$:
+
+$$
+\begin{aligned}
+p_t &= \beta_x\, p_{t-1} + \omega_{xy}\, q_{t-1} + \gamma_p\, u_t, \\
+q_t &= \beta_y\, q_{t-1} + \omega_{yx}\, p_{t-1} + \gamma_q\, u_t, \\
+u_t &= \rho\, u_{t-1} + \varepsilon_t,
+\quad \varepsilon_t \sim \mathcal{N}(0, \sigma^2_u).
+\end{aligned}
+$$
+
+Used to construct DGPs for "how badly does estimator $X$ do when there's
+an unmodeled confounder" studies. The confounder is technically observed
+in `sim$data` (the function returns `u1..uT` columns too, so you *can*
+model it). Drop them when simulating realistic data.
+
+## The generic path: `simFromSyntax`
+
+`simFromSyntax(estimator, waves, sample_size, ar_x, ...)` is a thin
+two-step pipeline:
+
+```r
+fn         <- crossLagR::estimateCLPM       # or any unified estimator
+syntax     <- fn(waves = 4)                 # lavaan with labels ar_x*, etc.
+populated  <- populate_unified_labels(      # substitute "ar_x*" -> "0.3*"
+                syntax, ar_x = 0.3, ar_y = 0.3,
+                cl_xy = 0.1, cl_yx = 0.1,
+                d_var_x = 0.5, d_var_y = 0.5,
+                d_cov_xy = 0)
+dat        <- lavaan::simulateData(populated, sample.nobs = 500,
+                                   meanstructure = TRUE)
+```
+
+`populate_unified_labels` uses word-boundary regex (`\bar_x\*`) so a
+hypothetical `ar_xx` parameter is not a partial match. Labels not
+supplied are left at lavaan's `simulateData` defaults --- a known
+limitation. Higher-level parameters (growth-factor variances for
+ALT/LGM/LCMSR, trait variances for TSO, latent FE variances for BB) end
+up at lavaan defaults rather than user-controlled. Worth fixing if
+anyone ever needs control over them.
+
+## Variance decomposition in `sensitivityCLPM`
+
+The sensitivity function takes a fitted CLPM and asks: *if the true DGP
+had the within-person dynamics I just estimated **plus** between-person
+trait variance giving ICC $\kappa$, how badly would a CLPM mis-estimate
+the AR/CL parameters?*
+
+### Deriving `var_BX = icc / (1 - icc) * d_var_x`
+
+The intraclass correlation is the fraction of total variance
+attributable to the trait:
+
+$$
+\mathrm{ICC}_x \;\equiv\; \frac{\sigma^2_{BX}}{\sigma^2_{BX} + \sigma^2_{WX}}.
+$$ {#eq-icc-def}
+
+Solve for the trait variance given a target ICC $\kappa$ and a fixed
+within-person variance $\sigma^2_{WX}$:
+
+$$
+\kappa \,(\sigma^2_{BX} + \sigma^2_{WX}) = \sigma^2_{BX}
+\;\;\Longrightarrow\;\;
+\sigma^2_{BX} \,(1 - \kappa) = \kappa\, \sigma^2_{WX}
+\;\;\Longrightarrow\;\;
+\boxed{\;
+\sigma^2_{BX} \;=\; \frac{\kappa}{1 - \kappa}\,\sigma^2_{WX}\,.
+\;}
+$$ {#eq-varbx-mapping}
+
+In code:
+
+```r
+var_BX <- if (icc == 0) 0 else icc / (1 - icc) * d_var_x
+var_BY <- if (icc == 0) 0 else icc / (1 - icc) * d_var_y
+```
+
+### Why `d_var_x` is a proxy, not the exact within-person variance
+
+The function uses the CLPM's estimated residual variance `d_var_x` for
+$\sigma^2_{WX}$. This is an approximation. The true stationary
+within-person variance under the bivariate VAR(1) dynamic in
+@eq-clpm-dynamics solves the discrete Lyapunov equation
+
+$$
+\boldsymbol\Sigma \;=\;
+\boldsymbol{B}\,\boldsymbol\Sigma\,\boldsymbol{B}^\top
+\;+\; \boldsymbol\Psi,
+\quad
+\boldsymbol{B} = \begin{bmatrix} \beta_x & \omega_{xy} \\ \omega_{yx} & \beta_y \end{bmatrix},
+\quad
+\boldsymbol\Psi = \begin{bmatrix} \sigma^2_p & \sigma_{pq} \\ \sigma_{pq} & \sigma^2_q \end{bmatrix},
+$$ {#eq-lyapunov}
+
+so $\sigma^2_{WX} = \boldsymbol\Sigma_{22}$, which is strictly larger
+than $\sigma^2_q$ whenever any element of $\boldsymbol{B}$ is non-zero.
+For the univariate AR(1) special case ($\omega_{xy} = \omega_{yx} = 0$),
+
+$$
+\sigma^2_{WX,\text{stationary}}
+\;=\; \frac{\sigma^2_q}{1 - \beta_y^2}.
+$$ {#eq-stationary-ar1}
+
+The implementation deliberately uses $\sigma^2_q$ (i.e. `d_var_x`)
+rather than @eq-stationary-ar1 because:
+
+- For modest AR/CL values ($|\beta| \lesssim 0.5$) the inflation factor
+  $1 / (1 - \beta^2)$ is within a few percent (e.g., $\beta = 0.4
+  \Rightarrow$ factor $1.19$).
+- The bias formula it is illustrating
+  ($b^{\text{CLPM}}_{xx} \approx \kappa + (1-\kappa)\,b^{\text{true}}_{xx}$;
+  see @eq-bias-formula) is itself a univariate approximation.
+- Users care about the **qualitative shape** (CLPM diverges from truth
+  as ICC grows), not a calibrated bias point estimate.
+
+If you ever need a calibrated sensitivity (e.g. publishing a bias
+correction), replace `d_var_x` with the solution to @eq-lyapunov and
+document the change.
+
+### The bias formula being illustrated
+
+The chapter's univariate AR(1) bias decomposition is
+
+$$
+b^{\text{CLPM}}_{xx}
+\;=\;
+\mathrm{ICC}_x
+\;+\;
+(1 - \mathrm{ICC}_x)\,b^{\text{true}}_{xx},
+$$ {#eq-bias-formula}
+
+with two notable special cases:
+
+- If $b^{\text{true}}_{xx} = 0$, the CLPM picks up a **spurious AR equal
+  to the ICC**.
+- If $b^{\text{true}}_{xx} > 0$, the CLPM AR is **inflated**: it equals
+  the truth plus an additive contamination $\mathrm{ICC}_x$ scaled by
+  $(1 - b^{\text{true}}_{xx})$.
+
+The cross-lag has an analogous decomposition driven by the **trait
+covariance** $\sigma_{BXBY}$:
+
+$$
+b^{\text{CLPM}}_{yx}
+\;=\;
+\underbrace{\frac{\sigma_{BXBY}}{\sigma^2_{BY} + \sigma^2_{WY}}}_{\substack{\text{trait-covariance}\\\text{contamination}}}
+\;+\;
+(1 - \mathrm{ICC}_y)\, b^{\text{true}}_{yx}.
+$$ {#eq-cl-bias-formula}
+
+`sensitivityCLPM` currently fixes $\sigma_{BXBY} = 0$, so the CL curves
+in the sensitivity plot are flat in expectation; the AR curves rise
+with $\kappa$.
+
+### What the function actually does
+
+```r
+sensitivityCLPM(fit, icc_grid, n_sims, sample_size, waves)
+```
+
+Pseudocode:
+
+```
+extract orig = (ar_x, ar_y, cl_xy, cl_yx, d_var_x, d_var_y, d_cov_xy) from fit
+for icc in icc_grid:
+  var_BX = icc / (1 - icc) * d_var_x       # eq-varbx-mapping
+  var_BY = icc / (1 - icc) * d_var_y
+  for s in 1..n_sims:
+    dat = simRICLPM(
+            waves, sample_size,
+            beta_x   = orig$ar_x,  beta_y   = orig$ar_y,
+            omega_xy = orig$cl_xy, omega_yx = orig$cl_yx,
+            var_p    = d_var_x,    var_q    = d_var_y,
+            cov_pq   = d_cov_xy,
+            var_BX,  var_BY, cov_BXBY = 0
+          )
+    record CLPM and RI-CLPM AR/CL estimates fit to dat
+```
+
+### Why both CLPM and RI-CLPM are refit
+
+The RI-CLPM is the **oracle** in this sensitivity: it knows the true
+structure of the DGP, so its estimates should track the within-person
+truth (the dashed baseline) as ICC varies. The CLPM is the **target of
+the diagnosis**: it omits the trait, so its estimates drift away from
+the truth as ICC grows, exactly as @eq-bias-formula predicts. The gap
+between the two curves at any ICC is the visible bias.
+
+The "truth" reference line in `plot.crossLagR_sensitivity` is the
+original CLPM fit's estimate, treated as the within-person truth by
+construction.
+
+### Things to know before changing this
+
+- `cov_BXBY = 0` is fixed. Allowing trait covariance would activate the
+  first term in @eq-cl-bias-formula. If you expose this argument, add a
+  regression test asserting the CL bias direction matches
+  $\mathrm{sign}(\sigma_{BXBY})$.
+- `n_sims = 30` is enough to see the *shape* of the sensitivity curve;
+  it is not enough to compute a sharp bias point estimate. The print
+  method reports the SD per cell so users can judge MC noise.
+- Convergence failures are silently turned into `NA` rows. This is fine
+  for the plot (the ribbon just gets wider) but downstream users who
+  aggregate `sens$estimates` should pass `na.rm = TRUE`.
+
+## Interpreting the sensitivity plot
+
+The plot has four facets ($ar\_x, ar\_y, cl\_xy, cl\_yx$), each with
+two curves (CLPM red, RI-CLPM blue) and a dashed horizontal line at the
+baseline.
+
+- **RI-CLPM tracks the baseline.** If it does not, either the DGP is so
+  extreme that RI-CLPM is also struggling (high ICC, small N), or there
+  is a bug in how `simRICLPM` is being parameterized.
+- **CLPM curve rises with ICC for AR parameters.** This is the Hamaker
+  bias from @eq-bias-formula. At $\kappa = 0$ both curves should
+  coincide.
+- **CLPM curve for CL parameters is approximately flat** (with
+  `cov_BXBY = 0`). @eq-cl-bias-formula attributes CL bias to the trait
+  *covariance*, which is zero here. Letting it drift would activate CL
+  bias too.
+- **Confidence ribbons (10th--90th pct across `n_sims`)** widen at high
+  ICC because the fits are harder.
+
+## Caveats users should know
+
+1. **It is a what-if, not a calibration.** The CLPM estimates you pass
+   in are already (potentially) biased; treating them as the
+   within-person truth means the "truth reference" is itself uncertain.
+   To get the actually-implied within-person dynamics, fit an RI-CLPM
+   directly with `estimateRICLPM()`.
+2. **Use a small grid for exploration, a dense grid for publication.**
+   `n_sims = 30` and 4--6 ICC points is enough to see the shape. Bump to
+   `n_sims = 200` and 10+ ICC points if this is going in a paper.
+3. **High-ICC cells are noisy.** $\kappa > 0.8$ produces RI-CLPMs that
+   frequently fail to converge. The function trims `icc_grid` to
+   $[0, 1)$ but does not warn at $0.9$; consider lowering by hand.
+4. **It assumes both fits use the same syntax wrappers.** If you pass a
+   `fit` that was not built from `estimateCLPM` (e.g., your own custom
+   lavaan syntax with non-standard labels), parameter extraction
+   silently fails and you get `NA` estimates. The function checks for
+   this and errors out before simulating.
+
+## Adding a new sensitivity dimension
+
+If you ever want to sweep a second axis (e.g., AR magnitude alongside
+ICC), the simplest extension is:
+
+```r
+sensitivityCLPMGrid <- function(fit, icc_grid, ar_inflate_grid, n_sims, ...) {
+  # for each combination of (icc, inflate):
+  #   set orig$ar_x  <- orig$ar_x  * inflate
+  #   set orig$ar_y  <- orig$ar_y  * inflate
+  #   call the inner simulation loop from sensitivityCLPM
+}
+```
+
+Keep the existing `sensitivityCLPM` as the one-axis sweep; expose the
+grid version as a separate function so the plot method can specialize on
+the one-axis case.
+
+## References
+
+- Hamaker, E. L., Kuiper, R. M., & Grasman, R. P. P. P. (2015). A
+  critique of the cross-lagged panel model. *Psychological Methods*,
+  20(1), 102--116.
+- Usami, S., Murayama, K., & Hamaker, E. L. (2019). A unified framework
+  of longitudinal models to examine reciprocal relations.
+  *Psychological Methods*, 24(5), 637--657.
+- CLPM bias derivation: see the [CLPM chapter](https://crweber9874.github.io/crossLagR/book/01_Panel_Models.html)
+  of the `crossLagR` book (Sec. on bias under stable trait
+  components).
