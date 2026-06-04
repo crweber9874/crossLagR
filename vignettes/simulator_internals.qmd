@@ -22,18 +22,6 @@ of the user guide](https://crweber9874.github.io/crossLagR/book/01_Panel_Models.
 this is the implementation-level companion.
 :::
 
-::: {.callout-tip title="Authorship"}
-Authored by Claude (Anthropic) under the prompt:
-> *"now create a simple internal document that describes how to use the
-> simulator. I've generally worked out the math correctly, but include a
-> detailed (though concise and straightforward) well explained walkthrough
-> of why the variance is this, and the characteristics of these new
-> sensitivity functions. It can be a quarto in vignettes."*
-
-Then converted to Quarto with formulas elaborated, per follow-up prompt
-*"make quarto and include formula."* Maintainer review by C. Weber.
-:::
-
 ## Two routes to a simulated dataset
 
 There are two ways to manufacture data in `crossLagR`:
