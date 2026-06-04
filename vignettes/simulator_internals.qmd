@@ -233,10 +233,24 @@ document the change.
 
 ### The bias formula being illustrated
 
-The chapter's univariate AR(1) bias decomposition is
+::: {.callout-warning title="This is the univariate decomposition, not the multivariate CLPM bias"}
+The closed-form below is derived for the **univariate regression** of
+$x_t$ on $x_{t-1}$ *alone* --- i.e. with the cross-lag dropped to zero.
+The actual multivariate CLPM fits $x_t$ on both $x_{t-1}$ *and*
+$y_{t-1}$ simultaneously, so its coefficients are **partial slopes**,
+not these simple ratios. There is no clean closed-form bias expression
+for the multivariate case --- which is precisely why this package
+characterizes the bias by simulation (`sensitivityCLPM()`) rather than
+analytically. The formula below is included for **intuition**: it tells
+you the *direction* and *rough scale* of the bias, not its exact
+magnitude in any given multivariate fit.
+:::
+
+Under the univariate simplification (set cross-lag to zero, regress
+$x_t$ on $x_{t-1}$ alone), the chapter shows
 
 $$
-b^{\text{CLPM}}_{xx}
+b^{\text{univariate}}_{xx}
 \;=\;
 \mathrm{ICC}_x
 \;+\;
@@ -245,26 +259,38 @@ $$ {#eq-bias-formula}
 
 with two notable special cases:
 
-- If $b^{\text{true}}_{xx} = 0$, the CLPM picks up a **spurious AR equal
-  to the ICC**.
-- If $b^{\text{true}}_{xx} > 0$, the CLPM AR is **inflated**: it equals
-  the truth plus an additive contamination $\mathrm{ICC}_x$ scaled by
-  $(1 - b^{\text{true}}_{xx})$.
+- If $b^{\text{true}}_{xx} = 0$, the univariate slope picks up a
+  **spurious AR equal to the ICC**.
+- If $b^{\text{true}}_{xx} > 0$, the univariate AR is **inflated**: it
+  equals the truth plus an additive contamination $\mathrm{ICC}_x$
+  scaled by $(1 - b^{\text{true}}_{xx})$.
 
-The cross-lag has an analogous decomposition driven by the **trait
-covariance** $\sigma_{BXBY}$:
+The cross-lag has an analogous univariate decomposition (regress $x_t$
+on $y_{t-1}$ alone, AR dropped) driven by the **trait covariance**
+$\sigma_{BXBY}$:
 
 $$
-b^{\text{CLPM}}_{yx}
+b^{\text{univariate}}_{yx}
 \;=\;
 \underbrace{\frac{\sigma_{BXBY}}{\sigma^2_{BY} + \sigma^2_{WY}}}_{\substack{\text{trait-covariance}\\\text{contamination}}}
 \;+\;
 (1 - \mathrm{ICC}_y)\, b^{\text{true}}_{yx}.
 $$ {#eq-cl-bias-formula}
 
-`sensitivityCLPM` currently fixes $\sigma_{BXBY} = 0$, so the CL curves
-in the sensitivity plot are flat in expectation; the AR curves rise
-with $\kappa$.
+`sensitivityCLPM` currently fixes $\sigma_{BXBY} = 0$, so in the
+multivariate fit the CL curves drift only because of partial-slope
+interactions with the (inflated) AR --- not because the univariate CL
+formula predicts movement. The AR curves rise with $\kappa$ in line
+with the *direction* (not magnitude) implied by @eq-bias-formula.
+
+::: {.callout-note title="Practical consequence"}
+Do not expect the plotted CLPM curve at, say, $\kappa = 0.4$ to land
+exactly at $0.4 + 0.6\,b^{\text{true}}_{xx}$. The multivariate partial
+slope will typically be **closer to the true value than the univariate
+formula predicts**, because the included cross-lag absorbs some of the
+contamination. The simulation is the authoritative answer; the formula
+is the storyline.
+:::
 
 ### What the function actually does
 
