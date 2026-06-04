@@ -16,3 +16,4 @@
 ^.*\.bib$
 ^scripts$
 ^vignettes/CONTRIBUTING\.Rmd$
+^vignettes/simulator_internals\.Rmd$
