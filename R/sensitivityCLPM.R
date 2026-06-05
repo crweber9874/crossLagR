@@ -222,15 +222,27 @@ plot.crossLagR_sensitivity <- function(x, ...) {
   est$parameter <- factor(est$parameter,
                           levels = c("ar_x", "ar_y", "cl_xy", "cl_yx"))
 
+  ## Ribbon = +/- 1.96 * MC standard error of the mean. This is the right
+  ## inference target for a bias plot: it shrinks with sqrt(n_sims) and
+  ## answers "is the mean estimate really different from the baseline."
+  ## A per-replication percentile ribbon (sampling distribution of a
+  ## single fit) is a different question and confuses bias for noise.
   agg <- stats::aggregate(
     est ~ icc + estimator + parameter,
     data = est,
-    FUN  = function(v) c(mean = mean(v, na.rm = TRUE),
-                         lo   = stats::quantile(v, 0.10, na.rm = TRUE),
-                         hi   = stats::quantile(v, 0.90, na.rm = TRUE))
+    FUN  = function(v) {
+      v <- v[is.finite(v)]
+      n <- length(v)
+      mu <- mean(v)
+      se <- if (n > 1L) stats::sd(v) / sqrt(n) else NA_real_
+      c(mean = mu,
+        lo   = mu - 1.96 * se,
+        hi   = mu + 1.96 * se,
+        n    = n)
+    }
   )
   agg <- do.call(data.frame, agg)
-  names(agg)[4:6] <- c("mean", "lo", "hi")
+  names(agg)[4:7] <- c("mean", "lo", "hi", "n")
 
   baseline <- data.frame(parameter = names(x$original),
                          baseline  = unname(x$original))
@@ -252,12 +264,13 @@ plot.crossLagR_sensitivity <- function(x, ...) {
                                            "RI-CLPM" = "#2166ac")) +
     ggplot2::labs(
       x = "Injected ICC (trait variance / total variance)",
-      y = "Recovered estimate (mean +/- 10th-90th percentile)",
+      y = "Recovered estimate (mean +/- 1.96 SE_MC of the mean)",
       color = NULL, fill = NULL,
       title    = "CLPM sensitivity to between-person trait variance",
       subtitle = paste0(
         "Dashed line: original CLPM estimate (preserved as within-person truth). ",
-        "N = ", x$sample_size, ", ", x$n_sims, " sims per ICC."
+        "N = ", x$sample_size, ", ", x$n_sims, " sims per ICC. ",
+        "Ribbon = MC uncertainty in the cell mean (shrinks with n_sims)."
       )
     ) +
     ggplot2::theme_minimal(base_size = 11) +
