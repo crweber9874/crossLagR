@@ -1,58 +1,70 @@
 #' @title sensitivityCLPM
-#' @description Sensitivity analysis for a fitted CLPM. Treats the CLPM's
-#'   estimated AR/CL parameters as the (hypothetical) within-person truth,
-#'   then injects between-person trait variance at a grid of ICC levels and
-#'   refits both a CLPM and an RI-CLPM. The output diagnoses how badly a
-#'   CLPM would mis-estimate the AR/CL parameters under varying degrees of
-#'   stable trait variance --- the bias mechanism formalized by
-#'   @hamaker2015critique and derived analytically in the CLPM chapter of
-#'   the package book.
+#' @description Diagnose how badly a fitted CLPM is biased by between-person
+#'   trait variance. Fits an RI-CLPM on the same data to obtain the within-
+#'   person truth, computes the data's observed ICC, then simulates CLPM
+#'   estimates across a grid of hypothetical ICCs to show the bias curve
+#'   relative to that truth. The user's actual CLPM estimate is plotted at
+#'   the observed ICC so the bias is immediate and concrete.
 #'
-#' @param fit A fitted lavaan CLPM object (from \code{lavaan::lavaan} or
-#'   \code{lavaan::sem}) whose syntax was produced by
+#' @param fit A fitted lavaan CLPM object (from
+#'   \code{lavaan::lavaan}/\code{sem}) whose syntax was produced by
 #'   \code{\link{estimateCLPM}}.
-#' @param icc_grid Numeric vector. Hypothetical ICC values to test
-#'   (proportion of total variance from a stable trait). Default
-#'   \code{seq(0, 0.8, by = 0.1)}; values \eqn{\ge 0.9} routinely fail to
-#'   converge.
-#' @param n_sims Integer. Replications per ICC level. Default 30 (sensible
-#'   for a sensitivity check; bump to 100+ for publication).
-#' @param sample_size Integer. Sample size per simulated dataset. Default:
-#'   match the original fit's \code{lavInspect(fit, "nobs")}.
-#' @param waves Integer. Number of waves. Default: inferred from the
-#'   original fit's observed variable list.
+#' @param icc_grid Numeric vector of hypothetical ICC values for the
+#'   simulation sweep. Default \code{seq(0, 0.8, by = 0.1)}; the function
+#'   adds the observed ICC to the grid automatically.
+#' @param n_sims Integer. Replications per ICC level. Default 30 (enough to
+#'   see the curve; bump to 100+ for publication-quality SE).
+#' @param sample_size Integer. Sample size per simulated dataset. Defaults
+#'   to the original fit's \code{lavInspect(fit, "nobs")}.
+#' @param waves Integer. Inferred from the fit by default.
+#' @param data Optional data.frame to use for the RI-CLPM refit and ICC
+#'   computation. If omitted, extracted from the lavaan fit via
+#'   \code{lavInspect(fit, "data")}.
 #' @param seed Optional integer for reproducibility.
 #' @param verbose Logical. Print per-cell progress. Default \code{FALSE}.
 #'
 #' @return An object of class \code{crossLagR_sensitivity} with elements:
 #'   \itemize{
-#'     \item \code{estimates}: long data.frame of recovered AR/CL estimates
-#'       across ICC x sim x estimator (CLPM vs RI-CLPM).
-#'     \item \code{original}: named numeric vector of the user's baseline
-#'       CLPM estimates (\code{ar_x, ar_y, cl_xy, cl_yx}).
-#'     \item \code{icc_grid}, \code{n_sims}, \code{sample_size}, \code{waves}.
+#'     \item \code{estimates}: long data.frame of CLPM AR/CL estimates from
+#'       simulation across \code{icc_grid}.
+#'     \item \code{clpm_actual}: named numeric vector of the user's actual
+#'       CLPM estimates (the biased point of departure).
+#'     \item \code{riclpm_truth}: named numeric vector of the RI-CLPM
+#'       estimates on the same data --- treated as the within-person
+#'       truth (the dashed baseline in the plot).
+#'     \item \code{observed_icc}: named numeric of empirical ICCs for x and
+#'       y in the data.
+#'     \item \code{implied_bias}: named numeric of
+#'       \code{clpm_actual - riclpm_truth} --- the estimated bias.
 #'   }
 #'   Has \code{print()} and \code{plot()} methods.
 #'
 #' @details
-#' \strong{What this answers.} "If the true data-generating process for my
-#' data has within-person dynamics equal to the CLPM estimates I observed,
-#' but ICC of the total variance comes from a stable trait, how biased
-#' would my CLPM estimates have been --- and what would an RI-CLPM have
-#' recovered instead?"
+#' \strong{The framing.} The CLPM is known to be biased when the data carry
+#' a stable trait component (between-person ICC > 0): lagged predictors
+#' correlate with the residual because both inherit the trait
+#' (@hamaker2015critique). This function answers the natural follow-up:
+#' \emph{by how much is my CLPM biased?}
 #'
-#' \strong{What this does not answer.} It does not calibrate the user's
-#' CLPM estimates against an unknown truth. The CLPM estimates already
-#' embed any trait-induced bias present in the original data; treating them
-#' as "within-person truth" is a sensitivity device, not a correction. To
-#' see the actually-implied within-person dynamics, fit an RI-CLPM directly.
+#' The plot shows three pieces of information:
+#' \enumerate{
+#'   \item \strong{Dashed horizontal line} = RI-CLPM estimate on the same
+#'     data, treated as the within-person truth.
+#'   \item \strong{Red curve} = mean CLPM estimate across simulated DGPs
+#'     with the RI-CLPM's within-person dynamics but varying ICC --- the
+#'     bias trajectory.
+#'   \item \strong{Red diamond at the observed ICC} = the user's actual
+#'     CLPM estimate. The vertical gap between the diamond and the dashed
+#'     line is the bias on \emph{your} data.
+#' }
 #'
-#' \strong{The bias mechanism.} The univariate analytical bias is
-#' \deqn{b^{\text{CLPM}}_{xx} \approx \text{ICC}_x + (1 - \text{ICC}_x)\,b^{\text{true}}_{xx}}
-#' (see Sec. on bias in the CLPM chapter). For \eqn{b^{\text{true}}_{xx} = 0}
-#' the CLPM produces a spurious AR equal to \eqn{\text{ICC}_x}. The
-#' multivariate case lacks a clean closed form because the coefficients are
-#' partial slopes; this function characterizes it by simulation.
+#' \strong{What this is not.} It is not a magical bias correction. The
+#' RI-CLPM is treated as truth, which is the standard move but rests on
+#' the RI-CLPM's own assumptions (uncorrelated trait/wave-1 within
+#' factors, no time-varying confounders). If those are violated --- e.g.
+#' the data is Bollen-Brand-shaped --- the RI-CLPM is also biased and the
+#' "truth" reference shifts. Triangulate with other estimators
+#' (Bollen & Brand, LCM-SR) when the stakes are high.
 #'
 #' @references
 #' Hamaker, E. L., Kuiper, R. M., & Grasman, R. P. P. P. (2015). A critique
@@ -61,12 +73,13 @@
 #'
 #' @examples
 #' \dontrun{
-#' dat <- simCLPM(waves = 4, sample_size = 500, seed = 1)$data
+#' dat <- simRICLPM(waves = 4, sample.nobs = 500,
+#'                  var_BX = 1.5, var_BY = 1.5)$data
 #' fit <- lavaan::lavaan(estimateCLPM(waves = 4), data = dat,
 #'                       meanstructure = TRUE)
-#' s <- sensitivityCLPM(fit, icc_grid = seq(0, 0.6, 0.15), n_sims = 20)
-#' s
-#' plot(s)
+#' s <- sensitivityCLPM(fit, icc_grid = seq(0, 0.7, 0.1), n_sims = 50)
+#' s          ## prints CLPM-actual, RI-CLPM-truth, observed ICC, bias
+#' plot(s)    ## bias curve with observed-ICC marker
 #' }
 #' @export
 sensitivityCLPM <- function(fit,
@@ -74,6 +87,7 @@ sensitivityCLPM <- function(fit,
                             n_sims = 30,
                             sample_size = NULL,
                             waves = NULL,
+                            data = NULL,
                             seed = NULL,
                             verbose = FALSE) {
 
@@ -91,24 +105,22 @@ sensitivityCLPM <- function(fit,
   }
   if (!is.null(seed)) set.seed(seed)
 
+  ## ---- 1. user's actual (biased) CLPM estimates ---------------------------
   pe <- lavaan::parameterEstimates(fit)
-  pick <- function(lab) {
-    v <- pe$est[pe$label == lab]
+  pick <- function(p, lab) {
+    v <- p$est[p$label == lab]
     if (!length(v)) NA_real_ else as.numeric(v[1])
   }
-  orig <- c(
-    ar_x  = pick("ar_x"),  ar_y  = pick("ar_y"),
-    cl_xy = pick("cl_xy"), cl_yx = pick("cl_yx")
+  clpm_actual <- c(
+    ar_x  = pick(pe, "ar_x"),  ar_y  = pick(pe, "ar_y"),
+    cl_xy = pick(pe, "cl_xy"), cl_yx = pick(pe, "cl_yx")
   )
-  d_var_x  <- pick("d_var_x")
-  d_var_y  <- pick("d_var_y")
-  d_cov_xy <- pick("d_cov_xy")
-
-  if (any(is.na(orig)) || is.na(d_var_x) || is.na(d_var_y)) {
-    stop("Could not extract CLPM parameters from fit. ",
+  if (any(is.na(clpm_actual))) {
+    stop("Could not extract unified CLPM labels from fit. ",
          "Was the syntax built with estimateCLPM()?")
   }
 
+  ## ---- 2. waves / N -------------------------------------------------------
   if (is.null(sample_size)) {
     sample_size <- tryCatch(as.integer(lavaan::lavInspect(fit, "nobs")),
                             error = function(e) 500L)
@@ -122,6 +134,57 @@ sensitivityCLPM <- function(fit,
     }
   }
 
+  ## ---- 3. RI-CLPM truth ---------------------------------------------------
+  if (is.null(data)) {
+    data <- tryCatch(as.data.frame(lavaan::lavInspect(fit, "data")),
+                     error = function(e) NULL)
+    if (is.null(data)) {
+      stop("Could not extract data from fit; supply 'data' explicitly.")
+    }
+    obs_names <- lavaan::lavNames(fit, "ov")
+    if (ncol(data) == length(obs_names)) names(data) <- obs_names
+  }
+
+  riclpm_fit <- tryCatch(
+    suppressWarnings(lavaan::lavaan(
+      crossLagR::estimateRICLPM(waves = waves),
+      data = data, meanstructure = TRUE,
+      control = list(iter.max = 500L))),
+    error = function(e) NULL
+  )
+  if (is.null(riclpm_fit) ||
+      !isTRUE(lavaan::lavInspect(riclpm_fit, "converged"))) {
+    stop("RI-CLPM refit did not converge on the supplied data; cannot ",
+         "construct a within-person truth reference. Consider ",
+         "iccReport(data) and inspecting the ICC structure manually.")
+  }
+  pe_ri <- lavaan::parameterEstimates(riclpm_fit)
+  riclpm_truth <- c(
+    ar_x  = pick(pe_ri, "ar_x"),  ar_y  = pick(pe_ri, "ar_y"),
+    cl_xy = pick(pe_ri, "cl_xy"), cl_yx = pick(pe_ri, "cl_yx")
+  )
+  d_var_x  <- pick(pe_ri, "d_var_x")  %||% pick(pe, "d_var_x")
+  d_var_y  <- pick(pe_ri, "d_var_y")  %||% pick(pe, "d_var_y")
+  d_cov_xy <- pick(pe_ri, "d_cov_xy") %||% pick(pe, "d_cov_xy") %||% 0
+
+  ## ---- 4. observed ICC on the actual data ---------------------------------
+  icc_obs_df <- tryCatch(
+    crossLagR::iccReport(data, vars = c("x", "y"), quiet = TRUE),
+    error = function(e) NULL
+  )
+  observed_icc <- if (is.null(icc_obs_df)) {
+    c(x = NA_real_, y = NA_real_)
+  } else {
+    c(x = icc_obs_df$icc[icc_obs_df$variable == "x"][1],
+      y = icc_obs_df$icc[icc_obs_df$variable == "y"][1])
+  }
+
+  ## Add the observed ICC to the grid (clipped to [0, 0.95)) so the plot
+  ## marker has somewhere to land.
+  icc_grid <- sort(unique(c(icc_grid,
+                            pmin(0.95, observed_icc[!is.na(observed_icc)]))))
+
+  ## ---- 5. simulate CLPM bias across icc_grid ------------------------------
   rows <- vector("list", length(icc_grid) * n_sims)
   k <- 0L
 
@@ -131,49 +194,45 @@ sensitivityCLPM <- function(fit,
 
     for (s in seq_len(n_sims)) {
       k <- k + 1L
-      cell <- tryCatch({
+      est <- tryCatch({
         dat <- crossLagR::simRICLPM(
           waves        = waves,
           sample.nobs  = sample_size,
-          beta_x       = orig["ar_x"],  beta_y = orig["ar_y"],
-          omega_xy     = orig["cl_xy"], omega_yx = orig["cl_yx"],
-          var_p        = d_var_x,       var_q  = d_var_y,
+          beta_x       = riclpm_truth["ar_x"],
+          beta_y       = riclpm_truth["ar_y"],
+          omega_xy     = riclpm_truth["cl_xy"],
+          omega_yx     = riclpm_truth["cl_yx"],
+          var_p        = d_var_x, var_q  = d_var_y,
           cov_pq       = d_cov_xy,
-          var_BX       = var_BX,        var_BY = var_BY,
+          var_BX       = var_BX,  var_BY = var_BY,
           cov_BXBY     = 0
         )$data
-        list(
-          clpm   = .sens_fit(dat, "CLPM",   waves),
-          riclpm = .sens_fit(dat, "RICLPM", waves)
-        )
+        .sens_fit(dat, "CLPM", waves)
       }, error = function(e) {
         if (verbose) message("[icc=", icc, " sim=", s, "] ", e$message)
-        NULL
+        rep(NA_real_, 4L)
       })
-
-      if (is.null(cell)) {
-        rows[[k]] <- .sens_row(icc, s, "CLPM",   rep(NA_real_, 4))
-        next
-      }
-      rows[[k]] <- rbind(
-        .sens_row(icc, s, "CLPM",    cell$clpm),
-        .sens_row(icc, s, "RI-CLPM", cell$riclpm)
-      )
+      rows[[k]] <- .sens_row(icc, s, "CLPM", est)
     }
     if (verbose) message("Finished ICC = ", icc)
   }
 
-  est <- do.call(rbind, rows)
-  est$original_est <- orig[est$parameter]
+  est_df <- do.call(rbind, rows)
+  est_df$riclpm_truth <- riclpm_truth[est_df$parameter]
+
+  implied_bias <- clpm_actual - riclpm_truth
 
   out <- structure(
     list(
-      estimates   = est,
-      original    = orig,
-      icc_grid    = icc_grid,
-      n_sims      = n_sims,
-      sample_size = sample_size,
-      waves       = waves
+      estimates    = est_df,
+      clpm_actual  = clpm_actual,
+      riclpm_truth = riclpm_truth,
+      observed_icc = observed_icc,
+      implied_bias = implied_bias,
+      icc_grid     = icc_grid,
+      n_sims       = n_sims,
+      sample_size  = sample_size,
+      waves        = waves
     ),
     class = "crossLagR_sensitivity"
   )
@@ -183,29 +242,29 @@ sensitivityCLPM <- function(fit,
 
 #' @export
 print.crossLagR_sensitivity <- function(x, digits = 3, ...) {
-  cat("crossLagR CLPM sensitivity analysis\n",
-      strrep("=", 35), "\n", sep = "")
-  cat("Baseline CLPM estimates (treated as within-person truth):\n")
-  print(round(x$original, digits))
-  cat("\nGrid: ICC in {", paste(x$icc_grid, collapse = ", "), "}, ",
-      x$n_sims, " sims per cell, N = ", x$sample_size, ", waves = ", x$waves,
-      "\n", sep = "")
+  cat("crossLagR CLPM bias diagnostic\n",
+      strrep("=", 32), "\n", sep = "")
 
-  agg <- stats::aggregate(
-    est ~ icc + estimator + parameter,
-    data = x$estimates,
-    FUN  = function(v) c(mean = mean(v, na.rm = TRUE),
-                         sd   = stats::sd(v, na.rm = TRUE))
+  tab <- data.frame(
+    parameter    = names(x$clpm_actual),
+    clpm_actual  = round(x$clpm_actual,  digits),
+    riclpm_truth = round(x$riclpm_truth, digits),
+    implied_bias = round(x$implied_bias, digits),
+    pct_inflation = ifelse(abs(x$riclpm_truth) > 1e-6,
+                           round(100 * x$implied_bias / x$riclpm_truth, 1),
+                           NA_real_),
+    stringsAsFactors = FALSE
   )
-  agg <- do.call(data.frame, agg)
-  names(agg)[4:5] <- c("mean_est", "sd_est")
-  cat("\nMean estimate by ICC x estimator x parameter:\n")
-  cat(strrep("-", 50), "\n", sep = "")
-  agg$mean_est <- round(agg$mean_est, digits)
-  agg$sd_est   <- round(agg$sd_est,   digits)
-  print(agg, row.names = FALSE)
+  print(tab, row.names = FALSE)
 
-  cat("\nCall plot() on this object for the sensitivity diagram.\n")
+  cat("\nObserved ICC in data:  x = ", round(x$observed_icc["x"], digits),
+      ",  y = ", round(x$observed_icc["y"], digits), "\n", sep = "")
+  cat("Sample size = ", x$sample_size, ",  waves = ", x$waves, ",  ",
+      x$n_sims, " sims per ICC cell\n", sep = "")
+  cat("\nInterpretation: rows where |implied_bias| is large relative to\n",
+      "riclpm_truth indicate the CLPM is materially biased on this data.\n",
+      "Call plot() to see the bias curve and where you sit on it.\n",
+      sep = "")
   invisible(x)
 }
 
@@ -215,67 +274,81 @@ plot.crossLagR_sensitivity <- function(x, ...) {
   if (!requireNamespace("ggplot2", quietly = TRUE)) {
     stop("Package 'ggplot2' is required for plot.crossLagR_sensitivity().")
   }
-  if (!requireNamespace("dplyr", quietly = TRUE)) {
-    stop("Package 'dplyr' is required for plot.crossLagR_sensitivity().")
-  }
   est <- x$estimates
   est$parameter <- factor(est$parameter,
                           levels = c("ar_x", "ar_y", "cl_xy", "cl_yx"))
 
-  ## Ribbon = +/- 1.96 * MC standard error of the mean. This is the right
-  ## inference target for a bias plot: it shrinks with sqrt(n_sims) and
-  ## answers "is the mean estimate really different from the baseline."
-  ## A per-replication percentile ribbon (sampling distribution of a
-  ## single fit) is a different question and confuses bias for noise.
   agg <- stats::aggregate(
-    est ~ icc + estimator + parameter,
+    est ~ icc + parameter,
     data = est,
     FUN  = function(v) {
       v <- v[is.finite(v)]
       n <- length(v)
       mu <- mean(v)
       se <- if (n > 1L) stats::sd(v) / sqrt(n) else NA_real_
-      c(mean = mu,
-        lo   = mu - 1.96 * se,
-        hi   = mu + 1.96 * se,
-        n    = n)
+      c(mean = mu, lo = mu - 1.96 * se, hi = mu + 1.96 * se)
     }
   )
   agg <- do.call(data.frame, agg)
-  names(agg)[4:7] <- c("mean", "lo", "hi", "n")
+  names(agg)[3:5] <- c("mean", "lo", "hi")
 
-  baseline <- data.frame(parameter = names(x$original),
-                         baseline  = unname(x$original))
+  truth_df <- data.frame(parameter = names(x$riclpm_truth),
+                         truth     = unname(x$riclpm_truth))
+  truth_df$parameter <- factor(truth_df$parameter,
+                               levels = levels(est$parameter))
 
-  ggplot2::ggplot(agg, ggplot2::aes(x = .data$icc, y = .data$mean,
-                                    color = .data$estimator,
-                                    fill  = .data$estimator)) +
+  ## User's actual CLPM estimate at the observed ICC (use ICC_x for AR_x /
+  ## CL paths involving x as the dependent, ICC_y for the others).
+  obs_icc_for_param <- function(p) {
+    switch(p,
+           ar_x  = unname(x$observed_icc["x"]),
+           cl_yx = unname(x$observed_icc["x"]),
+           ar_y  = unname(x$observed_icc["y"]),
+           cl_xy = unname(x$observed_icc["y"]),
+           NA_real_)
+  }
+  marker_df <- data.frame(
+    parameter = names(x$clpm_actual),
+    icc       = vapply(names(x$clpm_actual), obs_icc_for_param, numeric(1)),
+    value     = unname(x$clpm_actual),
+    stringsAsFactors = FALSE
+  )
+  marker_df$parameter <- factor(marker_df$parameter,
+                                levels = levels(est$parameter))
+
+  vlines_df <- marker_df[, c("parameter", "icc")]
+
+  ggplot2::ggplot(agg, ggplot2::aes(x = .data$icc, y = .data$mean)) +
     ggplot2::geom_ribbon(ggplot2::aes(ymin = .data$lo, ymax = .data$hi),
-                         alpha = 0.18, color = NA) +
-    ggplot2::geom_line(linewidth = 0.9) +
-    ggplot2::geom_point(size = 1.8) +
-    ggplot2::geom_hline(data = baseline,
-                        ggplot2::aes(yintercept = .data$baseline),
+                         fill = "#b2182b", alpha = 0.20) +
+    ggplot2::geom_line(color = "#b2182b", linewidth = 0.9) +
+    ggplot2::geom_point(color = "#b2182b", size = 1.6) +
+    ggplot2::geom_hline(data = truth_df,
+                        ggplot2::aes(yintercept = .data$truth),
                         linetype = "dashed", color = "grey30") +
+    ggplot2::geom_vline(data = vlines_df,
+                        ggplot2::aes(xintercept = .data$icc),
+                        linetype = "dotted", color = "grey50") +
+    ggplot2::geom_point(data = marker_df,
+                        ggplot2::aes(x = .data$icc, y = .data$value),
+                        shape = 23, size = 4, fill = "#b2182b",
+                        color = "black", stroke = 0.6,
+                        inherit.aes = FALSE) +
     ggplot2::facet_wrap(~ .data$parameter, scales = "free_y") +
-    ggplot2::scale_color_manual(values = c("CLPM"    = "#b2182b",
-                                           "RI-CLPM" = "#2166ac")) +
-    ggplot2::scale_fill_manual(values  = c("CLPM"    = "#b2182b",
-                                           "RI-CLPM" = "#2166ac")) +
     ggplot2::labs(
-      x = "Injected ICC (trait variance / total variance)",
-      y = "Recovered estimate (mean +/- 1.96 SE_MC of the mean)",
-      color = NULL, fill = NULL,
-      title    = "CLPM sensitivity to between-person trait variance",
+      x = "ICC (between-person trait variance / total variance)",
+      y = "Estimate",
+      title    = "CLPM bias diagnostic",
       subtitle = paste0(
-        "Dashed line: original CLPM estimate (preserved as within-person truth). ",
-        "N = ", x$sample_size, ", ", x$n_sims, " sims per ICC. ",
-        "Ribbon = MC uncertainty in the cell mean (shrinks with n_sims)."
+        "Dashed = RI-CLPM truth on your data. ",
+        "Red curve = mean CLPM at each simulated ICC (",
+        x$n_sims, " sims, ribbon = +/- 1.96 SE_MC). ",
+        "Diamond = your actual CLPM estimate at the observed ICC."
       )
     ) +
     ggplot2::theme_minimal(base_size = 11) +
-    ggplot2::theme(legend.position = "top",
-                   strip.text      = ggplot2::element_text(face = "bold"))
+    ggplot2::theme(strip.text = ggplot2::element_text(face = "bold"),
+                   legend.position = "none")
 }
 
 

@@ -10,28 +10,31 @@ sensitivityCLPM(
   n_sims = 30,
   sample_size = NULL,
   waves = NULL,
+  data = NULL,
   seed = NULL,
   verbose = FALSE
 )
 }
 \arguments{
-\item{fit}{A fitted lavaan CLPM object (from \code{lavaan::lavaan} or
-\code{lavaan::sem}) whose syntax was produced by
+\item{fit}{A fitted lavaan CLPM object (from
+\code{lavaan::lavaan}/\code{sem}) whose syntax was produced by
 \code{\link{estimateCLPM}}.}
 
-\item{icc_grid}{Numeric vector. Hypothetical ICC values to test
-(proportion of total variance from a stable trait). Default
-\code{seq(0, 0.8, by = 0.1)}; values \eqn{\ge 0.9} routinely fail to
-converge.}
+\item{icc_grid}{Numeric vector of hypothetical ICC values for the
+simulation sweep. Default \code{seq(0, 0.8, by = 0.1)}; the function
+adds the observed ICC to the grid automatically.}
 
-\item{n_sims}{Integer. Replications per ICC level. Default 30 (sensible
-for a sensitivity check; bump to 100+ for publication).}
+\item{n_sims}{Integer. Replications per ICC level. Default 30 (enough to
+see the curve; bump to 100+ for publication-quality SE).}
 
-\item{sample_size}{Integer. Sample size per simulated dataset. Default:
-match the original fit's \code{lavInspect(fit, "nobs")}.}
+\item{sample_size}{Integer. Sample size per simulated dataset. Defaults
+to the original fit's \code{lavInspect(fit, "nobs")}.}
 
-\item{waves}{Integer. Number of waves. Default: inferred from the
-original fit's observed variable list.}
+\item{waves}{Integer. Inferred from the fit by default.}
+
+\item{data}{Optional data.frame to use for the RI-CLPM refit and ICC
+computation. If omitted, extracted from the lavaan fit via
+\code{lavInspect(fit, "data")}.}
 
 \item{seed}{Optional integer for reproducibility.}
 
@@ -40,52 +43,64 @@ original fit's observed variable list.}
 \value{
 An object of class \code{crossLagR_sensitivity} with elements:
   \itemize{
-    \item \code{estimates}: long data.frame of recovered AR/CL estimates
-      across ICC x sim x estimator (CLPM vs RI-CLPM).
-    \item \code{original}: named numeric vector of the user's baseline
-      CLPM estimates (\code{ar_x, ar_y, cl_xy, cl_yx}).
-    \item \code{icc_grid}, \code{n_sims}, \code{sample_size}, \code{waves}.
+    \item \code{estimates}: long data.frame of CLPM AR/CL estimates from
+      simulation across \code{icc_grid}.
+    \item \code{clpm_actual}: named numeric vector of the user's actual
+      CLPM estimates (the biased point of departure).
+    \item \code{riclpm_truth}: named numeric vector of the RI-CLPM
+      estimates on the same data --- treated as the within-person
+      truth (the dashed baseline in the plot).
+    \item \code{observed_icc}: named numeric of empirical ICCs for x and
+      y in the data.
+    \item \code{implied_bias}: named numeric of
+      \code{clpm_actual - riclpm_truth} --- the estimated bias.
   }
   Has \code{print()} and \code{plot()} methods.
 }
 \description{
-Sensitivity analysis for a fitted CLPM. Treats the CLPM's
-  estimated AR/CL parameters as the (hypothetical) within-person truth,
-  then injects between-person trait variance at a grid of ICC levels and
-  refits both a CLPM and an RI-CLPM. The output diagnoses how badly a
-  CLPM would mis-estimate the AR/CL parameters under varying degrees of
-  stable trait variance --- the bias mechanism formalized by
-  @hamaker2015critique and derived analytically in the CLPM chapter of
-  the package book.
+Diagnose how badly a fitted CLPM is biased by between-person
+  trait variance. Fits an RI-CLPM on the same data to obtain the within-
+  person truth, computes the data's observed ICC, then simulates CLPM
+  estimates across a grid of hypothetical ICCs to show the bias curve
+  relative to that truth. The user's actual CLPM estimate is plotted at
+  the observed ICC so the bias is immediate and concrete.
 }
 \details{
-\strong{What this answers.} "If the true data-generating process for my
-data has within-person dynamics equal to the CLPM estimates I observed,
-but ICC of the total variance comes from a stable trait, how biased
-would my CLPM estimates have been --- and what would an RI-CLPM have
-recovered instead?"
+\strong{The framing.} The CLPM is known to be biased when the data carry
+a stable trait component (between-person ICC > 0): lagged predictors
+correlate with the residual because both inherit the trait
+(@hamaker2015critique). This function answers the natural follow-up:
+\emph{by how much is my CLPM biased?}
 
-\strong{What this does not answer.} It does not calibrate the user's
-CLPM estimates against an unknown truth. The CLPM estimates already
-embed any trait-induced bias present in the original data; treating them
-as "within-person truth" is a sensitivity device, not a correction. To
-see the actually-implied within-person dynamics, fit an RI-CLPM directly.
+The plot shows three pieces of information:
+\enumerate{
+  \item \strong{Dashed horizontal line} = RI-CLPM estimate on the same
+    data, treated as the within-person truth.
+  \item \strong{Red curve} = mean CLPM estimate across simulated DGPs
+    with the RI-CLPM's within-person dynamics but varying ICC --- the
+    bias trajectory.
+  \item \strong{Red diamond at the observed ICC} = the user's actual
+    CLPM estimate. The vertical gap between the diamond and the dashed
+    line is the bias on \emph{your} data.
+}
 
-\strong{The bias mechanism.} The univariate analytical bias is
-\deqn{b^{\text{CLPM}}_{xx} \approx \text{ICC}_x + (1 - \text{ICC}_x)\,b^{\text{true}}_{xx}}
-(see Sec. on bias in the CLPM chapter). For \eqn{b^{\text{true}}_{xx} = 0}
-the CLPM produces a spurious AR equal to \eqn{\text{ICC}_x}. The
-multivariate case lacks a clean closed form because the coefficients are
-partial slopes; this function characterizes it by simulation.
+\strong{What this is not.} It is not a magical bias correction. The
+RI-CLPM is treated as truth, which is the standard move but rests on
+the RI-CLPM's own assumptions (uncorrelated trait/wave-1 within
+factors, no time-varying confounders). If those are violated --- e.g.
+the data is Bollen-Brand-shaped --- the RI-CLPM is also biased and the
+"truth" reference shifts. Triangulate with other estimators
+(Bollen & Brand, LCM-SR) when the stakes are high.
 }
 \examples{
 \dontrun{
-dat <- simCLPM(waves = 4, sample_size = 500, seed = 1)$data
+dat <- simRICLPM(waves = 4, sample.nobs = 500,
+                 var_BX = 1.5, var_BY = 1.5)$data
 fit <- lavaan::lavaan(estimateCLPM(waves = 4), data = dat,
                       meanstructure = TRUE)
-s <- sensitivityCLPM(fit, icc_grid = seq(0, 0.6, 0.15), n_sims = 20)
-s
-plot(s)
+s <- sensitivityCLPM(fit, icc_grid = seq(0, 0.7, 0.1), n_sims = 50)
+s          ## prints CLPM-actual, RI-CLPM-truth, observed ICC, bias
+plot(s)    ## bias curve with observed-ICC marker
 }
 }
 \references{
