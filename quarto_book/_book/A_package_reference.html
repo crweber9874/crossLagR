@@ -85,7 +85,7 @@ div.csl-indent {
 <script src="site_libs/quarto-search/fuse.min.js"></script>
 <script src="site_libs/quarto-search/quarto-search.js"></script>
 <meta name="quarto:offset" content="./">
-<link href="./07_liss.html" rel="prev">
+<link href="./06_Unified.html" rel="prev">
 <script src="site_libs/quarto-html/quarto.js" type="module"></script>
 <script src="site_libs/quarto-html/tabsets/tabsets.js" type="module"></script>
 <script src="site_libs/quarto-html/axe/axe-check.js" type="module"></script>
@@ -211,60 +211,43 @@ window.Quarto = {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./02_Change.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  <a href="./02_Bias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bias in the Cross-Lagged Panel Model</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./03_RICLPM.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
+  <a href="./03_Identification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Sensitivity</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./04_Usami.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
+  <a href="./04_RICLPM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./05_simulations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Simulations</span></span></a>
+  <a href="./05_Change.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_Unified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Applications</span></a>
+ <span class="menu-text">Appendices</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./06_iscap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The ISCAP Panel</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./07_liss.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Replication: Bakker, Lelkes, &amp; Malka (2021)</span></span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./A_package_reference.html" class="sidebar-item-text sidebar-link active">
@@ -564,31 +547,31 @@ Converged: TRUE    N obs: 500    N missing: 0
 Parameters (unified labels)
 --------------------------------------------------
  label    description                                est   se    z      p    
- ar_x     Autoregressive effect of X (X(t-1) -&gt; X... 0.215 0.046 4.646  0.000
- cl_yx    Cross-lagged effect of Y on X (Y(t-1) -... 0.044 0.038 1.153  0.249
- ar_y     Autoregressive effect of Y (Y(t-1) -&gt; Y... 0.329 0.050 6.625  0.000
- cl_xy    Cross-lagged effect of X on Y (X(t-1) -... 0.018 0.040 0.457  0.647
- d_var_x  Within-person residual variance of X       0.947 0.042 22.447 0.000
- d_var_y  Within-person residual variance of Y       1.036 0.048 21.627 0.000
- d_cov_xy Within-person residual covariance X&lt;-&gt;Y    0.067 0.032 2.095  0.036
+ ar_x     Autoregressive effect of X (X(t-1) -&gt; X... 0.224 0.047 4.813  0.000
+ cl_yx    Cross-lagged effect of Y on X (Y(t-1) -... 0.053 0.039 1.358  0.174
+ ar_y     Autoregressive effect of Y (Y(t-1) -&gt; Y... 0.346 0.050 6.934  0.000
+ cl_xy    Cross-lagged effect of X on Y (X(t-1) -... 0.026 0.041 0.637  0.524
+ d_var_x  Within-person residual variance of X       0.974 0.044 22.369 0.000
+ d_var_y  Within-person residual variance of Y       1.067 0.049 21.550 0.000
+ d_cov_xy Within-person residual covariance X&lt;-&gt;Y    0.085 0.033 2.577  0.010
  95% CI          sig std  
- [0.124, 0.305]  *** 0.210
- [-0.031, 0.120]     0.045
- [0.231, 0.426]  *** 0.312
- [-0.061, 0.098]     0.017
- [0.865, 1.030]  *** 1.000
- [0.942, 1.130]  *** 1.000
- [0.004, 0.130]  *   0.068
+ [0.133, 0.315]  *** 0.218
+ [-0.023, 0.128]     0.053
+ [0.248, 0.444]  *** 0.327
+ [-0.054, 0.105]     0.023
+ [0.889, 1.060]  *** 1.000
+ [0.970, 1.164]  *** 1.000
+ [0.020, 0.150]  **  0.084
 ---
 Significance: '***' p&lt;.001  '**' p&lt;.01  '*' p&lt;.05  '.' p&lt;.10
 
 Fit statistics
 --------------------------------------------------
-  chi-square = 36.389   df = 32   p = 0.272
-  CFI = 0.998   TLI = 0.998
-  RMSEA = 0.017   [0.000, 0.038]
-  SRMR = 0.031
-  AIC = 12864.238   BIC = 12914.813</code></pre>
+  chi-square = 34.679   df = 32   p = 0.341
+  CFI = 0.999   TLI = 0.999
+  RMSEA = 0.013   [0.000, 0.036]
+  SRMR = 0.032
+  AIC = 12933.469   BIC = 12984.044</code></pre>
 </div>
 </div>
 </section>
@@ -2002,8 +1985,8 @@ Usami, Satoshi, Kou Murayama, and Ellen L. Hamaker. 2019. <span>“A Unified Fra
   </script>
 <nav class="page-navigation">
   <div class="nav-page nav-page-previous">
-      <a href="./07_liss.html" class="pagination-link" aria-label="Replication: Bakker, Lelkes, &amp; Malka (2021)">
-        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Replication: Bakker, Lelkes, &amp; Malka (2021)</span></span>
+      <a href="./06_Unified.html" class="pagination-link" aria-label="Extensions and Alternatives">
+        <i class="bi bi-arrow-left-short"></i> <span class="nav-page-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span>
       </a>          
   </div>
   <div class="nav-page nav-page-next">

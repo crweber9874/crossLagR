@@ -65,31 +65,9 @@
 #' - Observed variable residuals are fixed to 0 (perfect indicators)
 #'
 #' @examples
-#' # Basic RICLPM simulation
-#' riclpm_data <- simRICLPM(waves = 4, sample.nobs = 500)
+#' simRICLPM(waves = 4, sample.nobs = 500)
 #'
-#' # RICLPM with stronger cross-lagged effects
-#' riclpm_strong <- simRICLPM(
-#'   waves = 5,
-#'   omega_xy = 0.3,
-#'   omega_yx = 0.3,
-#'   sample.nobs = 1000
-#' )
-#'
-#' # RICLPM with third variable
-#' riclpm_3var <- simRICLPM(
-#'   waves = 4,
-#'   include_z = TRUE,
-#'   sample.nobs = 800
-#' )
-#'
-#' # RICLPM with unconstrained parameters
-#' riclpm_free <- simRICLPM(
-#'   waves = 4,
-#'   constrain_beta = FALSE,
-#'   constrain_omega = FALSE,
-#'   sample.nobs = 600
-#' )
+#' simRICLPM(waves = 5, omega_xy = 0.3, omega_yx = 0.3, sample.nobs = 1000)
 #'
 #' @export
 simRICLPM <- function(waves = 5,
@@ -336,30 +314,84 @@ simRICLPM <- function(waves = 5,
     }
   }
 
+  # ==================== STATIONARY WAVE-1 (CO)VARIANCES ==================
+  # Wave 1 has no predictor, so `p1 ~~ v*p1` fixes p1's TOTAL variance, while
+  # the same line at wave >= 2 fixes a RESIDUAL variance. Handing wave 1 the
+  # innovation (co)variances therefore starts the within-person process below
+  # its stationary level and lets it drift upward across waves. Wave 1 instead
+  # takes the stationary solution of Psi = M Psi M' + Sigma, i.e.
+  # vec(Psi) = (I - M (x) M)^-1 vec(Sigma).
+  M <- if (include_z) {
+    matrix(c(beta_x, omega_yx, omega_zx,
+             omega_xy, beta_y, omega_zy,
+             omega_xz, omega_yz, beta_z), nrow = 3, byrow = TRUE)
+  } else {
+    matrix(c(beta_x, omega_yx,
+             omega_xy, beta_y), nrow = 2, byrow = TRUE)
+  }
+  Sigma_innov <- if (include_z) {
+    matrix(c(var_p, cov_pq, cov_pr,
+             cov_pq, var_q, cov_qr,
+             cov_pr, cov_qr, var_r), nrow = 3, byrow = TRUE)
+  } else {
+    matrix(c(var_p, cov_pq,
+             cov_pq, var_q), nrow = 2, byrow = TRUE)
+  }
+
+  max_eig <- max(Mod(eigen(M, only.values = TRUE)$values))
+  if (max_eig >= 1) {
+    stop(sprintf(
+      paste0("Within-person AR matrix is non-stationary (max |eigenvalue| = %.3f). ",
+             "Reduce the autoregressive and cross-lagged effects."), max_eig),
+      call. = FALSE
+    )
+  }
+
+  k <- nrow(M)
+  Psi1 <- matrix(
+    solve(diag(k^2) - kronecker(M, M), as.vector(Sigma_innov)), k, k
+  )
+  Psi1 <- (Psi1 + t(Psi1)) / 2
+
+  var_p1 <- Psi1[1, 1]
+  var_q1 <- Psi1[2, 2]
+  cov_pq1 <- Psi1[1, 2]
+  if (include_z) {
+    var_r1  <- Psi1[3, 3]
+    cov_pr1 <- Psi1[1, 3]
+    cov_qr1 <- Psi1[2, 3]
+  }
+
   # ==================== RESIDUAL VARIANCES ====================
   model_string <- paste0(model_string, "\n\n# Residual Variances")
   if (constrain_residual_variances) {
     for (w in 1:waves) {
+      vp <- if (w == 1) var_p1 else var_p
+      vq <- if (w == 1) var_q1 else var_q
       model_string <- paste0(
-        model_string, "\np", w, " ~~ ", var_p, "*p", w,
-        "\nq", w, " ~~ ", var_q, "*q", w
+        model_string, "\np", w, " ~~ ", vp, "*p", w,
+        "\nq", w, " ~~ ", vq, "*q", w
       )
       if (include_z) {
+        vr <- if (w == 1) var_r1 else var_r
         model_string <- paste0(
-          model_string, "\nr", w, " ~~ ", var_r, "*r", w
+          model_string, "\nr", w, " ~~ ", vr, "*r", w
         )
       }
     }
   } else {
     # When unconstrained, each wave gets its own variance parameter
     for (w in 1:waves) {
+      vp <- if (w == 1) var_p1 else var_p
+      vq <- if (w == 1) var_q1 else var_q
       model_string <- paste0(
-        model_string, "\np", w, " ~~ ", var_p, "*p", w,
-        "\nq", w, " ~~ ", var_q, "*q", w
+        model_string, "\np", w, " ~~ ", vp, "*p", w,
+        "\nq", w, " ~~ ", vq, "*q", w
       )
       if (include_z) {
+        vr <- if (w == 1) var_r1 else var_r
         model_string <- paste0(
-          model_string, "\nr", w, " ~~ ", var_r, "*r", w
+          model_string, "\nr", w, " ~~ ", vr, "*r", w
         )
       }
     }
@@ -369,13 +401,16 @@ simRICLPM <- function(waves = 5,
   model_string <- paste0(model_string, "\n\n# Residual Covariances")
   if (constrain_residual_covariances) {
     for (w in 1:waves) {
+      cpq <- if (w == 1) cov_pq1 else cov_pq
       model_string <- paste0(
-        model_string, "\np", w, " ~~ ", cov_pq, "*q", w
+        model_string, "\np", w, " ~~ ", cpq, "*q", w
       )
       if (include_z) {
+        cpr <- if (w == 1) cov_pr1 else cov_pr
+        cqr <- if (w == 1) cov_qr1 else cov_qr
         model_string <- paste0(
-          model_string, "\np", w, " ~~ ", cov_pr, "*r", w,
-          "\nq", w, " ~~ ", cov_qr, "*r", w
+          model_string, "\np", w, " ~~ ", cpr, "*r", w,
+          "\nq", w, " ~~ ", cqr, "*r", w
         )
       }
     }

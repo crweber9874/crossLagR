@@ -141,30 +141,8 @@ Model identification follows standard RICLPM practices:
 - Observed variable residuals are fixed to 0 (perfect indicators)
 }
 \examples{
-# Basic RICLPM simulation
-riclpm_data <- simRICLPM(waves = 4, sample.nobs = 500)
+simRICLPM(waves = 4, sample.nobs = 500)
 
-# RICLPM with stronger cross-lagged effects
-riclpm_strong <- simRICLPM(
-  waves = 5,
-  omega_xy = 0.3,
-  omega_yx = 0.3,
-  sample.nobs = 1000
-)
-
-# RICLPM with third variable
-riclpm_3var <- simRICLPM(
-  waves = 4,
-  include_z = TRUE,
-  sample.nobs = 800
-)
-
-# RICLPM with unconstrained parameters
-riclpm_free <- simRICLPM(
-  waves = 4,
-  constrain_beta = FALSE,
-  constrain_omega = FALSE,
-  sample.nobs = 600
-)
+simRICLPM(waves = 5, omega_xy = 0.3, omega_yx = 0.3, sample.nobs = 1000)
 
 }

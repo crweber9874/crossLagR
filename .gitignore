@@ -2,7 +2,6 @@
 .Rhistory
 .Ruserdata
 .Renv
-docs
 .Rdata
 .RData
 .httr-oauth
@@ -27,5 +26,3 @@ archive/
 agent_workflow/
 
 
-vignettes/simulator_internals.html
-vignettes/simulator_internals_files/

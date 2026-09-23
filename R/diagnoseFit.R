@@ -270,6 +270,7 @@ print.crossLagR_fit <- function(x, ...) {
   invisible(x)
 }
 
+#' @method summary crossLagR_fit
 #' @export
 summary.crossLagR_fit <- function(object, ...) {
   print(object, ...)
@@ -314,6 +315,7 @@ print.crossLagR_diagnosis <- function(x, ...) {
   invisible(x)
 }
 
+#' @method summary crossLagR_diagnosis
 #' @export
 summary.crossLagR_diagnosis <- function(object, ...) {
   cat(object$summary, "\n", sep = "")
@@ -341,7 +343,7 @@ summary.crossLagR_diagnosis <- function(object, ...) {
       "Re-fit with simpler starts: lavaan(..., start = 'simple').",
       "Constrain AR/CL parameters across waves (constrain_beta = TRUE, constrain_omega = TRUE) to reduce empirical underidentification.",
       "Increase the iteration cap: lavaan(..., control = list(iter.max = 5000)).",
-      "Estimate in blavaan with weakly-informative priors; MCMC explores the posterior without requiring convergence to a single mode."
+      "Rescale variables to comparable variances (e.g., zero.one() or standardizing) -- wildly different scales flatten the likelihood surface."
     )
   ),
 
@@ -361,7 +363,7 @@ summary.crossLagR_diagnosis <- function(object, ...) {
       "If the negative variance is on a random intercept (I_x, I_y), the data may lack genuine between-person variation in that construct -- consider a plain CLPM (no random intercept) instead of RICLPM.",
       "Inspect the between/within decomposition with withinBetween() -- a near-zero ICC means a within-between model is mis-specified.",
       "Constrain the offending variance to non-negative (e.g., 'I_x ~~ lower(0)*I_x') or fix it to zero.",
-      "Estimate in blavaan with a positive-support prior (e.g., gamma(1, 0.5)) on the variance.",
+      "Screen for influential cases -- a single extreme respondent can push a boundary variance below zero.",
       "Increase sample size and/or number of waves -- boundary estimates are common in small N."
     )
   ),
@@ -381,7 +383,7 @@ summary.crossLagR_diagnosis <- function(object, ...) {
     remedies = c(
       "Constrain the corresponding residual variance to be non-negative.",
       "Re-check measurement assumptions -- a congeneric or formative spec may be more appropriate.",
-      "Estimate in blavaan with priors that bound loadings (e.g., normal(1, 0.3) truncated)."
+      "Fix the loading to 1 (a unit-loading / tau-equivalent spec) rather than estimating it freely."
     )
   ),
 
@@ -397,7 +399,7 @@ summary.crossLagR_diagnosis <- function(object, ...) {
     ),
     remedies = c(
       "Drop one of the redundant latent factors or combine them.",
-      "Estimate in blavaan with an LKJ(2) or LKJ(4) prior on the latent correlation matrix to regularize toward identifiability.",
+      "Fix the latent correlation to a plausible value (e.g., 'I_x ~~ 0.8*I_y') and compare fit, or test the one-factor alternative with a likelihood-ratio test.",
       "Verify that constructs are conceptually distinct -- if not, the model is mis-specified."
     )
   ),
@@ -416,7 +418,7 @@ summary.crossLagR_diagnosis <- function(object, ...) {
       "Inspect the model-implied covariance: lavInspect(fit, 'cov.lv').",
       "Constrain redundant residual covariances to zero or equality.",
       "Re-fit with smoothed starting values: lavaan(..., start = 'simple').",
-      "Estimate in blavaan with regularizing priors on (co)variances."
+      "Check whether an observed variable is a near-exact linear combination of others (e.g., a sum score entered alongside its own components)."
     )
   ),
 
@@ -433,7 +435,7 @@ summary.crossLagR_diagnosis <- function(object, ...) {
     remedies = c(
       "Use bootstrap SEs: lavaan(..., se = 'bootstrap', bootstrap = 1000).",
       "Re-fit from multiple starts; multimodal likelihoods often produce non-PD Hessians.",
-      "Switch to blavaan for fully Bayesian uncertainty quantification."
+      "Identify which parameters sit at a boundary -- Wald SEs are undefined there even when the rest of the vcov is sound."
     )
   ),
 
@@ -449,7 +451,7 @@ summary.crossLagR_diagnosis <- function(object, ...) {
     remedies = c(
       "Increase iterations: lavaan(..., control = list(iter.max = 5000)).",
       "Constrain parameters across waves (constrain_beta = TRUE, constrain_omega = TRUE).",
-      "Reduce model complexity or switch to blavaan."
+      "Reduce model complexity -- drop a wave-specific free parameter or a redundant latent factor."
     )
   )
 )

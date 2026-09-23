@@ -9,7 +9,7 @@
 devtools::install_github("crweber9874/crossLagR")
 ```
 
-The package is generally just a wrapper around `lavaan` for SEM estimation, `MASS` for multivariate normal draws in some simulators, and the usual tidyverse tools (`dplyr`, `tidyr`, `tibble`, `purrr`, `stringr`) for data wrangling. `DiagrammeR` is used to render the path diagrams reproduced throughout this guide. All dependencies are listed in the DESCRIPTION file and will be installed automatically with the above command.
+The package is generally just a wrapper around `lavaan` for SEM estimation, `MASS` for multivariate normal draws in some simulators, and the usual tidyverse tools (`dplyr`, `tidyr`, `tibble`, `purrr`, `stringr`) for data wrangling procedures. `DiagrammeR` is used to render the path diagrams reproduced throughout this guide. All dependencies are listed in the DESCRIPTION file and will be installed automatically with the above command.
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 library(crossLagR)
@@ -19,13 +19,13 @@ library(dplyr)
 
 ## Package Conventions
 
-The way the functions are written is that they fall into three families, identifiable by their prefix:
+Functions fall into three families, identifiable by their prefix:
 
-- `estimate*()` — generate `lavaan` model syntax. Each returns a character string that can be fed directly into `lavaan::lavaan()` or `lavaan::sem()`. So `estimateRICLPM(waves = 4)` returns a string of lavaan syntax for a 4-wave RI-CLPM, for instance.
-- `sim*()` — simulate data from a specified DGP. Each returns a list with `$model` (the population lavaan syntax) and `$data` (a wide-format tibble with one row per unit and columns `x1, …, xT, y1, …, yT`).
-- `monteCarlo*()` — wrappers that repeat a simulate-then-fit cycle and return a tibble table of results.
+- `estimate*()` — generate `lavaan` model syntax. Each returns a character string that can be fed directly into `lavaan::lavaan()` or `lavaan::sem()`. `estimateRICLPM(waves = 4)`, for example, returns lavaan syntax for a 4-wave RI-CLPM.
+- `simFromSyntax()` — simulate data from any `estimate*()` model by populating its syntax with true parameter values, then drawing from it with `lavaan::simulateData()`. Returns a wide-format data frame with columns `x1, …, xT, y1, …, yT`.
+- `monteCarlo*()` — repeat a simulate-then-fit cycle and return a tibble of results.
 
-All `estimate*()` functions in the unified family share a common labeling convention so that estimates from different models can be lined up side-by-side. The convention is to generally follow the framework introduced by @usami2019:
+It's not clear to me whether thi is the optimal way to write a package, but it works for now.All `estimate*()` functions in the unified family share a common labeling convention so that estimates from different models can be lined up side-by-side. The obvious issue with this is that the interpretation of these parameters can vary across models, so caution is warranted. The convention is to generally follow the framework introduced by @usami2019:
 
 | Label | Meaning | Used in |
 |:---|:---|:---|
@@ -38,13 +38,13 @@ All `estimate*()` functions in the unified family share a common labeling conven
 | `d_var_x`, `d_var_y` | Dynamic residual variance | RI-CLPM, ALT, LCM-SR |
 | `d_cov_xy` | Dynamic residual covariance | RI-CLPM, ALT, LCM-SR |
 
-: Unified parameter labels in `crossLagR`. The *substantive* interpretation depends on the model — see Chapter 4 — but the labels themselves are stable across estimators. An AR parameter in one model may not mean the same as an AR parameter in another, but they will both be labeled `ar_x` or `ar_y` in the output.
+: Unified parameter labels in `crossLagR`. The *substantive* interpretation depends on the model — see later chapters — but the labels themselves are stable across estimators. For example, an AR parameter in one model may not mean the same as an AR parameter in another, but they will both be labeled `ar_x` or `ar_y` in the output.
 
 ## Common Arguments
 
 Every `estimate*()` accepts at least:
 
-- `waves` — number of time points. Lower bound depends on the model (2 for CLPM, 3 for most others, 4 for `estimate_change_to_change`).
+- `waves` — number of time points. The lower bound for identification depends on the model (2 for CLPM, 3 for most others, 4 for `estimate_change_to_change`).
 - `constrain_beta` — equality constraint across waves on AR parameters. Default `TRUE`.
 - `constrain_omega` — equality constraint across waves on CL parameters. Default `TRUE`.
 
@@ -54,10 +54,20 @@ Bivariate/multivariate models add:
 - `include_z = TRUE` — for `estimateRICLPM()`; adds a third process.
 - `constrain_residual_variances`, `constrain_residual_covariances` — equality constraints on innovation variances and within-wave covariances.
 
-Sim wrappers accept the same constraint arguments plus true population values: `beta_x`/`beta_y` (AR), `omega_xy`/`omega_yx` (CL), and variance components specific to each model (e.g. `var_BX`, `var_BY` for RI-CLPM trait variances, `var_p`, `var_q` for within-person dynamic-residual variances).
 
-::: {.callout-note title="Sim/estimate argument names differ from output labels"}
-For historical reasons the `sim*()` true-value arguments use `beta_*` and `omega_*`, but the `estimate*()` syntax labels its parameters `ar_*` and `cl_*`. This is intentional — `beta` / `omega` refer to the DGP's true values, while `ar` / `cl` refer to *estimates from any model in the family*.
+::: {.callout-important title="Data convention: column names must be x1, x2, ..., y1, y2, ..."}
+
+```r
+my_data |>
+  tidyr::pivot_wider(
+    id_cols     = case_id,
+    names_from  = wave,
+    values_from = c(personality, ideology)
+  ) |>
+  dplyr::rename_with(~ sub("^personality_", "x", .x)) |>
+  dplyr::rename_with(~ sub("^ideology_",    "y", .x))
+```
+
 :::
 
 ## Estimator Quick Reference
@@ -98,47 +108,46 @@ summary(fit, standardized = TRUE)
 
 ## Simulation Quick Reference
 
-```{r echo=TRUE, eval=FALSE}
-# CLPM with two waves
-sim <- simCLPM(waves = 4, beta_x = 0.5, beta_y = 0.5,
-               omega_xy = 0.2, omega_yx = 0.1,
-               sample.nobs = 1000)
+`simFromSyntax()` takes the same arguments as `estimate*()` plus true parameter values and sample size. It returns a wide-format data frame with columns `x1, …, xT, y1, …, yT`. For example:
 
-# RI-CLPM with traits
-sim <- simRICLPM(waves = 4, beta_x = 0.3, beta_y = 0.3,
-                 omega_xy = 0.2, omega_yx = 0.1,
-                 var_BX = 1, var_BY = 1,
-                 sample.nobs = 1000)
+
+```{r echo=TRUE, eval=FALSE}
+# CLPM with 4 waves
+dat <- simFromSyntax("CLPM", waves = 4, sample_size = 1000,
+                     ar_x = 0.5, ar_y = 0.5,
+                     cl_xy = 0.2, cl_yx = 0.1)
+
+# RI-CLPM with between-person trait variance
+dat <- simFromSyntax("RICLPM", waves = 4, sample_size = 1000,
+                     ar_x = 0.3, ar_y = 0.3,
+                     cl_xy = 0.2, cl_yx = 0.1,
+                     var_between_x = 1, var_between_y = 1)
 
 # Latent change
-sim <- simLChange(waves = 5, variable_type = "bivariate",
-                  beta_x = -0.5, beta_y = -0.5,
-                  omega_x = 0.3, omega_y = 0.3,
-                  sample.nobs = 1000)
+dat <- simFromSyntax("LCHANGE", waves = 5, sample_size = 1000,
+                     ar_x = -0.5, ar_y = -0.5,
+                     cl_xy = 0.3, cl_yx = 0.3,
+                     estimator_args = list(variable_type = "bivariate"))
 
-# Wide tibble: id, x1..xT, y1..yT
-str(sim$data, list.len = 6)
+# Wide data frame: x1..xT, y1..yT
+str(dat)
 ```
 
-The wide-format output is what every `estimate*()` expects when fed to `lavaan`. A long-format helper `reshape_long_sim_cr()` is available for plotting, but generally the convention here is to keep the data in wide format.
+The wide-format output is what every `estimate*()` expects when fed to `lavaan`.
 
-## Quick 
+## Quick Example
 
 ```{r echo=TRUE, message=FALSE, warning=FALSE}
 set.seed(2026)
 
 # Simulate from an RI-CLPM
-sim <- simRICLPM(waves       = 5,
-                 beta_x      = 0.3,
-                 beta_y      = 0.3,
-                 omega_xy    = 0.2,
-                 omega_yx    = 0.1,
-                 var_BX      = 1,
-                 var_BY      = 1,
-                 sample.nobs = 1000)
+dat <- simFromSyntax("RICLPM", waves = 5, sample_size = 1000,
+                     ar_x = 0.3, ar_y = 0.3,
+                     cl_xy = 0.2, cl_yx = 0.1,
+                     var_between_x = 1, var_between_y = 1)
 
 # Fit the RI-CLPM
-fit <- lavaan(estimateRICLPM(waves = 5), data = sim$data)
+fit <- lavaan(estimateRICLPM(waves = 5), data = dat)
 
 # Pull just the AR and CL parameters
 parameterEstimates(fit) |>
@@ -147,15 +156,13 @@ parameterEstimates(fit) |>
   dplyr::mutate(across(where(is.numeric), \(x) round(x, 3)))
 ```
 
-The same labels (`ar_x`, `cl_yx`, …) will appear in the `parameterEstimates()` output regardless of which `estimate*()` function generated the syntax — that's what makes the unified framing useful when comparing estimators on the same data.
-
 ## Help and Documentation
 
-Every exported function has a roxygen-generated help page. The usual access:
+Every exported function has a roxygen-generated help page. The usual:
 
 ```r
 ?estimateRICLPM
-?simLChange
+?simFromSyntax
 help(package = "crossLagR")
 ```
 

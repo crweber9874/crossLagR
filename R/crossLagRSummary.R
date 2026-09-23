@@ -227,6 +227,7 @@ print.crossLagR_summary <- function(x, ...) {
   invisible(x)
 }
 
+#' @method summary crossLagR_summary
 #' @export
 summary.crossLagR_summary <- function(object, ...) {
   print(object, ...)

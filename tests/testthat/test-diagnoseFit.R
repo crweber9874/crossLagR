@@ -101,7 +101,7 @@ test_that("print.crossLagR_diagnosis runs and prints expected sections", {
   out <- capture.output(print(diag))
   expect_true(any(grepl("issue", out, ignore.case = TRUE)))
   expect_true(any(grepl("Remedies", out)))
-  expect_true(any(grepl("blavaan", out)))
+  expect_true(any(grepl("lavInspect", out, fixed = TRUE)))
 })
 
 test_that("summary.crossLagR_diagnosis prints one-line summary", {

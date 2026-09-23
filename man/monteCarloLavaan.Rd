@@ -17,8 +17,8 @@ monteCarloLavaan(
 )
 }
 \arguments{
-\item{estimator}{Character. One of "CLPM", "RICLPM", "ALT", "LGM", "LCMSR",
-"BB", "TSO", "LCHANGE".}
+\item{estimator}{Character. One of "CLPM", "RICLPM", "RICLPM_NOLAG", "ALT",
+"LGM", "LCMSR", "BB", "TSO", "LCHANGE".}
 
 \item{dgp}{Character. One of "clpm", "riclpm", "clpmu", "lchange".}
 

@@ -129,41 +129,11 @@ When estimate_constant_change = FALSE:
 - Only proportional and coupling effects drive systematic change
 }
 \examples{
-# Single variable latent change model
-single_change_data <- simLChange(
-  waves = 5,
-  variable_type = "univariate",
-  beta_x = -0.2,
-  constant_mean_x = 0.5,
-  sample.nobs = 1000
-)
+simLChange(waves = 5, variable_type = "univariate",
+           beta_x = -0.2, constant_mean_x = 0.5, sample.nobs = 1000)
 
-# Dual change model
-dual_change_data <- simLChange(
-  waves = 5,
-  variable_type = "bivariate",
-  beta_x = -0.2,
-  beta_y = -0.3,
-  omega_x = -0.15,
-  omega_y = -0.15,
-  cross_change_x = 0.1,
-  cross_change_y = 0.1,
-  sample.nobs = 1000
-)
-
-# Bivariate model without constant change factors
-no_constant_data <- simLChange(
-  waves = 5,
-  variable_type = "bivariate",
-  beta_x = -0.3,
-  beta_y = -0.3,
-  omega_x = 0.3,
-  omega_y = 0.3,
-  estimate_constant_change = FALSE,
-  var_ld_x = 0.5,
-  var_ld_y = 0.5,
-  cov_ld = 0.2,
-  sample.nobs = 5000
-)
+simLChange(waves = 5, variable_type = "bivariate",
+           beta_x = -0.2, beta_y = -0.3, omega_x = -0.15, omega_y = -0.15,
+           cross_change_x = 0.1, cross_change_y = 0.1, sample.nobs = 1000)
 
 }

@@ -15,6 +15,10 @@ simFromSyntax(
   d_var_x = 0.5,
   d_var_y = 0.5,
   d_cov_xy = 0,
+  var_between_x = NULL,
+  var_between_y = NULL,
+  cov_between_xy = NULL,
+  extra_cov = NULL,
   estimator_args = list(),
   seed = NULL,
   keep_unified_observed = TRUE
@@ -35,6 +39,18 @@ simFromSyntax(
 \item{d_var_x, d_var_y}{Dynamic residual variances.}
 
 \item{d_cov_xy}{Dynamic residual covariance.}
+
+\item{var_between_x, var_between_y}{Optional numeric. Random-intercept
+(between-person) variances for the latent intercepts \code{I_x}/\code{I_y}.
+\code{NULL} (default) leaves them free at lavaan defaults. Estimators
+without an \code{I_x}/\code{I_y} factor (e.g. CLPM) warn and ignore these.}
+
+\item{cov_between_xy}{Optional numeric. Covariance \code{I_x ~~ I_y}.}
+
+\item{extra_cov}{Optional data.frame with columns \code{lhs}, \code{rhs},
+\code{value}: additional \code{~~} entries to fix (e.g. the Bollen & Brand
+fixed-effect / initial-condition covariances). Only used when at least one
+of the between-variance arguments is also non-\code{NULL}.}
 
 \item{estimator_args}{Named list. Additional args forwarded to the estimator's
 syntax-generating function.}
@@ -64,9 +80,13 @@ of waves, and concrete population values for those parameters, builds the
 lavaan syntax, substitutes the labels with fixed numeric values, and
 simulates data.
 
-Other labeled parameters (e.g. growth-factor variances for ALT/LGM/LCMSR,
-trait variances for TSO, latent FE for BB) are left at the lavaan defaults
-used by \code{simulateData()}.
+By default, other labeled parameters (e.g. growth-factor variances for
+ALT/LGM/LCMSR, trait variances for TSO, latent FE for BB) are left at the
+lavaan defaults used by \code{simulateData()}. Supplying
+\code{var_between_x} / \code{var_between_y} (and, for BB, \code{extra_cov})
+instead routes through a parameter table so the random-intercept variance
+and its covariances can be fixed — this is what lets an ICC / between-person
+sweep actually change the generated data.
 }
 \examples{
 \dontrun{

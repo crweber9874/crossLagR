@@ -90,98 +90,15 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Basic usage with default parameters
-#' results <- run_mc_sims(
-#'   estimator = "RICLPM",
-#'   trials = 5,
-#'   waves = 3,
-#'   sample_size = 500
-#' )
+#' run_mc_sims(estimator = "RICLPM", trials = 5, waves = 3, sample_size = 500)
 #'
-#' # Test Random Intercepts with both full and cross-lagged only
-#' results_ri_full <- run_mc_sims(
-#'   estimator = "RI",
-#'   param_grid = data.frame(include_lagged_dv = TRUE),
-#'   trials = 10,
-#'   waves = 4,
-#'   sample_size = 1000
-#' )
-#'
-#' results_ri_cross <- run_mc_sims(
-#'   estimator = "RI",
-#'   param_grid = data.frame(include_lagged_dv = FALSE),
-#'   trials = 10,
-#'   waves = 4,
-#'   sample_size = 1000
-#' )
-#'
-#' # Compare regular RICLPM vs no-lag RICLPM
-#' results_regular <- run_mc_sims(
-#'   estimator = "RICLPM",
-#'   riclpm_type = "riclpm",
-#'   trials = 10,
-#'   waves = 4,
-#'   sample_size = 1000
-#' )
-#'
-#' results_nolag <- run_mc_sims(
-#'   estimator = "RICLPM",
-#'   riclpm_type = "riclpm_nolag",
-#'   trials = 10,
-#'   waves = 4,
-#'   sample_size = 1000
-#' )
-#'
-#' # Compare latent change models
-#' results_dual_change <- run_mc_sims(
-#'   estimator = "LCHANGE",
-#'   lchange_type = "dual_change",
-#'   trials = 10,
-#'   waves = 4,
-#'   sample_size = 1000
-#' )
-#'
-#' results_single_change <- run_mc_sims(
-#'   estimator = "LCHANGE",
-#'   lchange_type = "latent_change",
-#'   trials = 10,
-#'   waves = 4,
-#'   sample_size = 1000
-#' )
-#'
-#' # Study bias from unmeasured confounder
-#' results_confounded <- run_mc_sims(
+#' # CLPM fitted to confounded data; vary the DGP parameters over a grid
+#' run_mc_sims(
 #'   estimator = "CLPM",
-#'   trials = 10,
-#'   waves = 4,
-#'   sample_size = 1000,
-#'   data_generation = "clpmu"  # Data has confounder, but CLPM ignores it
+#'   param_grid = expand.grid(stability_p = c(0.2, 0.5), cross_q = c(0, 0.1)),
+#'   trials = 10, waves = 4, sample_size = 1000,
+#'   data_generation = "clpmu"
 #' )
-#'
-#' # Custom parameter grid
-#' my_grid <- expand.grid(
-#'   stability_p = c(0.2, 0.5),
-#'   stability_q = c(0.3, 0.6),
-#'   cross_p = c(0.0, 0.1),
-#'   cross_q = c(0.0, 0.1),
-#'   variance_between_x = c(0.5, 1.0)
-#' )
-#'
-#' results <- run_mc_sims(
-#'   estimator = "CLPM",
-#'   param_grid = my_grid,
-#'   trials = 10,
-#'   waves = 4,
-#'   sample_size = 1000,
-#'   data_generation = "riclpm"
-#' )
-#'
-#' # Compare estimators under confounding
-#' estimators <- c("OLS", "RICLPM", "CLPM", "RI")
-#' all_results <- lapply(estimators, function(est) {
-#'   run_mc_sims(estimator = est, trials = 5, waves = 3, data_generation = "clpmu")
-#' })
-#' combined_results <- do.call(rbind, all_results)
 #' }
 #'
 #' @import dplyr
@@ -202,18 +119,12 @@ run_mc_sims <- function(estimator,
     rm(.lavaan_cache, envir = .GlobalEnv)
   }
 
-  # Clear temporary objects that might conflict
-  temp_objects <- ls(pattern = "^(tmp_|temp_|model_|fit_)", envir = .GlobalEnv)
-  if (length(temp_objects) > 0) {
-    rm(list = temp_objects, envir = .GlobalEnv)
-  }
-
   library(dplyr)
 
   has_tictoc <- requireNamespace("tictoc", quietly = TRUE)
 
   # Valid estimators (Monte Carlo wrappers + lavaan-generic book estimators)
-  valid_estimators <- c("OLS", "RICLPM", "CLPM", "CTSEM", "FI", "LCHANGE", "RI",
+  valid_estimators <- c("OLS", "RICLPM", "CLPM", "CTSEM", "LCHANGE", "RI",
                         "ALT", "LGM", "LCMSR", "BB", "TSO")
   if (!estimator %in% valid_estimators) {
     stop("estimator must be one of: ", paste(valid_estimators, collapse = ", "))
@@ -407,9 +318,12 @@ run_mc_sims <- function(estimator,
       base_params$dgp <- data_generation
     }
 
-    # Add RICLPM-specific parameter
-    if (estimator == "RICLPM") {
-      base_params$estimator <- riclpm_type
+    # Add RICLPM-specific parameter. RICLPM routes through monteCarloLavaan,
+    # so the variant must be selected by estimator name, not base_params.
+    if (estimator == "RICLPM" && riclpm_type == "riclpm_nolag") {
+      estimator_for_call <- "RICLPM_NOLAG"
+    } else {
+      estimator_for_call <- estimator
     }
 
     # Add LCHANGE-specific parameter
@@ -425,13 +339,10 @@ run_mc_sims <- function(estimator,
     }
 
     # Call the appropriate Monte Carlo function.
-    # ALL lavaan-syntax estimators are routed through monteCarloLavaan so that
-    # the per-trial output always uses the unified labels (ar_x, ar_y, cl_xy,
-    # cl_yx) + true_* truth columns + fit indices (CFI, RMSEA, ...), regardless
-    # of which DGP is chosen. The legacy bespoke wrappers (monteCarloCLPM /
-    # monteCarloRICLPM / monteCarloLChange) remain in the package for back-
-    # compat but are no longer the default path. Runtime-only estimators (OLS,
-    # CTSEM, RI, FI) still use their dedicated wrappers.
+    # ALL lavaan-syntax estimators route through monteCarloLavaan so the
+    # per-trial output always uses the unified labels (ar_x, ar_y, cl_xy,
+    # cl_yx) + true_* truth columns + fit indices, regardless of DGP.
+    # Runtime-only estimators (OLS, CTSEM, RI) use their dedicated wrappers.
     lavaan_syntax_estimators <- c("CLPM", "RICLPM", "ALT", "LGM",
                                   "LCMSR", "BB", "TSO", "LCHANGE")
     ## Any DGP that names a unified-label estimator (canonical form or legacy
@@ -450,7 +361,7 @@ run_mc_sims <- function(estimator,
     tryCatch({
       if (use_lavaan_generic) {
         result <- monteCarloLavaan(
-          estimator      = estimator,
+          estimator      = estimator_for_call,
           dgp            = data_generation,
           trials         = trials,
           waves          = waves,
@@ -461,17 +372,9 @@ run_mc_sims <- function(estimator,
         )
       } else if (estimator == "OLS") {
         result <- do.call(monteCarloOLS, base_params)
-      } else if (estimator == "RICLPM") {
-        result <- do.call(monteCarloRICLPM, base_params)
-      } else if (estimator == "CLPM") {
-        result <- do.call(monteCarloCLPM, base_params)
       } else if (estimator == "CTSEM") {
         safe_mc_wrapped <- function(...) suppressMessages(suppressWarnings(monteCarloCTSEM(...)))
         result <- do.call(safe_mc_wrapped, base_params)
-      } else if (estimator == "FI") {
-        result <- do.call(monteCarloFI, base_params)
-      } else if (estimator == "LCHANGE") {
-        result <- do.call(monteCarloLChange, base_params)
       } else if (estimator == "RI") {
         result <- do.call(monteCarloRI, base_params)
       }

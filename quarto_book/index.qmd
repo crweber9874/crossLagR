@@ -20,5 +20,4 @@ This guide is organized as follows:
 
 1. **Theoretical Background.** An overview of the CLPM, RI-CLPM, LCM, LGM, and related models, including their mathematical formulations and the sources of bias in the standard CLPM. The chapter concludes with a unified framework [@usami2019] that organizes all models as special cases sharing common parameter types (`ar_x`, `ar_y`, `cl_xy`, `cl_yx`, etc.).
 2. **Using `crossLagR`.** A walkthrough of the package's estimation, simulation, and Monte Carlo functions, with path diagrams and worked examples using simulated data. All estimation functions use the unified labeling convention.
-3. **Monte Carlo Simulations.** Compares estimator performance (CLPM, RI-CLPM, Bollen & Brand, Latent Change) under varying degrees of unobserved heterogeneity using 4-wave panel data.
-4. **Applied Example.** An empirical application using the Institute for the Study of Citizens and Politics (ISCAP) Panel, examining the relationship between political legitimacy and partisanship from 2012--2020, as well as the Dutch LISS data.
+3. **Sensitivity and Identification.** How far a reported CLPM estimate can lie from the RI-CLPM truth once a degree of trait variance and trait correlation is assumed --- the bias function, where it peaks, and the tipping point at which a reported cross-lag is fully accounted for by trait confounding.

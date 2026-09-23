@@ -50,24 +50,12 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Generate some data
-#' sim_data <- simRICLPM(waves = 4, sample.nobs = 500)$data
-#' long_data <- reshape_long_sim_cr(sim_data)
-#'
-#' # Estimate Random Intercepts model
-#' ri_results <- estimateRI(long_data)
-#' print(ri_results)
-#'
-#' # Get full model objects
-#' ri_full <- estimateRI(long_data, return_models = TRUE)
-#' summary(ri_full$models$x_model)
-#' summary(ri_full$models$y_model)
-#'
-#' # Check random effects
-#' ri_full$random_effects
+#' long_data <- reshape_long_sim_cr(simRICLPM(waves = 4, sample.nobs = 500)$data)
+#' estimateRI(long_data)
 #' }
 #'
-#' @import lme4 stats
+#' @import lme4
+#' @importFrom stats as.formula complete.cases var
 #' @export
 estimateRI <- function(data,
                        y_outcome = "y",

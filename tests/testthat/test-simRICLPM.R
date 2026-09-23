@@ -56,3 +56,27 @@ test_that("generate_riclpm_indicator_lists_for_estimation rejects bad input", {
   expect_error(generate_riclpm_indicator_lists_for_estimation(waves = 2, num_indicators = 2,
                                                               x_prefix = c("a", "b")))
 })
+
+test_that("simRICLPM starts the within-person process at its stationary variance", {
+  b <- 0.5
+  sim <- suppressMessages(simRICLPM(
+    waves = 5, sample.nobs = 60000,
+    beta_x = b, beta_y = b, omega_xy = 0, omega_yx = 0,
+    var_p = 1 - b^2, var_q = 1 - b^2, cov_pq = 0,
+    var_BX = 1, var_BY = 1, cov_BXBY = 0.5
+  ))
+  v <- vapply(paste0("x", 1:5), function(nm) var(sim$data[[nm]]), numeric(1))
+  # stationary within variance is 1, trait variance is 1, so every wave ~ 2
+  expect_equal(unname(v), rep(2, 5), tolerance = 0.03)
+  # wave 1 must not sit below the later waves
+  expect_lt(abs(v[[1]] - mean(v[-1])), 0.05)
+})
+
+test_that("simRICLPM rejects a non-stationary within-person AR matrix", {
+  expect_error(
+    suppressMessages(simRICLPM(waves = 3, sample.nobs = 50,
+                               beta_x = 0.95, beta_y = 0.95,
+                               omega_xy = 0.30, omega_yx = 0.30)),
+    "non-stationary"
+  )
+})

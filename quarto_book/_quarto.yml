@@ -1,6 +1,7 @@
 project:
   type: book
   output-dir: _book
+  pre-render: scripts/clear_render_cache.R
 
 book:
   title: "crossLagR"
@@ -15,14 +16,11 @@ book:
     - index.qmd
     - 00_Install.qmd
     - 01_Panel_Models.qmd
-    - 02_Change.qmd
-    - 03_RICLPM.qmd
-    - 04_Usami.qmd
-    - 05_simulations.qmd
-    - part: "Applications"
-      chapters:
-        - 06_iscap.qmd
-        - 07_liss.qmd
+    - 02_Bias.qmd
+    - 03_Identification.qmd
+    - 04_RICLPM.qmd
+    - 05_Change.qmd
+    - 06_Unified.qmd
   appendices:
     - A_package_reference.qmd
 #
@@ -33,7 +31,11 @@ link-citations: true
 
 execute:
   cache: false
-  freeze: auto
+  # `freeze: auto` only invalidates when the qmd source changes, so edits to
+  # external R sources (R/clpmBias.R, etc.) silently use frozen output and
+  # the page goes stale. `freeze: false` forces re-execution on every render.
+  # Chunk-level `cache: true` still works for re-render speed on slow blocks.
+  freeze: false
 
 format:
   html:

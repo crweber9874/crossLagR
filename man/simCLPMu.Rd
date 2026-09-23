@@ -17,6 +17,8 @@ simCLPMu(
   confounder_q = 0.3,
   confounder_variance = 1,
   confounder_stability = 0.4,
+  confounder_type = c("time_variant", "time_invariant"),
+  sample.nobs = 500,
   ...
 )
 }
@@ -37,21 +39,29 @@ simCLPMu(
 
 \item{cov_pq}{The covariance between x and y within the same time point.}
 
-\item{confounder_p}{The effect of the confounder u on x variables.}
+\item{confounder_p}{The effect of the confounder on x variables.}
 
-\item{confounder_q}{The effect of the confounder u on y variables.}
+\item{confounder_q}{The effect of the confounder on y variables.}
 
-\item{confounder_variance}{The variance of the confounder u.}
+\item{confounder_variance}{The variance of the confounder.}
 
-\item{confounder_stability}{The stability parameter for the confounder (autoregressive effect).}
+\item{confounder_stability}{Autoregressive effect of the confounder. Used
+only when `confounder_type = "time_variant"`.}
 
-\item{...}{Additional arguments to pass to the `lavaan::simulateData` function.}
+\item{confounder_type}{Either `"time_variant"` (default) or `"time_invariant"`.}
+
+\item{sample.nobs}{Number of observations to simulate.}
+
+\item{...}{Additional arguments passed to `lavaan::simulateData`.}
 }
 \value{
 A list containing two elements:
-   * `model`: The Lavaan model syntax used for data simulation.
+   * `model`: The lavaan model syntax used for data simulation.
    * `data`:  The simulated data in a data frame format.
 }
 \description{
-Simulate data from a cross-lagged panel model (CLPM) with a time-variant confounder.
+Simulate data from a cross-lagged panel model (CLPM) with an
+  unmeasured confounder. `confounder_type` selects whether the confounder is
+  time-variant (an AR(1) process `u1..uT`, one draw per wave) or
+  time-invariant (a single latent `U` common to all waves).
 }

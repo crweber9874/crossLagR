@@ -9,7 +9,7 @@
 <meta name="author" content="Christopher Weber">
 <meta name="author" content="Adam Panish">
 <meta name="author" content="Bang Zheng">
-<meta name="dcterms.date" content="2026-06-04">
+<meta name="dcterms.date" content="2026-09-23">
 
 <title>crossLagR</title>
 <style>
@@ -186,60 +186,43 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./02_Change.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  <a href="./02_Bias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bias in the Cross-Lagged Panel Model</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./03_RICLPM.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
+  <a href="./03_Identification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Sensitivity</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./04_Usami.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
+  <a href="./04_RICLPM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./05_simulations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Simulations</span></span></a>
+  <a href="./05_Change.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_Unified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Applications</span></a>
+ <span class="menu-text">Appendices</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./06_iscap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The ISCAP Panel</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./07_liss.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Replication: Bakker, Lelkes, &amp; Malka (2021)</span></span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./A_package_reference.html" class="sidebar-item-text sidebar-link">
@@ -291,7 +274,7 @@ div.csl-indent {
     <div>
     <div class="quarto-title-meta-heading">Published</div>
     <div class="quarto-title-meta-contents">
-      <p class="date">June 4, 2026</p>
+      <p class="date">September 23, 2026</p>
     </div>
   </div>
   
@@ -323,8 +306,7 @@ div.csl-indent {
 <ol type="1">
 <li><strong>Theoretical Background.</strong> An overview of the CLPM, RI-CLPM, LCM, LGM, and related models, including their mathematical formulations and the sources of bias in the standard CLPM. The chapter concludes with a unified framework <span class="citation" data-cites="usami2019">(<a href="#ref-usami2019" role="doc-biblioref">Usami, Murayama, and Hamaker 2019</a>)</span> that organizes all models as special cases sharing common parameter types (<code>ar_x</code>, <code>ar_y</code>, <code>cl_xy</code>, <code>cl_yx</code>, etc.).</li>
 <li><strong>Using <code>crossLagR</code>.</strong> A walkthrough of the package’s estimation, simulation, and Monte Carlo functions, with path diagrams and worked examples using simulated data. All estimation functions use the unified labeling convention.</li>
-<li><strong>Monte Carlo Simulations.</strong> Compares estimator performance (CLPM, RI-CLPM, Bollen &amp; Brand, Latent Change) under varying degrees of unobserved heterogeneity using 4-wave panel data.</li>
-<li><strong>Applied Example.</strong> An empirical application using the Institute for the Study of Citizens and Politics (ISCAP) Panel, examining the relationship between political legitimacy and partisanship from 2012–2020, as well as the Dutch LISS data.</li>
+<li><strong>Sensitivity and Identification.</strong> How far a reported CLPM estimate can lie from the RI-CLPM truth once a degree of trait variance and trait correlation is assumed — the bias function, where it peaks, and the tipping point at which a reported cross-lag is fully accounted for by trait confounding.</li>
 </ol>
 
 

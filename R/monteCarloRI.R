@@ -43,36 +43,14 @@
 #'
 #' @examples
 #' \dontrun{
-#' # Basic Random Intercepts Monte Carlo
-#' results <- monteCarloRI(
-#'   trials = 100,
-#'   waves = 4,
-#'   dgp = "riclpm",
-#'   sample_size = 1000
-#' )
+#' monteCarloRI(trials = 100, waves = 4, dgp = "riclpm", sample_size = 1000)
 #'
-#' # Test with confounded data
-#' results_confounded <- monteCarloRI(
-#'   trials = 50,
-#'   waves = 4,
-#'   dgp = "clpmu",
-#'   confounder_type = "time_variant",
-#'   confounder_p = 0.3,
-#'   confounder_q = 0.3,
-#'   sample_size = 1000
-#' )
-#'
-#' # Compare with time-invariant confounder
-#' results_time_invariant <- monteCarloRI(
-#'   trials = 50,
-#'   waves = 4,
-#'   dgp = "clpmu",
-#'   confounder_type = "time_invariant",
-#'   sample_size = 1000
-#' )
+#' monteCarloRI(trials = 50, waves = 4, dgp = "clpmu",
+#'              confounder_type = "time_invariant", sample_size = 1000)
 #' }
 #'
-#' @import dplyr lme4 stats
+#' @import dplyr lme4
+#' @importFrom stats as.formula complete.cases na.omit setNames var
 #' @export
 monteCarloRI <- function(
     trials = 10,

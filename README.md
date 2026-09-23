@@ -11,8 +11,10 @@ simulates a random-intercept cross-lagged panel with three variables, and `simRI
 simulation when more than one indicator per time point is included. All files with `sim` as a prefix are simulation files.
 
 This directory also includes estimation functions, which are useful for comparing estimators across DGPs. These are prefixed with `estimate`.
-Thus far, only `estimateCLPM`, `estimateRICLPM`, `estimateStTr` (a trait-state model), and `estimateHLM` (a hierarchical model in `rstan`) 
-have been thoroughly tested.
+Each has a dedicated test file under `tests/testthat/`: `estimateCLPM`,
+`estimateRICLPM`, `estimateALT`, `estimateBollen_and_Brand`, `estimateLCMSR`,
+`estimateLChange`, `estimateLGM`, `estimateTSO`, and
+`estimateAllisonChamberlainFI`. Estimation is frequentist `lavaan` throughout.
 
 
 
@@ -59,7 +61,7 @@ workflow, do occur. AI assistance was used for:
   CLPM to the RI-CLPM, latent-variable variants, and three-variable
   generalizations).
 - **Generating helper functions.** This package builds upon other packages,
-  such as `lavaan`, `brms`, `blavaan`, `lme4`, and the `tidyverse`.
+  such as `lavaan`, `lme4`, and the `tidyverse`.
   Helper functions are used to link input/output across the
   different estimators in the package, as well as repetitive
   data wrangling exercises, like when one applies the same `dplyr::recode()`

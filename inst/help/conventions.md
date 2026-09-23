@@ -138,10 +138,9 @@ Generate lavaan model syntax strings. Pass the returned string to `lavaan::lavaa
 | `estimateLChange()` | Latent Change Score | Models wave-to-wave change as latent variable |
 | `estimateLGM()` | Latent Growth Model | Intercept and slope factors |
 | `estimateSTARTS()` | STARTS Model | Stable Trait, AR Trait, State decomposition |
-| `estimateHLM()` | Hierarchical Linear Model | brms-based random effects model |
 | `estimateCTSEM()` | Continuous-Time SEM | Handles unequal time spacing |
 | `estimateFI()` | Fixed Individual Effects | OLS-based within estimator |
-| `estimateRI()` | Random Intercept (brms) | brms-based random intercept model |
+| `estimateRI()` | Random Intercept | `lme4::lmer()` random intercept model |
 
 ### 2. Simulation: `sim*()`
 Generate synthetic data under known parameters. Returns a list with `$model` (syntax) and `$data` (data frame).
@@ -163,16 +162,16 @@ Run repeated simulation-and-estimation to evaluate model performance.
 
 | Function | Tests |
 |----------|-------|
-| `monteCarloCLPM()` | CLPM estimation under various DGPs |
-| `monteCarloRICLPM()` | RICLPM estimation |
-| `monteCarloCTSEM()` | Continuous-time SEM |
-| `monteCarloLChange()` | Latent change score |
-| `monteCarloOLS()` | OLS baseline |
-| `monteCarloFixed()` | Fixed effects |
-| `monteCarloRI()` | Random intercepts |
-| `monteCarloConfounder()` | Confounder scenarios |
-| `monteCarloAllisonChamberlainFI()` | Allison-Chamberlain FE |
-| `run_mc_sims()` | Unified MC orchestrator |
+| `run_mc_sims()` | Unified MC orchestrator -- start here |
+| `monteCarloLavaan()` | Generic engine for every lavaan-syntax estimator |
+| `monteCarloCTSEM()` | Continuous-time SEM (runtime-only) |
+| `monteCarloOLS()` | OLS baseline (runtime-only) |
+| `monteCarloRI()` | Random intercepts via lmer (runtime-only) |
+
+All lavaan-syntax estimators (CLPM, RICLPM, RICLPM_NOLAG, ALT, LGM, LCMSR, BB,
+TSO, LCHANGE) route through `monteCarloLavaan()`. The per-estimator wrappers
+`monteCarloCLPM()` / `monteCarloRICLPM()` / `monteCarloLChange()` were copies of
+one another and have been archived.
 
 ### 4. Utilities
 

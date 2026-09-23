@@ -1,4 +1,4 @@
-# Build pkgdown site + Quarto book and deploy to GitHub Pages.
+# Render the Quarto book and deploy to GitHub Pages.
 # Triggered on push to master and on manual dispatch.
 
 on:
@@ -33,37 +33,24 @@ jobs:
       - uses: r-lib/actions/setup-r-dependencies@v2
         with:
           extra-packages: |
-            any::pkgdown
             any::devtools
             any::DiagrammeR
-            any::brms
-            any::tidybayes
             any::plm
             any::naniar
             any::psych
             any::here
             any::ggridges
-            any::blavaan
             local::.
           needs: website
 
-      - name: Build pkgdown site
-        run: pkgdown::build_site_github_pages(new_process = FALSE, install = FALSE)
-        shell: Rscript {0}
-
       - name: Render Quarto book
         run: quarto render quarto_book
-
-      - name: Stage book under docs/book/
-        run: |
-          mkdir -p docs/book
-          cp -R quarto_book/_book/. docs/book/
 
       - name: Deploy to GitHub Pages
         uses: JamesIves/github-pages-deploy-action@v4
         with:
           branch: gh-pages
-          folder: docs
+          folder: quarto_book/_book
           clean: true
           clean-exclude: |
             .nojekyll

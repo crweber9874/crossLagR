@@ -4,8 +4,8 @@
 #'   LChange). Generates data once per trial under a chosen DGP, fits the requested
 #'   model, and returns unified-label parameter estimates alongside fit indices.
 #'
-#' @param estimator Character. One of "CLPM", "RICLPM", "ALT", "LGM", "LCMSR",
-#'   "BB", "TSO", "LCHANGE".
+#' @param estimator Character. One of "CLPM", "RICLPM", "RICLPM_NOLAG", "ALT",
+#'   "LGM", "LCMSR", "BB", "TSO", "LCHANGE".
 #' @param dgp Character. One of "clpm", "riclpm", "clpmu", "lchange".
 #' @param trials Integer. Trials per parameter cell.
 #' @param waves Integer. Number of waves.
@@ -50,7 +50,8 @@ monteCarloLavaan <- function(estimator,
 
   fit_function <- match.arg(fit_function)
 
-  valid_estimators <- c("CLPM", "RICLPM", "ALT", "LGM", "LCMSR", "BB", "TSO", "LCHANGE")
+  valid_estimators <- c("CLPM", "RICLPM", "RICLPM_NOLAG", "ALT", "LGM",
+                        "LCMSR", "BB", "TSO", "LCHANGE")
   if (!estimator %in% valid_estimators) {
     stop("estimator must be one of: ", paste(valid_estimators, collapse = ", "))
   }
@@ -186,10 +187,24 @@ build_estimator_syntax <- function(estimator, waves, args = list()) {
   args <- as.list(args)
   args$waves <- waves
 
+  ## Bollen & Brand only exposes the unified ar_x/ar_y/cl_xy/cl_yx labels when
+  ## its wave-specific coefficients are constrained equal; otherwise the labels
+  ## are ar_x2/ar_x3/... and the unified-label extraction returns NA.
+  if (estimator == "BB" && is.null(args$constrain_coefficients))
+    args$constrain_coefficients <- TRUE
+
+  ## estimateRICLPM_nolag takes explicit indicator vectors rather than deriving
+  ## them from waves; supply the canonical x1..xT / y1..yT names.
+  if (estimator == "RICLPM_NOLAG") {
+    args$time_varying_x <- args$time_varying_x %||% paste0("x", seq_len(waves))
+    args$time_varying_y <- args$time_varying_y %||% paste0("y", seq_len(waves))
+  }
+
   fn <- switch(
     estimator,
     "CLPM"    = crossLagR::estimateCLPM,
     "RICLPM"  = crossLagR::estimateRICLPM,
+    "RICLPM_NOLAG" = crossLagR::estimateRICLPM_nolag,
     "ALT"     = crossLagR::estimateALT,
     "LGM"     = crossLagR::estimateLGM,
     "LCMSR"   = crossLagR::estimateLCMSR,
@@ -212,7 +227,14 @@ build_estimator_syntax <- function(estimator, waves, args = list()) {
 ## "LCHANGE","BB","TSO"), which route through simFromSyntax.
 simulate_dgp <- function(dgp, waves, sample_size, params) {
   if (dgp == "clpmu") {
-    sim <- crossLagR::simCLPMu(
+    ## confounder_type selects between the time-variant confounder (simCLPMu,
+    ## an AR(1) U_t) and the time-invariant one (simCLPM_timeInvariantU, a
+    ## single U loading on every wave).
+    ctype <- params$confounder_type %||% "time_variant"
+    if (!ctype %in% c("time_variant", "time_invariant")) {
+      stop("confounder_type must be 'time_variant' or 'time_invariant'.")
+    }
+    sim_args <- list(
       waves                = waves,
       stability_p          = params$stability_p          %||% 0.3,
       stability_q          = params$stability_q          %||% 0.3,
@@ -224,26 +246,61 @@ simulate_dgp <- function(dgp, waves, sample_size, params) {
       confounder_p         = params$confounder_p         %||% 0.3,
       confounder_q         = params$confounder_q         %||% 0.3,
       confounder_variance  = params$confounder_variance  %||% 1,
-      confounder_stability = params$confounder_stability %||% 0.4,
       sample.nobs          = sample_size
     )
+    if (ctype == "time_variant") {
+      sim_args$confounder_stability <- params$confounder_stability %||% 0.4
+      sim <- do.call(crossLagR::simCLPMu, sim_args)
+    } else {
+      sim <- do.call(crossLagR::simCLPM_timeInvariantU, sim_args)
+    }
     return(sim$data)
   }
 
   ## Everything else: simulate from the estimator's populated lavaan syntax.
   if (dgp %in% c("CLPM", "RICLPM", "ALT", "LGM", "LCMSR",
                  "LCHANGE", "BB", "TSO")) {
+    ## Random-intercept (between-person) variances. Only the DGPs with an
+    ## I_x/I_y latent intercept can honour a fixed trait variance; for the rest
+    ## (CLPM has no trait; LCHANGE/TSO use a different stable structure) we leave
+    ## the stable part at lavaan defaults to avoid setting a non-existent entry.
+    has_intercepts <- dgp %in% c("RICLPM", "ALT", "LGM", "LCMSR", "BB")
+    vbx <- if (has_intercepts) params$variance_between_x else NULL
+    vby <- if (has_intercepts) params$variance_between_y else NULL
+    cbxy <- if (!is.null(vbx) && !is.null(vby)) {
+      params$cov_between_xy %||% (0.3 * sqrt(vbx * vby))
+    } else NULL
+
+    ## Bollen & Brand DGP: the defining feature is that the latent fixed effect
+    ## is correlated with the predetermined initial conditions (x1, y1) — the
+    ## relaxed orthogonality the RI-CLPM forbids. Without these covariances a
+    ## "BB DGP" is indistinguishable from an orthogonal-trait RI-CLPM.
+    extra <- NULL
+    if (dgp == "BB" && !is.null(vbx) && !is.null(vby)) {
+      r <- params$trait_init_cor %||% 0.3
+      extra <- data.frame(
+        lhs   = c("x1", "y1", "x1", "I_x",         "I_y",         "I_x",         "I_y"),
+        rhs   = c("x1", "y1", "y1", "x1",          "y1",          "y1",          "x1"),
+        value = c(1,    1,    0.3, r * sqrt(vbx),  r * sqrt(vby), r * sqrt(vbx), r * sqrt(vby)),
+        stringsAsFactors = FALSE
+      )
+    }
+
     return(crossLagR::simFromSyntax(
-      estimator   = dgp,
-      waves       = waves,
-      sample_size = sample_size,
-      ar_x        = params$stability_p %||% 0.3,
-      ar_y        = params$stability_q %||% 0.3,
-      cl_xy       = params$cross_q     %||% 0.1,
-      cl_yx       = params$cross_p     %||% 0.1,
-      d_var_x     = params$variance_p  %||% 0.5,
-      d_var_y     = params$variance_q  %||% 0.5,
-      d_cov_xy    = params$cov_pq      %||% 0
+      estimator     = dgp,
+      waves         = waves,
+      sample_size   = sample_size,
+      ar_x          = params$stability_p %||% 0.3,
+      ar_y          = params$stability_q %||% 0.3,
+      cl_xy         = params$cross_q     %||% 0.1,
+      cl_yx         = params$cross_p     %||% 0.1,
+      d_var_x       = params$variance_p  %||% 0.5,
+      d_var_y       = params$variance_q  %||% 0.5,
+      d_cov_xy      = params$cov_pq      %||% 0,
+      var_between_x = vbx,
+      var_between_y = vby,
+      cov_between_xy = cbxy,
+      extra_cov     = extra
     ))
   }
 

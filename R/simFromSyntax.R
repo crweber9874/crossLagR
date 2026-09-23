@@ -13,9 +13,13 @@
 #' lavaan syntax, substitutes the labels with fixed numeric values, and
 #' simulates data.
 #'
-#' Other labeled parameters (e.g. growth-factor variances for ALT/LGM/LCMSR,
-#' trait variances for TSO, latent FE for BB) are left at the lavaan defaults
-#' used by \code{simulateData()}.
+#' By default, other labeled parameters (e.g. growth-factor variances for
+#' ALT/LGM/LCMSR, trait variances for TSO, latent FE for BB) are left at the
+#' lavaan defaults used by \code{simulateData()}. Supplying
+#' \code{var_between_x} / \code{var_between_y} (and, for BB, \code{extra_cov})
+#' instead routes through a parameter table so the random-intercept variance
+#' and its covariances can be fixed — this is what lets an ICC / between-person
+#' sweep actually change the generated data.
 #'
 #' @param estimator Character. One of "CLPM", "RICLPM", "ALT", "LGM", "LCMSR",
 #'   "LCHANGE", "BB", "TSO".
@@ -25,6 +29,15 @@
 #' @param cl_xy,cl_yx Cross-lagged effects (or coupling for LCS).
 #' @param d_var_x,d_var_y Dynamic residual variances.
 #' @param d_cov_xy Dynamic residual covariance.
+#' @param var_between_x,var_between_y Optional numeric. Random-intercept
+#'   (between-person) variances for the latent intercepts \code{I_x}/\code{I_y}.
+#'   \code{NULL} (default) leaves them free at lavaan defaults. Estimators
+#'   without an \code{I_x}/\code{I_y} factor (e.g. CLPM) warn and ignore these.
+#' @param cov_between_xy Optional numeric. Covariance \code{I_x ~~ I_y}.
+#' @param extra_cov Optional data.frame with columns \code{lhs}, \code{rhs},
+#'   \code{value}: additional \code{~~} entries to fix (e.g. the Bollen & Brand
+#'   fixed-effect / initial-condition covariances). Only used when at least one
+#'   of the between-variance arguments is also non-\code{NULL}.
 #' @param estimator_args Named list. Additional args forwarded to the estimator's
 #'   syntax-generating function.
 #' @param seed Optional integer seed.
@@ -52,6 +65,8 @@ simFromSyntax <- function(estimator,
                           cl_xy = 0.1, cl_yx = 0.1,
                           d_var_x = 0.5, d_var_y = 0.5,
                           d_cov_xy = 0,
+                          var_between_x = NULL, var_between_y = NULL,
+                          cov_between_xy = NULL, extra_cov = NULL,
                           estimator_args = list(),
                           seed = NULL,
                           keep_unified_observed = TRUE) {
@@ -69,7 +84,10 @@ simFromSyntax <- function(estimator,
   ## produces both x* and y* columns (required by downstream estimators).
   defaults_per_estimator <- list(
     LGM     = list(variable_type = "bivariate"),
-    LCHANGE = list(variable_type = "bivariate")
+    LCHANGE = list(variable_type = "bivariate"),
+    ## BB: constrain wave-specific coefficients so the unified ar_x/ar_y/cl_xy/
+    ## cl_yx labels exist (both for populating values and for the I_x/I_y FE).
+    BB      = list(constrain_coefficients = TRUE)
   )
   args <- c(list(waves = waves),
             defaults_per_estimator[[estimator]],
@@ -101,14 +119,56 @@ simFromSyntax <- function(estimator,
 
   if (!is.null(seed)) set.seed(seed)
 
+  ## Whether the caller wants control over the stable (between-person) part.
+  ## When none of these are supplied we keep the historical behaviour: simulate
+  ## straight from the populated string, leaving trait variances at lavaan's
+  ## defaults. When any are supplied we route through a parameter table so the
+  ## random-intercept variance / covariances can be fixed by name.
+  set_between <- !is.null(var_between_x) || !is.null(var_between_y) ||
+                 !is.null(cov_between_xy) || !is.null(extra_cov)
+
   ## simulateData supports a model with a mix of fixed and free parameters.
   ## sample.nobs sets N; meanstructure = TRUE since some estimators (RICLPM)
   ## free trait means.
-  dat <- lavaan::simulateData(
-    model        = populated,
-    sample.nobs  = sample_size,
-    meanstructure = TRUE
-  )
+  if (!set_between) {
+    dat <- lavaan::simulateData(
+      model         = populated,
+      sample.nobs   = sample_size,
+      meanstructure = TRUE
+    )
+  } else {
+    pt <- lavaan::lavaanify(populated, meanstructure = TRUE)
+
+    set_var <- function(pt, v, val) {
+      if (is.null(val)) return(pt)
+      r <- pt$op == "~~" & pt$lhs == v & pt$rhs == v
+      if (!any(r)) warning("simFromSyntax: no variance entry '", v, " ~~ ", v,
+                           "' to set for estimator ", estimator, ".")
+      pt$ustart[r] <- val; pt$free[r] <- 0L; pt
+    }
+    set_cov <- function(pt, a, b, val) {
+      if (is.null(val)) return(pt)
+      r <- pt$op == "~~" &
+           ((pt$lhs == a & pt$rhs == b) | (pt$lhs == b & pt$rhs == a))
+      if (!any(r)) warning("simFromSyntax: no covariance entry '", a, " ~~ ", b,
+                           "' to set for estimator ", estimator, ".")
+      pt$ustart[r] <- val; pt$free[r] <- 0L; pt
+    }
+
+    pt <- set_var(pt, "I_x", var_between_x)
+    pt <- set_var(pt, "I_y", var_between_y)
+    pt <- set_cov(pt, "I_x", "I_y", cov_between_xy)
+    if (!is.null(extra_cov)) {
+      for (i in seq_len(nrow(extra_cov)))
+        pt <- set_cov(pt, extra_cov$lhs[i], extra_cov$rhs[i], extra_cov$value[i])
+    }
+
+    dat <- lavaan::simulateData(
+      model         = pt,
+      sample.nobs   = sample_size,
+      meanstructure = TRUE
+    )
+  }
 
   ## Most estimateXXX() functions use x1..xT, y1..yT. Sanity-check + return.
   if (keep_unified_observed) {

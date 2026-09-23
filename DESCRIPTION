@@ -4,7 +4,7 @@ Title: Latent variable models for estimating cross-lagged effects in R
 Version: 0.1.0
 Author: Christopher Weber
 Maintainer: Christopher Weber <chrisweber@arizona.edu>
-Description: This package accompanies Weber et al (2024) and contains the functions used to generate the results in the paper. The package contains a series of functions that wrap the brms package and generate the models used in the paper. The package also contains the data used in the paper.
+Description: This package accompanies Weber et al (2024) and contains the functions used to generate the results in the paper. The package wraps lavaan to build and fit panel-data SEM models (CLPM, RI-CLPM, latent change score, and related estimators). The package also contains the data used in the paper.
 License: MIT + file LICENSE
 Encoding: UTF-8
 LazyData: true
@@ -13,22 +13,14 @@ Imports:
   stats,
   MASS,
   dplyr,
-  gt,
   ggplot2,
   lavaan,
-  dagitty,
-  ggdag,
-  tidyverse,
-  stringr,
-  gganimate,
   tidyr,
-  stringr,
   lme4
 Suggests:
     knitr,
     rmarkdown,
     testthat (>= 3.0.0),
-    blavaan,
     shiny,
     bslib,
     shinyWidgets,
@@ -38,7 +30,8 @@ Suggests:
     digest,
     callr,
     ggridges,
-    devtools
+    devtools,
+    gt
 VignetteBuilder: knitr
 URL: https://crweber9874.github.io/crossLagR/
 Config/testthat/edition: 3

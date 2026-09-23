@@ -119,98 +119,15 @@ When data_generation = "clpmu", additional confounder parameters:
 }
 \examples{
 \dontrun{
-# Basic usage with default parameters
-results <- run_mc_sims(
-  estimator = "RICLPM",
-  trials = 5,
-  waves = 3,
-  sample_size = 500
-)
+run_mc_sims(estimator = "RICLPM", trials = 5, waves = 3, sample_size = 500)
 
-# Test Random Intercepts with both full and cross-lagged only
-results_ri_full <- run_mc_sims(
-  estimator = "RI",
-  param_grid = data.frame(include_lagged_dv = TRUE),
-  trials = 10,
-  waves = 4,
-  sample_size = 1000
-)
-
-results_ri_cross <- run_mc_sims(
-  estimator = "RI",
-  param_grid = data.frame(include_lagged_dv = FALSE),
-  trials = 10,
-  waves = 4,
-  sample_size = 1000
-)
-
-# Compare regular RICLPM vs no-lag RICLPM
-results_regular <- run_mc_sims(
-  estimator = "RICLPM",
-  riclpm_type = "riclpm",
-  trials = 10,
-  waves = 4,
-  sample_size = 1000
-)
-
-results_nolag <- run_mc_sims(
-  estimator = "RICLPM",
-  riclpm_type = "riclpm_nolag",
-  trials = 10,
-  waves = 4,
-  sample_size = 1000
-)
-
-# Compare latent change models
-results_dual_change <- run_mc_sims(
-  estimator = "LCHANGE",
-  lchange_type = "dual_change",
-  trials = 10,
-  waves = 4,
-  sample_size = 1000
-)
-
-results_single_change <- run_mc_sims(
-  estimator = "LCHANGE",
-  lchange_type = "latent_change",
-  trials = 10,
-  waves = 4,
-  sample_size = 1000
-)
-
-# Study bias from unmeasured confounder
-results_confounded <- run_mc_sims(
+# CLPM fitted to confounded data; vary the DGP parameters over a grid
+run_mc_sims(
   estimator = "CLPM",
-  trials = 10,
-  waves = 4,
-  sample_size = 1000,
-  data_generation = "clpmu"  # Data has confounder, but CLPM ignores it
+  param_grid = expand.grid(stability_p = c(0.2, 0.5), cross_q = c(0, 0.1)),
+  trials = 10, waves = 4, sample_size = 1000,
+  data_generation = "clpmu"
 )
-
-# Custom parameter grid
-my_grid <- expand.grid(
-  stability_p = c(0.2, 0.5),
-  stability_q = c(0.3, 0.6),
-  cross_p = c(0.0, 0.1),
-  cross_q = c(0.0, 0.1),
-  variance_between_x = c(0.5, 1.0)
-)
-
-results <- run_mc_sims(
-  estimator = "CLPM",
-  param_grid = my_grid,
-  trials = 10,
-  waves = 4,
-  sample_size = 1000,
-  data_generation = "riclpm"
-)
-
-# Compare estimators under confounding
-estimators <- c("OLS", "RICLPM", "CLPM", "RI")
-all_results <- lapply(estimators, function(est) {
-  run_mc_sims(estimator = est, trials = 5, waves = 3, data_generation = "clpmu")
-})
-combined_results <- do.call(rbind, all_results)
 }
 
 }

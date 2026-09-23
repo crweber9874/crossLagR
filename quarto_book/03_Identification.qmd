@@ -1,0 +1,339 @@
+# Sensitivity {#sec-identification}
+
+If all we know are the CL and AR parameters (from a CLPM), the direction and the magnitude of the bias brought about by trait variance is unknown. 
+
+We could work with the information available. One way is to assume a trait correlation $\rho_I$ and then solve for the true autoregression $b$ and the between-to-within variance ratio $r$ that would produce the reported estimates (when the true parameter cross lagged parameter is zero). Another is to simply assume the true AR and CL parameters are incorrect, produced by a non-zero trait variances and covariances. This is produced near the end of the chapter, and turns the problem on its head. We can assume the AR and CL parameters are wrong, the AR is a mixture of the true AR and the trait correlation, and if we assume a priori a trait correlation $\rho_I$, we can solve for the implied AR, CL and the between-to-within variance ratio $r$ that would produce the reported estimates. The chapter shows that these two approaches are equivalent, sides of the same coin, and interchangeable. 
+
+```{r}
+#| label: ident-setup
+#| echo: false
+#| message: false
+#| warning: false
+
+suppressPackageStartupMessages({
+  library(crossLagR); library(tidyverse)
+})
+devtools::load_all()
+
+b_true <- 0.30
+r_true <- 1.50
+rho_I  <- 0.50
+```
+
+
+Recall the bias function from @sec-bias. 
+$$
+\hat{\mathbf B}^{\text{CLPM}} = \mathbf B^{\text{true}} + \bigl(\mathbf I - \mathbf B^{\text{true}}\bigr)\,\mathbf V,
+\qquad \mathbf V \equiv \boldsymbol\Omega\,\mathbf S^{-1},
+$$
+
+For a review:
+
+| Matrix | Description | From | Code |
+|:--|:--|:--|:--|
+| $\mathbf B^{\text{true}}$ | true within-person dynamics | $b\,\mathbf I$ | `b_true` |
+| $\boldsymbol\Omega$ | trait (between-person) covariance | $r\begin{bmatrix}1 & \rho_I\\ \rho_I & 1\end{bmatrix}$ | `r_true`, `rho_I` |
+| $\boldsymbol\Psi$ | within-person covariance | $\mathbf I$ | -- |
+| $\mathbf S$ | total covariance of the lagged regressors | $\boldsymbol\Omega + \boldsymbol\Psi$ | `S` |
+| $\mathbf V$ | the term carrying the bias | $\boldsymbol\Omega\,\mathbf S^{-1}$ | `V` |
+
+
+```{r}
+#| label: ident-matrix-bias
+#| echo: true
+#| message: false
+#| warning: false
+
+Omega <- r_true * matrix(c(1, rho_I, rho_I, 1), 2)
+S     <- Omega + diag(2)
+V     <- Omega %*% solve(S)
+bias  <- (diag(2) - b_true * diag(2)) %*% V
+
+c(matrix_ar = bias[1, 1], matrix_cl = bias[1, 2])
+```
+
+In the $\omega$ matrix, the diagonal entries are the trait variances, and the off-diagonal entries are the trait covariances. So, fix the true autoregression and the assumed trait correlation, and we can see how the bias changes as $r$ varies, using the `clpmBias()` function. This bias is just produced from the bias function in @sec-bias.
+
+```{r}
+#| label: ident-matrix-check
+#| echo: true
+#| message: false
+#| warning: false
+
+clpmBias(bw_ratio = r_true, ar = b_true, rho_i = rho_I)[c("ar_bias", "cl_bias")]
+```
+
+@fig-ident-two-dials produces an all too familiar picture: a monotonic AR function and a non-monotonic CL function. 
+
+
+```{r}
+#| label: fig-ident-two-dials
+#| echo: false
+#| message: false
+#| warning: false
+#| out-width: 85%
+#| fig-cap: "AR bias is monotone in the variance ratio; CL bias is not."
+
+clpmBias(bw_ratio = seq(0.01, 9, length.out = 400), 
+         ar = b_true, 
+         rho_i = rho_I) |>
+  select(bw_ratio, ar_bias, cl_bias) |>
+  pivot_longer(-bw_ratio, names_to = "parameter", values_to = "bias") |>
+  mutate(parameter = recode(parameter, 
+                     ar_bias = "AR bias", cl_bias = "CL bias")) |>
+  ggplot(aes(bw_ratio, bias)) +
+  geom_line(linewidth = 0.9, colour = "#C0392B") +
+  facet_wrap(~parameter, scales = "free_y") +
+  labs(x = "Between-to-within variance ratio (r)", y = "Bias") +
+  theme_minimal(base_size = 11)
+```
+
+
+## Identification
+
+Importantly, we cannot actually find the true $r$ from the reported estimates in a CLPM. The bias function includes two equations in three unknowns: the true autoregression $b$, the true between-to-within variance ratio $r$, and the assumed trait correlation $\rho_I$.
+
+We can fix $\rho_I$ and solve for $b$ and $r$. To explore this, simulate data from and RI-CLPM,  `simRICLPM()` simulates data from an RI-CLPM, but then fit a CLPM with `estimateCLPM()`. Then we could compare the "truth" to the reported estimates. In particular, we might ask, if the true cross-lag is zero, what $r$ would be required to produce the reported CLPM estimates? 
+
+```{r}
+#| label: ident-nonidentified
+#| echo: true
+#| message: false
+#| warning: false
+
+suppressPackageStartupMessages(library(lavaan))
+
+candidates <- tibble(
+  ar_true  = c(0.30, 0.51, 0.58),
+  bw_ratio = c(1.50, 0.75, 0.50),
+  rho_i    = c(0.50, 0.70, 0.90)
+)
+
+fit_clpm <- function(ar_true, bw_ratio, rho_i, n, waves = 4) {
+  d <- simRICLPM(
+    waves    = waves,
+    beta_x   = ar_true, beta_y = ar_true,
+    omega_xy = 0,       omega_yx = 0,
+    var_p    = 1 - ar_true^2, var_q = 1 - ar_true^2, cov_pq = 0,
+    var_BX   = bw_ratio, var_BY = bw_ratio,
+    cov_BXBY = bw_ratio * rho_i,
+    sample.nobs = n
+  )
+  pe <- lavaan::parameterEstimates(
+    lavaan::lavaan(estimateCLPM(waves = waves), data = d$data)
+  )
+  pe <- pe[pe$label != "", ]
+  tibble(reported_ar = mean(pe$est[pe$label == "ar_x"]),
+         reported_cl = mean(pe$est[pe$label == "cl_xy"]),
+         n_obs = nrow(d$data), n_miss = sum(!complete.cases(d$data)))
+}
+
+set.seed(902)
+candidates |>
+  mutate(pmap_dfr(list(ar_true, bw_ratio, rho_i), fit_clpm, n = 20000)) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+### Cross Lag Artifacts
+
+If the cross lag effect is zero, is there some combination of trait variance and correlation that might produce the reported estimates? 
+
+**Step 1. Published findings.** We need this for a simple reason: We want to test to what extent the published numbers could have been erroneously produced by a non-zero trait variance (and covariance),  the next step.
+
+```{r}
+#| label: walk-1
+#| echo: true
+#| message: false
+#| warning: false
+
+pub_ar <- 0.55
+pub_cl <- 0.12
+```
+
+**Step 2. A Zero Cross Lag?** The model we might test is whether a cross-lagged effect is absent, incorrectly produced by a trait covariance. 
+
+**Step 3. Assume a trait correlation.** We can't exactly back this out of the recovered numbers. But since we can use a computer, we might test different values of $\rho_I$ and see how the implied $b$ and $r$ change. Recall that the bias function is two equations in three unknowns, so we have to fix one of them for identification. Also note that the matrix $\boldsymbol\Omega$ is symmetric (for now), so the trait correlation is the same in both directions. 
+
+**Step 4. Solve.** With $\rho_I$ fixed, the true autoregression $b$ and the trait variance $r$ are exactly determined.
+
+```{r}
+#| label: walk-2
+#| echo: true
+#| message: false
+#| warning: false
+
+solved <- clpmInvert(ar_obs = pub_ar, cl_obs = pub_cl, rho_i = 0.6)
+round(solved, 3)
+```
+
+
+**Step 5. Confirm.** These are all closed form calculations, based on the information we have and just identified equations. The recovered values should reproduce the published ones through the bias function.
+
+
+```{r}
+#| label: walk-3
+#| echo: true
+#| message: false
+#| warning: false
+
+clpmCLBias(bw_ratio = solved$bw_ratio_implied,
+           ar       = solved$ar_implied,
+           cl       = 0,
+           rho_i    = 0.6)[c("ar_pop", "cl_pop")] |>
+  round(3)
+```
+
+
+**Step 6. Iterate**  One value of $\rho_I$ gives one answer, but if we iterate through different values.
+
+```{r}
+#| label: walk-4
+#| echo: true
+#| message: false
+#| warning: false
+
+clpmInvert(ar_obs = pub_ar, cl_obs = pub_cl,
+           rho_i = c(0.4, 0.5, 0.6, 0.7, 0.8, 0.9)) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+ This displays something interesting -- as $rho_I$ increases...Actually, first a reminder: $\rho_I$  is the correlation. We assume no real cross-lagged effect in the CLPM. What we're doing is solving for the implied $b$ and $r$ that would produce the reported estimates, at different levels of $\rho_I$. So, what this shows is that as this correlation is increases -- just the stable relationship between two things, independent of time -- less autoregression and trait variance are required to produce the reported estimates.
+
+## Sensitivity Plot
+
+ `clpmSensitivityBands()` iterates over a range of $r$ values, simulating an RI-CLPM at each value (with a true cross-lag of zero), fitting a CLPM to every draw, and providing a summary across replications. 
+
+```{r}
+#| label: sens-sim
+#| echo: true
+#| message: false
+#| warning: false
+
+# `clpmSensitivityBands()` runs the whole sweep: simulate an RI-CLPM at each
+# variance ratio with a true cross-lag of zero, fit a CLPM to every draw, and
+# summarise. The swept data comes back attached to the plot, so the ratio table
+# below reuses it rather than simulating a second time.
+sens_plot <- clpmSensitivityBands(
+  reported_ar = pub_ar,
+  reported_cl = pub_cl,
+  ar_true     = b_true,
+  rho_i       = rho_I,
+  seed        = 414
+)
+
+sens <- attr(sens_plot, "sim")
+```
+
+```{r}
+#| label: fig-sens-bands
+#| echo: false
+#| message: false
+#| warning: false
+#| out-width: 95%
+#| fig-cap: "Artifact-only CLPM estimates as trait variance grows, with 95% simulation bands. Dashed lines mark the reported estimates; points mark where an artifact curve reaches them."
+
+sens_plot
+```
+
+## Asymmetry
+
+We can expand these effects to asymmetric effects, where the $x$ and $y$ equations have different coefficient sets. 
+
+$$
+\mathbf B^{\text{true}} = \begin{bmatrix} b_x & 0\\ 0 & b_y\end{bmatrix},
+\qquad
+\boldsymbol\Omega = \begin{bmatrix} r_x & \rho_I\sqrt{r_x r_y}\\ \rho_I\sqrt{r_x r_y} & r_y\end{bmatrix}
+$$
+
+
+**Step 1. Published Research.** Two autoregressions and two cross-lags; however, they are no longer equal.
+
+```{r}
+#| label: asym-1
+#| echo: true
+#| message: false
+#| warning: false
+
+pub_ar_xy <- c(0.55, 0.50)   # ar_x, ar_y
+pub_cl_xy <- c(0.10, 0.07)   # cl_xy, cl_yx
+```
+
+**Step 2. A Zero Cross Lag?** The off-diagonal elements of $\mathbf B^{\text{true}}$ are zero, so the true cross-lag is zero.
+
+**Step 3. Assume a trait correlation.** Also unchanged, and still unavoidable.
+
+**Step 4. Solve.** `clpmInvert()` again, which will return the implied $b_x$, $b_y$, $r_x$, and $r_y$ that would produce the reported estimates, given the assumed $\rho_I$.
+
+```{r}
+#| label: asym-2
+#| echo: true
+#| message: false
+#| warning: false
+
+solved_asym <- clpmInvert(ar_obs = pub_ar_xy, cl_obs = pub_cl_xy, rho_i = 0.6)
+round(solved_asym, 3)
+```
+
+**Step 5. Confirm.** Validate with the bias function.
+
+```{r}
+#| label: asym-3
+#| echo: true
+#| message: false
+#| warning: false
+
+rx <- solved_asym$bw_ratio_implied_x
+ry <- solved_asym$bw_ratio_implied_y
+p  <- 0.6
+
+Omega_a <- matrix(c(rx, p * sqrt(rx * ry),
+                    p * sqrt(rx * ry), ry), 2)
+V_a     <- Omega_a %*% solve(Omega_a + diag(2))
+B_a     <- diag(c(solved_asym$ar_implied_x, solved_asym$ar_implied_y))
+
+round(B_a + (diag(2) - B_a) %*% V_a, 3)
+```
+
+**Step 6. Iterate.** As before, one assumed $\rho_I$ gives one answer.
+
+```{r}
+#| label: asym-4
+#| echo: true
+#| message: false
+#| warning: false
+
+clpmInvert(ar_obs = pub_ar_xy, cl_obs = pub_cl_xy,
+           rho_i = c(0.4, 0.5, 0.6, 0.7, 0.8, 0.9)) |>
+  mutate(across(where(is.numeric), \(x) round(x, 3)))
+```
+
+
+### An interesting observation
+
+The ratio of the reported cross-lag effects in the asymmetric case is independent of the assumed trait correlation, or even the AR parameters. This is strange, but seems right.
+
+
+Notice that $\boldsymbol\Omega$ is a covariance matrix, so its off-diagonals don't change by $r$, and if $\boldsymbol\Psi = \mathbf I$, the trait variance cancels out entirely.
+
+Now take the ratio of the cross lagged effects. 
+
+$$
+\frac{\hat\Phi_{cl,xy}}{\hat\Phi_{cl,yx}} \;=\; \frac{(1-b_x)\,\mathbf V_{12}}{(1-b_y)\,\mathbf V_{21}} \;=\; \frac{1-b_x}{1-b_y}.
+$$
+
+The ratio of the reported cross-lags is exactly the ratio of the $(1-b)$ terms, which is a restriction that must hold for any admissible pair of cross-lags. This is neat: The CLPM will produce a pair of cross-lags for $x$ and $y$ equations. The ratio of the cross-lagged effect will always be the same, regardless of the assumed trait correlation. And, any reported set of parameters that produce an implied set of estimates, at different $\rho_I$, will always produce the same ratio of cross-lags.
+
+```{r}
+#| label: asym-ratio
+#| echo: true
+#| message: false
+#| warning: false
+
+# The relation holds at every assumed trait correlation.
+map_dfr(c(0.4, 0.5, 0.6, 0.7, 0.8, 0.9), function(p) {
+  o <- clpmInvert(ar_obs = pub_ar_xy, cl_obs = pub_cl_xy, rho_i = p)
+  tibble(rho_i        = p,
+         reported_ratio = pub_cl_xy[1] / pub_cl_xy[2],
+         implied_ratio  = (1 - o$ar_implied_x) / (1 - o$ar_implied_y))
+}) |>
+  mutate(across(where(is.numeric), \(x) round(x, 4)))
+```

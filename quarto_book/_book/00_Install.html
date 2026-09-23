@@ -183,60 +183,43 @@ div.csl-indent {
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./02_Change.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  <a href="./02_Bias.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">3</span>&nbsp; <span class="chapter-title">Bias in the Cross-Lagged Panel Model</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./03_RICLPM.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
+  <a href="./03_Identification.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">4</span>&nbsp; <span class="chapter-title">Sensitivity</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./04_Usami.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
+  <a href="./04_RICLPM.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">5</span>&nbsp; <span class="chapter-title">The Random-Intercept CLPM</span></span></a>
   </div>
 </li>
         <li class="sidebar-item">
   <div class="sidebar-item-container"> 
-  <a href="./05_simulations.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Simulations</span></span></a>
+  <a href="./05_Change.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">6</span>&nbsp; <span class="chapter-title">Latent Change Score Models</span></span></a>
+  </div>
+</li>
+        <li class="sidebar-item">
+  <div class="sidebar-item-container"> 
+  <a href="./06_Unified.html" class="sidebar-item-text sidebar-link">
+ <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">Extensions and Alternatives</span></span></a>
   </div>
 </li>
         <li class="sidebar-item sidebar-item-section">
       <div class="sidebar-item-container"> 
             <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true">
- <span class="menu-text">Applications</span></a>
+ <span class="menu-text">Appendices</span></a>
           <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-1" role="navigation" aria-expanded="true" aria-label="Toggle section">
             <i class="bi bi-chevron-right ms-2"></i>
           </a> 
       </div>
       <ul id="quarto-sidebar-section-1" class="collapse list-unstyled sidebar-section depth1 show">  
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./06_iscap.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">7</span>&nbsp; <span class="chapter-title">The ISCAP Panel</span></span></a>
-  </div>
-</li>
-          <li class="sidebar-item">
-  <div class="sidebar-item-container"> 
-  <a href="./07_liss.html" class="sidebar-item-text sidebar-link">
- <span class="menu-text"><span class="chapter-number">8</span>&nbsp; <span class="chapter-title">Replication: Bakker, Lelkes, &amp; Malka (2021)</span></span></a>
-  </div>
-</li>
-      </ul>
-  </li>
-        <li class="sidebar-item sidebar-item-section">
-      <div class="sidebar-item-container"> 
-            <a class="sidebar-item-text sidebar-link text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true">
- <span class="menu-text">Appendices</span></a>
-          <a class="sidebar-item-toggle text-start" data-bs-toggle="collapse" data-bs-target="#quarto-sidebar-section-2" role="navigation" aria-expanded="true" aria-label="Toggle section">
-            <i class="bi bi-chevron-right ms-2"></i>
-          </a> 
-      </div>
-      <ul id="quarto-sidebar-section-2" class="collapse list-unstyled sidebar-section depth1 show">  
           <li class="sidebar-item">
   <div class="sidebar-item-container"> 
   <a href="./A_package_reference.html" class="sidebar-item-text sidebar-link">
@@ -260,7 +243,7 @@ div.csl-indent {
   <li><a href="#common-arguments" id="toc-common-arguments" class="nav-link" data-scroll-target="#common-arguments"><span class="header-section-number">1.3</span> Common Arguments</a></li>
   <li><a href="#estimator-quick-reference" id="toc-estimator-quick-reference" class="nav-link" data-scroll-target="#estimator-quick-reference"><span class="header-section-number">1.4</span> Estimator Quick Reference</a></li>
   <li><a href="#simulation-quick-reference" id="toc-simulation-quick-reference" class="nav-link" data-scroll-target="#simulation-quick-reference"><span class="header-section-number">1.5</span> Simulation Quick Reference</a></li>
-  <li><a href="#quick" id="toc-quick" class="nav-link" data-scroll-target="#quick"><span class="header-section-number">1.6</span> Quick</a></li>
+  <li><a href="#quick-example" id="toc-quick-example" class="nav-link" data-scroll-target="#quick-example"><span class="header-section-number">1.6</span> Quick Example</a></li>
   <li><a href="#help-and-documentation" id="toc-help-and-documentation" class="nav-link" data-scroll-target="#help-and-documentation"><span class="header-section-number">1.7</span> Help and Documentation</a></li>
   </ul>
 </nav>
@@ -292,7 +275,7 @@ div.csl-indent {
 <p><code>crossLagR</code> can be found on GitHub and is not yet on CRAN. Install with <code>devtools</code> (or <code>remotes</code>):</p>
 <div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb1"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb1-1"><a href="#cb1-1" aria-hidden="true" tabindex="-1"></a><span class="co"># install.packages("devtools")</span></span>
 <span id="cb1-2"><a href="#cb1-2" aria-hidden="true" tabindex="-1"></a>devtools<span class="sc">::</span><span class="fu">install_github</span>(<span class="st">"crweber9874/crossLagR"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
-<p>The package is generally just a wrapper around <code>lavaan</code> for SEM estimation, <code>MASS</code> for multivariate normal draws in some simulators, and the usual tidyverse tools (<code>dplyr</code>, <code>tidyr</code>, <code>tibble</code>, <code>purrr</code>, <code>stringr</code>) for data wrangling. <code>DiagrammeR</code> is used to render the path diagrams reproduced throughout this guide. All dependencies are listed in the DESCRIPTION file and will be installed automatically with the above command.</p>
+<p>The package is generally just a wrapper around <code>lavaan</code> for SEM estimation, <code>MASS</code> for multivariate normal draws in some simulators, and the usual tidyverse tools (<code>dplyr</code>, <code>tidyr</code>, <code>tibble</code>, <code>purrr</code>, <code>stringr</code>) for data wrangling procedures. <code>DiagrammeR</code> is used to render the path diagrams reproduced throughout this guide. All dependencies are listed in the DESCRIPTION file and will be installed automatically with the above command.</p>
 <div class="cell">
 <div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb2"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb2-1"><a href="#cb2-1" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(crossLagR)</span>
 <span id="cb2-2"><a href="#cb2-2" aria-hidden="true" tabindex="-1"></a><span class="fu">library</span>(lavaan)</span>
@@ -301,15 +284,15 @@ div.csl-indent {
 </section>
 <section id="package-conventions" class="level2" data-number="1.2">
 <h2 data-number="1.2" class="anchored" data-anchor-id="package-conventions"><span class="header-section-number">1.2</span> Package Conventions</h2>
-<p>The way the functions are written is that they fall into three families, identifiable by their prefix:</p>
+<p>Functions fall into three families, identifiable by their prefix:</p>
 <ul>
-<li><code>estimate*()</code> — generate <code>lavaan</code> model syntax. Each returns a character string that can be fed directly into <code>lavaan::lavaan()</code> or <code>lavaan::sem()</code>. So <code>estimateRICLPM(waves = 4)</code> returns a string of lavaan syntax for a 4-wave RI-CLPM, for instance.</li>
-<li><code>sim*()</code> — simulate data from a specified DGP. Each returns a list with <code>$model</code> (the population lavaan syntax) and <code>$data</code> (a wide-format tibble with one row per unit and columns <code>x1, …, xT, y1, …, yT</code>).</li>
-<li><code>monteCarlo*()</code> — wrappers that repeat a simulate-then-fit cycle and return a tibble table of results.</li>
+<li><code>estimate*()</code> — generate <code>lavaan</code> model syntax. Each returns a character string that can be fed directly into <code>lavaan::lavaan()</code> or <code>lavaan::sem()</code>. <code>estimateRICLPM(waves = 4)</code>, for example, returns lavaan syntax for a 4-wave RI-CLPM.</li>
+<li><code>simFromSyntax()</code> — simulate data from any <code>estimate*()</code> model by populating its syntax with true parameter values, then drawing from it with <code>lavaan::simulateData()</code>. Returns a wide-format data frame with columns <code>x1, …, xT, y1, …, yT</code>.</li>
+<li><code>monteCarlo*()</code> — repeat a simulate-then-fit cycle and return a tibble of results.</li>
 </ul>
-<p>All <code>estimate*()</code> functions in the unified family share a common labeling convention so that estimates from different models can be lined up side-by-side. The convention is to generally follow the framework introduced by <span class="citation" data-cites="usami2019">Usami, Murayama, and Hamaker (<a href="#ref-usami2019" role="doc-biblioref">2019</a>)</span>:</p>
+<p>It’s not clear to me whether thi is the optimal way to write a package, but it works for now.All <code>estimate*()</code> functions in the unified family share a common labeling convention so that estimates from different models can be lined up side-by-side. The obvious issue with this is that the interpretation of these parameters can vary across models, so caution is warranted. The convention is to generally follow the framework introduced by <span class="citation" data-cites="usami2019">Usami, Murayama, and Hamaker (<a href="#ref-usami2019" role="doc-biblioref">2019</a>)</span>:</p>
 <table class="caption-top table">
-<caption>Unified parameter labels in <code>crossLagR</code>. The <em>substantive</em> interpretation depends on the model — see Chapter 4 — but the labels themselves are stable across estimators. An AR parameter in one model may not mean the same as an AR parameter in another, but they will both be labeled <code>ar_x</code> or <code>ar_y</code> in the output.</caption>
+<caption>Unified parameter labels in <code>crossLagR</code>. The <em>substantive</em> interpretation depends on the model — see later chapters — but the labels themselves are stable across estimators. For example, an AR parameter in one model may not mean the same as an AR parameter in another, but they will both be labeled <code>ar_x</code> or <code>ar_y</code> in the output.</caption>
 <colgroup>
 <col style="width: 33%">
 <col style="width: 33%">
@@ -370,7 +353,7 @@ div.csl-indent {
 <h2 data-number="1.3" class="anchored" data-anchor-id="common-arguments"><span class="header-section-number">1.3</span> Common Arguments</h2>
 <p>Every <code>estimate*()</code> accepts at least:</p>
 <ul>
-<li><code>waves</code> — number of time points. Lower bound depends on the model (2 for CLPM, 3 for most others, 4 for <code>estimate_change_to_change</code>).</li>
+<li><code>waves</code> — number of time points. The lower bound for identification depends on the model (2 for CLPM, 3 for most others, 4 for <code>estimate_change_to_change</code>).</li>
 <li><code>constrain_beta</code> — equality constraint across waves on AR parameters. Default <code>TRUE</code>.</li>
 <li><code>constrain_omega</code> — equality constraint across waves on CL parameters. Default <code>TRUE</code>.</li>
 </ul>
@@ -380,131 +363,133 @@ div.csl-indent {
 <li><code>include_z = TRUE</code> — for <code>estimateRICLPM()</code>; adds a third process.</li>
 <li><code>constrain_residual_variances</code>, <code>constrain_residual_covariances</code> — equality constraints on innovation variances and within-wave covariances.</li>
 </ul>
-<p>Sim wrappers accept the same constraint arguments plus true population values: <code>beta_x</code>/<code>beta_y</code> (AR), <code>omega_xy</code>/<code>omega_yx</code> (CL), and variance components specific to each model (e.g.&nbsp;<code>var_BX</code>, <code>var_BY</code> for RI-CLPM trait variances, <code>var_p</code>, <code>var_q</code> for within-person dynamic-residual variances).</p>
-<div class="callout callout-style-default callout-note callout-titled" title="Sim/estimate argument names differ from output labels">
+<div class="callout callout-style-default callout-important callout-titled" title="Data convention: column names must be x1, x2, ..., y1, y2, ...">
 <div class="callout-header d-flex align-content-center">
 <div class="callout-icon-container">
 <i class="callout-icon"></i>
 </div>
 <div class="callout-title-container flex-fill">
-<span class="screen-reader-only">Note</span>Sim/estimate argument names differ from output labels
+<span class="screen-reader-only">Important</span>Data convention: column names must be x1, x2, …, y1, y2, …
 </div>
 </div>
 <div class="callout-body-container callout-body">
-<p>For historical reasons the <code>sim*()</code> true-value arguments use <code>beta_*</code> and <code>omega_*</code>, but the <code>estimate*()</code> syntax labels its parameters <code>ar_*</code> and <code>cl_*</code>. This is intentional — <code>beta</code> / <code>omega</code> refer to the DGP’s true values, while <code>ar</code> / <code>cl</code> refer to <em>estimates from any model in the family</em>.</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a>my_data <span class="sc">|&gt;</span></span>
+<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a>  tidyr<span class="sc">::</span><span class="fu">pivot_wider</span>(</span>
+<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a>    <span class="at">id_cols     =</span> case_id,</span>
+<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a>    <span class="at">names_from  =</span> wave,</span>
+<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a>    <span class="at">values_from =</span> <span class="fu">c</span>(personality, ideology)</span>
+<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a>  ) <span class="sc">|&gt;</span></span>
+<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">sub</span>(<span class="st">"^personality_"</span>, <span class="st">"x"</span>, .x)) <span class="sc">|&gt;</span></span>
+<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">rename_with</span>(<span class="sc">~</span> <span class="fu">sub</span>(<span class="st">"^ideology_"</span>,    <span class="st">"y"</span>, .x))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </div>
 </section>
 <section id="estimator-quick-reference" class="level2" data-number="1.4">
 <h2 data-number="1.4" class="anchored" data-anchor-id="estimator-quick-reference"><span class="header-section-number">1.4</span> Estimator Quick Reference</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb3"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb3-1"><a href="#cb3-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CLPM — baseline cross-lagged panel</span></span>
-<span id="cb3-2"><a href="#cb3-2" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
-<span id="cb3-3"><a href="#cb3-3" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-4"><a href="#cb3-4" aria-hidden="true" tabindex="-1"></a><span class="co"># RI-CLPM — random intercept + within-person AR/CL</span></span>
-<span id="cb3-5"><a href="#cb3-5" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
-<span id="cb3-6"><a href="#cb3-6" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-7"><a href="#cb3-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Latent Change — proportional change with optional accumulating factor</span></span>
-<span id="cb3-8"><a href="#cb3-8" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">variable_type =</span> <span class="st">"bivariate"</span>,</span>
-<span id="cb3-9"><a href="#cb3-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>)</span>
-<span id="cb3-10"><a href="#cb3-10" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-11"><a href="#cb3-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Growth — intercept + slope, no dynamics</span></span>
-<span id="cb3-12"><a href="#cb3-12" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLGM</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">variable_type =</span> <span class="st">"bivariate"</span>)</span>
-<span id="cb3-13"><a href="#cb3-13" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-14"><a href="#cb3-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ALT — growth + AR/CL on observed scores (compounding)</span></span>
-<span id="cb3-15"><a href="#cb3-15" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateALT</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
-<span id="cb3-16"><a href="#cb3-16" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-17"><a href="#cb3-17" aria-hidden="true" tabindex="-1"></a><span class="co"># LCM-SR / GCLM — growth + AR/CL on structured residuals</span></span>
-<span id="cb3-18"><a href="#cb3-18" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLCMSR</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
-<span id="cb3-19"><a href="#cb3-19" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-20"><a href="#cb3-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Bollen &amp; Brand — latent fixed effects dynamic panel</span></span>
-<span id="cb3-21"><a href="#cb3-21" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateBollen_and_Brand</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
-<span id="cb3-22"><a href="#cb3-22" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb3-23"><a href="#cb3-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Trait-State-Occasion — three-component variance decomposition</span></span>
-<span id="cb3-24"><a href="#cb3-24" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateTSO</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CLPM — baseline cross-lagged panel</span></span>
+<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
+<span id="cb4-3"><a href="#cb4-3" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-4"><a href="#cb4-4" aria-hidden="true" tabindex="-1"></a><span class="co"># RI-CLPM — random intercept + within-person AR/CL</span></span>
+<span id="cb4-5"><a href="#cb4-5" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
+<span id="cb4-6"><a href="#cb4-6" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-7"><a href="#cb4-7" aria-hidden="true" tabindex="-1"></a><span class="co"># Latent Change — proportional change with optional accumulating factor</span></span>
+<span id="cb4-8"><a href="#cb4-8" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLChange</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">variable_type =</span> <span class="st">"bivariate"</span>,</span>
+<span id="cb4-9"><a href="#cb4-9" aria-hidden="true" tabindex="-1"></a>                <span class="at">estimate_constant_change =</span> <span class="cn">TRUE</span>)</span>
+<span id="cb4-10"><a href="#cb4-10" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-11"><a href="#cb4-11" aria-hidden="true" tabindex="-1"></a><span class="co"># Linear Growth — intercept + slope, no dynamics</span></span>
+<span id="cb4-12"><a href="#cb4-12" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLGM</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">variable_type =</span> <span class="st">"bivariate"</span>)</span>
+<span id="cb4-13"><a href="#cb4-13" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-14"><a href="#cb4-14" aria-hidden="true" tabindex="-1"></a><span class="co"># ALT — growth + AR/CL on observed scores (compounding)</span></span>
+<span id="cb4-15"><a href="#cb4-15" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateALT</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
+<span id="cb4-16"><a href="#cb4-16" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-17"><a href="#cb4-17" aria-hidden="true" tabindex="-1"></a><span class="co"># LCM-SR / GCLM — growth + AR/CL on structured residuals</span></span>
+<span id="cb4-18"><a href="#cb4-18" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateLCMSR</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
+<span id="cb4-19"><a href="#cb4-19" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-20"><a href="#cb4-20" aria-hidden="true" tabindex="-1"></a><span class="co"># Bollen &amp; Brand — latent fixed effects dynamic panel</span></span>
+<span id="cb4-21"><a href="#cb4-21" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateBollen_and_Brand</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span>
+<span id="cb4-22"><a href="#cb4-22" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb4-23"><a href="#cb4-23" aria-hidden="true" tabindex="-1"></a><span class="co"># Trait-State-Occasion — three-component variance decomposition</span></span>
+<span id="cb4-24"><a href="#cb4-24" aria-hidden="true" tabindex="-1"></a><span class="fu">estimateTSO</span>(<span class="at">waves =</span> <span class="dv">4</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 <p>Each call returns a character string. To fit, pipe it into <code>lavaan</code>:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb4"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb4-1"><a href="#cb4-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lavaan</span>(<span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>), <span class="at">data =</span> my_panel)</span>
-<span id="cb4-2"><a href="#cb4-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit, <span class="at">standardized =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lavaan</span>(<span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>), <span class="at">data =</span> my_panel)</span>
+<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a><span class="fu">summary</span>(fit, <span class="at">standardized =</span> <span class="cn">TRUE</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
 </section>
 <section id="simulation-quick-reference" class="level2" data-number="1.5">
 <h2 data-number="1.5" class="anchored" data-anchor-id="simulation-quick-reference"><span class="header-section-number">1.5</span> Simulation Quick Reference</h2>
+<p><code>simFromSyntax()</code> takes the same arguments as <code>estimate*()</code> plus true parameter values and sample size. It returns a wide-format data frame with columns <code>x1, …, xT, y1, …, yT</code>. For example:</p>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb5"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb5-1"><a href="#cb5-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CLPM with two waves</span></span>
-<span id="cb5-2"><a href="#cb5-2" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">simCLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">beta_x =</span> <span class="fl">0.5</span>, <span class="at">beta_y =</span> <span class="fl">0.5</span>,</span>
-<span id="cb5-3"><a href="#cb5-3" aria-hidden="true" tabindex="-1"></a>               <span class="at">omega_xy =</span> <span class="fl">0.2</span>, <span class="at">omega_yx =</span> <span class="fl">0.1</span>,</span>
-<span id="cb5-4"><a href="#cb5-4" aria-hidden="true" tabindex="-1"></a>               <span class="at">sample.nobs =</span> <span class="dv">1000</span>)</span>
-<span id="cb5-5"><a href="#cb5-5" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-6"><a href="#cb5-6" aria-hidden="true" tabindex="-1"></a><span class="co"># RI-CLPM with traits</span></span>
-<span id="cb5-7"><a href="#cb5-7" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">simRICLPM</span>(<span class="at">waves =</span> <span class="dv">4</span>, <span class="at">beta_x =</span> <span class="fl">0.3</span>, <span class="at">beta_y =</span> <span class="fl">0.3</span>,</span>
-<span id="cb5-8"><a href="#cb5-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">omega_xy =</span> <span class="fl">0.2</span>, <span class="at">omega_yx =</span> <span class="fl">0.1</span>,</span>
-<span id="cb5-9"><a href="#cb5-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">var_BX =</span> <span class="dv">1</span>, <span class="at">var_BY =</span> <span class="dv">1</span>,</span>
-<span id="cb5-10"><a href="#cb5-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sample.nobs =</span> <span class="dv">1000</span>)</span>
-<span id="cb5-11"><a href="#cb5-11" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-12"><a href="#cb5-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Latent change</span></span>
-<span id="cb5-13"><a href="#cb5-13" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">simLChange</span>(<span class="at">waves =</span> <span class="dv">5</span>, <span class="at">variable_type =</span> <span class="st">"bivariate"</span>,</span>
-<span id="cb5-14"><a href="#cb5-14" aria-hidden="true" tabindex="-1"></a>                  <span class="at">beta_x =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">beta_y =</span> <span class="sc">-</span><span class="fl">0.5</span>,</span>
-<span id="cb5-15"><a href="#cb5-15" aria-hidden="true" tabindex="-1"></a>                  <span class="at">omega_x =</span> <span class="fl">0.3</span>, <span class="at">omega_y =</span> <span class="fl">0.3</span>,</span>
-<span id="cb5-16"><a href="#cb5-16" aria-hidden="true" tabindex="-1"></a>                  <span class="at">sample.nobs =</span> <span class="dv">1000</span>)</span>
-<span id="cb5-17"><a href="#cb5-17" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb5-18"><a href="#cb5-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Wide tibble: id, x1..xT, y1..yT</span></span>
-<span id="cb5-19"><a href="#cb5-19" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(sim<span class="sc">$</span>data, <span class="at">list.len =</span> <span class="dv">6</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="co"># CLPM with 4 waves</span></span>
+<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">simFromSyntax</span>(<span class="st">"CLPM"</span>, <span class="at">waves =</span> <span class="dv">4</span>, <span class="at">sample_size =</span> <span class="dv">1000</span>,</span>
+<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ar_x =</span> <span class="fl">0.5</span>, <span class="at">ar_y =</span> <span class="fl">0.5</span>,</span>
+<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>                     <span class="at">cl_xy =</span> <span class="fl">0.2</span>, <span class="at">cl_yx =</span> <span class="fl">0.1</span>)</span>
+<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a><span class="co"># RI-CLPM with between-person trait variance</span></span>
+<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">simFromSyntax</span>(<span class="st">"RICLPM"</span>, <span class="at">waves =</span> <span class="dv">4</span>, <span class="at">sample_size =</span> <span class="dv">1000</span>,</span>
+<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ar_x =</span> <span class="fl">0.3</span>, <span class="at">ar_y =</span> <span class="fl">0.3</span>,</span>
+<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                     <span class="at">cl_xy =</span> <span class="fl">0.2</span>, <span class="at">cl_yx =</span> <span class="fl">0.1</span>,</span>
+<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                     <span class="at">var_between_x =</span> <span class="dv">1</span>, <span class="at">var_between_y =</span> <span class="dv">1</span>)</span>
+<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Latent change</span></span>
+<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">simFromSyntax</span>(<span class="st">"LCHANGE"</span>, <span class="at">waves =</span> <span class="dv">5</span>, <span class="at">sample_size =</span> <span class="dv">1000</span>,</span>
+<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ar_x =</span> <span class="sc">-</span><span class="fl">0.5</span>, <span class="at">ar_y =</span> <span class="sc">-</span><span class="fl">0.5</span>,</span>
+<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a>                     <span class="at">cl_xy =</span> <span class="fl">0.3</span>, <span class="at">cl_yx =</span> <span class="fl">0.3</span>,</span>
+<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a>                     <span class="at">estimator_args =</span> <span class="fu">list</span>(<span class="at">variable_type =</span> <span class="st">"bivariate"</span>))</span>
+<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a><span class="co"># Wide data frame: x1..xT, y1..yT</span></span>
+<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a><span class="fu">str</span>(dat)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 </div>
-<p>The wide-format output is what every <code>estimate*()</code> expects when fed to <code>lavaan</code>. A long-format helper <code>reshape_long_sim_cr()</code> is available for plotting, but generally the convention here is to keep the data in wide format.</p>
+<p>The wide-format output is what every <code>estimate*()</code> expects when fed to <code>lavaan</code>.</p>
 </section>
-<section id="quick" class="level2" data-number="1.6">
-<h2 data-number="1.6" class="anchored" data-anchor-id="quick"><span class="header-section-number">1.6</span> Quick</h2>
+<section id="quick-example" class="level2" data-number="1.6">
+<h2 data-number="1.6" class="anchored" data-anchor-id="quick-example"><span class="header-section-number">1.6</span> Quick Example</h2>
 <div class="cell">
-<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb6"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb6-1"><a href="#cb6-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
-<span id="cb6-2"><a href="#cb6-2" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-3"><a href="#cb6-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate from an RI-CLPM</span></span>
-<span id="cb6-4"><a href="#cb6-4" aria-hidden="true" tabindex="-1"></a>sim <span class="ot">&lt;-</span> <span class="fu">simRICLPM</span>(<span class="at">waves       =</span> <span class="dv">5</span>,</span>
-<span id="cb6-5"><a href="#cb6-5" aria-hidden="true" tabindex="-1"></a>                 <span class="at">beta_x      =</span> <span class="fl">0.3</span>,</span>
-<span id="cb6-6"><a href="#cb6-6" aria-hidden="true" tabindex="-1"></a>                 <span class="at">beta_y      =</span> <span class="fl">0.3</span>,</span>
-<span id="cb6-7"><a href="#cb6-7" aria-hidden="true" tabindex="-1"></a>                 <span class="at">omega_xy    =</span> <span class="fl">0.2</span>,</span>
-<span id="cb6-8"><a href="#cb6-8" aria-hidden="true" tabindex="-1"></a>                 <span class="at">omega_yx    =</span> <span class="fl">0.1</span>,</span>
-<span id="cb6-9"><a href="#cb6-9" aria-hidden="true" tabindex="-1"></a>                 <span class="at">var_BX      =</span> <span class="dv">1</span>,</span>
-<span id="cb6-10"><a href="#cb6-10" aria-hidden="true" tabindex="-1"></a>                 <span class="at">var_BY      =</span> <span class="dv">1</span>,</span>
-<span id="cb6-11"><a href="#cb6-11" aria-hidden="true" tabindex="-1"></a>                 <span class="at">sample.nobs =</span> <span class="dv">1000</span>)</span>
-<span id="cb6-12"><a href="#cb6-12" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-13"><a href="#cb6-13" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the RI-CLPM</span></span>
-<span id="cb6-14"><a href="#cb6-14" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lavaan</span>(<span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>), <span class="at">data =</span> sim<span class="sc">$</span>data)</span>
-<span id="cb6-15"><a href="#cb6-15" aria-hidden="true" tabindex="-1"></a></span>
-<span id="cb6-16"><a href="#cb6-16" aria-hidden="true" tabindex="-1"></a><span class="co"># Pull just the AR and CL parameters</span></span>
-<span id="cb6-17"><a href="#cb6-17" aria-hidden="true" tabindex="-1"></a><span class="fu">parameterEstimates</span>(fit) <span class="sc">|&gt;</span></span>
-<span id="cb6-18"><a href="#cb6-18" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(label <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"ar_x"</span>, <span class="st">"ar_y"</span>, <span class="st">"cl_xy"</span>, <span class="st">"cl_yx"</span>)) <span class="sc">|&gt;</span></span>
-<span id="cb6-19"><a href="#cb6-19" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(label, est, se, pvalue) <span class="sc">|&gt;</span></span>
-<span id="cb6-20"><a href="#cb6-20" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<div class="code-copy-outer-scaffold"><div class="sourceCode cell-code" id="cb7"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb7-1"><a href="#cb7-1" aria-hidden="true" tabindex="-1"></a><span class="fu">set.seed</span>(<span class="dv">2026</span>)</span>
+<span id="cb7-2"><a href="#cb7-2" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-3"><a href="#cb7-3" aria-hidden="true" tabindex="-1"></a><span class="co"># Simulate from an RI-CLPM</span></span>
+<span id="cb7-4"><a href="#cb7-4" aria-hidden="true" tabindex="-1"></a>dat <span class="ot">&lt;-</span> <span class="fu">simFromSyntax</span>(<span class="st">"RICLPM"</span>, <span class="at">waves =</span> <span class="dv">5</span>, <span class="at">sample_size =</span> <span class="dv">1000</span>,</span>
+<span id="cb7-5"><a href="#cb7-5" aria-hidden="true" tabindex="-1"></a>                     <span class="at">ar_x =</span> <span class="fl">0.3</span>, <span class="at">ar_y =</span> <span class="fl">0.3</span>,</span>
+<span id="cb7-6"><a href="#cb7-6" aria-hidden="true" tabindex="-1"></a>                     <span class="at">cl_xy =</span> <span class="fl">0.2</span>, <span class="at">cl_yx =</span> <span class="fl">0.1</span>,</span>
+<span id="cb7-7"><a href="#cb7-7" aria-hidden="true" tabindex="-1"></a>                     <span class="at">var_between_x =</span> <span class="dv">1</span>, <span class="at">var_between_y =</span> <span class="dv">1</span>)</span>
+<span id="cb7-8"><a href="#cb7-8" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-9"><a href="#cb7-9" aria-hidden="true" tabindex="-1"></a><span class="co"># Fit the RI-CLPM</span></span>
+<span id="cb7-10"><a href="#cb7-10" aria-hidden="true" tabindex="-1"></a>fit <span class="ot">&lt;-</span> <span class="fu">lavaan</span>(<span class="fu">estimateRICLPM</span>(<span class="at">waves =</span> <span class="dv">5</span>), <span class="at">data =</span> dat)</span>
+<span id="cb7-11"><a href="#cb7-11" aria-hidden="true" tabindex="-1"></a></span>
+<span id="cb7-12"><a href="#cb7-12" aria-hidden="true" tabindex="-1"></a><span class="co"># Pull just the AR and CL parameters</span></span>
+<span id="cb7-13"><a href="#cb7-13" aria-hidden="true" tabindex="-1"></a><span class="fu">parameterEstimates</span>(fit) <span class="sc">|&gt;</span></span>
+<span id="cb7-14"><a href="#cb7-14" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">filter</span>(label <span class="sc">%in%</span> <span class="fu">c</span>(<span class="st">"ar_x"</span>, <span class="st">"ar_y"</span>, <span class="st">"cl_xy"</span>, <span class="st">"cl_yx"</span>)) <span class="sc">|&gt;</span></span>
+<span id="cb7-15"><a href="#cb7-15" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">select</span>(label, est, se, pvalue) <span class="sc">|&gt;</span></span>
+<span id="cb7-16"><a href="#cb7-16" aria-hidden="true" tabindex="-1"></a>  dplyr<span class="sc">::</span><span class="fu">mutate</span>(<span class="fu">across</span>(<span class="fu">where</span>(is.numeric), \(x) <span class="fu">round</span>(x, <span class="dv">3</span>)))</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <div class="cell-output cell-output-stdout">
 <pre><code>   label   est    se pvalue
-1   ar_x 0.341 0.025      0
-2  cl_yx 0.114 0.021      0
-3   ar_y 0.290 0.024      0
-4  cl_xy 0.195 0.021      0
-5   ar_x 0.341 0.025      0
-6  cl_yx 0.114 0.021      0
-7   ar_y 0.290 0.024      0
-8  cl_xy 0.195 0.021      0
-9   ar_x 0.341 0.025      0
-10 cl_yx 0.114 0.021      0
-11  ar_y 0.290 0.024      0
-12 cl_xy 0.195 0.021      0
-13  ar_x 0.341 0.025      0
-14 cl_yx 0.114 0.021      0
-15  ar_y 0.290 0.024      0
-16 cl_xy 0.195 0.021      0</code></pre>
+1   ar_x 0.292 0.026      0
+2  cl_yx 0.093 0.021      0
+3   ar_y 0.288 0.025      0
+4  cl_xy 0.212 0.021      0
+5   ar_x 0.292 0.026      0
+6  cl_yx 0.093 0.021      0
+7   ar_y 0.288 0.025      0
+8  cl_xy 0.212 0.021      0
+9   ar_x 0.292 0.026      0
+10 cl_yx 0.093 0.021      0
+11  ar_y 0.288 0.025      0
+12 cl_xy 0.212 0.021      0
+13  ar_x 0.292 0.026      0
+14 cl_yx 0.093 0.021      0
+15  ar_y 0.288 0.025      0
+16 cl_xy 0.212 0.021      0</code></pre>
 </div>
 </div>
-<p>The same labels (<code>ar_x</code>, <code>cl_yx</code>, …) will appear in the <code>parameterEstimates()</code> output regardless of which <code>estimate*()</code> function generated the syntax — that’s what makes the unified framing useful when comparing estimators on the same data.</p>
 </section>
 <section id="help-and-documentation" class="level2" data-number="1.7">
 <h2 data-number="1.7" class="anchored" data-anchor-id="help-and-documentation"><span class="header-section-number">1.7</span> Help and Documentation</h2>
-<p>Every exported function has a roxygen-generated help page. The usual access:</p>
-<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb8"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb8-1"><a href="#cb8-1" aria-hidden="true" tabindex="-1"></a>?estimateRICLPM</span>
-<span id="cb8-2"><a href="#cb8-2" aria-hidden="true" tabindex="-1"></a>?simLChange</span>
-<span id="cb8-3"><a href="#cb8-3" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(<span class="at">package =</span> <span class="st">"crossLagR"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
+<p>Every exported function has a roxygen-generated help page. The usual:</p>
+<div class="code-copy-outer-scaffold"><div class="sourceCode" id="cb9"><pre class="sourceCode r code-with-copy"><code class="sourceCode r"><span id="cb9-1"><a href="#cb9-1" aria-hidden="true" tabindex="-1"></a>?estimateRICLPM</span>
+<span id="cb9-2"><a href="#cb9-2" aria-hidden="true" tabindex="-1"></a>?simFromSyntax</span>
+<span id="cb9-3"><a href="#cb9-3" aria-hidden="true" tabindex="-1"></a><span class="fu">help</span>(<span class="at">package =</span> <span class="st">"crossLagR"</span>)</span></code></pre></div><button title="Copy to Clipboard" class="code-copy-button"><i class="bi"></i></button></div>
 <p>Source code is on GitHub at <a href="https://github.com/crweber9874/crossLagR" class="uri">https://github.com/crweber9874/crossLagR</a>; issues and feature requests welcome.</p>
 
 
